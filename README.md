@@ -40,4 +40,4 @@ The **Training Room** (title screen) has spawnable dummies, hitbox and frame-dat
 | M14 | Platforms and vertical layers (optional) | Planned |
 | M15 | Polish, audio, balance, release | Planned |
 
-Each finished milestone is tagged (`m0`…), so any earlier version can be checked out or restored.
+Each finished milestone gets its own branch (`m5`, `m6`, …) pointing at that version, so any milestone can be played, compared or restored.
