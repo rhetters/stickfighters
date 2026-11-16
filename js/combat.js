@@ -654,7 +654,7 @@ function sep() {
     }
   }
 }
-// Ground height as a function of x: flat today; M15 (platforms, stairs) changes only this.
+// Ground height as a function of x: flat today; M14 (platforms, stairs) changes only this.
 const groundY = x => G;
 function phys(f) {
   if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav;

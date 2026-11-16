@@ -19,7 +19,7 @@ This is the destination, not a promise to build it all soon.
 4. **Local multiplayer on the TV.** An iPad mirrored or wired to the TV, Bluetooth controllers, and a "press any button to join" screen.
 5. **Network multiplayer.** Each kid on their own iPad over home Wi-Fi, for co-op and versus.
 6. **Ninja star economy.** Enemies drop ninja stars that buy cosmetics only, in a store organized by slot (head, shoes and so on). Purchases are saved, equipped in Character Creation, and visible to other players.
-7. **XP and skill tree** (roadmap M9).
+7. **XP and skill tree** (roadmap M10).
 8. **House builder.** A grid where you drag out walls (charged in stars per square), add backgrounds, furniture and decorations, then invite friends to visit.
 9. **Level creator** for Rhett. Its levels are playable directly and can join the procedural pools.
 10. **Depth in 2D.** Parallax layers (foreground trees, far mountains, fighters in between) in the paper style.
@@ -42,17 +42,6 @@ Cheap to follow now, expensive to add later.
 | R9 | **The world isn't one screen.** A camera and world bounds arrive in M8 instead of hard-coded `W` everywhere. | Scrolling levels, co-op cameras, big arenas, houses. |
 | R10 | **Touch first.** Every feature needs an iPad touch path, and every menu also works with a controller. | The kids play on iPads and the TV. |
 
-## Proposed milestone order (awaiting Ron and Rhett)
+## Milestone order (approved November 16, 2026)
 
-Suggested by the restructure handoff; nothing is renumbered until it's approved. See ROADMAP.md for the current plan.
-
-1. M7.5 Restructure (done).
-2. M8 Level framework built around R1 and R9: modes, camera and world bounds, levels as ordered lists of chunks, parallax layers, the wave game moved into an Arcade mode.
-3. Per-player refactor (R4, R5), then local multiplayer: TV and controllers, join lobby, Versus in a fixed arena, local co-op.
-4. XP and skill tree.
-5. Economy: ninja stars, cosmetic store by slot, Character Creation equipping, versioned save, Back up / Restore.
-6. More biomes, themes, bosses and platforms as data, plus the procedural run generator.
-7. Level creator.
-8. Network multiplayer on home Wi-Fi (co-op first, then versus).
-9. House builder, then house visiting.
-10. Someday: cloud saves, Steam.
+M8 level framework and modes → M9 local multiplayer (TV, controllers, versus, co-op) → M10 XP and skill tree → M11 ninja stars, cosmetic store and character creation → M12 levels 2–5 and procedural runs → M13 boss → M14 platforms (optional) → M15 polish and v1.0 → M16 level creator → M17 network multiplayer → M18 house builder → someday cloud saves and Steam. Details in [ROADMAP.md](ROADMAP.md).

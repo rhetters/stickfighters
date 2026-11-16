@@ -167,7 +167,7 @@ function addPlayer() {
   const p = mkPlayer(W / 2 - 90, 1, '#2fb5ff', '#1d86c4');
   PL.push(p);
   return p;
-} // M12 (multiplayer) calls this when a second player joins
+} // M9 (multiplayer) calls this when a second player joins
 function tgt(e) {
   let b = null,
     bd = 1e9;

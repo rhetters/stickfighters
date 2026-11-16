@@ -2,6 +2,10 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Roadmap reorder (November 16, 2026)
+- Approved by Ron and Rhett: local multiplayer moves up to M9; XP and skill tree M10; ninja stars, cosmetic store and character creation merged into M11 (store items are cosmetic only); new milestones for the level creator (M16), network play (M17) and the house builder (M18). Old-to-new numbers are in ROADMAP.md.
+- Rhett checked M7.5 on his iPad: all good.
+
 ## M7.5 · Restructure (no gameplay changes)
 - Code split from one `index.html` into `css/style.css` and 15 scripts under `js/`, then reformatted. Cut and paste only.
 - `?selftest` determinism check added. Fingerprint `39f01735`, unchanged through the split, reformat and comment fixes.

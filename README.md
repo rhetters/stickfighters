@@ -4,7 +4,7 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Play:** https://rhetters.github.io/stickfighters/
 
-**Status:** M0–M7 done, plus the M7.5 restructure. Next: M8, the level framework and Level 1: Wooded Trail. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Status:** M0–M7 done, plus the M7.5 restructure. Next: M8, the level framework and Level 1: Wooded Trail, then M9 local multiplayer (versus and co-op on the TV). Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Controls
 
