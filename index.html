@@ -931,7 +931,7 @@ function render(){
  for(const e of E)drawF(e);
  for(const p of PL){use(p);
   if(K.s&&live()&&P.st!=='dead'&&!STM.winded){const pul=.45+.2*Math.sin(fr*.4);drawFig(P.x,P.y,P.face,P.pose,P.s,'#ffd400','#ffd400',P.pose[9],pul,17);
-   if(fr%4===0)fxp({k:'d',x:P.x+(rnd()-.5)*30,y:P.y-rnd()*70,vx:0,vy:-1.4,r:2+rnd()*2,l:16,m:16,c:'#ffd400'})}
+   if(fr%4===0)fxp({k:'d',x:P.x+(Math.random()-.5)*30,y:P.y-Math.random()*70,vx:0,vy:-1.4,r:2+Math.random()*2,l:16,m:16,c:'#ffd400'})}
   drawF(P)}
  use(PL[0]);
  for(const x of FX)drawFX(x);
@@ -1138,7 +1138,25 @@ function loop(now){
  if(portraitMQ.matches&&live())pause(true);
  if(!paused){acc+=dt*(state==='train'?TR.ts:1);while(acc>=16.67){acc-=16.67;tick()}}
  render();requestAnimationFrame(loop)}
+// ===== SELF-TEST: open the game with ?selftest to check the simulation is deterministic =====
+// Runs a fixed seed with scripted inputs and no drawing, then prints a fingerprint (hash) of the game state.
+// The hash must be identical before and after any refactor. Cosmetic effects (FX) are not part of the hash.
+function selfTest(n){n=n||3600;const keep={feel:{...FEEL},surge:SET.surge,vol:SET.vol};Object.assign(FEEL,FEELDEF);SET.surge='hold';SET.vol=0;
+ releaseAll();reseed(20261116);fr=0;init();state='play';nextWave();PL[0].hp=PL[0].max=1e6;
+ const seq='rrrrpprrkkjjllppkkuuppddkksrsrsppkkllrrjjpkpkuukk';
+ const step=i=>{const a=seq[(i>>4)%seq.length],on=(i&15)<10;for(const b of ACT)setA('kb',b,b===a&&on,0);fr++;update()};
+ for(let i=0;i<n;i++)step(i);
+ for(const t of['u','f','c']){const e=F(t==='f'?120:700,t,0);e.y=G;E.push(e)}
+ for(let i=n;i<n+1800;i++)step(i);
+ for(const b of ACT)setA('kb',b,0,0);
+ const r=v=>typeof v==='number'?Math.round(v*1000)/1000:v,fx=f=>[f.tk||'P',r(f.x),r(f.y),r(f.vx),r(f.vy),r(f.hp),f.st,r(f.poise),r(f.gm),f.face];
+ const snap=JSON.stringify({fr,SEED,wave,score,maxc,q:queue.length,P:PL.map(p=>fx(p).concat([r(p.stm.v)])),E:E.map(fx)});
+ let h=2166136261;for(let i=0;i<snap.length;i++){h^=snap.charCodeAt(i);h=Math.imul(h,16777619)}
+ const res={hash:(h>>>0).toString(16).padStart(8,'0'),wave,score,enemies:E.length,ticks:n+1800};
+ Object.assign(FEEL,keep.feel);SET.surge=keep.surge;SET.vol=keep.vol;state='menu';init();return res}
 applySet();resize();bindSettings();syncTrain();openTitle();
+if(/[?&]selftest/.test(location.search)){const R=selfTest(),d=document.createElement('pre');d.id='selftest';d.textContent='SELFTEST '+R.hash+'  (ticks '+R.ticks+', wave '+R.wave+', score '+R.score+')';
+ d.style.cssText='position:fixed;left:8px;top:8px;z-index:99;background:#1c1626;color:#ffd400;padding:8px 12px;font:14px monospace;border-radius:6px';document.body.appendChild(d);console.log(d.textContent)}
 requestAnimationFrame(loop);
 
 </script>
