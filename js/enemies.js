@@ -32,13 +32,13 @@ function updE(e) {
   let tp = e.pose,
     k = 0.3;
   if (e.st === 'fly') {
-    if ((e.x < 26 && e.vx < 0) || (e.x > W - 26 && e.vx > 0)) {
+    if ((e.x < WB.l + 26 && e.vx < 0) || (e.x > WB.r - 26 && e.vx > 0)) {
       if (e.splat && Math.abs(e.vx) > 4) {
         if (e.dying) e.dk = 'slump';
         e.st = 'splat';
         e.dt = 22;
-        e.x = e.x < W / 2 ? 24 : W - 24;
-        e.face = e.x < W / 2 ? 1 : -1;
+        e.x = e.x < (WB.l + WB.r) / 2 ? WB.l + 24 : WB.r - 24;
+        e.face = e.x < (WB.l + WB.r) / 2 ? 1 : -1;
         e.vx = 0;
         e.vy = 0;
         e.splat = 0;
@@ -62,7 +62,7 @@ function updE(e) {
         if (e.dying) e.dk = 'legsup';
         e.vx *= e.dying ? -0.12 : -0.55;
         e.spv *= -0.7;
-        spark(e.x < W / 2 ? 26 : W - 26, e.y - 40, 18, '#ffd400');
+        spark(e.x < (WB.l + WB.r) / 2 ? WB.l + 26 : WB.r - 26, e.y - 40, 18, '#ffd400');
         shake = Math.max(shake, 4);
         sfx(80, 0.1, 'square', 0.06);
       }
@@ -238,7 +238,7 @@ const BOSSPH = {
       cd: 0.6,
       enter: e => {
         bn('CAPTAIN ENRAGED!');
-        for (const x of [60, W - 60]) {
+        for (const x of [WB.l + 60, WB.r - 60]) {
           if (state === 'play') {
             const m = F(x, 'g', 0);
             m.y = -70;
@@ -279,7 +279,7 @@ function bossThink(e, Q, T_, spd) {
   e.vx += ((dist > want ? Math.sign(Q.x - e.x) : 0) * spd - e.vx) * 0.15;
 }
 function spawn(t) {
-  const e = F(rnd() < 0.5 ? 50 + rnd() * 150 : W - 50 - rnd() * 150, t, 0);
+  const e = F(rnd() < 0.5 ? WB.l + 50 + rnd() * 150 : WB.r - 50 - rnd() * 150, t, 0);
   e.y = -70;
   E.push(e);
 }

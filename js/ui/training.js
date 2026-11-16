@@ -3,8 +3,8 @@
 const TR = { mortal: 0, inf: 0, boxes: 1, frames: 1, hist: 1, god: 1, passive: 1, ts: 1, freeze: 0, step: 0 };
 function spawnDummy(t) {
   if (state !== 'train' || E.filter(x => !x.gone && !x.dying).length >= 8) return;
-  const dir = P.x < W / 2 ? 1 : -1,
-    e = F(Math.max(60, Math.min(W - 60, P.x + dir * (150 + rnd() * 60))), t, 0);
+  const dir = P.x < (WB.l + WB.r) / 2 ? 1 : -1,
+    e = F(Math.max(WB.l + 60, Math.min(WB.r - 60, P.x + dir * (150 + rnd() * 60))), t, 0);
   if (!TR.mortal) e.hp = e.max = 9999;
   e.cd = 30;
   e.face = P.x > e.x ? 1 : -1;

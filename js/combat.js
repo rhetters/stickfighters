@@ -667,7 +667,7 @@ function phys(f) {
     f.y = gy;
     f.vy = 0;
   }
-  f.x = Math.max(24, Math.min(W - 24, f.x));
+  f.x = Math.max(WB.l + 24, Math.min(WB.r - 24, f.x));
   return imp;
 }
 function freePose(f) {

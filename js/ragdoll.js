@@ -130,11 +130,11 @@ function ragStep(R, s) {
         p.py = p.y + Math.max(0, vy) * 0.25;
         p.px = p.x - (p.x - p.px) * 0.7;
       } // floor: small bounce, friction
-      if (p.x < r) {
-        p.x = r;
+      if (p.x < WW.l + r) {
+        p.x = WW.l + r;
         p.px = p.x + (p.x - p.px) * 0.3;
-      } else if (p.x > W - r) {
-        p.x = W - r;
+      } else if (p.x > WW.r - r) {
+        p.x = WW.r - r;
         p.px = p.x + (p.x - p.px) * 0.3;
       }
     }
@@ -295,11 +295,11 @@ function corpseTick(f, dissolve) {
         R.set = 1;
         R.pt = 0;
         let k = f.dk || 'sprawl';
-        const nearWall = R.p[4].x < 110 || R.p[4].x > W - 110;
+        const nearWall = R.p[4].x < WB.l + 110 || R.p[4].x > WB.r - 110;
         if ((k === 'slump' || k === 'legsup') && !nearWall) k = 'sprawl';
-        const wallDir = R.p[4].x < W / 2 ? 1 : -1,
+        const wallDir = R.p[4].x < (WB.l + WB.r) / 2 ? 1 : -1,
           dir = k === 'slump' || k === 'legsup' ? wallDir : f.ddir || f.face || 1,
-          ax = k === 'slump' || k === 'legsup' ? (wallDir > 0 ? 16 : W - 16) : R.p[4].x;
+          ax = k === 'slump' || k === 'legsup' ? (wallDir > 0 ? WB.l + 16 : WB.r - 16) : R.p[4].x;
         R.tpl = DPOSE[k].map(([x, y]) => ({ x: ax + x * dir * f.s, y: G + y * f.s }));
         R.pose = k;
         if (state === 'train') txt(R.p[4].x, G - 70, DPNAME[k], '#7a6e80', 14);

@@ -321,7 +321,7 @@ function update() {
   for (const e of E) {
     if (e.corpse) continue;
     if (!isFinite(e.x) || !isFinite(e.y)) {
-      e.x = W / 2;
+      e.x = (WB.l + WB.r) / 2;
       e.y = G;
       e.vx = e.vy = 0;
       e.st = 'down';
@@ -335,21 +335,7 @@ function update() {
       }
     } else e.ft = 0;
   } // safety net: nothing stays stuck
-  if (PL.some(p => p.st !== 'dead') && state === 'play') {
-    if (queue.length && --spawnT <= 0 && E.filter(e => !e.dying).length < Math.min(8, 4 + (wave >> 1))) {
-      spawn(queue.shift());
-      spawnT = 45;
-    }
-    if (!queue.length && !E.some(e => !e.dying)) {
-      if (!cl) {
-        cl = 110;
-        bn('WAVE CLEAR!');
-        for (const p of PL) if (p.st !== 'dead') p.hp = Math.min(p.max, p.hp + 30);
-        score += wave * 50;
-        sfx(600, 0.3, 'square', 0.05, 400);
-      } else if (--cl <= 0) nextWave();
-    }
-  }
+  if (PL.some(p => p.st !== 'dead') && state === 'play') MODE.update();
   for (const x of FX) {
     x.l--;
     if (x.k === 'sh') {
@@ -446,6 +432,7 @@ function loop(now) {
   render();
   requestAnimationFrame(loop);
 }
+init();
 applySet();
 resize();
 bindSettings();

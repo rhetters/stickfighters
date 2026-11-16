@@ -45,6 +45,11 @@ const cv = document.getElementById('c'),
   G = 345,
   D = Math.PI / 180,
   INK = '#1c1626';
+// World (M8). CAM.x = world x of the screen's left edge. WB = walls for living fighters (the screen, or a gate such
+// as the fallen log). WW = the whole world's edges, used by ragdolls. In Arcade and Training all three are the screen.
+const CAM = { x: 0 },
+  WB = { l: 0, r: W },
+  WW = { l: 0, r: W };
 // Feel knobs (training room > Feel). Saved per device.
 const FEEL = { hitstop: 1, shake: 1, kb: 1, grav: 1, bounce: 1, body: 2.5 }; // body = seconds a settled body stays before the confetti
 let NB;

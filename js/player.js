@@ -183,6 +183,9 @@ function tgt(e) {
 }
 function init() {
   wave = 0;
+  CAM.x = WB.l = WW.l = 0;
+  WB.r = WW.r = W;
+  MODE = ARCADE;
   PL = [mkPlayer(W / 2, 0)];
   use(PL[0]);
   camX = camY = 0;
@@ -195,7 +198,6 @@ function init() {
   queue = [];
   spawnT = 0;
 }
-init();
 // ===== PLAYER =====
 function updP() {
   const f = P;

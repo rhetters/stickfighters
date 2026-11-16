@@ -531,6 +531,7 @@ function render() {
   ctx.scale(1 + zoom * cm, 1 + zoom * cm);
   ctx.translate(-W / 2, -H / 2);
   bg();
+  ctx.translate(-CAM.x, 0);
   for (const f of [...PL, ...E]) {
     const s = f.s * 16 * Math.max(0.4, 1 - (G - f.y) / 400);
     ctx.fillStyle = 'rgba(0,0,0,.14)';
@@ -565,6 +566,8 @@ function render() {
   use(PL[0]);
   for (const x of FX) drawFX(x);
   if (state === 'train' && TR.boxes) drawBoxes();
+  ctx.translate(CAM.x, 0);
+  if (MODE.fg) MODE.fg();
   ctx.restore();
   if (state !== 'menu') hud();
   debugUI();
