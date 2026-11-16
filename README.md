@@ -1,8 +1,10 @@
 # Orange vs. the Pink Army
 
-A stick-figure beat-'em-up: you're the orange fighter holding off waves of the pink army. Built as one self-contained HTML page (no build step, no dependencies), so GitHub Pages serves `index.html` as-is.
+A stick-figure beat-'em-up: you're the orange fighter holding off waves of the pink army. Plain HTML, CSS and JavaScript with no build step, so GitHub Pages serves it as-is.
 
-**Play:** https://rhetters.github.io/stickfighters/ (once Pages is enabled: Settings → Pages → Deploy from a branch → `main` / root)
+**Play:** https://rhetters.github.io/stickfighters/
+
+**Status:** M0–M7 done, plus the M7.5 restructure. Next: M8, the level framework and Level 1: Wooded Trail. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Controls
 
@@ -34,26 +36,17 @@ The **Training Room** (title screen) has spawnable dummies, hitbox and frame-dat
 
 Only a few enemies attack at once; the rest circle at a distance waiting their turn. Surge-phasing through one confuses it (?!) and then it chases faster.
 
-## Milestones
+## Test checklist (iPad and a keyboard computer)
 
-| ID | Milestone | Status |
-| --- | --- | --- |
-| M0 | Foundation, training room, game shell | Done |
-| M1 | Input system, mobile/iPad controls | Done |
-| M2 | Combat engine, directional combos | Done |
-| M3 | Surge (stamina) system | Done |
-| M4 | Collision and impact feel, grab and throw | Done |
-| M5 | Ragdoll, death poses, cleanup | Done |
-| M6 | Custom touch layout (drag, resize, profiles) | Done |
-| M7 | Enemy AI and roster v2 (Guard, Flanker, Captain boss) | Done |
-| M8 | Level framework, Level 1: Wooded Trail | Next |
-| M9 | XP, levels, skill tree | Planned |
-| M10 | Ninja stars, items, shop | Planned |
-| M11 | Character creation | Planned |
-| M12 | Multiplayer: co-op and versus | Planned |
-| M13 | Levels 2–5 | Planned |
-| M14 | Boss level | Planned |
-| M15 | Platforms and vertical layers (optional) | Planned |
-| M16 | Polish, audio, balance, release | Planned |
+- Title screen shows your best score; Settings keep their values after a reload.
+- Custom touch layouts still appear, and drag, resize, save and delete work.
+- Combos from each Move List section (A–G), Surge moves, Winded, grab and all four throws, Tornado Kick.
+- A Guard breaking, a Flanker leap, a Captain on wave 5 (enrages at about half health).
+- Ragdolls, death poses, confetti cleanup.
+- Training Room: spawn 1–6, hitboxes, frame data, speeds, freeze/step, Feel / Moves / Info.
+- Gamepad works; rotate-to-landscape prompt; the game pauses when you switch apps.
+- For developers: `index.html?selftest` shows the fingerprint in docs/ARCHITECTURE.md.
 
-Each finished milestone gets its own branch (`m5`, `m6`, …) pointing at that version, so any milestone can be played, compared or restored.
+## For developers
+
+Read [CLAUDE.md](CLAUDE.md) first. [docs/VISION.md](docs/VISION.md) has where the game is headed and the architecture rules, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) the file map, [docs/CHANGELOG.md](docs/CHANGELOG.md) the history. Each finished milestone has its own branch (`m5`, `m6`, `m7`, …) so any version can be played, compared or restored.
