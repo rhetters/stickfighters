@@ -17,6 +17,8 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 | Tornado Kick (blue meter full) | U | ULT | Y |
 | Pause | Esc or P | II | Start |
 
+**Touch layout:** Settings → Touch layout → **Customize** lets you drag every button and the stick where you want them, resize them, and save named layouts (Default and Left-handed are built in).
+
 The **Training Room** (title screen) has spawnable dummies, hitbox and frame-data overlays, a move list with every combo (**M**), and live feel tuning (**T**): hit-stop, screen shake, knockback, gravity, bounce and how long bodies stay.
 
 ## Milestones
@@ -29,15 +31,16 @@ The **Training Room** (title screen) has spawnable dummies, hitbox and frame-dat
 | M3 | Surge (stamina) system | Done |
 | M4 | Collision and impact feel, grab and throw | Done |
 | M5 | Ragdoll, death poses, cleanup | Done |
-| M6 | Enemy AI and roster v2 | Next |
-| M7 | Level framework, Level 1: Wooded Trail | Planned |
-| M8 | XP, levels, skill tree | Planned |
-| M9 | Ninja stars, items, shop | Planned |
-| M10 | Character creation | Planned |
-| M11 | Multiplayer: co-op and versus | Planned |
-| M12 | Levels 2–5 | Planned |
-| M13 | Boss level | Planned |
-| M14 | Platforms and vertical layers (optional) | Planned |
-| M15 | Polish, audio, balance, release | Planned |
+| M6 | Custom touch layout (drag, resize, profiles) | Done |
+| M7 | Enemy AI and roster v2 | Next |
+| M8 | Level framework, Level 1: Wooded Trail | Planned |
+| M9 | XP, levels, skill tree | Planned |
+| M10 | Ninja stars, items, shop | Planned |
+| M11 | Character creation | Planned |
+| M12 | Multiplayer: co-op and versus | Planned |
+| M13 | Levels 2–5 | Planned |
+| M14 | Boss level | Planned |
+| M15 | Platforms and vertical layers (optional) | Planned |
+| M16 | Polish, audio, balance, release | Planned |
 
 Each finished milestone gets its own branch (`m5`, `m6`, …) pointing at that version, so any milestone can be played, compared or restored.

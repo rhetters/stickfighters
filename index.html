@@ -34,17 +34,33 @@ canvas{width:100%;aspect-ratio:900/420;height:auto;display:block}
 #touch{position:absolute;inset:0;z-index:3;display:none;pointer-events:none;opacity:var(--to)}
 .touch-on #touch{display:block}
 #touch>*{pointer-events:auto;touch-action:none}
-#stick{z-index:1;position:absolute;left:calc(12px + env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));width:calc(min(156px,var(--wh)*.37)*var(--ts));height:calc(min(156px,var(--wh)*.37)*var(--ts));border-radius:50%;border:3px solid #1c1626;background:rgba(255,248,238,.6)}
+#stick{z-index:1;position:absolute;left:12px;top:60%;width:150px;height:150px;border-radius:50%;border:3px solid #1c1626;background:rgba(255,248,238,.6)}
 #stick i{position:absolute;left:50%;transform:translateX(-50%);font-style:normal;font-size:12px;font-weight:900;color:#1c1626;opacity:.6}
 #stick .zu{top:4px}#stick .zd{bottom:4px}
 #knob{position:absolute;left:50%;top:50%;width:46%;height:46%;margin:-23% 0 0 -23%;border-radius:50%;background:#ff7a00;border:3px solid #1c1626}
-#btns{position:absolute;right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,calc(max(52px,min(72px,var(--wh)*.172))*var(--ts)));grid-auto-rows:calc(max(52px,min(72px,var(--wh)*.172))*var(--ts));gap:calc(min(8px,var(--wh)*.015)*var(--ts));grid-template-areas:". ult jump" "surge punch kick";pointer-events:none}
-.mirror #stick{left:auto;right:calc(12px + env(safe-area-inset-right))}
-.mirror #btns{right:auto;left:calc(12px + env(safe-area-inset-left))}
-.tb{pointer-events:auto;border-radius:50%;border:3px solid #1c1626;background:rgba(255,248,238,.88);color:#1c1626;font:900 calc(max(9px,min(12px,var(--wh)*.028))*var(--ts)) "Trebuchet MS",sans-serif;padding:0;touch-action:none;cursor:pointer}
+#btns{position:absolute;inset:0;pointer-events:none}
+.tb{position:absolute;width:70px;height:70px;pointer-events:auto;border-radius:50%;border:3px solid #1c1626;background:rgba(255,248,238,.88);color:#1c1626;font:900 12px "Trebuchet MS",sans-serif;padding:0;touch-action:none;cursor:pointer}
 .tb.on{background:#ff7a00;color:#fff}
 .tb[data-a=s]{background:#ffe96b}.tb[data-a=s].on{background:#ffd400;color:#1c1626}
-.tb[data-a=x]{grid-area:ult}.tb[data-a=j]{grid-area:jump}.tb[data-a=s]{grid-area:surge}.tb[data-a=p]{grid-area:punch}.tb[data-a=k]{grid-area:kick}
+.editing #touch{display:block!important;opacity:1;background:rgba(28,22,38,.38)}
+.editing #touch [data-ctl]{outline:3px dashed rgba(255,255,255,.75);outline-offset:3px;cursor:grab}
+.editing #touch [data-ctl].sel{outline:4px solid #ffd400;outline-offset:4px}
+#rh{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:#ffd400;border:3px solid #1c1626;z-index:5;display:none;touch-action:none;cursor:nwse-resize;pointer-events:auto}
+#rh::after{content:"";position:absolute;inset:7px;border-right:3px solid #1c1626;border-bottom:3px solid #1c1626}
+.editing #rh.on{display:block}
+#layed{position:absolute;z-index:7;left:0;right:0;top:0;background:rgba(255,248,238,.97);border-bottom:3px solid #1c1626;color:#1c1626;padding:6px 8px;font:700 13px "Trebuchet MS",sans-serif;display:flex;flex-direction:column;gap:5px}
+#layed[hidden]{display:none}
+#layed .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#layed .row[hidden]{display:none}
+@media (max-height:500px){#layed{padding:4px 6px;gap:3px;font-size:12px}#layed button,#layed select,#layed input[type=text]{min-height:30px;padding:2px 8px}#layed .hint{display:none}}
+#layed button,#layed select,#layed input[type=text]{font:inherit;font-weight:900;border:2px solid #1c1626;border-radius:8px;background:#fff8ee;color:#1c1626;padding:5px 10px;min-height:36px}
+#layed button.pri{background:#ff7a00;color:#fff}#layed button.warn{background:#e8212b;color:#fff}
+#layed button:disabled{opacity:.4}
+#layed input[type=range]{width:min(160px,30vw)}
+#layed .hint{font-weight:400;opacity:.8}
+.layrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.layrow select{flex:1;min-width:110px}
+.layrow button{font:900 13px "Trebuchet MS",sans-serif;border:2px solid #1c1626;border-radius:6px;background:#ff7a00;color:#fff;padding:4px 10px;min-height:32px;cursor:pointer}
 #pausebtn{position:absolute;z-index:4;left:50%;top:11%;transform:translateX(-50%);width:40px;height:40px;border-radius:50%;border:3px solid #1c1626;background:rgba(255,248,238,.85);font:900 15px Impact,sans-serif;color:#1c1626;display:none;cursor:pointer;padding:0}
 .tchint{display:none}.touch-on .tchint{display:block}.touch-on .kbhint{display:none}
 .touch-on #pausebtn{width:44px;height:44px}
@@ -72,16 +88,23 @@ canvas{width:100%;aspect-ratio:900/420;height:auto;display:block}
 <div id="wrap">
 <canvas id="c" width="900" height="420" aria-label="Game canvas"></canvas>
 <div id="touch" oncontextmenu="return false">
- <div id="stick"><div id="knob"></div><i class="zu">&#9650;</i><i class="zd">&#9660;</i></div>
+ <div id="stick" data-ctl="stick"><div id="knob"></div><i class="zu">&#9650;</i><i class="zd">&#9660;</i></div>
  <div id="btns">
-  <button class="tb" data-a="x" tabindex="-1">ULT</button>
-  <button class="tb" data-a="j" tabindex="-1">JUMP</button>
-  <button class="tb" data-a="s" tabindex="-1">SURGE</button>
-  <button class="tb" data-a="p" tabindex="-1">PUNCH</button>
-  <button class="tb" data-a="k" tabindex="-1">KICK</button>
+  <button class="tb" data-a="x" data-ctl="x" tabindex="-1">ULT</button>
+  <button class="tb" data-a="j" data-ctl="j" tabindex="-1">JUMP</button>
+  <button class="tb" data-a="s" data-ctl="s" tabindex="-1">SURGE</button>
+  <button class="tb" data-a="p" data-ctl="p" tabindex="-1">PUNCH</button>
+  <button class="tb" data-a="k" data-ctl="k" tabindex="-1">KICK</button>
  </div>
+ <div id="rh" aria-label="Resize"></div>
 </div>
 <div id="moves" hidden></div>
+<div id="layed" hidden>
+ <div class="row"><b>Touch layout</b><select id="le-prof" aria-label="Layout profile"></select><button id="le-new">Save as new</button><button id="le-del">Delete</button></div>
+ <div class="row" id="le-namebox" hidden><input id="le-name" type="text" maxlength="16" placeholder="Name this layout" aria-label="Layout name"><button class="pri" id="le-name-ok">Create</button><button id="le-name-x">Back</button></div>
+ <div class="row"><span class="hint" id="le-hint">Drag a control to move it. Tap one, then drag the yellow corner (or the slider) to resize.</span></div>
+ <div class="row"><label>Size <input id="le-size" type="range" min="36" max="240" step="1" aria-label="Selected control size"></label><button id="le-reset">Default positions</button><button id="le-cancel">Cancel</button><button class="pri" id="le-save">Save layout</button></div>
+</div>
 <div id="feel" hidden></div>
 <button id="pausebtn" aria-label="Pause" tabindex="-1">II</button>
 <div id="ui">
@@ -109,7 +132,7 @@ canvas{width:100%;aspect-ratio:900/420;height:auto;display:block}
    <label for="o-touch">Touch controls</label><select id="o-touch"><option value="auto">Auto</option><option value="on">Always on</option><option value="off">Off</option></select>
    <label for="o-tsize">Touch size</label><input id="o-tsize" type="range" min="0.8" max="1.5" step="0.1">
    <label for="o-topac">Touch opacity</label><input id="o-topac" type="range" min="0.3" max="1" step="0.05">
-   <label for="o-mirror">Left-hand layout</label><input id="o-mirror" type="checkbox">
+   <label for="o-prof">Touch layout</label><div class="layrow"><select id="o-prof"></select><button id="o-edit">Customize</button></div>
    <label for="o-hist">Input display</label><input id="o-hist" type="checkbox">
    <label for="o-calm">Reduce screen shake</label><input id="o-calm" type="checkbox">
    <label for="o-seed">Seed (blank = random)</label><input id="o-seed" type="text" maxlength="12">
@@ -135,7 +158,7 @@ canvas{width:100%;aspect-ratio:900/420;height:auto;display:block}
 // ===== SETTINGS & SAVE (M0) =====
 const $=id=>document.getElementById(id);
 const SAVE_KEY='orangeArmy.v1';
-const DEF={vol:1,tsize:1,topac:.75,mirror:0,touch:'auto',hist:0,calm:0,seed:''};
+const DEF={vol:1,tsize:1,topac:.75,lay:null,touch:'auto',hist:0,calm:0,seed:''};
 let SET={...DEF},BEST={score:0,wave:0,combo:0},LAST=null;
 try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');if(s.set)Object.assign(SET,s.set);if(s.best)Object.assign(BEST,s.best)}catch(e){}
 const save=()=>{try{localStorage.setItem(SAVE_KEY,JSON.stringify({set:SET,best:BEST}))}catch(e){}};
@@ -185,11 +208,11 @@ function stickAt(e){const r=stick.getBoundingClientRect(),R=r.width/2;let dx=(e.
  knob.style.transform='translate('+dx*R*.5+'px,'+dy*R*.5+'px)';
  setA('tc','l',dx<-.3);setA('tc','r',dx>.3);setA('tc','u',dy<-.4);setA('tc','d',dy>.4)}
 function stickEnd(){sid=null;knob.style.transform='';for(const a of['l','r','u','d'])setA('tc',a,0)}
-stick.addEventListener('pointerdown',e=>{if(sid!==null)return;sid=e.pointerId;stick.setPointerCapture(e.pointerId);stickAt(e);e.preventDefault()});
+stick.addEventListener('pointerdown',e=>{if(EDITING())return;if(sid!==null)return;sid=e.pointerId;stick.setPointerCapture(e.pointerId);stickAt(e);e.preventDefault()});
 stick.addEventListener('pointermove',e=>{if(e.pointerId===sid)stickAt(e)});
 ['pointerup','pointercancel','lostpointercapture'].forEach(t=>stick.addEventListener(t,e=>{if(e.pointerId===sid)stickEnd()}));
 document.querySelectorAll('.tb').forEach(b=>{const a=b.dataset.a,ids=new Set();
- b.addEventListener('pointerdown',e=>{b.setPointerCapture(e.pointerId);ids.add(e.pointerId);setA('tc',a,1);b.classList.add('on');e.preventDefault()});
+ b.addEventListener('pointerdown',e=>{if(EDITING())return;b.setPointerCapture(e.pointerId);ids.add(e.pointerId);setA('tc',a,1);b.classList.add('on');e.preventDefault()});
  const off=e=>{ids.delete(e.pointerId);if(!ids.size){setA('tc',a,0);b.classList.remove('on')}};
  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>b.addEventListener(t,off))});
 // gamepad (standard mapping): stick/d-pad move+aim, A jump, X punch, B kick, bumpers/triggers Surge, Y ultimate, Start pause
@@ -858,6 +881,59 @@ function debugUI(){
    ctx.fillStyle=on?INK:'rgba(28,22,38,.6)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 10px "Trebuchet MS",sans-serif';
    ctx.fillText(a==='j'?'JMP':a==='x'?'ULT':a==='s'?'SRG':SYM[a],hx+14,yk+10);hx+=30}}
  ctx.restore()}
+// ===== TOUCH LAYOUT (M6): every control's centre (x, y) and size are fractions of the game area, so a layout fits any screen =====
+const CTL=['stick','x','j','s','p','k'],CTLNAME={stick:'Stick',x:'ULT',j:'JUMP',s:'SURGE',p:'PUNCH',k:'KICK'};
+const LDEF={stick:{x:.105,y:.785,s:.37},x:{x:.866,y:.716,s:.16},j:{x:.95,y:.716,s:.16},s:{x:.782,y:.894,s:.16},p:{x:.866,y:.894,s:.16},k:{x:.95,y:.894,s:.16}};
+const mirrorL=L=>Object.fromEntries(Object.entries(L).map(([k,c])=>[k,{...c,x:1-c.x}]));
+const BUILTIN={'Default':LDEF,'Left-handed':mirrorL(LDEF)};
+const LAY=SET.lay||{active:SET.mirror?'Left-handed':'Default',custom:{}};SET.lay=LAY;delete SET.mirror;   // older saves: Left-hand layout becomes the Left-handed profile
+const EDITING=()=>$('wrap').classList.contains('editing');
+const cloneL=L=>JSON.parse(JSON.stringify(L));
+function getProf(n){return BUILTIN[n]||LAY.custom[n]||LDEF}
+function saveLay(){SET.lay=LAY;save();fillProfiles()}
+function fillProfiles(){const names=[...Object.keys(BUILTIN),...Object.keys(LAY.custom)];if(!names.includes(LAY.active))LAY.active='Default';
+ for(const id of['o-prof','le-prof']){const el=$(id);el.innerHTML='';for(const n of names){const o=document.createElement('option');o.value=n;o.textContent=n+(BUILTIN[n]?' (built-in)':'');el.appendChild(o)}el.value=ED&&id==='le-prof'?ED.prof:LAY.active}}
+const ctlEl=id=>id==='stick'?$('stick'):document.querySelector('.tb[data-a='+id+']');
+function ctlPx(c,ww,wh,mn){const sz=Math.max(mn||36,Math.min(wh*.75,c.s*wh*SET.tsize));let x=c.x*ww-sz/2,y=c.y*wh-sz/2;x=Math.max(2,Math.min(ww-sz-2,x));y=Math.max(2,Math.min(wh-sz-2,y));return{x,y,sz}}
+// built-in layouts keep thumb-sized minimums (stick 96 px, buttons 52 px); custom layouts can go smaller
+function applyLayout(L){const builtin=!L&&BUILTIN[LAY.active]||(L&&ED&&BUILTIN[ED.prof]&&JSON.stringify(L)===JSON.stringify(BUILTIN[ED.prof]));L=L||getProf(LAY.active);const w=$('wrap'),ww=w.clientWidth,wh=w.clientHeight;if(!ww||!wh)return;
+ for(const id of CTL){const el=ctlEl(id),{x,y,sz}=ctlPx(L[id],ww,wh,builtin?(id==='stick'?96:52):36);Object.assign(el.style,{left:x+'px',top:y+'px',width:sz+'px',height:sz+'px'});if(id!=='stick')el.style.fontSize=Math.max(9,Math.min(22,sz*.17))+'px'}
+ if(ED)placeHandle()}
+// ----- editor: drag to move, yellow corner or slider to resize, profiles -----
+let ED=null;
+function openEditor(){ED={prof:LAY.active,draft:cloneL(getProf(LAY.active)),sel:null,back:back};releaseAll();$('wrap').classList.add('editing');$('ui').hidden=true;$('layed').hidden=false;$('le-namebox').hidden=true;$('le-del').dataset.armed='';
+ knob.style.transform='';fillProfiles();selectCtl(null);applyLayout(ED.draft)}
+function closeEditor(){$('wrap').classList.remove('editing');$('layed').hidden=true;document.querySelectorAll('[data-ctl].sel').forEach(e=>e.classList.remove('sel'));ED=null;applyLayout();fillProfiles();show('s-settings')}
+function selectCtl(id){if(!ED)return;ED.sel=id;document.querySelectorAll('[data-ctl]').forEach(e=>e.classList.toggle('sel',e.dataset.ctl===id));
+ const sl=$('le-size');sl.disabled=!id;$('le-hint').textContent=id?CTLNAME[id]+' selected. Drag it, or drag the yellow corner to resize.':'Drag a control to move it. Tap one, then drag the yellow corner (or the slider) to resize.';
+ if(id){const wh=$('wrap').clientHeight;sl.value=Math.round(ED.draft[id].s*wh*SET.tsize)}placeHandle()}
+function placeHandle(){const rh=$('rh');if(!ED||!ED.sel){rh.classList.remove('on');return}const el=ctlEl(ED.sel);rh.classList.add('on');
+ rh.style.left=(el.offsetLeft+el.offsetWidth*.85)+'px';rh.style.top=(el.offsetTop+el.offsetHeight*.85)+'px'}
+function updEdButtons(){const custom=!BUILTIN[ED.prof];$('le-del').disabled=!custom;$('le-save').textContent=custom?'Save layout':'Save as my layout'}
+(function(){const T=$('touch');let drag=null;
+ T.addEventListener('pointerdown',e=>{if(!ED)return;const w=$('wrap').getBoundingClientRect(),ww=$('wrap').clientWidth,wh=$('wrap').clientHeight;
+  if(e.target.id==='rh'){const c=ED.draft[ED.sel],cx=w.left+c.x*ww,cy=w.top+c.y*wh;drag={kind:'size',id:ED.sel,cx,cy};}
+  else{const el=e.target.closest('[data-ctl]');if(!el){selectCtl(null);return}const id=el.dataset.ctl,c=ED.draft[id];selectCtl(id);drag={kind:'move',id,ox:e.clientX-(w.left+c.x*ww),oy:e.clientY-(w.top+c.y*wh)}}
+  T.setPointerCapture(e.pointerId);drag.pid=e.pointerId;e.preventDefault();e.stopPropagation()},true);
+ T.addEventListener('pointermove',e=>{if(!ED||!drag||e.pointerId!==drag.pid)return;const w=$('wrap').getBoundingClientRect(),ww=$('wrap').clientWidth,wh=$('wrap').clientHeight,c=ED.draft[drag.id];
+  if(drag.kind==='move'){c.x=Math.max(0,Math.min(1,(e.clientX-drag.ox-w.left)/ww));c.y=Math.max(0,Math.min(1,(e.clientY-drag.oy-w.top)/wh))}
+  else{const sz=Math.max(Math.abs(e.clientX-drag.cx),Math.abs(e.clientY-drag.cy))/.35;c.s=Math.max(36,Math.min(wh*.75,sz))/(wh*SET.tsize);$('le-size').value=Math.round(c.s*wh*SET.tsize)}
+  applyLayout(ED.draft)},true);
+ const up=e=>{if(drag&&e.pointerId===drag.pid){drag=null;const ww=$('wrap').clientWidth,wh=$('wrap').clientHeight;for(const id of CTL){const c=ED.draft[id],p=ctlPx(c,ww,wh);c.x=(p.x+p.sz/2)/ww;c.y=(p.y+p.sz/2)/wh}}};   // snap back inside the screen
+ T.addEventListener('pointerup',up,true);T.addEventListener('pointercancel',up,true);
+ $('le-size').oninput=()=>{if(!ED||!ED.sel)return;const wh=$('wrap').clientHeight;ED.draft[ED.sel].s=parseFloat($('le-size').value)/(wh*SET.tsize);applyLayout(ED.draft)};
+ $('le-prof').onchange=()=>{ED.prof=$('le-prof').value;ED.draft=cloneL(getProf(ED.prof));$('le-del').dataset.armed='';selectCtl(null);applyLayout(ED.draft);updEdButtons()};
+ $('le-reset').onclick=()=>{ED.draft=cloneL(LDEF);selectCtl(null);applyLayout(ED.draft);$('le-hint').textContent='Back to the default positions. Save to keep them.'};
+ $('le-cancel').onclick=closeEditor;
+ const askName=()=>{$('le-namebox').hidden=false;const n=$('le-name');n.value='';n.focus()};
+ $('le-new').onclick=askName;$('le-name-x').onclick=()=>{$('le-namebox').hidden=true};
+ $('le-name-ok').onclick=()=>{let n=$('le-name').value.trim().replace(/[<>]/g,'')||'My layout';if(BUILTIN[n])n+=' 2';let m=n,i=2;while(LAY.custom[m]&&m!==ED.prof)m=n+' '+(i++);
+  LAY.custom[m]=cloneL(ED.draft);LAY.active=m;saveLay();closeEditor()};
+ $('le-name').addEventListener('keydown',e=>{if(e.key==='Enter')$('le-name-ok').click();e.stopPropagation()});
+ $('le-save').onclick=()=>{if(BUILTIN[ED.prof]){askName();$('le-name').value='My layout';return}LAY.custom[ED.prof]=cloneL(ED.draft);LAY.active=ED.prof;saveLay();closeEditor()};
+ $('le-del').onclick=()=>{const b=$('le-del');if(BUILTIN[ED.prof])return;if(!b.dataset.armed){b.dataset.armed='1';b.textContent='Tap again to delete';b.classList.add('warn');return}
+  delete LAY.custom[ED.prof];if(LAY.active===ED.prof)LAY.active='Default';b.dataset.armed='';b.textContent='Delete';b.classList.remove('warn');saveLay();ED.prof=LAY.active;ED.draft=cloneL(getProf(ED.prof));fillProfiles();selectCtl(null);applyLayout(ED.draft);updEdButtons()};
+ const _open=openEditor;openEditor=function(){_open();updEdButtons()}})();
 // ===== GAME SHELL (M0): title, pause, settings, save =====
 let paused=false,back='s-title',curSeed=0,sawTouch=false,DPR=1,gridDPR=0;
 const gridC=document.createElement('canvas'),coarseMQ=matchMedia('(pointer:coarse)'),portraitMQ=matchMedia('(orientation:portrait) and (pointer:coarse)');
@@ -882,13 +958,14 @@ function over(){if(state!=='play')return;state='over';const nb=score>BEST.score;
  BEST.score=Math.max(BEST.score,score);BEST.wave=Math.max(BEST.wave,wave);BEST.combo=Math.max(BEST.combo,maxc);save();
  $('o-l1').textContent='Wave '+wave+' · Score '+score+' · Best combo '+maxc;$('o-l2').textContent=nb?'New best score!':'Best: '+BEST.score;show('s-over')}
 function applyTouchVis(){$('wrap').classList.toggle('touch-on',SET.touch==='on'||(SET.touch==='auto'&&(coarseMQ.matches||sawTouch)))}
-function applySet(){const w=$('wrap');w.style.setProperty('--ts',SET.tsize);w.style.setProperty('--to',SET.topac);w.classList.toggle('mirror',!!SET.mirror);applyTouchVis()}
+function applySet(){const w=$('wrap');w.style.setProperty('--ts',SET.tsize);w.style.setProperty('--to',SET.topac);applyTouchVis();applyLayout()}
 addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&!sawTouch){sawTouch=true;applyTouchVis()}},{passive:true});
 function bindSettings(){
  const vol=$('o-vol');vol.value=Math.round(SET.vol*100);vol.oninput=()=>{SET.vol=vol.value/100;save()};vol.onchange=()=>sfx(260,.12,'square',.06);
  const sel=$('o-touch');sel.value=SET.touch;sel.onchange=()=>{SET.touch=sel.value;applySet();save()};
  for(const[id,key]of[['o-tsize','tsize'],['o-topac','topac']]){const el=$(id);el.value=SET[key];el.oninput=()=>{SET[key]=parseFloat(el.value);applySet();save()}}
- for(const[id,key]of[['o-mirror','mirror'],['o-hist','hist'],['o-calm','calm']]){const el=$(id);el.checked=!!SET[key];el.onchange=()=>{SET[key]=el.checked?1:0;applySet();save()}}
+ fillProfiles();$('o-prof').onchange=()=>{LAY.active=$('o-prof').value;saveLay();applyLayout()};$('o-edit').onclick=openEditor;
+ for(const[id,key]of[['o-hist','hist'],['o-calm','calm']]){const el=$(id);el.checked=!!SET[key];el.onchange=()=>{SET[key]=el.checked?1:0;applySet();save()}}
  const sd=$('o-seed');sd.value=SET.seed;sd.oninput=()=>{SET.seed=sd.value;save()}}
 $('b-start').onclick=start;$('b-train').onclick=startTrain;
 $('b-set1').onclick=()=>{back='s-title';show('s-settings')};
@@ -915,7 +992,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&live())pau
 // ===== SCREEN FIT (M1): sharp canvas on retina, cached grid layer =====
 function buildGrid(){gridC.width=cv.width;gridC.height=cv.height;const g=gridC.getContext('2d');g.setTransform(DPR,0,0,DPR,0,0);
  g.strokeStyle='#e3e9f2';g.lineWidth=1;g.beginPath();for(let x=0;x<=W;x+=30){g.moveTo(x,0);g.lineTo(x,H)}for(let y=0;y<=H;y+=30){g.moveTo(0,y);g.lineTo(W,y)}g.stroke()}
-function resize(){const w=$('wrap');w.style.setProperty('--wh',w.clientHeight+'px');
+function resize(){const w=$('wrap');w.style.setProperty('--wh',w.clientHeight+'px');applyLayout(ED?ED.draft:null);
  if(document.body.classList.contains('train')){const tp=$('trainpanel');document.body.style.setProperty('--ph',(tp.offsetHeight+28)+'px')}
 const d=Math.max(1,Math.min(2,(cv.clientWidth/W)*(window.devicePixelRatio||1)));
  if(d!==gridDPR){DPR=d;cv.width=Math.round(W*d);cv.height=Math.round(H*d);buildGrid();gridDPR=d}}
