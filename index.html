@@ -41,7 +41,7 @@ canvas{width:100%;aspect-ratio:900/420;height:auto;display:block}
 #btns{position:absolute;inset:0;pointer-events:none}
 .tb{position:absolute;width:70px;height:70px;pointer-events:auto;border-radius:50%;border:3px solid #1c1626;background:rgba(255,248,238,.88);color:#1c1626;font:900 12px "Trebuchet MS",sans-serif;padding:0;touch-action:none;cursor:pointer}
 .tb.on{background:#ff7a00;color:#fff}
-.tb[data-a=s]{background:#ffe96b}.tb[data-a=s].on{background:#ffd400;color:#1c1626}
+.tb[data-a=s]{background:#ffe96b}.tb[data-a=s].on,.tb[data-a=s].latched{background:#ffd400;color:#1c1626;box-shadow:0 0 0 4px #ffd400}
 .editing #touch{display:block!important;opacity:1;background:rgba(28,22,38,.38)}
 .editing #touch [data-ctl]{outline:3px dashed rgba(255,255,255,.75);outline-offset:3px;cursor:grab}
 .editing #touch [data-ctl].sel{outline:4px solid #ffd400;outline-offset:4px}
@@ -114,7 +114,7 @@ canvas{width:100%;aspect-ratio:900/420;height:auto;display:block}
   <button class="btn" id="b-start">START GAME</button>
   <button class="btn alt" id="b-train">TRAINING ROOM</button>
   <button class="btn alt" id="b-set1">SETTINGS</button>
-  <p class="kbhint"><b>A/D</b> move &middot; <b>W/S</b> aim up/down &middot; <b>Space</b> jump &middot; <b>J</b> punch &middot; <b>K</b> kick &middot; <b>Shift</b> Surge: hold + &larr;/&rarr; to run through enemies, + Space super jump, + J/K Surge moves &middot; <b>U</b> ultimate &middot; <b>Esc</b> pause</p>
+  <p class="kbhint"><b>A/D</b> move &middot; <b>W/S</b> aim up/down &middot; <b>Space</b> jump &middot; <b>J</b> punch &middot; <b>K</b> kick &middot; <b>Shift</b> Surge (hold, or tap on/off in Settings): + &larr;/&rarr; to run through enemies, + Space super jump, + J/K Surge moves &middot; <b>U</b> ultimate &middot; <b>Esc</b> pause</p>
   <p class="tchint">Left stick: move, and push up/down to aim &middot; JUMP &middot; PUNCH &middot; KICK &middot; hold SURGE + stick to run through enemies, + JUMP / PUNCH / KICK for Surge moves &middot; ULT when the blue bar is full</p>
  </div>
  <div class="screen" id="s-pause" hidden>
@@ -133,6 +133,7 @@ canvas{width:100%;aspect-ratio:900/420;height:auto;display:block}
    <label for="o-tsize">Touch size</label><input id="o-tsize" type="range" min="0.8" max="1.5" step="0.1">
    <label for="o-topac">Touch opacity</label><input id="o-topac" type="range" min="0.3" max="1" step="0.05">
    <label for="o-prof">Touch layout</label><div class="layrow"><select id="o-prof"></select><button id="o-edit">Customize</button></div>
+   <label for="o-surge">Surge button</label><select id="o-surge"><option value="hold">Hold (push and hold)</option><option value="toggle">Toggle (tap on, tap off)</option></select>
    <label for="o-hist">Input display</label><input id="o-hist" type="checkbox">
    <label for="o-calm">Reduce screen shake</label><input id="o-calm" type="checkbox">
    <label for="o-seed">Seed (blank = random)</label><input id="o-seed" type="text" maxlength="12">
@@ -158,7 +159,7 @@ canvas{width:100%;aspect-ratio:900/420;height:auto;display:block}
 // ===== SETTINGS & SAVE (M0) =====
 const $=id=>document.getElementById(id);
 const SAVE_KEY='orangeArmy.v1';
-const DEF={vol:1,tsize:1,topac:.75,lay:null,touch:'auto',hist:0,calm:0,seed:''};
+const DEF={vol:1,tsize:1,topac:.75,lay:null,surge:'hold',touch:'auto',hist:0,calm:0,seed:''};
 let SET={...DEF},BEST={score:0,wave:0,combo:0},LAST=null;
 try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');if(s.set)Object.assign(SET,s.set);if(s.best)Object.assign(BEST,s.best)}catch(e){}
 const save=()=>{try{localStorage.setItem(SAVE_KEY,JSON.stringify({set:SET,best:BEST}))}catch(e){}};
@@ -184,11 +185,14 @@ const INP=[mkSlot(),mkSlot()],SRC=INP[0].src,HIST=[];let fr=0;
 // K / press / AIM / SRG point at the slot of the player being updated (see use()); AIM = direction held when P/K was pressed
 let K=INP[0].K,press=INP[0].press,AIM=INP[0].AIM,SRG=INP[0].SRG;
 const SYM={l:'←',r:'→',u:'↑',d:'↓',j:'JUMP',p:'P',k:'K',s:'SURGE',x:'ULT'};
+// Toggle mode (Settings > Surge button): each press flips Surge on/off and letting go does nothing.
 function setA(src,a,on,slot){const I=INP[slot||0],S=I.src;on=on?1:0;if(S[src][a]===on)return;S[src][a]=on;
- const v=(S.kb[a]||S.tc[a]||S.gp[a])?1:0;if(v===I.K[a])return;I.K[a]=v;
+ let v=(S.kb[a]||S.tc[a]||S.gp[a])?1:0;
+ if(a==='s'&&SET.surge==='toggle'){if(on)I.sl=!I.sl;v=I.sl?1:0}
+ if(v===I.K[a])return;I.K[a]=v;
  if(v){I.press[a]=fr;if(a==='p'||a==='k'){I.AIM[a]=I.K.u?'u':I.K.d?'d':'n';I.SRG[a]=I.K.s}if(!slot){HIST.push({f:fr,a});if(HIST.length>40)HIST.shift()}}}
 const kbDown=new Set();   // physical keys held, so W + ↑ both mapped to Up don't cancel each other
-function releaseAll(){kbDown.clear();INP.forEach((I,n)=>{for(const s in I.src)for(const a of ACT)setA(s,a,0,n)})}
+function releaseAll(){kbDown.clear();INP.forEach((I,n)=>{I.sl=false;for(const s in I.src)for(const a of ACT)setA(s,a,0,n)});if(typeof stickEnd==='function'&&sid!==null)stickEnd();document.querySelectorAll('.tb').forEach(b=>{if(b._ids)b._ids.clear();b.classList.remove('on')})}
 const want=k=>fr-(press[k]??-99)<=12,eat=k=>press[k]=-99;   // 12-frame input buffer
 const live=()=>(state==='play'||state==='train')&&!paused;
 function unlockAudio(){try{AC=AC||new AudioContext();if(AC.state==='suspended')AC.resume()}catch(e){}}
@@ -208,16 +212,30 @@ function stickAt(e){const r=stick.getBoundingClientRect(),R=r.width/2;let dx=(e.
  knob.style.transform='translate('+dx*R*.5+'px,'+dy*R*.5+'px)';
  setA('tc','l',dx<-.3);setA('tc','r',dx>.3);setA('tc','u',dy<-.4);setA('tc','d',dy>.4)}
 function stickEnd(){sid=null;knob.style.transform='';for(const a of['l','r','u','d'])setA('tc',a,0)}
-stick.addEventListener('pointerdown',e=>{if(EDITING())return;if(sid!==null)return;sid=e.pointerId;stick.setPointerCapture(e.pointerId);stickAt(e);e.preventDefault()});
-stick.addEventListener('pointermove',e=>{if(e.pointerId===sid)stickAt(e)});
+// Touch robustness (M6 fix): a touch can end before we lock onto it (fast spamming on iPad). The lock then throws, and the old code
+// had already claimed the stick for a finger that would never lift, so the stick ignored every later touch. Now: the lock can't
+// throw us out, a new finger always takes over a stick whose old finger is gone, and a watchdog frees anything left holding.
+const grab=(el,id)=>{try{el.setPointerCapture(id);return true}catch(err){return false}};
+let sT=0;
+stick.addEventListener('pointerdown',e=>{if(EDITING())return;if(sid!==null&&sid!==e.pointerId&&stick.hasPointerCapture&&stick.hasPointerCapture(sid))return;
+ if(!grab(stick,e.pointerId)){stickEnd();return}sid=e.pointerId;sT=performance.now();stickAt(e);e.preventDefault()});
+stick.addEventListener('pointermove',e=>{if(e.pointerId===sid){sT=performance.now();stickAt(e)}});
 ['pointerup','pointercancel','lostpointercapture'].forEach(t=>stick.addEventListener(t,e=>{if(e.pointerId===sid)stickEnd()}));
 document.querySelectorAll('.tb').forEach(b=>{const a=b.dataset.a,ids=new Set();
- b.addEventListener('pointerdown',e=>{if(EDITING())return;b.setPointerCapture(e.pointerId);ids.add(e.pointerId);setA('tc',a,1);b.classList.add('on');e.preventDefault()});
+ b.addEventListener('pointerdown',e=>{if(EDITING())return;e.preventDefault();if(!grab(b,e.pointerId)){setA('tc',a,1);setA('tc',a,0);return}   // tap that already ended: still counts as a press
+  ids.add(e.pointerId);setA('tc',a,1);b.classList.add('on')});
+ b._ids=ids;
  const off=e=>{ids.delete(e.pointerId);if(!ids.size){setA('tc',a,0);b.classList.remove('on')}};
+ if(a==='s')b.classList.add('surgebtn');
  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>b.addEventListener(t,off))});
 // gamepad (standard mapping): stick/d-pad move+aim, A jump, X punch, B kick, bumpers/triggers Surge, Y ultimate, Start pause
 let padStart=false;
-function pollPad(){
+// watchdog, every frame: release the stick or a button if the browser no longer has the finger that was holding it
+function touchWatch(){
+ {const sb=document.querySelector('.tb[data-a=s]');if(sb)sb.classList.toggle('latched',SET.surge==='toggle'&&!!INP[0].K.s)}
+ if(sid!==null&&!(stick.hasPointerCapture&&stick.hasPointerCapture(sid))&&performance.now()-sT>250)stickEnd();
+ document.querySelectorAll('.tb').forEach(b=>{const ids=b._ids;if(!ids||!ids.size)return;for(const id of[...ids])if(!b.hasPointerCapture(id))ids.delete(id);if(!ids.size){setA('tc',b.dataset.a,0);b.classList.remove('on')}})}
+function pollPad(){touchWatch();
  const pads=navigator.getGamepads?navigator.getGamepads():[];let g=null;for(const p of pads)if(p&&p.connected){g=p;break}
  if(!g){for(const a of ACT)if(SRC.gp[a])setA('gp',a,0);return}
  const B=i=>!!(g.buttons[i]&&g.buttons[i].pressed),ax=i=>g.axes[i]||0;
@@ -354,7 +372,8 @@ let PL=[],STM,P,E,FX,GH,camX=0,camY=0,wave,score,combo,comboT,maxc,meter,hpT,sto
 const bn=t=>banner={t:70,m:70,txt:t};
 const infS=()=>state==='train'&&TR.inf;
 const canSurge=()=>!STM.winded&&(STM.v>0||infS());
-function wind(){STM.v=0;STM.winded=Math.round(SURGE.winded*60);if(P){txt(P.x,P.y-110,'WINDED!','#e8a400',22);P.running=0}sfx(150,.45,'triangle',.08,-90)}
+function wind(){STM.v=0;STM.winded=Math.round(SURGE.winded*60);if(P&&SET.surge==='toggle'){const I=INP[P.slot];I.sl=false;I.K.s=0}   // running dry switches toggled Surge off
+ if(P){txt(P.x,P.y-110,'WINDED!','#e8a400',22);P.running=0}sfx(150,.45,'triangle',.08,-90)}
 function deny(){STM.flash=24;sfx(90,.12,'square',.05)}
 function spend(c){if(infS())return true;if(STM.winded||STM.v<c){deny();return false}STM.v-=c;STM.last=fr;if(STM.v<=0)wind();return true}
 function stamTick(){if(STM.flash>0)STM.flash--;if(infS()){STM.v=SURGE.max;STM.winded=0;return}
@@ -965,6 +984,7 @@ function bindSettings(){
  const sel=$('o-touch');sel.value=SET.touch;sel.onchange=()=>{SET.touch=sel.value;applySet();save()};
  for(const[id,key]of[['o-tsize','tsize'],['o-topac','topac']]){const el=$(id);el.value=SET[key];el.oninput=()=>{SET[key]=parseFloat(el.value);applySet();save()}}
  fillProfiles();$('o-prof').onchange=()=>{LAY.active=$('o-prof').value;saveLay();applyLayout()};$('o-edit').onclick=openEditor;
+ {const el=$('o-surge');el.value=SET.surge||'hold';el.onchange=()=>{SET.surge=el.value;for(const I of INP){I.sl=false;I.K.s=0}document.querySelector('.tb[data-a=s]').classList.remove('on');save()}}
  for(const[id,key]of[['o-hist','hist'],['o-calm','calm']]){const el=$(id);el.checked=!!SET[key];el.onchange=()=>{SET[key]=el.checked?1:0;applySet();save()}}
  const sd=$('o-seed');sd.value=SET.seed;sd.oninput=()=>{SET.seed=sd.value;save()}}
 $('b-start').onclick=start;$('b-train').onclick=startTrain;

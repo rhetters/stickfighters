@@ -12,7 +12,7 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 | Aim up / down (picks the move) | W / S or ↑ / ↓ | Stick up/down | Left stick / d-pad |
 | Jump (twice for a flip) | Space | JUMP | A |
 | Punch / Kick | J / K | PUNCH / KICK | X / B |
-| Surge (hold): run through enemies, super jump, Surge moves | Shift | SURGE | Bumpers / triggers |
+| Surge (hold, or tap on/off: Settings → Surge button): run through enemies, super jump, Surge moves | Shift | SURGE | Bumpers / triggers |
 | Grab | J + K together | PUNCH + KICK | X + B |
 | Tornado Kick (blue meter full) | U | ULT | Y |
 | Pause | Esc or P | II | Start |
