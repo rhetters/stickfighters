@@ -4,7 +4,7 @@
 //   l r  move        u d  aim (the direction held when an attack is pressed picks the branch in M2)
 //   j    jump        p k  punch / kick        s  Surge (hold)        x  ultimate
 const ACT = ['l', 'r', 'u', 'd', 'j', 'p', 'k', 's', 'x'];
-// One input slot per player (M4 groundwork for M11). Devices feed slot 0 today; M11 maps a second device to slot 1.
+// One input slot per player (M4 groundwork for M12 multiplayer). Devices feed slot 0 today; M12 maps a second device to slot 1.
 const mkSlot = () => {
   const I = {
     K: {},
