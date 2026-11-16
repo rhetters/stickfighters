@@ -1,166 +1,738 @@
 // Orange vs. the Pink Army: Combat and collision: hitboxes, attacks, blocking, grabs/throws, hits, bowling, separation, physics, poses
 // ===== COMBAT & COLLISION =====
-const ov=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
-function hbox(f){const d=f.att.d,s=f.s,r=d.r*s,fc=d.back?-f.face:f.face;let x0=fc>0?f.x-8*s:f.x-r,x1=fc>0?f.x+r:f.x+8*s;if(d.omni){x0=f.x-r;x1=f.x+r}return[x0,f.y-(d.top||84)*s,x1,f.y+(d.dive?44:(d.bot||6))]}
-function markDone(n){if(!DONE.has(n)&&MOVELIST.some(s=>s[1].some(r=>r[1]===n))){DONE.add(n);renderMoves()}}
-function startAtk(f,def,btn){f.att={d:def,f:0,hit:new Set(),aim:btn?AIM[btn]:'n',b:btn,pf:fr};f.st='atk';f.tp=null;if(f.pl){const am=f.att.aim;LAST={n:def.nm||def.n,key:def.n,ul:def.ul,aim:am==='u'?'↑':am==='d'?'↓':'·',su:def.h[0],ac:def.h[1]-def.h[0]+1,rc:def.d-def.h[1],dmg:def.dmg,fx:def.fx,cost:def.cost,inf:def.d>999};markDone(def.n);if(def.h!==NOHIT)sfx(200,.12,'sawtooth',.03,300)}}
-function endAtk(f,q){f.att=null;f.pose[9]=0;if(!q)f.st='free';f.last=fr;if(!f.pl&&!f.T.boss)f.cd=f.T.cd+rnd()*40;else if(f.inv>100)f.inv=45}   // grace after the Tornado Kick so a swing that started during it can't land
-function tickAtk(f){
- const a=f.att,d=a.d;a.f++;f.tp=kf(d.k,Math.min(1,a.f/(d.kt||d.d)));
- if(f.pl&&a.b&&!a.chained&&!d.cost&&!d.air&&a.f<=Math.min(5,d.h[0])&&f.y>=G-1){const o=a.b==='p'?'k':'p';if(want(o)&&Math.abs(press[o]-a.pf)<=3){eat(o);endAtk(f,1);tryGrab(f);return}}
- if(d.hop&&a.f===1&&f.y>=G-1){f.vy=d.hop;if(d.hopx)f.vx=f.face*d.hopx}
- if(!f.pl&&d.dive&&a.f===1){const q=tgt(f);if(q){f.face=q.x>f.x?1:-1;a.tx=q.x}}
- if(!f.pl&&d.dive&&a.tx!=null&&a.f<(d.diveAt||0))f.vx=(a.tx-f.x)/Math.max(4,(d.diveAt||0)-a.f+6);
- if(d.airhop&&a.f===1)f.vy=d.airhop;
- if(d.flipAt&&a.f===d.flipAt)f.face*=-1;
- if(d.iv&&a.f>=d.iv[0]&&a.f<=d.iv[1])f.inv=Math.max(f.inv,2);
- if(d.float)f.vy=Math.min(f.vy,1.2);
- if(d.lg&&a.f===Math.max(1,d.h[0]-3))f.vx=f.face*d.lg*1.6;
- if(d.lv&&a.f>=d.h[0]&&a.f<=d.h[1])f.vx=f.face*d.lv;
- if(d.blink&&a.f===1&&f.pl){const n=near(f);a.bs=n&&(n.x-f.x)*f.face>0?Math.max(6,Math.min(d.dv[2],(Math.abs(n.x-f.x)+42)/(d.dv[1]-d.dv[0]+1))):0}
- if(d.dv&&a.f>=d.dv[0]&&a.f<=d.dv[1])f.vx=f.face*(a.bs||d.dv[2]);
- if(d.dv&&a.f===d.dv[1]+1)f.vx*=.15;   // forced dashes brake when they end, so strings can follow
- if(d.ph&&a.f>=d.ph[0]&&a.f<=d.ph[1])f.phase=2;
- if(d.hover){f.vy*=.8;f.vx=((K.r?1:0)-(K.l?1:0))*3.5}
- if(d.tatsu){const m=(K.r?1:0)-(K.l?1:0),hy=groundY(f.x)-46;if(a.f<=7)f.vy=-6.5;else if(a.f<d.d-4)f.vy=(hy-f.y)*.25;f.vx=f.face*3.4+m*1.6;
-  if(a.f%4===0)fxp({k:'l',x:f.x-f.face*(30+rnd()*20),y:f.y-10-rnd()*50,len:40+rnd()*30,dir:f.face,l:9,m:9});if(a.f%10===0){sfx(420,.12,'triangle',.04,-260);noise(.1,.04,2400)}}
- const diving=d.dive&&a.f>=(d.diveAt||0);
- if(diving){f.vx=f.pl?f.face*(d.dvx||8):f.vx*.9;f.vy=Math.max(f.vy,d.dvy||9)}
- if(d.multi&&a.f%(d.multi>1?d.multi:7)===0||(d.finalAt&&a.f===d.finalAt))a.hit.clear();
- if(d.quake&&a.f===d.h[0]){ring(f.x,G,d.r);dust(f.x-60,G,6);dust(f.x+60,G,6);shake=Math.max(shake,8);camY+=4;sfx(55,.3,'sine',.12)}
- if(d.ring&&a.f===d.h[0])ring(f.x+f.face*50,f.y-45,60);
- if(a.f>=d.h[0]&&a.f<=d.h[1]){
-  const hb=hbox(f);
-  for(const e of f.pl?E:PL){
-   if(a.hit.has(e)||e.gone||(e.st==='down'&&(!d.otg||e.otgU))||e.st==='getup'||e.st==='held')continue;
-   if(!f.pl&&(e.inv>0||e.st==='dead'))continue;
-   if(ov(hb,[e.x-15*e.s,e.y-78*e.s,e.x+15*e.s,e.y+4])){
-    a.hit.add(e);const dr=d.omni?(e.x>=f.x?1:-1):(d.back?-f.face:f.face);
-    if(f.pl&&blocks(e,f,d)){block(e,d,dr);continue}
-    if(f.pl){hurtE(e,d.spikeAt&&a.f>=d.spikeAt?{...d,dmg:7,lift:10,kb:4,st:6,sh:6,ef:'bounce'}:d.finalAt&&a.f>=d.finalAt?{...d,dmg:10,lift:-10,kb:9,w:'H',ef:'launch'}:d,dr,f);
-     if(diving&&!d.area){f.vy=-8;f.vx=-f.face*3;f.jumps=1;endAtk(f);return}}else hurtP(e,d,dr)}}}
- if(d.dive&&a.f>(d.diveAt||0)+3&&f.y>=G-1){
-  ring(f.x,G,d.area?d.area:60);dust(f.x,G,d.area?16:8);shake=Math.max(shake,d.area?10:5);sfx(60,.2,'sine',.12);
-  if(d.area&&!f.pl){for(const q of PL){if(q.st==='dead'||q.y<G-24||Math.abs(q.x-f.x)>d.area)continue;hurtP(q,{dmg:d.adm||10,kb:10,lift:-6},q.x>=f.x?1:-1)}shake=Math.max(shake,12)}
-  if(d.area&&f.pl)for(const e of E){if(e.gone||e.dying||a.hit.has(e)||e.st==='down'||e.y<G-60||Math.abs(e.x-f.x)>d.area)continue;hurtE(e,{dmg:d.adm||12,kb:9,lift:-7,st:7,sh:9,ef:'kd',fold:d.n==='meteor'},e.x>=f.x?1:-1)}
-  endAtk(f);return}
- if(d.air&&a.f>2&&f.y>=G-1){if(a.q)press[a.q]=fr;endAtk(f);return}   // air moves end when you land
- // Chain queue: a press any time after the move connects is held until the move can follow up (never dropped).
- if(f.pl&&!d.dive&&!d.hover&&a.f>=d.h[0]&&!a.q){const b=want('p')?'p':want('k')?'k':0;if(b){eat(b);a.q=b}}
- if(!d.dive&&a.f>=d.d){if(d.turn)f.face*=-1;if(a.q)press[a.q]=fr;endAtk(f);return}
- if(a.q&&(d.air||f.y>=G-1)&&a.f>=d.d*d.cx){const b=a.q;if(d.turn)f.face*=-1;const n=pick(f,b,true);endAtk(f,1);startAtk(f,n,b);f.att.chained=1}
+const ov = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
+function hbox(f) {
+  const d = f.att.d,
+    s = f.s,
+    r = d.r * s,
+    fc = d.back ? -f.face : f.face;
+  let x0 = fc > 0 ? f.x - 8 * s : f.x - r,
+    x1 = fc > 0 ? f.x + r : f.x + 8 * s;
+  if (d.omni) {
+    x0 = f.x - r;
+    x1 = f.x + r;
+  }
+  return [x0, f.y - (d.top || 84) * s, x1, f.y + (d.dive ? 44 : d.bot || 6)];
+}
+function markDone(n) {
+  if (!DONE.has(n) && MOVELIST.some(s => s[1].some(r => r[1] === n))) {
+    DONE.add(n);
+    renderMoves();
+  }
+}
+function startAtk(f, def, btn) {
+  f.att = { d: def, f: 0, hit: new Set(), aim: btn ? AIM[btn] : 'n', b: btn, pf: fr };
+  f.st = 'atk';
+  f.tp = null;
+  if (f.pl) {
+    const am = f.att.aim;
+    LAST = {
+      n: def.nm || def.n,
+      key: def.n,
+      ul: def.ul,
+      aim: am === 'u' ? '↑' : am === 'd' ? '↓' : '·',
+      su: def.h[0],
+      ac: def.h[1] - def.h[0] + 1,
+      rc: def.d - def.h[1],
+      dmg: def.dmg,
+      fx: def.fx,
+      cost: def.cost,
+      inf: def.d > 999
+    };
+    markDone(def.n);
+    if (def.h !== NOHIT) sfx(200, 0.12, 'sawtooth', 0.03, 300);
+  }
+}
+function endAtk(f, q) {
+  f.att = null;
+  f.pose[9] = 0;
+  if (!q) f.st = 'free';
+  f.last = fr;
+  if (!f.pl && !f.T.boss) f.cd = f.T.cd + rnd() * 40;
+  else if (f.inv > 100) f.inv = 45;
+} // grace after the Tornado Kick so a swing that started during it can't land
+function tickAtk(f) {
+  const a = f.att,
+    d = a.d;
+  a.f++;
+  f.tp = kf(d.k, Math.min(1, a.f / (d.kt || d.d)));
+  if (f.pl && a.b && !a.chained && !d.cost && !d.air && a.f <= Math.min(5, d.h[0]) && f.y >= G - 1) {
+    const o = a.b === 'p' ? 'k' : 'p';
+    if (want(o) && Math.abs(press[o] - a.pf) <= 3) {
+      eat(o);
+      endAtk(f, 1);
+      tryGrab(f);
+      return;
+    }
+  }
+  if (d.hop && a.f === 1 && f.y >= G - 1) {
+    f.vy = d.hop;
+    if (d.hopx) f.vx = f.face * d.hopx;
+  }
+  if (!f.pl && d.dive && a.f === 1) {
+    const q = tgt(f);
+    if (q) {
+      f.face = q.x > f.x ? 1 : -1;
+      a.tx = q.x;
+    }
+  }
+  if (!f.pl && d.dive && a.tx != null && a.f < (d.diveAt || 0))
+    f.vx = (a.tx - f.x) / Math.max(4, (d.diveAt || 0) - a.f + 6);
+  if (d.airhop && a.f === 1) f.vy = d.airhop;
+  if (d.flipAt && a.f === d.flipAt) f.face *= -1;
+  if (d.iv && a.f >= d.iv[0] && a.f <= d.iv[1]) f.inv = Math.max(f.inv, 2);
+  if (d.float) f.vy = Math.min(f.vy, 1.2);
+  if (d.lg && a.f === Math.max(1, d.h[0] - 3)) f.vx = f.face * d.lg * 1.6;
+  if (d.lv && a.f >= d.h[0] && a.f <= d.h[1]) f.vx = f.face * d.lv;
+  if (d.blink && a.f === 1 && f.pl) {
+    const n = near(f);
+    a.bs =
+      n && (n.x - f.x) * f.face > 0
+        ? Math.max(6, Math.min(d.dv[2], (Math.abs(n.x - f.x) + 42) / (d.dv[1] - d.dv[0] + 1)))
+        : 0;
+  }
+  if (d.dv && a.f >= d.dv[0] && a.f <= d.dv[1]) f.vx = f.face * (a.bs || d.dv[2]);
+  if (d.dv && a.f === d.dv[1] + 1) f.vx *= 0.15; // forced dashes brake when they end, so strings can follow
+  if (d.ph && a.f >= d.ph[0] && a.f <= d.ph[1]) f.phase = 2;
+  if (d.hover) {
+    f.vy *= 0.8;
+    f.vx = ((K.r ? 1 : 0) - (K.l ? 1 : 0)) * 3.5;
+  }
+  if (d.tatsu) {
+    const m = (K.r ? 1 : 0) - (K.l ? 1 : 0),
+      hy = groundY(f.x) - 46;
+    if (a.f <= 7) f.vy = -6.5;
+    else if (a.f < d.d - 4) f.vy = (hy - f.y) * 0.25;
+    f.vx = f.face * 3.4 + m * 1.6;
+    if (a.f % 4 === 0)
+      fxp({
+        k: 'l',
+        x: f.x - f.face * (30 + rnd() * 20),
+        y: f.y - 10 - rnd() * 50,
+        len: 40 + rnd() * 30,
+        dir: f.face,
+        l: 9,
+        m: 9
+      });
+    if (a.f % 10 === 0) {
+      sfx(420, 0.12, 'triangle', 0.04, -260);
+      noise(0.1, 0.04, 2400);
+    }
+  }
+  const diving = d.dive && a.f >= (d.diveAt || 0);
+  if (diving) {
+    f.vx = f.pl ? f.face * (d.dvx || 8) : f.vx * 0.9;
+    f.vy = Math.max(f.vy, d.dvy || 9);
+  }
+  if ((d.multi && a.f % (d.multi > 1 ? d.multi : 7) === 0) || (d.finalAt && a.f === d.finalAt)) a.hit.clear();
+  if (d.quake && a.f === d.h[0]) {
+    ring(f.x, G, d.r);
+    dust(f.x - 60, G, 6);
+    dust(f.x + 60, G, 6);
+    shake = Math.max(shake, 8);
+    camY += 4;
+    sfx(55, 0.3, 'sine', 0.12);
+  }
+  if (d.ring && a.f === d.h[0]) ring(f.x + f.face * 50, f.y - 45, 60);
+  if (a.f >= d.h[0] && a.f <= d.h[1]) {
+    const hb = hbox(f);
+    for (const e of f.pl ? E : PL) {
+      if (
+        a.hit.has(e) ||
+        e.gone ||
+        (e.st === 'down' && (!d.otg || e.otgU)) ||
+        e.st === 'getup' ||
+        e.st === 'held'
+      )
+        continue;
+      if (!f.pl && (e.inv > 0 || e.st === 'dead')) continue;
+      if (ov(hb, [e.x - 15 * e.s, e.y - 78 * e.s, e.x + 15 * e.s, e.y + 4])) {
+        a.hit.add(e);
+        const dr = d.omni ? (e.x >= f.x ? 1 : -1) : d.back ? -f.face : f.face;
+        if (f.pl && blocks(e, f, d)) {
+          block(e, d, dr);
+          continue;
+        }
+        if (f.pl) {
+          hurtE(
+            e,
+            d.spikeAt && a.f >= d.spikeAt
+              ? { ...d, dmg: 7, lift: 10, kb: 4, st: 6, sh: 6, ef: 'bounce' }
+              : d.finalAt && a.f >= d.finalAt
+                ? { ...d, dmg: 10, lift: -10, kb: 9, w: 'H', ef: 'launch' }
+                : d,
+            dr,
+            f
+          );
+          if (diving && !d.area) {
+            f.vy = -8;
+            f.vx = -f.face * 3;
+            f.jumps = 1;
+            endAtk(f);
+            return;
+          }
+        } else hurtP(e, d, dr);
+      }
+    }
+  }
+  if (d.dive && a.f > (d.diveAt || 0) + 3 && f.y >= G - 1) {
+    ring(f.x, G, d.area ? d.area : 60);
+    dust(f.x, G, d.area ? 16 : 8);
+    shake = Math.max(shake, d.area ? 10 : 5);
+    sfx(60, 0.2, 'sine', 0.12);
+    if (d.area && !f.pl) {
+      for (const q of PL) {
+        if (q.st === 'dead' || q.y < G - 24 || Math.abs(q.x - f.x) > d.area) continue;
+        hurtP(q, { dmg: d.adm || 10, kb: 10, lift: -6 }, q.x >= f.x ? 1 : -1);
+      }
+      shake = Math.max(shake, 12);
+    }
+    if (d.area && f.pl)
+      for (const e of E) {
+        if (
+          e.gone ||
+          e.dying ||
+          a.hit.has(e) ||
+          e.st === 'down' ||
+          e.y < G - 60 ||
+          Math.abs(e.x - f.x) > d.area
+        )
+          continue;
+        hurtE(
+          e,
+          { dmg: d.adm || 12, kb: 9, lift: -7, st: 7, sh: 9, ef: 'kd', fold: d.n === 'meteor' },
+          e.x >= f.x ? 1 : -1
+        );
+      }
+    endAtk(f);
+    return;
+  }
+  if (d.air && a.f > 2 && f.y >= G - 1) {
+    if (a.q) press[a.q] = fr;
+    endAtk(f);
+    return;
+  } // air moves end when you land
+  // Chain queue: a press any time after the move connects is held until the move can follow up (never dropped).
+  if (f.pl && !d.dive && !d.hover && a.f >= d.h[0] && !a.q) {
+    const b = want('p') ? 'p' : want('k') ? 'k' : 0;
+    if (b) {
+      eat(b);
+      a.q = b;
+    }
+  }
+  if (!d.dive && a.f >= d.d) {
+    if (d.turn) f.face *= -1;
+    if (a.q) press[a.q] = fr;
+    endAtk(f);
+    return;
+  }
+  if (a.q && (d.air || f.y >= G - 1) && a.f >= d.d * d.cx) {
+    const b = a.q;
+    if (d.turn) f.face *= -1;
+    const n = pick(f, b, true);
+    endAtk(f, 1);
+    startAtk(f, n, b);
+    f.att.chained = 1;
+  }
 }
 // Guards block hits that come from in front of them while they're ready. Low hits go under the shield, the Tornado Kick
 // cuts through, and hits from behind land. Each block drains the guard meter; empty = GUARD BREAK (dizzy, shield dropped 4 s).
-function blocks(e,f,d){if(!e.T.guard||e.noShield>0||e.dying)return false;if(!(e.st==='free'||e.st==='block'))return false;
- if(d.pierce||(d.top&&d.top<=60)||d.otg)return false;return(f.x-e.x)*e.face>0}
-function block(e,d,dr){const w=wtOf(d);e.gm-=Math.max(2,d.dmg)*(w==='H'?2:w==='M'?1.3:1);e.st='block';e.stun=12;e.att=null;e.vx=dr*(w==='H'?4:2)/(e.T.m||1);e.lh=fr;
- spark(e.x+e.face*16*e.s,e.y-50*e.s,14,'#bfefff');stop=Math.max(stop,2);sfx(700,.06,'square',.04,-200);noise(.04,.05,3000);combo++;comboT=100;
- if(e.gm<=0){e.gm=0;e.noShield=240;e.st='hurt';e.stun=80;e.broken=90;txt(e.x,e.y-118*e.s,'GUARD BREAK!','#3ec5ff',24);ring(e.x,e.y-50*e.s,70);stop+=4;
-  fxp({k:'sh',x:e.x+e.face*16*e.s,y:e.y-50*e.s,vx:-e.face*3,vy:-6,a:0,va:.25*-e.face,l:70,m:70,s:e.s});sfx(180,.3,'sawtooth',.07,-90)}
- else txt(e.x,e.y-104*e.s,'BLOCK','#7a6e80',15)}
-// Grab: reach 52 px in front, standing enemies only; a big enemy needs its poise broken first.
-function tryGrab(f){let tg=null;for(const e of E){if(e.gone||e.dying||!(e.st==='free'||e.st==='hurt'||e.st==='atk'))continue;const dx=(e.x-f.x)*f.face;if(dx>-6&&dx<52&&Math.abs(e.y-f.y)<24){tg=e;break}}
- if(tg&&tg.pmax&&tg.poise>0&&!tg.broken){startAtk(f,A.gwhiff,0);txt(tg.x,tg.y-118*tg.s,'TOO HEAVY!','#e8212b',18);tg.vx+=f.face*1.5;return}
- if(!tg){startAtk(f,A.gwhiff,0);return}
- f.st='grab';f.att=null;f.gt=tg;f.gd=0;f.pum=0;f.pt=0;tg.st='held';tg.att=null;tg.vx=tg.vy=0;tg.sp=0;tg.pose[9]=0;tg.held=f;
- markDone('grab');txt(tg.x,tg.y-110*tg.s,'GRAB!','#ff7a00',20);sfx(260,.08,'square',.05,-60);noise(.05,.05,1800);combo++;comboT=100;maxc=Math.max(maxc,combo)}
-function pummel(f,e){const dmg=Math.max(1,Math.round(4*(combo<4?1:Math.max(.45,1-(combo-3)*.04))));e.hp-=dmg;e.flash=4;e.hs=3;markDone('pummel');
- spark(e.x-f.face*6,e.y-40*e.s,14,'#fff3a0');txt(e.x,e.y-95*e.s,dmg,INK);impact('L',f.face,e.x,e.y-40);combo++;comboT=100;meter=Math.min(100,meter+3);maxc=Math.max(maxc,combo);
- if(e.hp<=0)throwE(f,e,'f')}
-// Throws: K while holding. Forward/neutral and back throw the enemy as a projectile into the crowd; Up launches; Down slams.
-function throwE(f,e,dir){e.held=null;e.st='fly';e.y=f.y-10;const mv={f:'tfwd',b:'tback',u:'tup',d:'tslam'}[dir];
- if(dir==='b'){f.face*=-1;e.x=f.x+f.face*20}
- startAtk(f,A[mv],0);f.st='atk';const fc=f.face;
- if(dir==='u')hurtE(e,{dmg:6,kb:1,lift:-13,ef:'launch',w:'M'},fc);
- else if(dir==='d'){e.y=G-4;hurtE(e,{dmg:10,kb:1,lift:-8,ef:'bounce',w:'H'},fc);ring(e.x,G,70);dust(e.x,G,12)}
- else{hurtE(e,{dmg:8,kb:12,lift:-5,ef:'splat',w:'H'},fc);e.thrown=1;e.ch=0}}
-// Hit weight (M4): every hit is Light, Medium or Heavy. Weight sets hit-stop, shake, camera kick, zoom and sound.
-const WT={L:{st:3,sh:2,kx:2,ky:0,z:0},M:{st:5,sh:4,kx:4,ky:1,z:.008},H:{st:7,sh:7,kx:9,ky:3,z:.03}};
-const wtOf=d=>d.w||(d.dmg>=10||d.ef==='launch'||d.ef==='splat'?'H':d.dmg>=7?'M':'L');
-function impact(w,dr,x,y,kill){const t=WT[w];stop=Math.max(stop,Math.round((t.st+(kill?2:0))*FEEL.hitstop));shake=Math.max(shake,t.sh);camX+=dr*t.kx;camY+=t.ky;if(t.z)zoom=Math.max(zoom,t.z);sfxHit(w);if(w==='H')fxp({k:'b',x,y,l:9,m:9,a:rnd()*6})}
-// Hit effects (Combat Chart F): stagger, push, pop, launch, kd (knockdown), trip, splat, bounce.
-const JUGMAX=7,EFVY={pop:-5,launch:-10,kd:-4,trip:-4,splat:-3};
-function hurtE(e,d,dr,src){
- if(e.dying)return;
- const w=wtOf(d),dmg=Math.max(1,Math.round(d.dmg*(combo<4?1:Math.max(.45,1-(combo-3)*.04))));   // long combos deal less per hit
- if(fr-(e.lh||-999)>60)e.jug=0;e.lh=fr;
- if(src&&src.pl){e.ch=0;e.thrown=0}
- if(e.st==='down')e.otgU=1;   // one hit on a downed enemy per knockdown
- e.hp-=dmg;e.flash=4;e.hs=WT[w].st;
- let ef=d.ef||'stagger';const air=e.y<G-6||e.st==='fly'||e.st==='splat';
- const ef0=ef;
- if(e.hp<=0){e.dying=1;e.ddir=dr;e.dk=d.fold?'fold':ef==='launch'||ef==='pop'?'back':ef==='trip'?'curl':ef==='bounce'?'plant':'sprawl';
-  if((ef==='stagger'||ef==='push')&&!air&&w!=='H'&&e.st!=='held'){e.dk='kneel';e.st='kneel';e.dt=22;e.att=null;e.vx=dr*1.5;e.face=-dr;ef='none'}
-  else if(ef==='stagger'||ef==='push')ef='kd'}
- // Poise: big enemies soak hits until it breaks; heavy hits wear it down faster. Broken = dizzy, grabbable, launchable.
- let arm=false;
- if(e.pmax&&!e.broken&&e.hp>0){e.poise-=dmg*(w==='H'?1.6:w==='M'?1.2:1);e.pr=fr;
-  if(e.poise<=0){e.poise=0;e.broken=150;txt(e.x,e.y-118*e.s,'BREAK!','#3ec5ff',26);ring(e.x,e.y-50*e.s,80);stop+=3;if(ef==='stagger'||ef==='push')ef='dizzy'}
-  else arm=!d.pierce}
- const m=e.T.m||1,ks=FEEL.kb/Math.sqrt(m),carry=src&&!d.dv&&Math.sign(src.vx)===dr?src.vx*.35/m:0;   // a moving attacker hits harder (dash-through moves pass through instead)
- if(ef==='none'){}
- else if(arm)e.vx+=dr*d.kb*.2*ks;
- else if(ef==='dizzy'){e.st='hurt';e.att=null;e.stun=90;e.vx=dr*2}
- else{
-  if(air&&(ef==='stagger'||ef==='push'))ef='pop';   // anything that connects in the air keeps them up
-  if(ef==='stagger'||ef==='push'){e.st='hurt';e.att=null;e.stun=12+(d.st||3)*2+(ef==='push'?4:0);e.vx=dr*d.kb*(ef==='push'?1.3:1)*ks+carry}
-  else{const capped=e.jug>=JUGMAX;e.jug++;
-   e.st='fly';e.ft=0;e.att=null;e.bh=new Set();e.pop=ef==='pop'&&!e.dying?1:0;e.gb=ef==='bounce'?1:0;e.splat=ef==='splat'?1:0;
-   e.vx=dr*(ef==='pop'?d.kb*.4:ef==='trip'?d.kb*.5:d.kb+(ef==='launch'?0:2))*ks+carry;
-   let vy=d.lift!=null?d.lift:ef==='bounce'?(air?11:3):EFVY[ef];
-   if(capped){vy=Math.max(vy,3);e.pop=0}   // juggle limit: no more lift, they drop
-   e.vy=vy/Math.pow(m,.25);e.spv=dr*(ef==='trip'?26:12+rnd()*8);e.sp=e.pose[9]=0;e.y-=2}}
- if(RS(e)||e.rag)e.ri={dr,ef:ef0==='push'?'kd':ef0};
- const px=e.x-dr*6,py=e.y-42*e.s;
- spark(px,py,10+d.dmg*2.2,w==='H'?'#ffd400':'#fff3a0');if(w!=='L')ring(px,py,w==='H'?55:35);
- txt(e.x,e.y-95*e.s,dmg,INK);
- impact(w,dr,px,py,e.hp<=0);
- combo++;comboT=100;meter=Math.min(100,meter+4);maxc=Math.max(maxc,combo);
- const cw={5:'NICE!',10:'GREAT!',20:'AMAZING!',35:'UNSTOPPABLE!',50:'GODLIKE!'}[combo];if(cw)txt(P.x,P.y-120,cw,'#ff7a00',26);
- if(e.hp<=0){const sc=Math.round(e.T.sc*(1+combo*.1));score+=sc;meter=Math.min(100,meter+6);txt(e.x,e.y-120*e.s,'+'+sc,'#ff4fa3',20);if(!queue.length&&E.every(x=>x.dying))slow=55}
+function blocks(e, f, d) {
+  if (!e.T.guard || e.noShield > 0 || e.dying) return false;
+  if (!(e.st === 'free' || e.st === 'block')) return false;
+  if (d.pierce || (d.top && d.top <= 60) || d.otg) return false;
+  return (f.x - e.x) * e.face > 0;
 }
-function hurtP(q,d,dr){if(state==='train'&&TR.god)return;
- if(q.inv>0||q.st==='dead'||(q.att&&q.att.d.invul))return;
- if(q.st==='grab'&&q.gt){const g=q.gt;if(g.st==='held'){g.st='hurt';g.stun=8;g.held=null}q.gt=null}   // getting hit lets go
- q.hp-=d.dmg;q.inv=65;q.flash=4;q.hs=7;combo=0;comboT=0;q.att=null;q.pose[9]=0;q.flip=0;q.running=0;
- stop=Math.max(stop,Math.round(7*FEEL.hitstop));shake=9;camX+=dr*7;spark(q.x,q.y-45,26,'#ff4fa3');sfxHit('M');sfx(90,.25,'sawtooth',.07,-50);
- q.ri={dr,ef:d.kb>=12?'launch':'kd'};
- if(q.hp<=0){q.hp=0;q.st='dead';q.dk='back';q.ddir=dr;q.vx=dr*6;q.vy=-9;q.sp=0;slow=80;q.deadT=0;return}
- if(d.kb>=12){q.st='fly';q.vx=dr*7;q.vy=-7;q.spv=dr*14;q.sp=0;q.inv=110;return}
- q.st='hurt';q.stun=18;q.vx=dr*d.kb;q.vy=d.lift?-5:-3;
+function block(e, d, dr) {
+  const w = wtOf(d);
+  e.gm -= Math.max(2, d.dmg) * (w === 'H' ? 2 : w === 'M' ? 1.3 : 1);
+  e.st = 'block';
+  e.stun = 12;
+  e.att = null;
+  e.vx = (dr * (w === 'H' ? 4 : 2)) / (e.T.m || 1);
+  e.lh = fr;
+  spark(e.x + e.face * 16 * e.s, e.y - 50 * e.s, 14, '#bfefff');
+  stop = Math.max(stop, 2);
+  sfx(700, 0.06, 'square', 0.04, -200);
+  noise(0.04, 0.05, 3000);
+  combo++;
+  comboT = 100;
+  if (e.gm <= 0) {
+    e.gm = 0;
+    e.noShield = 240;
+    e.st = 'hurt';
+    e.stun = 80;
+    e.broken = 90;
+    txt(e.x, e.y - 118 * e.s, 'GUARD BREAK!', '#3ec5ff', 24);
+    ring(e.x, e.y - 50 * e.s, 70);
+    stop += 4;
+    fxp({
+      k: 'sh',
+      x: e.x + e.face * 16 * e.s,
+      y: e.y - 50 * e.s,
+      vx: -e.face * 3,
+      vy: -6,
+      a: 0,
+      va: 0.25 * -e.face,
+      l: 70,
+      m: 70,
+      s: e.s
+    });
+    sfx(180, 0.3, 'sawtooth', 0.07, -90);
+  } else txt(e.x, e.y - 104 * e.s, 'BLOCK', '#7a6e80', 15);
+}
+// Grab: reach 52 px in front, standing enemies only; a big enemy needs its poise broken first.
+function tryGrab(f) {
+  let tg = null;
+  for (const e of E) {
+    if (e.gone || e.dying || !(e.st === 'free' || e.st === 'hurt' || e.st === 'atk')) continue;
+    const dx = (e.x - f.x) * f.face;
+    if (dx > -6 && dx < 52 && Math.abs(e.y - f.y) < 24) {
+      tg = e;
+      break;
+    }
+  }
+  if (tg && tg.pmax && tg.poise > 0 && !tg.broken) {
+    startAtk(f, A.gwhiff, 0);
+    txt(tg.x, tg.y - 118 * tg.s, 'TOO HEAVY!', '#e8212b', 18);
+    tg.vx += f.face * 1.5;
+    return;
+  }
+  if (!tg) {
+    startAtk(f, A.gwhiff, 0);
+    return;
+  }
+  f.st = 'grab';
+  f.att = null;
+  f.gt = tg;
+  f.gd = 0;
+  f.pum = 0;
+  f.pt = 0;
+  tg.st = 'held';
+  tg.att = null;
+  tg.vx = tg.vy = 0;
+  tg.sp = 0;
+  tg.pose[9] = 0;
+  tg.held = f;
+  markDone('grab');
+  txt(tg.x, tg.y - 110 * tg.s, 'GRAB!', '#ff7a00', 20);
+  sfx(260, 0.08, 'square', 0.05, -60);
+  noise(0.05, 0.05, 1800);
+  combo++;
+  comboT = 100;
+  maxc = Math.max(maxc, combo);
+}
+function pummel(f, e) {
+  const dmg = Math.max(1, Math.round(4 * (combo < 4 ? 1 : Math.max(0.45, 1 - (combo - 3) * 0.04))));
+  e.hp -= dmg;
+  e.flash = 4;
+  e.hs = 3;
+  markDone('pummel');
+  spark(e.x - f.face * 6, e.y - 40 * e.s, 14, '#fff3a0');
+  txt(e.x, e.y - 95 * e.s, dmg, INK);
+  impact('L', f.face, e.x, e.y - 40);
+  combo++;
+  comboT = 100;
+  meter = Math.min(100, meter + 3);
+  maxc = Math.max(maxc, combo);
+  if (e.hp <= 0) throwE(f, e, 'f');
+}
+// Throws: K while holding. Forward/neutral and back throw the enemy as a projectile into the crowd; Up launches; Down slams.
+function throwE(f, e, dir) {
+  e.held = null;
+  e.st = 'fly';
+  e.y = f.y - 10;
+  const mv = { f: 'tfwd', b: 'tback', u: 'tup', d: 'tslam' }[dir];
+  if (dir === 'b') {
+    f.face *= -1;
+    e.x = f.x + f.face * 20;
+  }
+  startAtk(f, A[mv], 0);
+  f.st = 'atk';
+  const fc = f.face;
+  if (dir === 'u') hurtE(e, { dmg: 6, kb: 1, lift: -13, ef: 'launch', w: 'M' }, fc);
+  else if (dir === 'd') {
+    e.y = G - 4;
+    hurtE(e, { dmg: 10, kb: 1, lift: -8, ef: 'bounce', w: 'H' }, fc);
+    ring(e.x, G, 70);
+    dust(e.x, G, 12);
+  } else {
+    hurtE(e, { dmg: 8, kb: 12, lift: -5, ef: 'splat', w: 'H' }, fc);
+    e.thrown = 1;
+    e.ch = 0;
+  }
+}
+// Hit weight (M4): every hit is Light, Medium or Heavy. Weight sets hit-stop, shake, camera kick, zoom and sound.
+const WT = {
+  L: { st: 3, sh: 2, kx: 2, ky: 0, z: 0 },
+  M: { st: 5, sh: 4, kx: 4, ky: 1, z: 0.008 },
+  H: { st: 7, sh: 7, kx: 9, ky: 3, z: 0.03 }
+};
+const wtOf = d =>
+  d.w || (d.dmg >= 10 || d.ef === 'launch' || d.ef === 'splat' ? 'H' : d.dmg >= 7 ? 'M' : 'L');
+function impact(w, dr, x, y, kill) {
+  const t = WT[w];
+  stop = Math.max(stop, Math.round((t.st + (kill ? 2 : 0)) * FEEL.hitstop));
+  shake = Math.max(shake, t.sh);
+  camX += dr * t.kx;
+  camY += t.ky;
+  if (t.z) zoom = Math.max(zoom, t.z);
+  sfxHit(w);
+  if (w === 'H') fxp({ k: 'b', x, y, l: 9, m: 9, a: rnd() * 6 });
+}
+// Hit effects (Combat Chart F): stagger, push, pop, launch, kd (knockdown), trip, splat, bounce.
+const JUGMAX = 7,
+  EFVY = { pop: -5, launch: -10, kd: -4, trip: -4, splat: -3 };
+function hurtE(e, d, dr, src) {
+  if (e.dying) return;
+  const w = wtOf(d),
+    dmg = Math.max(1, Math.round(d.dmg * (combo < 4 ? 1 : Math.max(0.45, 1 - (combo - 3) * 0.04)))); // long combos deal less per hit
+  if (fr - (e.lh || -999) > 60) e.jug = 0;
+  e.lh = fr;
+  if (src && src.pl) {
+    e.ch = 0;
+    e.thrown = 0;
+  }
+  if (e.st === 'down') e.otgU = 1; // one hit on a downed enemy per knockdown
+  e.hp -= dmg;
+  e.flash = 4;
+  e.hs = WT[w].st;
+  let ef = d.ef || 'stagger';
+  const air = e.y < G - 6 || e.st === 'fly' || e.st === 'splat';
+  const ef0 = ef;
+  if (e.hp <= 0) {
+    e.dying = 1;
+    e.ddir = dr;
+    e.dk = d.fold
+      ? 'fold'
+      : ef === 'launch' || ef === 'pop'
+        ? 'back'
+        : ef === 'trip'
+          ? 'curl'
+          : ef === 'bounce'
+            ? 'plant'
+            : 'sprawl';
+    if ((ef === 'stagger' || ef === 'push') && !air && w !== 'H' && e.st !== 'held') {
+      e.dk = 'kneel';
+      e.st = 'kneel';
+      e.dt = 22;
+      e.att = null;
+      e.vx = dr * 1.5;
+      e.face = -dr;
+      ef = 'none';
+    } else if (ef === 'stagger' || ef === 'push') ef = 'kd';
+  }
+  // Poise: big enemies soak hits until it breaks; heavy hits wear it down faster. Broken = dizzy, grabbable, launchable.
+  let arm = false;
+  if (e.pmax && !e.broken && e.hp > 0) {
+    e.poise -= dmg * (w === 'H' ? 1.6 : w === 'M' ? 1.2 : 1);
+    e.pr = fr;
+    if (e.poise <= 0) {
+      e.poise = 0;
+      e.broken = 150;
+      txt(e.x, e.y - 118 * e.s, 'BREAK!', '#3ec5ff', 26);
+      ring(e.x, e.y - 50 * e.s, 80);
+      stop += 3;
+      if (ef === 'stagger' || ef === 'push') ef = 'dizzy';
+    } else arm = !d.pierce;
+  }
+  const m = e.T.m || 1,
+    ks = FEEL.kb / Math.sqrt(m),
+    carry = src && !d.dv && Math.sign(src.vx) === dr ? (src.vx * 0.35) / m : 0; // a moving attacker hits harder (dash-through moves pass through instead)
+  if (ef === 'none') {
+  } else if (arm) e.vx += dr * d.kb * 0.2 * ks;
+  else if (ef === 'dizzy') {
+    e.st = 'hurt';
+    e.att = null;
+    e.stun = 90;
+    e.vx = dr * 2;
+  } else {
+    if (air && (ef === 'stagger' || ef === 'push')) ef = 'pop'; // anything that connects in the air keeps them up
+    if (ef === 'stagger' || ef === 'push') {
+      e.st = 'hurt';
+      e.att = null;
+      e.stun = 12 + (d.st || 3) * 2 + (ef === 'push' ? 4 : 0);
+      e.vx = dr * d.kb * (ef === 'push' ? 1.3 : 1) * ks + carry;
+    } else {
+      const capped = e.jug >= JUGMAX;
+      e.jug++;
+      e.st = 'fly';
+      e.ft = 0;
+      e.att = null;
+      e.bh = new Set();
+      e.pop = ef === 'pop' && !e.dying ? 1 : 0;
+      e.gb = ef === 'bounce' ? 1 : 0;
+      e.splat = ef === 'splat' ? 1 : 0;
+      e.vx =
+        dr *
+          (ef === 'pop' ? d.kb * 0.4 : ef === 'trip' ? d.kb * 0.5 : d.kb + (ef === 'launch' ? 0 : 2)) *
+          ks +
+        carry;
+      let vy = d.lift != null ? d.lift : ef === 'bounce' ? (air ? 11 : 3) : EFVY[ef];
+      if (capped) {
+        vy = Math.max(vy, 3);
+        e.pop = 0;
+      } // juggle limit: no more lift, they drop
+      e.vy = vy / Math.pow(m, 0.25);
+      e.spv = dr * (ef === 'trip' ? 26 : 12 + rnd() * 8);
+      e.sp = e.pose[9] = 0;
+      e.y -= 2;
+    }
+  }
+  if (RS(e) || e.rag) e.ri = { dr, ef: ef0 === 'push' ? 'kd' : ef0 };
+  const px = e.x - dr * 6,
+    py = e.y - 42 * e.s;
+  spark(px, py, 10 + d.dmg * 2.2, w === 'H' ? '#ffd400' : '#fff3a0');
+  if (w !== 'L') ring(px, py, w === 'H' ? 55 : 35);
+  txt(e.x, e.y - 95 * e.s, dmg, INK);
+  impact(w, dr, px, py, e.hp <= 0);
+  combo++;
+  comboT = 100;
+  meter = Math.min(100, meter + 4);
+  maxc = Math.max(maxc, combo);
+  const cw = { 5: 'NICE!', 10: 'GREAT!', 20: 'AMAZING!', 35: 'UNSTOPPABLE!', 50: 'GODLIKE!' }[combo];
+  if (cw) txt(P.x, P.y - 120, cw, '#ff7a00', 26);
+  if (e.hp <= 0) {
+    const sc = Math.round(e.T.sc * (1 + combo * 0.1));
+    score += sc;
+    meter = Math.min(100, meter + 6);
+    txt(e.x, e.y - 120 * e.s, '+' + sc, '#ff4fa3', 20);
+    if (!queue.length && E.every(x => x.dying)) slow = 55;
+  }
+}
+function hurtP(q, d, dr) {
+  if (state === 'train' && TR.god) return;
+  if (q.inv > 0 || q.st === 'dead' || (q.att && q.att.d.invul)) return;
+  if (q.st === 'grab' && q.gt) {
+    const g = q.gt;
+    if (g.st === 'held') {
+      g.st = 'hurt';
+      g.stun = 8;
+      g.held = null;
+    }
+    q.gt = null;
+  } // getting hit lets go
+  q.hp -= d.dmg;
+  q.inv = 65;
+  q.flash = 4;
+  q.hs = 7;
+  combo = 0;
+  comboT = 0;
+  q.att = null;
+  q.pose[9] = 0;
+  q.flip = 0;
+  q.running = 0;
+  stop = Math.max(stop, Math.round(7 * FEEL.hitstop));
+  shake = 9;
+  camX += dr * 7;
+  spark(q.x, q.y - 45, 26, '#ff4fa3');
+  sfxHit('M');
+  sfx(90, 0.25, 'sawtooth', 0.07, -50);
+  q.ri = { dr, ef: d.kb >= 12 ? 'launch' : 'kd' };
+  if (q.hp <= 0) {
+    q.hp = 0;
+    q.st = 'dead';
+    q.dk = 'back';
+    q.ddir = dr;
+    q.vx = dr * 6;
+    q.vy = -9;
+    q.sp = 0;
+    slow = 80;
+    q.deadT = 0;
+    return;
+  }
+  if (d.kb >= 12) {
+    q.st = 'fly';
+    q.vx = dr * 7;
+    q.vy = -7;
+    q.spv = dr * 14;
+    q.sp = 0;
+    q.inv = 110;
+    return;
+  }
+  q.st = 'hurt';
+  q.stun = 18;
+  q.vx = dr * d.kb;
+  q.vy = d.lift ? -5 : -3;
 }
 // Bodies as projectiles: a flying enemy knocks down whoever it hits. Each link in the chain hits 25% softer.
 // Momentum is shared by mass; a heavy target with poise stops the projectile cold. Falling bodies crush; downed bodies make a pile-up.
-function bowl(){for(const a of E){if(a.st!=='fly'||a.gone||a.corpse)continue;const sp=Math.abs(a.vx),fall=a.vy>7;
- if(sp<(a.thrown?3:4)&&!fall)continue;
- for(const b of E){if(b===a||b.gone||b.st==='held'||a.bh.has(b))continue;
-  const dx=b.x-a.x,dy=b.y-a.y;
-  if(b.st==='down'){if(Math.abs(dx)<30&&Math.abs(dy)<24&&sp>=4){a.bh.add(b);b.vx+=a.vx*.4/b.T.m;if(b.rag){b.ri={dr:Math.sign(a.vx),ef:'kd'};b.ct=0}a.vy=Math.min(a.vy,-5);a.vx*=.6;dust(b.x,G,4);sfx(90,.08,'sine',.08)}continue}
-  if(b.st==='fly'||b.st==='getup'||b.st==='splat')continue;
-  if(fall&&Math.abs(dx)<26&&dy>20&&dy<75){a.bh.add(b);hurtE(b,{dmg:6,kb:2,lift:-3,ef:'kd',w:'M'},Math.sign(dx)||1);b.ch=(a.ch||0)+1;a.vy=-4;txt(b.x,b.y-100,'CRUSH!','#ff7a00',20);continue}
-  if(Math.abs(dx)<28&&Math.abs(dy)<60&&Math.sign(dx)===Math.sign(a.vx)){
-   a.bh.add(b);const ch=a.ch||0,dir=Math.sign(a.vx),ma=a.T.m,mb=b.T.m;
-   const dmg=Math.max(2,Math.round((4+sp*.7)*ma*(a.thrown?1.4:1)*Math.pow(.75,ch)));
-   if(blocks(b,a,{dmg,top:84})){block(b,{dmg:dmg*1.5,w:'H'},dir);a.vx*=-.35;continue}
-   hurtE(b,{dmg,kb:Math.min(12,sp*.8*ma),lift:-5,ef:'kd',w:dmg>=10?'H':'M'},dir);
-   if(b.st==='fly'){b.ch=ch+1;b.thrown=0;a.vx*=ma/(ma+mb)}else{a.vx*=-.3;spark(b.x-dir*14,b.y-45*b.s,16,'#fff3a0')}
-   txt(b.x,b.y-104*b.s,ch?('CHAIN x'+(ch+2)):'STRIKE!','#ff7a00',20);score+=10*(ch+1)}}}}
-function sep(){const all=E.filter(e=>(e.st==='free'||e.st==='atk'||e.st==='hurt'||e.st==='getup')&&!e.gone);
- for(let i=0;i<all.length;i++){const a=all[i];
-  for(let j=i+1;j<all.length;j++){const b=all[j];if(Math.abs(a.y-b.y)>40)continue;const m=(a.s+b.s)*9,dx=b.x-a.x;
-   if(Math.abs(dx)<m){const o=(m-Math.abs(dx))*.5,s=dx>=0?1:-1,ma=a.T.m,mb=b.T.m;a.x-=s*o*mb/(ma+mb);b.x+=s*o*ma/(ma+mb)}}
-  for(const p of PL){if(p.st==='dead'||p.phase>0||p.st==='grab'||Math.abs(a.y-p.y)>45)continue;const m=10+14*a.s,dx=a.x-p.x;
-   if(Math.abs(dx)<m){const o=(m-Math.abs(dx))*.6,s=dx>=0?1:-1,ma=a.T.m,canMove=p.st==='free'||p.st==='atk';
-    a.x+=s*o*(canMove?1/(ma+1):1);if(canMove)p.x-=s*o*ma/(ma+1);
-    if(Math.sign(p.vx)===s&&Math.abs(p.vx)>1&&a.st!=='atk')a.vx+=p.vx*.12/ma}}}}
+function bowl() {
+  for (const a of E) {
+    if (a.st !== 'fly' || a.gone || a.corpse) continue;
+    const sp = Math.abs(a.vx),
+      fall = a.vy > 7;
+    if (sp < (a.thrown ? 3 : 4) && !fall) continue;
+    for (const b of E) {
+      if (b === a || b.gone || b.st === 'held' || a.bh.has(b)) continue;
+      const dx = b.x - a.x,
+        dy = b.y - a.y;
+      if (b.st === 'down') {
+        if (Math.abs(dx) < 30 && Math.abs(dy) < 24 && sp >= 4) {
+          a.bh.add(b);
+          b.vx += (a.vx * 0.4) / b.T.m;
+          if (b.rag) {
+            b.ri = { dr: Math.sign(a.vx), ef: 'kd' };
+            b.ct = 0;
+          }
+          a.vy = Math.min(a.vy, -5);
+          a.vx *= 0.6;
+          dust(b.x, G, 4);
+          sfx(90, 0.08, 'sine', 0.08);
+        }
+        continue;
+      }
+      if (b.st === 'fly' || b.st === 'getup' || b.st === 'splat') continue;
+      if (fall && Math.abs(dx) < 26 && dy > 20 && dy < 75) {
+        a.bh.add(b);
+        hurtE(b, { dmg: 6, kb: 2, lift: -3, ef: 'kd', w: 'M' }, Math.sign(dx) || 1);
+        b.ch = (a.ch || 0) + 1;
+        a.vy = -4;
+        txt(b.x, b.y - 100, 'CRUSH!', '#ff7a00', 20);
+        continue;
+      }
+      if (Math.abs(dx) < 28 && Math.abs(dy) < 60 && Math.sign(dx) === Math.sign(a.vx)) {
+        a.bh.add(b);
+        const ch = a.ch || 0,
+          dir = Math.sign(a.vx),
+          ma = a.T.m,
+          mb = b.T.m;
+        const dmg = Math.max(2, Math.round((4 + sp * 0.7) * ma * (a.thrown ? 1.4 : 1) * Math.pow(0.75, ch)));
+        if (blocks(b, a, { dmg, top: 84 })) {
+          block(b, { dmg: dmg * 1.5, w: 'H' }, dir);
+          a.vx *= -0.35;
+          continue;
+        }
+        hurtE(b, { dmg, kb: Math.min(12, sp * 0.8 * ma), lift: -5, ef: 'kd', w: dmg >= 10 ? 'H' : 'M' }, dir);
+        if (b.st === 'fly') {
+          b.ch = ch + 1;
+          b.thrown = 0;
+          a.vx *= ma / (ma + mb);
+        } else {
+          a.vx *= -0.3;
+          spark(b.x - dir * 14, b.y - 45 * b.s, 16, '#fff3a0');
+        }
+        txt(b.x, b.y - 104 * b.s, ch ? 'CHAIN x' + (ch + 2) : 'STRIKE!', '#ff7a00', 20);
+        score += 10 * (ch + 1);
+      }
+    }
+  }
+}
+function sep() {
+  const all = E.filter(
+    e => (e.st === 'free' || e.st === 'atk' || e.st === 'hurt' || e.st === 'getup') && !e.gone
+  );
+  for (let i = 0; i < all.length; i++) {
+    const a = all[i];
+    for (let j = i + 1; j < all.length; j++) {
+      const b = all[j];
+      if (Math.abs(a.y - b.y) > 40) continue;
+      const m = (a.s + b.s) * 9,
+        dx = b.x - a.x;
+      if (Math.abs(dx) < m) {
+        const o = (m - Math.abs(dx)) * 0.5,
+          s = dx >= 0 ? 1 : -1,
+          ma = a.T.m,
+          mb = b.T.m;
+        a.x -= (s * o * mb) / (ma + mb);
+        b.x += (s * o * ma) / (ma + mb);
+      }
+    }
+    for (const p of PL) {
+      if (p.st === 'dead' || p.phase > 0 || p.st === 'grab' || Math.abs(a.y - p.y) > 45) continue;
+      const m = 10 + 14 * a.s,
+        dx = a.x - p.x;
+      if (Math.abs(dx) < m) {
+        const o = (m - Math.abs(dx)) * 0.6,
+          s = dx >= 0 ? 1 : -1,
+          ma = a.T.m,
+          canMove = p.st === 'free' || p.st === 'atk';
+        a.x += s * o * (canMove ? 1 / (ma + 1) : 1);
+        if (canMove) p.x -= (s * o * ma) / (ma + 1);
+        if (Math.sign(p.vx) === s && Math.abs(p.vx) > 1 && a.st !== 'atk') a.vx += (p.vx * 0.12) / ma;
+      }
+    }
+  }
+}
 // Ground height as a function of x: flat today; M14 (platforms, stairs) changes only this.
-const groundY=x=>G;
-function phys(f){if(!(f.att&&(f.att.d.hover||f.att.d.tatsu)))f.vy+=.7*FEEL.grav;f.x+=f.vx;f.y+=f.vy;let imp=0;const gy=groundY(f.x);if(f.y>=gy){if(f.vy>0)imp=f.vy;f.y=gy;f.vy=0}f.x=Math.max(24,Math.min(W-24,f.x));return imp}
-function freePose(f){
- if(f.y<G-4)return f.vy<-1?JUMP:FALL;
- if(Math.abs(f.vx)>.9){const ph=f.t*(f.pl?.3:.22),c=Math.cos(ph),n=Math.sin(ph);return[14,35-n*45,70,35+n*45,70,n*50,25+Math.max(0,c)*60,-n*50,25+Math.max(0,-c)*60,0]}
- const b=Math.sin(f.t*.1)*3;return[IDLE[0]+b/2,IDLE[1]+b,IDLE[2]-b,IDLE[3]-b,IDLE[4]+b,IDLE[5],IDLE[6]+b,IDLE[7],IDLE[8]-b,0]}
-function runPose(f){const ph=f.t*.42,c=Math.cos(ph),n=Math.sin(ph);return[35,60-n*70,80,60+n*70,80,n*70,30+Math.max(0,c)*80,-n*70,30+Math.max(0,-c)*80,0]}
-const smooth=(f,tp,k)=>{for(let i=0;i<9;i++)f.pose[i]+=(tp[i]-f.pose[i])*k};
-function near(f){let b=null,bd=150;for(const e of E){if(e.dying||e.gone)continue;const d=Math.abs(e.x-f.x);if(d<bd){bd=d;b=e}}return b}
+const groundY = x => G;
+function phys(f) {
+  if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav;
+  f.x += f.vx;
+  f.y += f.vy;
+  let imp = 0;
+  const gy = groundY(f.x);
+  if (f.y >= gy) {
+    if (f.vy > 0) imp = f.vy;
+    f.y = gy;
+    f.vy = 0;
+  }
+  f.x = Math.max(24, Math.min(W - 24, f.x));
+  return imp;
+}
+function freePose(f) {
+  if (f.y < G - 4) return f.vy < -1 ? JUMP : FALL;
+  if (Math.abs(f.vx) > 0.9) {
+    const ph = f.t * (f.pl ? 0.3 : 0.22),
+      c = Math.cos(ph),
+      n = Math.sin(ph);
+    return [
+      14,
+      35 - n * 45,
+      70,
+      35 + n * 45,
+      70,
+      n * 50,
+      25 + Math.max(0, c) * 60,
+      -n * 50,
+      25 + Math.max(0, -c) * 60,
+      0
+    ];
+  }
+  const b = Math.sin(f.t * 0.1) * 3;
+  return [
+    IDLE[0] + b / 2,
+    IDLE[1] + b,
+    IDLE[2] - b,
+    IDLE[3] - b,
+    IDLE[4] + b,
+    IDLE[5],
+    IDLE[6] + b,
+    IDLE[7],
+    IDLE[8] - b,
+    0
+  ];
+}
+function runPose(f) {
+  const ph = f.t * 0.42,
+    c = Math.cos(ph),
+    n = Math.sin(ph);
+  return [
+    35,
+    60 - n * 70,
+    80,
+    60 + n * 70,
+    80,
+    n * 70,
+    30 + Math.max(0, c) * 80,
+    -n * 70,
+    30 + Math.max(0, -c) * 80,
+    0
+  ];
+}
+const smooth = (f, tp, k) => {
+  for (let i = 0; i < 9; i++) f.pose[i] += (tp[i] - f.pose[i]) * k;
+};
+function near(f) {
+  let b = null,
+    bd = 150;
+  for (const e of E) {
+    if (e.dying || e.gone) continue;
+    const d = Math.abs(e.x - f.x);
+    if (d < bd) {
+      bd = d;
+      b = e;
+    }
+  }
+  return b;
+}
