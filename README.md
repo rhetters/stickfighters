@@ -19,7 +19,7 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Touch layout:** Settings → Touch layout → **Customize** lets you drag every button and the stick where you want them, resize them, and save named layouts (Default and Left-handed are built in).
 
-The **Training Room** (title screen) has spawnable dummies, hitbox and frame-data overlays, a move list with every combo (**M**), and live feel tuning (**T**): hit-stop, screen shake, knockback, gravity, bounce and how long bodies stay.
+The **Training Room** (title screen) has spawnable dummies, hitbox and frame-data overlays, and three colored buttons at the top: **Feel** (**F**, live feel tuning), **Moves** (**M**, every combo) and **Info** (**I**, health, speed, damage, height and how to beat each enemy). Feel tuning covers hit-stop, screen shake, knockback, gravity, bounce and how long bodies stay.
 
 ## Enemies
 
