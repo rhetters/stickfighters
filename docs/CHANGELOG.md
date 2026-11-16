@@ -2,6 +2,13 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M8 · Level framework and Level 1: Wooded Trail
+- Modes: Arcade and Level run on the same engine. Title: Play Wooded Trail / Arcade: Endless Waves.
+- Wooded Trail: 6 chunks, 5 ambushes, a breakable fallen log, checkpoints with Continue, level-clear screen with time bonus.
+- Paper-style parallax scenery, morning-to-dusk sky, falling leaves, fireflies, foreground grass. Trail map in the HUD.
+- Save version 2 (level progress) with migration from old saves.
+- Self-test fingerprints: Arcade `39f01735` (unchanged), Level `8c67f67e`.
+
 ## Roadmap reorder (November 16, 2026)
 - Approved by Ron and Rhett: local multiplayer moves up to M9; XP and skill tree M10; ninja stars, cosmetic store and character creation merged into M11 (store items are cosmetic only); new milestones for the level creator (M16), network play (M17) and the house builder (M18). Old-to-new numbers are in ROADMAP.md.
 - Rhett checked M7.5 on his iPad: all good.

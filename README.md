@@ -4,7 +4,13 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Play:** https://rhetters.github.io/stickfighters/
 
-**Status:** M0–M7 done, plus the M7.5 restructure. Next: M8, the level framework and Level 1: Wooded Trail, then M9 local multiplayer (versus and co-op on the TV). Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Status:** M0–M8 done: the Wooded Trail level and Arcade waves are both playable. Next: M9, local multiplayer (versus and co-op on the TV). Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
+
+## Modes
+
+- **Play: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.
+- **Arcade: Endless Waves** is the original game: waves on one screen, with a Captain every fifth wave.
+- **Training Room** has dummies, hitboxes, frame data and the Feel / Moves / Info panels.
 
 ## Controls
 
@@ -39,6 +45,7 @@ Only a few enemies attack at once; the rest circle at a distance waiting their t
 ## Test checklist (iPad and a keyboard computer)
 
 - Title screen shows your best score; Settings keep their values after a reload.
+- Wooded Trail: the camera stops for each fight, GO → appears after each, the log blocks the way until smashed, Continue after a KO, and the level-clear screen at the arch.
 - Custom touch layouts still appear, and drag, resize, save and delete work.
 - Combos from each Move List section (A–G), Surge moves, Winded, grab and all four throws, Tornado Kick.
 - A Guard breaking, a Flanker leap, a Captain on wave 5 (enrages at about half health).

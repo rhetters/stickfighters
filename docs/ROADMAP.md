@@ -10,7 +10,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 
 **Why this order.** Input comes first because every combo depends on knowing which direction is held. Then the combat engine, then Surge (your stamina system), because Surge modifies moves. Collision feel and ragdoll come before levels and progression, since you called them the core of the game and there’s no point building five levels on combat that will change. Progression and the shop come once there’s a real level to earn XP in. Levels 2–6 come last, when the systems stop moving.
 
-**Where things stand.** M0 to M7 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M8 is next.
+**Where things stand.** M0 to M8 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M9 is next.
 
 **Why this order after M7 (reordered November 16, 2026).** Ron and Rhett approved the order from the restructure plan. M8 builds the level framework so the world is no longer one screen and each game type is a separate "mode". Local multiplayer comes next (M9) so Rhett gets Smash-style versus early, and because network play later needs the same per-player groundwork. Progression (M10) and the ninja star store with character creation (M11) follow, then the rest of the campaign (M12–M15, ending in the v1.0 release). The level creator, network play and the house builder come after that. The old numbers are listed under "Renumbering" below.
 
@@ -35,8 +35,8 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 | M6 | Custom touch layout | Done | M | M1 | Drag and resize every touch control, saved layout profiles |
 | M7 | Enemy AI and roster v2 | Done | L | M4, M5 | New enemy types, AI director, boss hooks |
 | M7.5 | Restructure: files, docs, self-test | Done | M | M7 | Same game; code split into files, docs in the repo, `?selftest` determinism check |
-| M8 | Level framework, modes, Level 1: Wooded Trail | Next | L | M7.5 | Scrolling level with parallax layers; the wave game becomes Arcade mode |
-| M9 | Local multiplayer: co-op and versus | Planned | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
+| M8 | Level framework, modes, Level 1: Wooded Trail | Done | L | M7.5 | Scrolling level with parallax layers; the wave game becomes Arcade mode |
+| M9 | Local multiplayer: co-op and versus | Next | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
 | M10 | XP, levels, skill tree | Planned | L | M3, M8 | Level-ups, skill points, tree screen |
 | M11 | Ninja stars, cosmetic store, character creation | Planned | L | M10 | Star drops, store by slot, create and dress your fighter, save backup |
 | M12 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M11 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
@@ -257,6 +257,20 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **Decision gate G1:** keep levels flat, or commit to platforms (see M14).
 
 **Done when:** Level 1 is playable start to finish on iPad, phone and desktop, Arcade mode still plays as before, and the self-test passes.
+
+**Status: complete.** The title screen now offers **Play: Wooded Trail** and **Arcade: Endless Waves**.
+
+- **Modes:** Arcade (the original waves) and Level are separate modes on the same combat engine. Training is unchanged.
+- **The trail:** six chunks, 6,900 px long: Trailhead, Birches, Fallen Log, Clearing, Grove, Trail End. The camera follows you forward only and stops for each of the 5 ambushes (enemies leap down from the treetops). You can't leave the screen during a fight. After a fight: +25 health, a checkpoint, and a flashing GO →.
+- **Fights:** 3 grunts; grunts and runners; a Guard with grunts; Flankers, a runner and a Brute; then the Grove finale with a Guard, a Flanker, a Brute and the Captain. Enemies get tougher as you go.
+- **The fallen log** blocks the trail after the third fight. Punch and kick it (or splat an enemy into it) until it smashes.
+- **Continue:** a KO in the level offers Continue from the last fight you won (full health, score kept) or Restart.
+- **Level clear:** walking through the Sewer Entrance arch shows time, score (with a time bonus) and best combo, and saves your best score and time.
+- **Scenery:** paper-style parallax (far mountains, hills with pines, a tree line), trees, birches, pines, bushes, rocks, stumps, ferns, signs, foreground grass, falling leaves, a sky that goes from morning to dusk, and fireflies in the Grove.
+- **HUD:** level name with a trail map (fights, the log, you), enemies left, and the GO arrow.
+- **Save version 2:** the save now records level progress. Old saves load with every setting, best score and touch layout intact.
+- **Self-test:** a second fingerprint plays the Wooded Trail with scripted inputs (`8c67f67e`); the Arcade fingerprint is unchanged (`39f01735`).
+- **Decision gate G1 (platforms):** still open. The trail is flat; M14 decides on platforms.
 
 ### M9 · Local multiplayer: co-op and versus
 
@@ -523,4 +537,4 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 
 ## Suggested next step
 
-Next is **M8**, the level framework and Level 1: Wooded Trail. It turns the waves into a scrolling level with themed scenery, encounters and checkpoints, using the M7 roster.
+Next is **M9**, local multiplayer: one input slot per player, a "press any button to join" screen for controllers on the TV, Rhett's Smash-style versus arena, and co-op through the Wooded Trail. Decide first how players defend in versus (Open decisions, item 8).
