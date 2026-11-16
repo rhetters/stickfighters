@@ -21,6 +21,19 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 The **Training Room** (title screen) has spawnable dummies, hitbox and frame-data overlays, a move list with every combo (**M**), and live feel tuning (**T**): hit-stop, screen shake, knockback, gravity, bounce and how long bodies stay.
 
+## Enemies
+
+| Enemy | What it does | How to beat it |
+|---|---|---|
+| Grunt | Basic puncher | Anything |
+| Runner | Fast lunge from range | Interrupt it with quick hits |
+| Brute | Heavy, has poise (blue bar) | Heavy hits to break poise, then launch or grab |
+| Guard | Shield blocks hits from the front | Hit it from behind, sweep low, grab it, Tornado Kick, or smash the shield (GUARD BREAK) |
+| Flanker | Sneaks or leaps behind you | Hits that cover both sides: Spin Back-Kick, sweeps, Whirlwind |
+| Captain (boss, waves 5/10/15) | Slam, charge; enraged at 55% adds a quake leap and backup | Break its poise; jump the quake |
+
+Only a few enemies attack at once; the rest circle at a distance waiting their turn. Surge-phasing through one confuses it (?!) and then it chases faster.
+
 ## Milestones
 
 | ID | Milestone | Status |
@@ -32,8 +45,8 @@ The **Training Room** (title screen) has spawnable dummies, hitbox and frame-dat
 | M4 | Collision and impact feel, grab and throw | Done |
 | M5 | Ragdoll, death poses, cleanup | Done |
 | M6 | Custom touch layout (drag, resize, profiles) | Done |
-| M7 | Enemy AI and roster v2 | Next |
-| M8 | Level framework, Level 1: Wooded Trail | Planned |
+| M7 | Enemy AI and roster v2 (Guard, Flanker, Captain boss) | Done |
+| M8 | Level framework, Level 1: Wooded Trail | Next |
 | M9 | XP, levels, skill tree | Planned |
 | M10 | Ninja stars, items, shop | Planned |
 | M11 | Character creation | Planned |
