@@ -263,6 +263,7 @@ function drawF(f) {
   }
 }
 function bg() {
+  if (MODE.bg && state !== 'train') return MODE.bg();
   ctx.fillStyle = '#fbfaf4';
   ctx.fillRect(-30, -30, W + 60, H + 60);
   ctx.drawImage(gridC, 0, 0, W, H);
@@ -480,13 +481,15 @@ function hud() {
   if (state !== 'train') ctx.fillText(String(score).padStart(7, '0'), W - 16, 34);
   ctx.textAlign = 'center';
   ctx.font = '900 18px Impact,"Arial Black",sans-serif';
-  ctx.fillText(
-    state === 'train'
-      ? 'TRAINING ROOM'
-      : 'WAVE ' + wave + '  ·  ' + (queue.length + E.filter(e => !e.dying).length) + ' LEFT',
-    W / 2,
-    30
-  );
+  if (MODE.hud && state !== 'train') MODE.hud();
+  else
+    ctx.fillText(
+      state === 'train'
+        ? 'TRAINING ROOM'
+        : 'WAVE ' + wave + '  ·  ' + (queue.length + E.filter(e => !e.dying).length) + ' LEFT',
+      W / 2,
+      30
+    );
   if (combo > 1) {
     const sz = 30 + Math.min(combo, 30) * 0.8 + (comboT > 95 ? 6 : 0);
     ctx.textAlign = 'right';

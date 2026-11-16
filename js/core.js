@@ -15,15 +15,28 @@ const DEF = {
 };
 let SET = { ...DEF },
   BEST = { score: 0, wave: 0, combo: 0 },
+  PROG = {},
   LAST = null;
+// The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
+//   v1 (no saveVersion): { set, best }
+//   v2 (M8): adds prog = { levelId: { done, score, time, combo } }
+const SAVE_VERSION = 2;
+function migrate(s) {
+  if (!s.saveVersion) {
+    s.prog = s.prog || {};
+    s.saveVersion = 2;
+  }
+  return s;
+}
 try {
-  const s = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
+  const s = migrate(JSON.parse(localStorage.getItem(SAVE_KEY) || '{}'));
   if (s.set) Object.assign(SET, s.set);
   if (s.best) Object.assign(BEST, s.best);
+  if (s.prog) Object.assign(PROG, s.prog);
 } catch (e) {}
 const save = () => {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ set: SET, best: BEST }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ saveVersion: SAVE_VERSION, set: SET, best: BEST, prog: PROG }));
   } catch (e) {}
 };
 // ===== SEEDED RANDOM (M0): same seed = same spawns, AI rolls and particle noise =====

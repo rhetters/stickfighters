@@ -9,7 +9,7 @@ let paused = false,
 const gridC = document.createElement('canvas'),
   coarseMQ = matchMedia('(pointer:coarse)'),
   portraitMQ = matchMedia('(orientation:portrait) and (pointer:coarse)');
-const SCREENS = ['s-title', 's-pause', 's-settings', 's-over'];
+const SCREENS = ['s-title', 's-pause', 's-settings', 's-over', 's-clear'];
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
   $('ui').hidden = !id;
@@ -41,9 +41,14 @@ function openTitle() {
   $('trainpanel').hidden = true;
   newSeed();
   init();
-  $('best').textContent = BEST.score
-    ? 'Best: ' + BEST.score + ' pts · wave ' + BEST.wave + ' · ' + BEST.combo + '-hit combo'
-    : 'No runs yet. Pick a mode.';
+  const lp = PROG.woods1;
+  $('best').textContent =
+    (lp && lp.done ? 'Wooded Trail cleared: best ' + lp.score + ' pts in ' + fmtT(lp.time) + '. ' : '') +
+    (BEST.score
+      ? 'Arcade best: ' + BEST.score + ' pts · wave ' + BEST.wave + ' · ' + BEST.combo + '-hit combo'
+      : lp && lp.done
+        ? ''
+        : 'No runs yet. Pick a mode.');
   show('s-title');
 }
 function start() {
@@ -92,6 +97,9 @@ function pause(on) {
 const togglePause = () => pause(!paused);
 function over() {
   if (state !== 'play') return;
+  if (MODE.over) return MODE.over();
+  $('b-cont').hidden = true;
+  $('b-again').textContent = 'FIGHT AGAIN';
   state = 'over';
   const nb = score > BEST.score;
   BEST.score = Math.max(BEST.score, score);
@@ -200,6 +208,7 @@ $('b-set1').onclick = () => {
 $('b-resume').onclick = () => pause(false);
 $('b-restart').onclick = () => {
   if (state === 'train') startTrain();
+  else if (MODE === LEVEL) startLevel(LV.id);
   else start();
 };
 $('b-set2').onclick = () => {
@@ -208,7 +217,11 @@ $('b-set2').onclick = () => {
 };
 $('b-quit').onclick = openTitle;
 $('b-back').onclick = () => show(back);
-$('b-again').onclick = start;
+$('b-again').onclick = () => (MODE === LEVEL ? startLevel(LV.id) : start());
+$('b-cont').onclick = continueLevel;
+$('b-level').onclick = () => startLevel('woods1');
+$('b-next').onclick = () => startLevel(LV.id);
+$('b-title2').onclick = openTitle;
 $('b-title').onclick = openTitle;
 $('pausebtn').onclick = () => pause(true);
 // training panel + hotkeys (1/2/3 spawn, 0 clear, H boxes, [ ] speed, \ freeze, . step)
@@ -443,7 +456,7 @@ if (/[?&]selftest/.test(location.search)) {
     d = document.createElement('pre');
   d.id = 'selftest';
   d.textContent =
-    'SELFTEST ' + R.hash + '  (ticks ' + R.ticks + ', wave ' + R.wave + ', score ' + R.score + ')';
+    'SELFTEST ' + R.hash + '  (ticks ' + R.ticks + ', wave ' + R.wave + ', score ' + R.score + ')  LEVEL ' + R.hashL + '  (' + R.level + ')';
   d.style.cssText =
     'position:fixed;left:8px;top:8px;z-index:99;background:#1c1626;color:#ffd400;padding:8px 12px;font:14px monospace;border-radius:6px';
   document.body.appendChild(d);

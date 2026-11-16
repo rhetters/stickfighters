@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Orange vs. the Pink Army</title>
-<link rel="stylesheet" href="css/style.css?v=1">
+<link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
 <div id="wrap">
@@ -35,7 +35,8 @@
  <div class="screen" id="s-title">
   <h1>ORANGE vs. PINK ARMY</h1>
   <p id="best"></p>
-  <button class="btn" id="b-start">START GAME</button>
+  <button class="btn" id="b-level">PLAY: WOODED TRAIL</button>
+  <button class="btn alt" id="b-start">ARCADE: ENDLESS WAVES</button>
   <button class="btn alt" id="b-train">TRAINING ROOM</button>
   <button class="btn alt" id="b-set1">SETTINGS</button>
   <p class="kbhint"><b>A/D</b> move &middot; <b>W/S</b> aim up/down &middot; <b>Space</b> jump &middot; <b>J</b> punch &middot; <b>K</b> kick &middot; <b>Shift</b> Surge (hold, or tap on/off in Settings): + &larr;/&rarr; to run through enemies, + Space super jump, + J/K Surge moves &middot; <b>U</b> ultimate &middot; <b>Esc</b> pause</p>
@@ -67,8 +68,15 @@
  <div class="screen" id="s-over" hidden>
   <h1>KO!</h1>
   <p id="o-l1"></p><p id="o-l2"></p>
+  <button class="btn" id="b-cont" hidden>CONTINUE FROM CHECKPOINT</button>
   <button class="btn" id="b-again">FIGHT AGAIN</button>
   <button class="btn alt" id="b-title">TITLE</button>
+ </div>
+ <div class="screen" id="s-clear" hidden>
+  <h1>LEVEL CLEAR!</h1>
+  <p id="c-l1"></p><p id="c-l2"></p><p id="c-l3"></p>
+  <button class="btn" id="b-next">PLAY AGAIN</button>
+  <button class="btn alt" id="b-title2">TITLE</button>
  </div>
 </div>
 </div>
@@ -78,21 +86,24 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=1" defer></script>
-<script src="js/input.js?v=1" defer></script>
-<script src="js/data/moves.js?v=1" defer></script>
-<script src="js/data/enemies.js?v=1" defer></script>
-<script src="js/player.js?v=1" defer></script>
-<script src="js/effects.js?v=1" defer></script>
-<script src="js/combat.js?v=1" defer></script>
-<script src="js/enemies.js?v=1" defer></script>
-<script src="js/modes.js?v=1" defer></script>
-<script src="js/ragdoll.js?v=1" defer></script>
-<script src="js/render.js?v=1" defer></script>
-<script src="js/ui/panels.js?v=1" defer></script>
-<script src="js/ui/training.js?v=1" defer></script>
-<script src="js/ui/touch-layout.js?v=1" defer></script>
-<script src="js/selftest.js?v=1" defer></script>
-<script src="js/main.js?v=1" defer></script>
+<script src="js/core.js?v=2" defer></script>
+<script src="js/input.js?v=2" defer></script>
+<script src="js/data/moves.js?v=2" defer></script>
+<script src="js/data/enemies.js?v=2" defer></script>
+<script src="js/data/levels.js?v=2" defer></script>
+<script src="js/player.js?v=2" defer></script>
+<script src="js/effects.js?v=2" defer></script>
+<script src="js/combat.js?v=2" defer></script>
+<script src="js/enemies.js?v=2" defer></script>
+<script src="js/modes.js?v=2" defer></script>
+<script src="js/level.js?v=2" defer></script>
+<script src="js/ragdoll.js?v=2" defer></script>
+<script src="js/scenery.js?v=2" defer></script>
+<script src="js/render.js?v=2" defer></script>
+<script src="js/ui/panels.js?v=2" defer></script>
+<script src="js/ui/training.js?v=2" defer></script>
+<script src="js/ui/touch-layout.js?v=2" defer></script>
+<script src="js/selftest.js?v=2" defer></script>
+<script src="js/main.js?v=2" defer></script>
 </body>
 </html>
