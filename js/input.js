@@ -75,33 +75,93 @@ function unlockAudio() {
   } catch (e) {}
 }
 addEventListener('pointerdown', unlockAudio, { passive: true });
-// keyboard
-const KEYS = {
-  arrowleft: 'l',
-  a: 'l',
-  arrowright: 'r',
-  d: 'r',
-  arrowup: 'u',
-  w: 'u',
-  arrowdown: 'd',
-  s: 'd',
-  ' ': 'j',
-  j: 'p',
-  k: 'k',
-  shift: 's',
-  l: 's',
-  u: 'x'
+// ===== BUTTON BINDINGS =====
+// Default keys and controller buttons for each action. Settings > Buttons changes them; changes are saved in
+// SET.binds = { kb: {action: [keys]}, pad: {controllerType: {action: [button numbers]}} }.
+// Controller buttons use the browser's standard layout: 0 bottom, 1 right, 2 left, 3 top face button, 4/5 bumpers,
+// 6/7 triggers, 8 select/minus, 9 start/plus, 10/11 stick clicks, 12-15 d-pad up/down/left/right.
+const BIND_ACTS = ['l', 'r', 'u', 'd', 'j', 'p', 'k', 's', 'x', 'pause'];
+const KEYDEF = {
+  l: ['arrowleft', 'a'],
+  r: ['arrowright', 'd'],
+  u: ['arrowup', 'w'],
+  d: ['arrowdown', 's'],
+  j: [' '],
+  p: ['j'],
+  k: ['k'],
+  s: ['shift', 'l'],
+  x: ['u'],
+  pause: ['escape', 'p']
 };
+const PADDEF = {
+  l: [14],
+  r: [15],
+  u: [12],
+  d: [13],
+  j: [0],
+  p: [2],
+  k: [1],
+  s: [4, 5, 6, 7],
+  x: [3],
+  pause: [9]
+};
+let KEYS = {};
+const kbBinds = () => (SET.binds && SET.binds.kb) || KEYDEF;
+function applyBinds() {
+  KEYS = {};
+  const B = kbBinds();
+  for (const a of BIND_ACTS) for (const k of B[a] || []) KEYS[k] = a;
+}
+applyBinds();
+// Controller type: the same model of controller shares one mapping on this device.
+const padType = g => (g.id || 'controller').toLowerCase().replace(/\s+/g, ' ').slice(0, 80);
+const padFamily = g => {
+  const id = (g && g.id) || '';
+  if (/xbox|xinput|045e/i.test(id)) return 'xbox';
+  if (/pro controller|joy-?con|nintendo|057e/i.test(id)) return 'switch';
+  if (/dualshock|dualsense|playstation|054c|wireless controller/i.test(id)) return 'ps';
+  return 'xbox';
+};
+const padBinds = g => (SET.binds && SET.binds.pad && SET.binds.pad[padType(g)]) || PADDEF;
+// While the Buttons screen is waiting for a key or button: { dev: 'kb' | 'pad', a: action, t: start time }
+let CAP = null;
+addEventListener(
+  'keydown',
+  e => {
+    if (!CAP || CAP.dev !== 'kb') return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const key = (e.key || '').toLowerCase();
+    bindSwallow = key;
+    if (key === 'escape' && CAP.a !== 'pause') return bindDone(null);
+    bindDone(key);
+  },
+  true
+);
+// the key that was just captured must not also press the focused button when it comes back up
+let bindSwallow = null;
+addEventListener(
+  'keyup',
+  e => {
+    if (bindSwallow && (e.key || '').toLowerCase() === bindSwallow) {
+      bindSwallow = null;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  },
+  true
+);
 addEventListener('keydown', e => {
-  const key = (e.key || '').toLowerCase();
-  if (key === 'escape' || key === 'p') {
+  if (CAP) return;
+  const key = (e.key || '').toLowerCase(),
+    a = KEYS[key];
+  if (a === 'pause') {
     if (!e.repeat && (state === 'play' || state === 'train')) {
       togglePause();
       e.preventDefault();
     }
     return;
   }
-  const a = KEYS[key];
   if (!a || !live() || e.metaKey || e.ctrlKey || e.altKey) return;
   kbDown.add(key);
   setA('kb', a, 1);
@@ -111,7 +171,7 @@ addEventListener('keydown', e => {
 addEventListener('keyup', e => {
   const key = (e.key || '').toLowerCase(),
     a = KEYS[key];
-  if (!a) return;
+  if (!a || a === 'pause') return;
   kbDown.delete(key);
   setA(
     'kb',
@@ -209,8 +269,7 @@ document.querySelectorAll('.tb').forEach(b => {
   if (a === 's') b.classList.add('surgebtn');
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => b.addEventListener(t, off));
 });
-// gamepad (standard mapping): stick/d-pad move+aim, A jump, X punch, B kick, bumpers/triggers Surge, Y ultimate, Start pause
-let padStart = false;
+// gamepad (standard layout): left stick always moves and aims; every button follows the bindings above
 // watchdog, every frame: release the stick or a button if the browser no longer has the finger that was holding it
 function touchWatch() {
   {
@@ -233,6 +292,8 @@ function touchWatch() {
     }
   });
 }
+let padPrev = [],
+  padNav = { dir: '', t: 0 };
 function pollPad() {
   touchWatch();
   const pads = navigator.getGamepads ? navigator.getGamepads() : [];
@@ -244,20 +305,116 @@ function pollPad() {
     }
   if (!g) {
     for (const a of ACT) if (SRC.gp[a]) setA('gp', a, 0);
+    padPrev = [];
     return;
   }
   const B = i => !!(g.buttons[i] && g.buttons[i].pressed),
-    ax = i => g.axes[i] || 0;
-  setA('gp', 'l', ax(0) < -0.4 || B(14));
-  setA('gp', 'r', ax(0) > 0.4 || B(15));
-  setA('gp', 'u', ax(1) < -0.5 || B(12));
-  setA('gp', 'd', ax(1) > 0.5 || B(13));
-  setA('gp', 'j', B(0));
-  setA('gp', 'p', B(2));
-  setA('gp', 'k', B(1));
-  setA('gp', 's', B(4) || B(5) || B(6) || B(7));
-  setA('gp', 'x', B(3));
-  const st = B(9);
-  if (st && !padStart && (state === 'play' || state === 'train')) togglePause();
-  padStart = st;
+    ax = i => g.axes[i] || 0,
+    now = g.buttons.map(b => !!(b && b.pressed)),
+    prev = padPrev,
+    down = i => now[i] && !prev[i],
+    M = padBinds(g),
+    any = a => (M[a] || []).some(B);
+  padPrev = now;
+  if (CAP && CAP.dev === 'pad') {
+    const i = now.findIndex((v, n) => v && !prev[n]);
+    if (i >= 0 && performance.now() - CAP.t > 250) bindDone(i, g);
+    else if (performance.now() - CAP.t > 6000) bindDone(null);
+    return;
+  }
+  setA('gp', 'l', ax(0) < -0.4 || any('l'));
+  setA('gp', 'r', ax(0) > 0.4 || any('r'));
+  setA('gp', 'u', ax(1) < -0.5 || any('u'));
+  setA('gp', 'd', ax(1) > 0.5 || any('d'));
+  for (const a of ['j', 'p', 'k', 's', 'x']) setA('gp', a, any(a));
+  // Start pauses; on the pause menu it resumes
+  if ((M.pause || []).some(down)) {
+    if (live()) pause(true);
+    else if (paused && !$('s-pause').hidden) pause(false);
+  }
+  if (!live()) padMenu(g, now, down, ax);
+}
+// Controller menus: d-pad or stick moves between buttons, left/right changes sliders and lists,
+// confirm (A) presses, back (B) goes back or resumes, Start on a menu presses the highlighted button.
+function padMenu(g, now, down, ax) {
+  const sw = padFamily(g) === 'switch',
+    OK = sw ? 1 : 0,
+    BACK = sw ? 0 : 1,
+    dir =
+      ax(1) < -0.5 || now[12]
+        ? 'u'
+        : ax(1) > 0.5 || now[13]
+          ? 'd'
+          : ax(0) < -0.5 || now[14]
+            ? 'l'
+            : ax(0) > 0.5 || now[15]
+              ? 'r'
+              : '',
+    t = performance.now();
+  if (dir !== padNav.dir) {
+    padNav.dir = dir;
+    padNav.t = t + 380;
+    if (dir) navMove(dir);
+  } else if (dir && t >= padNav.t) {
+    padNav.t = t + 120;
+    navMove(dir);
+  }
+  if (down(OK)) navPress();
+  else if (down(BACK)) navBack();
+  else if (down(9) && $('s-title') && !$('s-title').hidden) navPress();
+}
+function navScreen() {
+  for (const id of SCREENS) {
+    const el = $(id);
+    if (el && !el.hidden && !$('ui').hidden) return el;
+  }
+  return null;
+}
+function navItems() {
+  const sc = navScreen();
+  if (!sc) return [];
+  return [...sc.querySelectorAll('button, input, select')].filter(
+    e => !e.disabled && e.offsetParent !== null && !e.closest('[hidden]')
+  );
+}
+function navMove(dir) {
+  document.body.classList.add('padnav');
+  const L = navItems();
+  if (!L.length) return;
+  let i = L.indexOf(document.activeElement);
+  const el = L[i];
+  if (el && (dir === 'l' || dir === 'r')) {
+    const s = dir === 'r' ? 1 : -1;
+    if (el.type === 'range') {
+      el.value = +el.value + s * (+el.step || (el.max - el.min) / 20);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      return;
+    }
+    if (el.tagName === 'SELECT') {
+      el.selectedIndex = (el.selectedIndex + s + el.options.length) % el.options.length;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      return;
+    }
+  }
+  i = i < 0 ? 0 : (i + (dir === 'd' || dir === 'r' ? 1 : -1) + L.length) % L.length;
+  L[i].focus({ preventScroll: true });
+  L[i].scrollIntoView({ block: 'nearest' });
+  sfx(440, 0.03, 'square', 0.02);
+}
+function navPress() {
+  document.body.classList.add('padnav');
+  const L = navItems(),
+    el = L.includes(document.activeElement) ? document.activeElement : null;
+  if (!el) return navMove('d');
+  if (el.tagName === 'SELECT') return navMove('r');
+  if (el.type === 'range' || el.type === 'text') return;
+  el.click();
+}
+function navBack() {
+  const sc = navScreen();
+  if (!sc) return;
+  if (sc.id === 's-pause') pause(false);
+  else if (sc.id === 's-settings') $('b-back').click();
+  else if (sc.id === 's-binds') $('bd-back').click();
 }

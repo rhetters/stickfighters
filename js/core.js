@@ -11,7 +11,8 @@ const DEF = {
   touch: 'auto',
   hist: 0,
   calm: 0,
-  seed: ''
+  seed: '',
+  binds: null
 };
 let SET = { ...DEF },
   BEST = { score: 0, wave: 0, combo: 0 },
@@ -20,11 +21,16 @@ let SET = { ...DEF },
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
 //   v2 (M8): adds prog = { levelId: { done, score, time, combo } }
-const SAVE_VERSION = 2;
+//   v3: adds set.binds = custom keys and controller buttons (null = defaults)
+const SAVE_VERSION = 3;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
     s.saveVersion = 2;
+  }
+  if (s.saveVersion === 2) {
+    if (s.set) s.set.binds = s.set.binds || null;
+    s.saveVersion = 3;
   }
   return s;
 }
@@ -36,7 +42,10 @@ try {
 } catch (e) {}
 const save = () => {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ saveVersion: SAVE_VERSION, set: SET, best: BEST, prog: PROG }));
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify({ saveVersion: SAVE_VERSION, set: SET, best: BEST, prog: PROG })
+    );
   } catch (e) {}
 };
 // ===== SEEDED RANDOM (M0): same seed = same spawns, AI rolls and particle noise =====

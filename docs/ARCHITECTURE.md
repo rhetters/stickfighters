@@ -4,7 +4,7 @@ How the code fits together. Update this at the end of every milestone.
 
 ## Files and load order
 
-`index.html` holds the markup and loads one stylesheet and 19 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
+`index.html` holds the markup and loads one stylesheet and 20 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
 
 | # | File | What's in it |
 |---|---|---|
@@ -25,8 +25,9 @@ How the code fits together. Update this at the end of every milestone.
 | 15 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
 | 16 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
 | 17 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
-| 18 | `js/selftest.js` | `selfTest()` determinism check |
-| 19 | `js/main.js` | Screens, settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
+| 18 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
+| 19 | `js/selftest.js` | `selfTest()` determinism check |
+| 20 | `js/main.js` | Screens, settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
 
 Nothing runs game code at load except data setup; boot (`init(); applySet(); resize(); bindSettings(); syncTrain(); openTitle(); requestAnimationFrame(loop)`) is the last thing in `main.js`.
 
@@ -48,11 +49,14 @@ Nothing runs game code at load except data setup; boot (`init(); applySet(); res
 
 ## Input
 
+Keyboard keys and controller buttons come from bindings (`KEYS` built by `applyBinds()`, `padBinds(g)` per controller type). The left stick always moves and aims. When no game is running (menus, pause), `pollPad()` drives `padMenu()`: d-pad/stick moves focus through the visible screen's controls, confirm presses, back goes back or resumes. Switch controllers use A (right) to confirm and B (bottom) to go back.
+
+
 Every device calls `setA(src, action, on, slot)`. Each slot (`INP[n]`) has `K` (held), `press` (frame pressed), `AIM` and `SRG` (direction and Surge captured at the press). `use(p)` points the globals `P`, `STM`, `K`, `press`, `AIM`, `SRG` at player `p`. This global swap is legacy (rule R5) and gets replaced by explicit player parameters before multiplayer.
 
 ## Save
 
-localStorage key `orangeArmy.v1` (never change it) holds `{saveVersion, set, best, prog}`. `SET` holds settings, feel knobs and touch layouts; `BEST` the Arcade records; `PROG` level progress (`{woods1: {done, score, time, combo}}`). `migrate()` in `core.js` upgrades older saves one version at a time: v1 had no `saveVersion` and no `prog`. Any new shape change bumps `SAVE_VERSION` and adds a step.
+localStorage key `orangeArmy.v1` (never change it) holds `{saveVersion, set, best, prog}`. `SET` holds settings, feel knobs and touch layouts; `BEST` the Arcade records; `PROG` level progress (`{woods1: {done, score, time, combo}}`). `SET.binds` holds custom keys and controller buttons (null = defaults; see `KEYDEF`/`PADDEF` in `input.js`). `migrate()` in `core.js` upgrades older saves one version at a time: v1 had no `saveVersion` and no `prog`; v2 had no `binds`. Any new shape change bumps `SAVE_VERSION` and adds a step.
 
 ## Self-test
 

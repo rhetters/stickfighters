@@ -26,6 +26,10 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 | Tornado Kick (blue meter full) | U | ULT | Y |
 | Pause | Esc or P | II | Start |
 
+**Changing buttons:** Settings → **Buttons** lets you change the keyboard keys and controller buttons for every action. Tap + then press the key or button; tap a key to remove it. Controller mappings are saved per kind of controller (Switch, Xbox, PlayStation) on that device, so any controller of that kind uses them.
+
+**Menus with a controller:** the d-pad or left stick moves the yellow highlight, A confirms, B goes back (on Switch controllers: A right, B bottom), and Start pauses and resumes.
+
 **Touch layout:** Settings → Touch layout → **Customize** lets you drag every button and the stick where you want them, resize them, and save named layouts (Default and Left-handed are built in).
 
 The **Training Room** (title screen) has spawnable dummies, hitbox and frame-data overlays, and three colored buttons at the top: **Feel** (**F**, live feel tuning), **Moves** (**M**, every combo) and **Info** (**I**, health, speed, damage, height and how to beat each enemy). Feel tuning covers hit-stop, screen shake, knockback, gravity, bounce and how long bodies stay.

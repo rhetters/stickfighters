@@ -2,6 +2,12 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Buttons and controller menus (November 16, 2026)
+- Settings > Buttons: change keyboard keys and controller buttons for every action, including Pause. Controller mappings are saved per controller type, with Xbox, Switch and PlayStation button names.
+- Fixed: after pressing Start on a controller, the pause menu couldn't be used with the controller. Every menu now works with a controller (d-pad/stick, confirm, back, Start resumes).
+- Save version 3 (adds button bindings), migrating from version 2 and older.
+- Self-test fingerprints unchanged.
+
 ## Combat patch (November 16, 2026)
 - Block: Down + Surge, standing still. Hits from the front cost Surge instead of health, no stun; the kneeling pose trembles more as Surge drains; Winded when it runs out, then hits land.
 - Ground hits: downed enemies can be hit (half damage, ragdoll flop) without extending their knockdown.

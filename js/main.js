@@ -9,7 +9,7 @@ let paused = false,
 const gridC = document.createElement('canvas'),
   coarseMQ = matchMedia('(pointer:coarse)'),
   portraitMQ = matchMedia('(orientation:portrait) and (pointer:coarse)');
-const SCREENS = ['s-title', 's-pause', 's-settings', 's-over', 's-clear'];
+const SCREENS = ['s-title', 's-pause', 's-settings', 's-binds', 's-over', 's-clear'];
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
   $('ui').hidden = !id;
@@ -263,7 +263,7 @@ $('trainpanel').addEventListener('click', e => {
   if (e.target.blur) e.target.blur();
 });
 addEventListener('keydown', e => {
-  if (state !== 'train' || paused || e.repeat) return;
+  if (state !== 'train' || paused || e.repeat || CAP || KEYS[(e.key || '').toLowerCase()]) return;
   const k = e.key;
   if (k === 'm' || k === 'M') toggleMoves();
   else if (k === 'f' || k === 'F') toggleFeel();
@@ -456,7 +456,19 @@ if (/[?&]selftest/.test(location.search)) {
     d = document.createElement('pre');
   d.id = 'selftest';
   d.textContent =
-    'SELFTEST ' + R.hash + '  (ticks ' + R.ticks + ', wave ' + R.wave + ', score ' + R.score + ')  LEVEL ' + R.hashL + '  (' + R.level + ')';
+    'SELFTEST ' +
+    R.hash +
+    '  (ticks ' +
+    R.ticks +
+    ', wave ' +
+    R.wave +
+    ', score ' +
+    R.score +
+    ')  LEVEL ' +
+    R.hashL +
+    '  (' +
+    R.level +
+    ')';
   d.style.cssText =
     'position:fixed;left:8px;top:8px;z-index:99;background:#1c1626;color:#ffd400;padding:8px 12px;font:14px monospace;border-radius:6px';
   document.body.appendChild(d);

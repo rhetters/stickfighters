@@ -737,3 +737,94 @@ canvas {
     display: flex;
   }
 }
+
+/* Buttons screen (Settings > Buttons) */
+#s-binds {
+  justify-content: flex-start;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin: 2px 0 4px;
+}
+.tab {
+  font:
+    800 14px 'Trebuchet MS',
+    sans-serif;
+  padding: 6px 16px;
+  border: 2px solid #1c1626;
+  border-radius: 8px;
+  background: #fff;
+  color: #1c1626;
+  cursor: pointer;
+}
+.tab.on {
+  background: #1c1626;
+  color: #fff;
+}
+#bd-list {
+  width: 100%;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 22px;
+}
+@media (max-width: 640px) {
+  #bd-list {
+    grid-template-columns: 1fr;
+  }
+}
+.brow {
+  display: grid;
+  grid-template-columns: 8.5em 1fr auto;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  font:
+    700 clamp(12px, 1.8vw, 14px) 'Trebuchet MS',
+    sans-serif;
+  border-bottom: 1px solid #e6dccb;
+  padding: 2px 0;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.chips i {
+  color: #7a6e80;
+}
+.chip {
+  font:
+    800 13px 'Trebuchet MS',
+    sans-serif;
+  min-width: 34px;
+  min-height: 30px;
+  padding: 3px 9px;
+  border: 2px solid #1c1626;
+  border-radius: 7px;
+  background: #fff8ee;
+  color: #1c1626;
+  cursor: pointer;
+}
+.chip.add {
+  background: #ff7a00;
+  color: #fff;
+}
+#bd-msg {
+  min-height: 1.4em;
+  font-weight: 700;
+  color: #b25a00;
+}
+.bdrow {
+  display: flex;
+  gap: 8px;
+}
+/* a controller moves a yellow highlight through menus */
+body.padnav #ui button:focus,
+body.padnav #ui input:focus,
+body.padnav #ui select:focus {
+  outline: 4px solid #ffd400;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 7px #1c1626;
+}
