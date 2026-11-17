@@ -450,9 +450,39 @@ function navMove(dir) {
       return;
     }
   }
-  i = i < 0 ? 0 : (i + (dir === 'd' || dir === 'r' ? 1 : -1) + L.length) % L.length;
-  L[i].focus({ preventScroll: true });
-  L[i].scrollIntoView({ block: 'nearest' });
+  // Move the way the stick points (patch 2): the nearest control in that direction, preferring ones in the same
+  // row (left/right) or column (up/down). Nothing that way = stay put.
+  let to = i < 0 ? L[0] : null;
+  if (el) {
+    const a = el.getBoundingClientRect(),
+      ax = (a.left + a.right) / 2,
+      ay = (a.top + a.bottom) / 2,
+      hz = dir === 'l' || dir === 'r',
+      sg = dir === 'r' || dir === 'd' ? 1 : -1;
+    let best = Infinity;
+    for (const e of L) {
+      if (e === el) continue;
+      const b = e.getBoundingClientRect();
+      if (!b.width && !b.height) continue;
+      const bx = (b.left + b.right) / 2,
+        by = (b.top + b.bottom) / 2,
+        main = (hz ? bx - ax : by - ay) * sg;
+      if (main <= 4) continue;
+      // sideways distance; zero when the two controls overlap in that row or column
+      const gap = hz
+          ? Math.max(0, Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom))
+          : Math.max(0, Math.max(a.left, b.left) - Math.min(a.right, b.right)),
+        side = Math.abs(hz ? by - ay : bx - ax),
+        score = main + (gap > 0 ? 1000 + gap * 4 : 0) + side * 0.6;
+      if (score < best) {
+        best = score;
+        to = e;
+      }
+    }
+  }
+  if (!to) return;
+  to.focus({ preventScroll: true });
+  to.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   sfx(440, 0.03, 'square', 0.02);
 }
 function navPress() {

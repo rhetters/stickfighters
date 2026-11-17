@@ -71,10 +71,22 @@ function lbDraw(cv2, r) {
   k.setTransform(2, 0, 0, 2, 0, 0);
   k.clearRect(0, 0, w, h);
   withCtx(k, () => {
-    drawFig(30, 68, 1, S, 0.72 * L.ht, L.col, L.d2, 0, 1, L.lw, o, L.head, U =>
-      drawLookUnder(f, { ...U, face: 1, s: 0.72 * L.ht }, 1)
+    drawFig(
+      30,
+      68,
+      1,
+      S,
+      0.72 * L.ht,
+      L.col,
+      L.d2,
+      0,
+      1,
+      L.lw,
+      o,
+      L.head,
+      lookLayers(f, { face: 1, s: 0.72 * L.ht }, 1)
     );
-    drawLook(f, { ...o, face: 1, s: 0.72 * L.ht }, 1);
+    drawLook(f, { ...o, face: 1, s: 0.72 * L.ht }, 1, 'front');
   });
 }
 function openLobby() {

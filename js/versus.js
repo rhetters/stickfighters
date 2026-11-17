@@ -133,6 +133,8 @@ const VERSUS = {
   bg: () => drawWoods(),
   fg: () => drawWoodsFg(),
   hud: vsHud,
+  // after a KO nobody can move: the winner strikes their victory pose (patch 2, Rhett's request)
+  locked: () => !!VS && (VS.phase === 'ko' || VS.phase === 'end'),
   wins: q => (VS ? VS.wins[vsKey(q)] || 0 : 0),
   team: q => (VS && VS.teams ? q.team + 1 : 0)
 };

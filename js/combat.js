@@ -146,6 +146,8 @@ function tickAtk(f) {
       )
         continue;
       if (!f.pl && (e.inv > 0 || e.st === 'dead')) continue;
+      // a defeated enemy lying on the ground can't be hit (a Dive Kick used to bounce off the body like a wall)
+      if (!e.pl && (e.dying || e.st === 'dead')) continue;
       if (e.pl && (e.inv > 0 || e.st === 'dead' || e.st === 'down' || e.st === 'getup')) continue;
       if (ov(hb, [e.x - 15 * e.s, e.y - 78 * e.s, e.x + 15 * e.s, e.y + 4])) {
         a.hit.add(e);
@@ -793,7 +795,7 @@ function sep() {
     }
   }
 }
-// Ground height as a function of x: flat today; M14 (platforms, stairs) changes only this.
+// Ground height as a function of x: flat today; M15 (platforms, stairs) changes only this.
 const groundY = x => G;
 function phys(f) {
   if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav;

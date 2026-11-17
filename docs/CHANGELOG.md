@@ -2,6 +2,18 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M10 patch 2 (November 17, 2026)
+- Clothes sit at the right depth: the far hand, sleeve and leg go behind the body and dresses; ties and scarves go under the near arm. Ties look like ties.
+- Controller menus move the way you point (down from a fighter goes to the tabs below, right goes to the next fighter).
+- Mohawk follows the head with more spikes. Halo and headphones no longer hide the hair.
+- The Character shelves no longer jump back to the top when you tap an item.
+- Pose wheel holds up to 8 poses, split evenly in a wheel that stays the same size; aim in 8 directions. Long names are shortened.
+- Versus: after a KO nobody can move; the winner strikes their victory pose.
+- Fixed: a Dive Kick bounced off a defeated enemy lying on the ground as if it hit a wall.
+- iPad: PRESS START also says "or tap the screen", and a second check watches for controller buttons.
+- Roadmap: network multiplayer moved up from M17 to M11 at Rhett's request; M11–M16 each moved down one.
+- Self-test fingerprints unchanged.
+
 ## M10 patch (November 16, 2026): Rhett's 16 fixes
 - Character screen tabs are now Body, Colors, Head (hair, hats, headbands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge and Poses. Sections scroll; wear one item from each section (pants, shorts, skirts and dresses are one at a time). Every section has a None card.
 - New items: 9 hairstyles, 6 ties, 7 shirts, 6 jackets (including a hood and a hero cape), 16 pants/shorts/skirts/dresses, more gloves (mittens, hand wraps, work, driving, boxing) and shoes (sneakers, high-tops, sandals, fuzzy slippers, boots, cowboy boots). 143 items in all.

@@ -36,11 +36,11 @@ const SECS = {
   dress: { name: 'Dresses', slot: 'legs' },
   shoes: { name: 'Shoes', slot: 'shoes' },
   surge: { name: 'Surge style', slot: 'surge', note: 'the glow and afterimages when you use Surge' },
-  pose: { name: 'Poses', slot: 'pose', note: 'up to 4 on your pose wheel; the first is your victory pose' }
+  pose: { name: 'Poses', slot: 'pose', note: 'up to 8 on your pose wheel; the first is your victory pose' }
 };
 // The slots a fighter wears (colour and the pose wheel are kept separately)
 const EQ = ['hair', 'hat', 'band', 'scarf', 'tie', 'shirt', 'jacket', 'gloves', 'legs', 'shoes', 'surge'];
-const WHEEL_MAX = 4;
+const WHEEL_MAX = 8;
 const ITEMS = [
   // body colors: all of them stand out against the pink army
   { id: 'col-orange', sec: 'color', name: 'Orange', c: '#ff7a00', how: { free: 1 } },
@@ -69,13 +69,13 @@ const ITEMS = [
   { id: 'hat-cap', sec: 'hat', name: 'Ball Cap', c: '#e8212b', price: 40 },
   { id: 'hat-beanie', sec: 'hat', name: 'Beanie', c: '#2a55c9', c2: '#ffd400', price: 40 },
   { id: 'hat-party', sec: 'hat', name: 'Party Hat', c: '#3ccf6e', c2: '#ffd400', price: 60 },
-  { id: 'hat-headphones', sec: 'hat', name: 'Headphones', c: '#1c1626', c2: '#ff7a00', price: 80 },
+  { id: 'hat-headphones', sec: 'hat', name: 'Headphones', c: '#1c1626', c2: '#ff7a00', open: 1, price: 80 },
   { id: 'hat-chef', sec: 'hat', name: 'Chef Hat', c: '#ffffff', price: 90 },
   { id: 'hat-cowboy', sec: 'hat', name: 'Cowboy Hat', c: '#a8743e', c2: '#6b4420', price: 120 },
   { id: 'hat-top', sec: 'hat', name: 'Top Hat', c: '#2b2533', c2: '#e8212b', price: 150 },
   { id: 'hat-wizard', sec: 'hat', name: 'Wizard Hat', c: '#4a3cb8', c2: '#ffd400', price: 220 },
   { id: 'hat-ranger', sec: 'hat', name: 'Ranger Hat', c: '#5f8a3a', c2: '#3d5c24', how: { lvl: 'woods1' } },
-  { id: 'hat-halo', sec: 'hat', name: 'Halo', c: '#ffd400', how: { wave: 10 } },
+  { id: 'hat-halo', sec: 'hat', name: 'Halo', c: '#ffd400', open: 1, how: { wave: 10 } },
   { id: 'hat-viking', sec: 'hat', name: 'Viking Helmet', c: '#9aa3b5', c2: '#f4ead2', how: { drop: 1 } },
   { id: 'hat-propeller', sec: 'hat', name: 'Propeller Cap', c: '#ff7a00', c2: '#2fb5ff', how: { drop: 1 } },
   // headbands: a band and two tails that flutter behind
@@ -243,7 +243,7 @@ const ITEMS = [
   { id: 'surge-bolt', sec: 'surge', name: 'Lightning Surge', c: 'bolt', price: 250 },
   { id: 'trail-rainbow', sec: 'surge', name: 'Rainbow Surge', c: 'rainbow', price: 300 },
   { id: 'trail-hearts', sec: 'surge', name: 'Heart Surge', c: 'hearts', how: { drop: 1 } },
-  // poses: put up to 4 on your pose wheel (hold T, Select or POSE in a fight); the first is your victory pose
+  // poses: put up to 8 on your pose wheel (hold T, Select or POSE in a fight); the first is your victory pose
   { id: 'pose-flex', sec: 'pose', name: 'Flex', how: { free: 1 } },
   { id: 'pose-wave', sec: 'pose', name: 'Wave', how: { free: 1 } },
   { id: 'pose-thumbs', sec: 'pose', name: 'Thumbs Up', price: 30 },

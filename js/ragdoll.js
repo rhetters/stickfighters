@@ -424,28 +424,40 @@ function drawRag(f, a) {
         }
       : null;
   if (J) drawLookUnder(f, J, a);
-  ctx.save();
-  ctx.globalAlpha = a;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = lw;
   const L = (c, ids) => {
-    ctx.strokeStyle = c;
+      ctx.strokeStyle = c;
+      ctx.beginPath();
+      ctx.moveTo(Q[ids[0]].x, Q[ids[0]].y);
+      for (let i = 1; i < ids.length; i++) ctx.lineTo(Q[ids[i]].x, Q[ids[i]].y);
+      ctx.stroke();
+    },
+    // the body in layers, with the look's layers in between (like drawFig)
+    layer = fn => {
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = lw;
+      fn();
+      ctx.restore();
+    },
+    look = ph => J && drawLook(f, J, a, ph);
+  layer(() => {
+    L(c2, [2, 7, 8]);
+    L(c2, [4, 11, 12]);
+  });
+  look('back');
+  layer(() => {
+    L(c1, [4, 3, 2, 1]);
     ctx.beginPath();
-    ctx.moveTo(Q[ids[0]].x, Q[ids[0]].y);
-    for (let i = 1; i < ids.length; i++) ctx.lineTo(Q[ids[i]].x, Q[ids[i]].y);
+    ctx.arc(hx, hy, 9 * s * hk, 0, 7);
     ctx.stroke();
-  };
-  L(c2, [2, 7, 8]);
-  L(c2, [4, 11, 12]);
-  L(c1, [4, 3, 2, 1]);
-  L(c1, [4, 9, 10]);
-  L(c1, [2, 5, 6]);
-  ctx.beginPath();
-  ctx.arc(hx, hy, 9 * s * hk, 0, 7);
-  ctx.stroke();
-  ctx.restore();
-  if (J) drawLook(f, J, a);
+  });
+  look('mid');
+  layer(() => L(c1, [4, 9, 10]));
+  look('legs');
+  layer(() => L(c1, [2, 5, 6]));
+  look('front');
 }
 // Tornado Kick drawing: the fighter stays upright and turns around its own vertical axis, one leg locked straight out.
 // The leg's sideways reach is cos(angle); when it swings behind the body it's drawn in the back colour, before the body.

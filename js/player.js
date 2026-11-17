@@ -150,10 +150,12 @@ function mkPlayer(x, slot, col, d2) {
   }
   return p;
 }
+// A slot nobody presses: players whose control the mode has taken away (MODE.locked) read this instead.
+const NO_INPUT = mkSlot();
 function use(p) {
   P = p;
   STM = p.stm;
-  const I = INP[p.slot];
+  const I = MODE.locked && MODE.locked(p) ? NO_INPUT : INP[p.slot];
   K = I.K;
   press = I.press;
   AIM = I.AIM;
@@ -356,12 +358,15 @@ function updP() {
   }
   f.blk = 0;
   if (f.blkT > 0) f.blkT--;
-  // Pose wheel (M10 patch; looks only): hold the pose button on the ground to stand still and aim at one of four
-  // poses, let go to strike it. Moving, jumping, Surge or attacking ends the pose.
+  // Pose wheel (M10 patch; looks only): hold the pose button on the ground to stand still and aim (8 directions)
+  // at a pose, let go to strike it. Moving, jumping, Surge or attacking ends the pose.
   if (f.emote && (f.st !== 'free' || K.l || K.r || K.j || K.p || K.k || K.s || K.x)) f.emote = null;
   if (f.st === 'free' && K.e && f.y >= G - 1) {
-    f.wheel = f.wheel || { sel: 0 };
-    f.wheel.sel = K.u ? 0 : K.r ? 1 : K.d ? 2 : K.l ? 3 : f.wheel.sel;
+    // d = the aimed direction in eighths of a turn, clockwise from up (0 = up, 2 = right, 4 = down, 6 = left)
+    f.wheel = f.wheel || { d: 0 };
+    const ax = (K.r ? 1 : 0) - (K.l ? 1 : 0),
+      ay = (K.d ? 1 : 0) - (K.u ? 1 : 0);
+    if (ax || ay) f.wheel.d = (Math.round(Math.atan2(ax, -ay) / (Math.PI / 4)) + 8) % 8;
     f.vx *= 0.78;
     f.running = 0;
     for (const b of ['p', 'k', 'j', 'x', 'd']) eat(b);
@@ -371,7 +376,7 @@ function updP() {
     return;
   }
   if (f.wheel) {
-    f.emote = { i: f.wheel.sel };
+    f.emote = { d: f.wheel.d };
     f.wheel = null;
   }
   if (f.st === 'free') {

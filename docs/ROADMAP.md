@@ -10,9 +10,9 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 
 **Why this order.** Input comes first because every combo depends on knowing which direction is held. Then the combat engine, then Surge (your stamina system), because Surge modifies moves. Collision feel and ragdoll come before levels and progression, since you called them the core of the game and there’s no point building five levels on combat that will change. Progression and the shop come once there’s a real level to earn XP in. Levels 2–6 come last, when the systems stop moving.
 
-**Where things stand.** M0 to M10 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M11 (XP, levels and the skill tree) is next.
+**Where things stand.** M0 to M10 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M11 (network multiplayer on home Wi-Fi) is next, moved up from M17 on November 17 at Rhett's request.
 
-**Why this order after M7 (reordered November 16, 2026).** Ron and Rhett approved the order from the restructure plan. M8 builds the level framework so the world is no longer one screen and each game type is a separate "mode". Local multiplayer comes next (M9) so Rhett gets Smash-style versus early, and because network play later needs the same per-player groundwork. The ninja star store with character creation (M10) and then progression with the skill tree (M11) follow (swapped on November 16 at Rhett's request), then the rest of the campaign (M12–M15, ending in the v1.0 release). The level creator, network play and the house builder come after that. The old numbers are listed under "Renumbering" below.
+**Why this order after M7 (reordered November 16, 2026).** Ron and Rhett approved the order from the restructure plan. M8 builds the level framework so the world is no longer one screen and each game type is a separate "mode". Local multiplayer comes next (M9) so Rhett gets Smash-style versus early, and because network play later needs the same per-player groundwork. The ninja star store with character creation (M10) follows. Network play (M11) comes right after it (moved up from M17 on November 17 at Rhett's request; it only needs M9 and M10, and building it early means every later feature is made online-ready from the start). Then progression with the skill tree (M12), the rest of the campaign (M13–M16, ending in the v1.0 release), the level creator (M17) and the house builder (M18). The old numbers are listed under "Renumbering" below.
 
 ## Ground rules
 
@@ -38,14 +38,14 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 | M8 | Level framework, modes, Level 1: Wooded Trail | Done | L | M7.5 | Scrolling level with parallax layers; the wave game becomes Arcade mode |
 | M9 | Local multiplayer: co-op and versus | Done | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
 | M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
-| M11 | XP, levels, skill tree | Next | L | M3, M8, M10 | Level-ups, skill points, tree screen |
-| M12 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M10, M11 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
-| M13 | Boss level | Planned | L | M12 | Multi-phase boss fight |
-| M14 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
-| M15 | Polish, audio, balance, v1.0 release | Planned | L | M8–M14 | Release candidate |
-| M16 | Level creator | Planned | L | M8, M12 | Rhett builds levels that join the procedural pools |
-| M17 | Network multiplayer on home Wi-Fi | Planned | XL | M9 | Each kid on their own iPad, co-op first, then versus |
-| M18 | House builder and visiting | Planned | L | M10, M17 | Build a house with stars, invite friends over |
+| M11 | Network multiplayer on home Wi-Fi | Next | XL | M9, M10 | Each kid on their own iPad, co-op first, then versus |
+| M12 | XP, levels, skill tree | Planned | L | M3, M8, M10 | Level-ups, skill points, tree screen |
+| M13 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M10, M12 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
+| M14 | Boss level | Planned | L | M13 | Multi-phase boss fight |
+| M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
+| M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
+| M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
+| M18 | House builder and visiting | Planned | L | M10, M11 | Build a house with stars, invite friends over |
 | Someday | Cloud saves, Steam | Maybe | — | — | Desktop app, Steam Workshop, server-backed stars |
 
 ## Milestone details
@@ -92,7 +92,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 
 **Done when:** Every row in sections A–D is playable, hits correctly, and shows frame data in the training room.
 
-**Status: complete.** All 30 moves in sections A–D work and land every hit of their strings, mixed finishers included. Also added: the hit effects in section F (basic Splat and Bounce; M4 adds the full physics), a juggle cap of 7, damage scaling in long combos (4% less per hit after the third, never below 45%), a get-up with protection, player knockdown, and motion smears on heavy moves. The training room's Move list (M key) ticks off every chart row as you land it. Every move is unlocked until M11 (see Open decisions).
+**Status: complete.** All 30 moves in sections A–D work and land every hit of their strings, mixed finishers included. Also added: the hit effects in section F (basic Splat and Bounce; M4 adds the full physics), a juggle cap of 7, damage scaling in long combos (4% less per hit after the third, never below 45%), a get-up with protection, player knockdown, and motion smears on heavy moves. The training room's Move list (M key) ticks off every chart row as you land it. Every move is unlocked until M12 (see Open decisions).
 
 ### M3 · Surge (stamina) system
 
@@ -103,7 +103,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 - Surge jump: higher, longer, with an air burst.
 - Surge strings: Combat Chart section E. Holding Surge swaps each branch to its Surge version.
 - Visuals: yellow afterimages, speed lines, bar flash when low.
-- Every number is tunable (max, regen, costs) so the skill tree can change them in M11.
+- Every number is tunable (max, regen, costs) so the skill tree can change them in M12.
 
 **Done when:** You can chain Surge run, phase through a crowd, and finish with Surge strings, with the bar draining and recovering predictably.
 
@@ -229,7 +229,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 **AI director:** each player has a few attack tokens (2, rising to 3 after wave 5 and 4 after wave 9). Enemies holding one move in and attack; the rest hold a ring 110–260 px out and wait. Bosses always attack. Phasing through an enemy with Surge makes it pause (?!), then chase at 1.6× speed for a second.
 
-**Also added:** a training **Info** panel (**I**) with a card for Orange and every enemy: how to beat it, health, speed, damage per attack, height, weight, poise and guard. Three colored buttons at the top of the Training Room, **Feel** (blue, **F**; was T), **Moves** (orange, **M**) and **Info** (green, **I**), replace the old panel buttons and work by touch. The score is hidden in training to make room. Spawn buttons and hotkeys 4 (Guard), 5 (Flanker) and 6 (Captain). The boss template (phases by health, enter-phase script, health and poise bar, scripted attack picks) is ready for the M13 Pink General. First-time pop-up tips were tried and removed in favor of the Info panel.
+**Also added:** a training **Info** panel (**I**) with a card for Orange and every enemy: how to beat it, health, speed, damage per attack, height, weight, poise and guard. Three colored buttons at the top of the Training Room, **Feel** (blue, **F**; was T), **Moves** (orange, **M**) and **Info** (green, **I**), replace the old panel buttons and work by touch. The score is hidden in training to make room. Spawn buttons and hotkeys 4 (Guard), 5 (Flanker) and 6 (Captain). The boss template (phases by health, enter-phase script, health and poise bar, scripted attack picks) is ready for the M14 Pink General. First-time pop-up tips were tried and removed in favor of the Info panel.
 
 ### M7.5 · Restructure (no gameplay changes)
 
@@ -249,12 +249,12 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 - **Modes:** a small mode interface (set up the world, run the rules, decide when it's over, show results). The current wave game moves into an **Arcade** mode; Training becomes a mode too.
 - **Camera and world bounds:** the world is wider than the screen. Physics, spawns, drawing and ragdoll wall checks use the world's edges instead of the screen's.
-- **A level is an ordered list of chunks.** A chunk is a data file: width, ground shape, spawn points or an encounter budget, props, background layers, entry and exit. M8's list is handmade; M12 adds a generator. The format is designed so the M16 level creator can save to it.
+- **A level is an ordered list of chunks.** A chunk is a data file: width, ground shape, spawn points or an encounter budget, props, background layers, entry and exit. M8's list is handmade; M13 adds a generator. The format is designed so the M17 level creator can save to it.
 - **Parallax layers** in the paper style: a list of layers with depth, plus optional foreground layers in front of the fighters (trees, grass).
 - Encounters use the M7 AI director with a difficulty budget per chunk.
 - “GO →” prompts, checkpoints, level-complete screen.
 - Level 1: trees, drifting leaves, fireflies, a log obstacle, four to five encounters.
-- **Decision gate G1:** keep levels flat, or commit to platforms (see M14).
+- **Decision gate G1:** keep levels flat, or commit to platforms (see M15).
 
 **Done when:** Level 1 is playable start to finish on iPad, phone and desktop, Arcade mode still plays as before, and the self-test passes.
 
@@ -270,7 +270,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **HUD:** level name with a trail map (fights, the log, you), enemies left, and the GO arrow.
 - **Save version 2:** the save now records level progress. Old saves load with every setting, best score and touch layout intact.
 - **Self-test:** a second fingerprint plays the Wooded Trail with scripted inputs (`8c67f67e`); the Arcade fingerprint is unchanged (`39f01735`).
-- **Decision gate G1 (platforms):** still open. The trail is flat; M14 decides on platforms.
+- **Decision gate G1 (platforms):** still open. The trail is flat; M15 decides on platforms.
 
 
 **Combat patch (after M8, at Rhett's request):**
@@ -299,7 +299,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - Fixed arena, 2–4 players (8 later), free-for-all or teams. Best of 3 rounds, round timer, round-start countdown and slow motion on the final KO.
 - Tighter rules than co-op: juggle cap of 4, stronger damage scaling, get-up protection.
 - Needs a way to defend, such as holding Back to block with a parry on a well-timed press (see Open decisions).
-- Equal stats for now; after M10 and M11, players can bring their skills and look, with a Fair-mode switch.
+- Equal stats for now; after M10 and M12, players can bring their skills and look, with a Fair-mode switch.
 
 **Stage D: local co-op**
 
@@ -329,7 +329,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - Ninja stars drop from defeated enemies (Grunt 1–2, Runner 2–3, Brute 8–12, more for Guards, Flankers and Captains), with a bonus at high combo counts and a magnet pickup arc. They're credited at the end of a run through one function (rule R7).
 - **Store items are cosmetic only** (rule R8): heads and hats, headbands, scarves, gloves, shoes, colors, trails, victory poses. The store is organized by slot. Some items are fixed unlocks (beat a level, land a combo) and some are random drops.
 - Changed from the original shop plan: gear that changed stats, charms and bought consumables are out of the store, so purchases never make anyone stronger. Health and Surge pickups can still appear in levels as part of play.
-- Character creation: name, body color (swatches that always contrast with the pink army), head ring size, line thickness, idle stance, and equipping owned cosmetics. Live preview, randomize, three save slots. (A starting style that sets your first skill point is added in M11, with the skill tree.)
+- Character creation: name, body color (swatches that always contrast with the pink army), head ring size, line thickness, idle stance, and equipping owned cosmetics. Live preview, randomize, three save slots. (A starting style that sets your first skill point is added in M12, with the skill tree.)
 - Accessories attach to joints and follow the ragdoll. In multiplayer, each player's look is shared as item IDs and drawn by every device.
 - **Character creation in local multiplayer** (like Mario Kart): on the Players screen, each player picks or customizes their own fighter with their own controller (or touch), side by side, before Versus or Co-op. Their name and look carry into the match, the HUD and the winner screen. Each player can load a saved fighter or tweak one for that session.
 - Save version and migrations, plus **Back up / Restore save** (a file or a text code), so hours of grinding survive Safari clearing data.
@@ -349,7 +349,17 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **M10 patch (Rhett's 16 fixes, November 16):** tabs became Body, Colors, Head (hair, hats, bands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge and Poses, each with a None card; 143 items. Trails became Surge styles (the glow and afterimages when you use Surge). Victory poses became a **pose wheel**: up to 4 poses (the first is the victory pose); hold T, Select or POSE in a fight, aim, let go. Height setting, four fighter slots, delete a fighter, gifts show the item inside, headphones fixed, no more spinning in the preview. Save version 5.
 - Self-test fingerprints unchanged: Arcade `c87c9470`, Level `21292ab5`. Star drops use their own seeded roll, not the gameplay random sequence.
 
-### M11 · XP, levels, skill tree
+### M11 · Network multiplayer on home Wi-Fi
+
+*Moved up from M17 on November 17, 2026 at Rhett's request. It only needs M9 (players in slots, inputs through `setA`) and M10 (looks are shared at the start of a match), and doing it early means every later feature is built and tested with online play in mind instead of retrofitted.*
+
+- Each kid plays on their own iPad. Every device runs the same simulation from a shared seed and only inputs are exchanged (rule R2). Co-op first, since it forgives some lag; then versus, with rollback if lag is a problem.
+- WebRTC peer-to-peer from GitHub Pages needs a small matchmaking ("signaling") step even at home. Options to evaluate then: NetplayJS, PeerJS, or a tiny free signaling service.
+- The self-test fingerprint doubles as a desync check: devices compare it every few seconds.
+
+**Done when:** Two iPads finish Level 1 together over home Wi-Fi with a measured lag figure, and a versus match is playable or a clear decision is made to keep online co-op only.
+
+### M12 · XP, levels, skill tree
 
 **Goal:** A reason to keep fighting. (Moved after the store and character creation on November 16 at Rhett's request; ninja stars already exist by then, so respecs can cost stars from day one.)
 
@@ -371,7 +381,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 **Done when:** Level-ups give points, spending them changes your moves and stats visibly, and everything saves.
 
-### M12 · Levels 2–5, themes and procedural runs
+### M13 · Levels 2–5, themes and procedural runs
 
 | Level | Theme | Look | Gameplay twist |
 |---|---|---|---|
@@ -386,7 +396,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 **Done when:** All four levels play in order with themed transitions, and the same seed always produces the same run.
 
-### M13 · Boss level
+### M14 · Boss level
 
 - Boss arena (working name: The Pink General), built on the M7 boss framework: three phases, clear telegraphs, summons from the army, and a health bar.
 - Finishing blow in slow motion with a special death pose.
@@ -394,18 +404,18 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 **Done when:** The boss is beatable with any build, alone or in co-op, and hard to beat without learning the combat.
 
-### M14 · Platforms and vertical layers (optional)
+### M15 · Platforms and vertical layers (optional)
 
 A short prototype first: jump-through platforms, real stairs, and vertical camera movement. The test is whether it keeps combat readable. If yes, we add it to Levels 3–5 and to the chunk format. If no, we keep the stair look as scenery. M4’s groundY function means either choice is cheap, once the remaining direct ground checks are routed through it.
 
-### M15 · Polish, audio, balance, v1.0 release
+### M16 · Polish, audio, balance, v1.0 release
 
 - Music and ambient sound per level, full sound pass.
 - Difficulty settings, balance pass on XP, stars, and enemy health.
 - Accessibility: control remapping, color-blind-safe hit flashes, reduced screen shake option.
 - Performance pass on phones and iPads, final tutorial and move list screen.
 
-### M16 · Level creator
+### M17 · Level creator
 
 - A mode for Rhett that edits a grid and saves a chunk or a whole level in the same data format the game uses.
 - His levels can be played directly and can be added to the procedural pools.
@@ -413,19 +423,11 @@ A short prototype first: jump-through platforms, real stairs, and vertical camer
 
 **Done when:** Rhett builds a level on the iPad, plays it, and sees his chunks appear in generated runs.
 
-### M17 · Network multiplayer on home Wi-Fi
-
-- Each kid plays on their own iPad. Every device runs the same simulation from a shared seed and only inputs are exchanged (rule R2). Co-op first, since it forgives some lag; then versus, with rollback if lag is a problem.
-- WebRTC peer-to-peer from GitHub Pages needs a small matchmaking ("signaling") step even at home. Options to evaluate then: NetplayJS, PeerJS, or a tiny free signaling service.
-- The self-test fingerprint doubles as a desync check: devices compare it every few seconds.
-
-**Done when:** Two iPads finish Level 1 together over home Wi-Fi with a measured lag figure, and a versus match is playable or a clear decision is made to keep online co-op only.
-
 ### M18 · House builder and visiting
 
 - A "House" section of the store opens your fighter on an open 2D grid. Drag across squares to build walls, charged in stars per square; buy backgrounds, furniture and decorations.
 - A house is data (background, grid, tiles, items), saved with the profile.
-- Invite friends into your house while you're in it: a host-based network session using M17, where guests can look around and only the host edits.
+- Invite friends into your house while you're in it: a host-based network session using M11, where guests can look around and only the host edits.
 
 **Done when:** You can build and decorate a house with stars, and a sibling can visit it from their iPad.
 
@@ -433,21 +435,21 @@ A short prototype first: jump-through platforms, real stairs, and vertical camer
 
 Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Workshop for editor levels and server-owned stars and inventory (why rules R7 and R8 exist). Anything public-facing with kids' accounts raises privacy and moderation questions, so it stays family-only unless Ron decides otherwise.
 
-### Renumbering (November 16, 2026)
+### Renumbering (November 16, 2026; updated November 17: network play moved up to M11, so M11–M16 each moved down one)
 
 | Milestone | Old number | New number |
 |---|---|---|
 | Level framework, Level 1 | M8 | M8 |
 | Multiplayer (local) | M12 Stages A–B | M9 |
-| XP and skill tree | M9 | M11 (after the store, swapped at Rhett's request) |
+| XP and skill tree | M9 | M12 (after the store and network play, at Rhett's request) |
 | Ninja stars, shop | M10 | M10 (merged, cosmetics only) |
 | Character creation | M11 | M10 (merged) |
-| Levels 2–5 | M13 | M12 (plus procedural runs) |
-| Boss level | M14 | M13 |
-| Platforms (optional) | M15 | M14 |
-| Polish and release | M16 | M15 |
-| Level creator | new | M16 |
-| Online multiplayer | M12 Stage C | M17 (home Wi-Fi, WebRTC) |
+| Levels 2–5 | M13 | M13 (plus procedural runs) |
+| Boss level | M14 | M14 |
+| Platforms (optional) | M15 | M15 |
+| Polish and release | M16 | M16 |
+| Level creator | new | M17 |
+| Online multiplayer | M12 Stage C | M11 (home Wi-Fi, WebRTC; moved up from M17 on November 17) |
 | House builder | new | M18 |
 
 ## Combat Chart
@@ -561,14 +563,14 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 ## Open decisions
 
 1. **Name of the stamina button.** Decided: **Surge**, with a yellow bar.
-2. **Phasing rules.** Decided: phasing skips enemy bodies only, so you can still be hit while running through. A skill in M11 could add dodging attacks.
+2. **Phasing rules.** Decided: phasing skips enemy bodies only, so you can still be hit while running through. A skill in M12 could add dodging attacks.
 3. **Ultimate.** Decided for now: the Tornado Kick keeps its own blue meter, separate from Surge. Renaming it Typhoon is still open.
 4. **Back moves.** Add Back+P Backfist and Back+K Back Kick, which hit behind you? Not in the chart yet.
 5. **Grab and throw.** Decided: yes, built in M4. Punch + Kick together grabs, and a throw sends the enemy into others.
-6. **Unlock approach.** For now every move is unlocked, and each carries its tier (FST-1, LEG-2 and so on) so M11 can lock them. Decide before M11: start with base strings and unlock the rest, or start with everything and unlock upgrades?
+6. **Unlock approach.** For now every move is unlocked, and each carries its tier (FST-1, LEG-2 and so on) so M12 can lock them. Decide before M12: start with base strings and unlock the rest, or start with everything and unlock upgrades?
 7. **Level style.** I assumed side-scrolling levels with “GO →” prompts, rather than single-screen arenas. Decide before M8.
 8. **Defense for versus.** Decided (combat patch, November 16): hold **Down + Surge** while standing still to block. Hits from the front cost Surge instead of health with no stun or dizziness; the kneeling pose trembles more as Surge drains; when Surge runs out you're Winded and hits land. Hits from behind always land.
 
 ## Suggested next step
 
-Next is **M11**: XP, levels and the skill tree, with the starting style (Brawler, Kicker or Sprinter) added to character creation. Decide the unlock approach first (Open decisions, item 6).
+Next is **M11**: network multiplayer on home Wi-Fi, each kid on their own iPad. First step: choose how two iPads find each other from GitHub Pages (a small free signaling service, or pairing by a short code), then co-op on the Wooded Trail. The skill tree follows in M12.

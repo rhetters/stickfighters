@@ -266,6 +266,13 @@ $('b-onlineback').onclick = () => {
 addEventListener('gamepadconnected', () => {
   if (pressMode()) titleReveal();
 });
+// A second check that doesn't depend on animation frames, in case the browser holds those back before the
+// first touch (patch 2, iPad): any controller button or stick opens the title.
+setInterval(() => {
+  if (!pressMode() || !navigator.getGamepads) return;
+  for (const g of navigator.getGamepads())
+    if (g && (g.buttons.some(b => b && b.pressed) || g.axes.some(v => Math.abs(v) > 0.6))) titleReveal();
+}, 150);
 $('s-title').addEventListener('pointerdown', e => {
   if (pressMode()) {
     titleReveal();
