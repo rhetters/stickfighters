@@ -519,7 +519,7 @@ function hud() {
   ctx.textAlign = 'right';
   ctx.font = '900 26px Impact,"Arial Black",sans-serif';
   ctx.fillStyle = INK;
-  if (state !== 'train') ctx.fillText(String(score).padStart(7, '0'), W - 16, 34);
+  if (state !== 'train' && !MODE.pvp) ctx.fillText(String(score).padStart(7, '0'), W - 16, 34);
   ctx.textAlign = 'center';
   ctx.font = '900 18px Impact,"Arial Black",sans-serif';
   if (MODE.hud && state !== 'train') MODE.hud();
@@ -612,6 +612,20 @@ function render() {
   }
   use(PL[0]);
   for (const x of FX) drawFX(x);
+  // co-op revive progress over a downed teammate
+  for (const p of PL)
+    if (p.st === 'dead' && p.rv > 0) {
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 70, 18, 0, 7);
+      ctx.stroke();
+      ctx.strokeStyle = p.col;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 70, 18, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * p.rv) / 120);
+      ctx.stroke();
+    }
   if (state === 'train' && TR.boxes) drawBoxes();
   ctx.translate(CAM.x, 0);
   if (MODE.fg) MODE.fg();

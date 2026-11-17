@@ -86,6 +86,18 @@ const CHUNKS = {
     ]
   }
 };
+// Versus arena (M9): one screen, no fights scripted.
+CHUNKS.arena = {
+  w: 900,
+  dusk: 0.35,
+  props: [
+    { k: 'tree', x: 40, s: 1.2 },
+    { k: 'stump', x: 250 },
+    { k: 'fern', x: 470 },
+    { k: 'rock', x: 640 },
+    { k: 'tree', x: 870, s: 1.1 }
+  ]
+};
 const LEVELS = {
   woods1: {
     name: 'WOODED TRAIL',
@@ -93,5 +105,6 @@ const LEVELS = {
     theme: 'woods',
     next: 'Sewer Entrance (coming in M12)',
     chunks: ['trailhead', 'birches', 'fallenlog', 'clearing', 'grove', 'trailend']
-  }
+  },
+  arena: { name: 'THE CLEARING', num: 0, theme: 'woods', next: '', chunks: ['arena'] }
 };

@@ -136,7 +136,7 @@ function tickAtk(f) {
   if (d.ring && a.f === d.h[0]) ring(f.x + f.face * 50, f.y - 45, 60);
   if (a.f >= d.h[0] && a.f <= d.h[1]) {
     const hb = hbox(f);
-    for (const e of f.pl ? E : PL) {
+    for (const e of f.pl ? (MODE.pvp ? [...E, ...PL.filter(q => q !== f)] : E) : PL) {
       if (
         a.hit.has(e) ||
         e.gone ||
@@ -146,6 +146,7 @@ function tickAtk(f) {
       )
         continue;
       if (!f.pl && (e.inv > 0 || e.st === 'dead')) continue;
+      if (e.pl && (e.inv > 0 || e.st === 'dead' || e.st === 'down' || e.st === 'getup')) continue;
       if (ov(hb, [e.x - 15 * e.s, e.y - 78 * e.s, e.x + 15 * e.s, e.y + 4])) {
         a.hit.add(e);
         const dr = d.omni ? (e.x >= f.x ? 1 : -1) : d.back ? -f.face : f.face;
@@ -153,7 +154,8 @@ function tickAtk(f) {
           block(e, d, dr);
           continue;
         }
-        if (f.pl && e.st === 'down' && (!d.otg || e.otgU)) groundHit(e, d, dr, f);
+        if (f.pl && e.pl) pvpHit(e, d, dr, f);
+        else if (f.pl && e.st === 'down' && (!d.otg || e.otgU)) groundHit(e, d, dr, f);
         else if (f.pl) {
           hurtE(
             e,
@@ -190,6 +192,11 @@ function tickAtk(f) {
       }
       shake = Math.max(shake, 12);
     }
+    if (d.area && f.pl && MODE.pvp)
+      for (const q of PL) {
+        if (q === f || q.inv > 0 || q.st === 'dead' || q.y < G - 24 || Math.abs(q.x - f.x) > d.area) continue;
+        pvpHit(q, { dmg: d.adm || 12, kb: 9, lift: -7, ef: 'kd' }, q.x >= f.x ? 1 : -1, f);
+      }
     if (d.area && f.pl)
       for (const e of E) {
         if (
@@ -503,6 +510,59 @@ function hurtE(e, d, dr, src) {
     txt(e.x, e.y - 120 * e.s, '+' + sc, '#ff4fa3', 20);
     if (!queue.length && E.every(x => x.dying)) slow = 55;
   }
+}
+// Versus (M9): a player's attack on another player. Light hits stagger briefly so strings connect; launches and
+// knockdowns send them flying with protection until they're back up (no juggles in versus yet). Long combos scale
+// down faster than against the army. Block (Down + Surge) works the same as against enemies.
+function pvpHit(q, d, dr, f) {
+  if (q.blk && dr === -q.face && q.st === 'free') return blockHit(q, d, dr);
+  const w = wtOf(d),
+    sc = f.combo < 3 ? 1 : Math.max(0.35, 1 - (f.combo - 2) * 0.08),
+    dmg = Math.max(1, Math.round((d.dmg || 4) * sc)),
+    ef = d.ef || 'stagger',
+    big = (d.kb || 0) >= 11 || w === 'H' || ['launch', 'kd', 'trip', 'splat', 'bounce'].includes(ef);
+  if (q.st === 'grab' && q.gt) {
+    q.gt.st = 'hurt';
+    q.gt.stun = 8;
+    q.gt.held = null;
+    q.gt = null;
+  }
+  f.combo++;
+  f.comboT = 100;
+  f.meter = Math.min(100, f.meter + 4);
+  maxc = Math.max(maxc, f.combo);
+  q.hp -= dmg;
+  q.flash = 4;
+  q.hs = WT[w].st;
+  q.combo = q.comboT = 0;
+  q.att = null;
+  q.running = q.flip = 0;
+  q.pose[9] = 0;
+  impact(w, dr, q.x, q.y - 45);
+  txt(q.x, q.y - 95, dmg, f.col);
+  if (q.hp <= 0) {
+    Object.assign(q, { hp: 0, st: 'dead', dk: 'back', ddir: dr, vx: dr * 6, vy: -9, sp: 0, deadT: 0 });
+    q.ri = { dr, ef: 'launch' };
+    slow = 80;
+    return;
+  }
+  if (big) {
+    Object.assign(q, {
+      st: 'fly',
+      vx: dr * Math.max(6, (d.kb || 8) * 0.7),
+      vy: d.lift && d.lift < 0 ? Math.min(-6, d.lift) : -7,
+      spv: dr * 14,
+      sp: 0,
+      inv: 100
+    });
+    q.ri = { dr, ef: 'launch' };
+    return;
+  }
+  q.st = 'hurt';
+  q.stun = d.st || 14;
+  q.vx = dr * (d.kb || 4) * 0.8;
+  q.vy = -2;
+  q.inv = 6;
 }
 // Ground hits (combat patch): a downed enemy can still be hit. Half damage and a ragdoll flop, but the hit never
 // adds down time or juggle count, so it gets up when its knockdown runs out. A finishing hit uses the normal path.

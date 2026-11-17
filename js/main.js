@@ -212,6 +212,7 @@ $('b-resume').onclick = () => pause(false);
 $('b-restart').onclick = () => {
   if (state === 'train') startTrain();
   else if (MODE === LEVEL) startLevel(LV.id);
+  else if (MODE === VERSUS) startVersus();
   else start();
 };
 $('b-set2').onclick = () => {
@@ -223,7 +224,7 @@ $('b-back').onclick = () => show(back);
 $('b-again').onclick = () => (MODE === LEVEL ? startLevel(LV.id) : start());
 $('b-cont').onclick = continueLevel;
 $('b-level').onclick = () => startLevel('woods1');
-$('b-next').onclick = () => startLevel(LV.id);
+$('b-next').onclick = () => (MODE === VERSUS ? startVersus() : startLevel(LV.id));
 $('b-title2').onclick = openTitle;
 $('b-title').onclick = openTitle;
 $('pausebtn').onclick = () => pause(true);
@@ -317,6 +318,7 @@ function update() {
       return;
     }
   }
+  if (MODE.pre && MODE.pre()) return;
   for (const p of PL) {
     use(p);
     updP();

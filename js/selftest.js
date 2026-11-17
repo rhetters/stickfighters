@@ -90,7 +90,14 @@ function selfTest(n) {
     h = Math.imul(h, 16777619);
   }
   res.hashL = (h >>> 0).toString(16).padStart(8, '0');
-  res.level = 'cleared ' + (LV.cp + 1) + '/' + LV.encs.length + ' fights, ' + fmtT(LV.t) + (state === 'clear' ? ', finished' : '');
+  res.level =
+    'cleared ' +
+    (LV.cp + 1) +
+    '/' +
+    LV.encs.length +
+    ' fights, ' +
+    fmtT(LV.t) +
+    (state === 'clear' ? ', finished' : '');
   SELFTESTING = false;
   Object.assign(FEEL, keep.feel);
   SET.surge = keep.surge;

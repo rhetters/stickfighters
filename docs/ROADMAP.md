@@ -10,7 +10,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 
 **Why this order.** Input comes first because every combo depends on knowing which direction is held. Then the combat engine, then Surge (your stamina system), because Surge modifies moves. Collision feel and ragdoll come before levels and progression, since you called them the core of the game and there’s no point building five levels on combat that will change. Progression and the shop come once there’s a real level to earn XP in. Levels 2–6 come last, when the systems stop moving.
 
-**Where things stand.** M0 to M8 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M9 is next.
+**Where things stand.** M0 to M9 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M10 is next.
 
 **Why this order after M7 (reordered November 16, 2026).** Ron and Rhett approved the order from the restructure plan. M8 builds the level framework so the world is no longer one screen and each game type is a separate "mode". Local multiplayer comes next (M9) so Rhett gets Smash-style versus early, and because network play later needs the same per-player groundwork. Progression (M10) and the ninja star store with character creation (M11) follow, then the rest of the campaign (M12–M15, ending in the v1.0 release). The level creator, network play and the house builder come after that. The old numbers are listed under "Renumbering" below.
 
@@ -36,8 +36,8 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 | M7 | Enemy AI and roster v2 | Done | L | M4, M5 | New enemy types, AI director, boss hooks |
 | M7.5 | Restructure: files, docs, self-test | Done | M | M7 | Same game; code split into files, docs in the repo, `?selftest` determinism check |
 | M8 | Level framework, modes, Level 1: Wooded Trail | Done | L | M7.5 | Scrolling level with parallax layers; the wave game becomes Arcade mode |
-| M9 | Local multiplayer: co-op and versus | Next | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
-| M10 | XP, levels, skill tree | Planned | L | M3, M8 | Level-ups, skill points, tree screen |
+| M9 | Local multiplayer: co-op and versus | Done | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
+| M10 | XP, levels, skill tree | Next | L | M3, M8 | Level-ups, skill points, tree screen |
 | M11 | Ninja stars, cosmetic store, character creation | Planned | L | M10 | Star drops, store by slot, create and dress your fighter, save backup |
 | M12 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M11 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
 | M13 | Boss level | Planned | L | M12 | Multi-phase boss fight |
@@ -310,6 +310,16 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 **Done when:** Two to four players finish Level 1 together on one screen, a best-of-3 versus match plays start to finish on controllers, and the self-test is unchanged for one player.
 
+**Status: complete** (pending Rhett's test with real controllers on the iPad and TV).
+
+- **Players screen** (title → Multiplayer): up to 4 players. Controllers join by pressing any button and leave with B; you can also join with the touch screen, the keyboard, or a second keyboard player (arrows and number pad, press 0 on the number pad to join). Colors by slot: Orange, Blue, Green, Purple.
+- **Per player:** each player has their own input slot, health, Surge, blue meter, combo counter and Winded state. In multiplayer the HUD shows a compact row per player. Touch controls hide when nobody joined with touch, so they don't cover the TV picture. Any controller's Start pauses.
+- **Versus:** The Clearing arena, 2–4 players, free-for-all, best of 3 rounds: countdown, 60-second rounds, last one standing (or the most health when time runs out), slow-motion KO, winner screen and Rematch. Light hits stagger briefly so strings connect; launches and knockdowns give protection until you're back up (no juggles in versus yet); long combos scale down faster than against the army. Block works in versus. Equal stats for everyone. Players push each other apart unless they're phasing with Surge.
+- **Co-op:** Wooded Trail and Arcade with 2–4 players. No friendly fire. Enemies get 35% more health and about 30% more grunts per extra player, and more can fight at once. A downed player is revived (40% health) when a teammate stands next to them for 2 seconds; if everyone is down, Continue works as before. The camera follows the player furthest along; players who fall behind are pushed along by the left edge of the screen.
+- **Choices made (Rhett can change them):** versus is last-one-standing with a health bar, free-for-all only (no 2v2 yet), and co-op revive is "stand next to them for 2 seconds".
+- **Not yet:** grabbing another player in versus, juggles in versus, 2v2 teams, per-player character looks (comes with M11).
+- Self-test fingerprints unchanged (one player): Arcade `c87c9470`, Level `21292ab5`.
+
 ### M10 · XP, levels, skill tree
 
 **Goal:** A reason to keep fighting.
@@ -544,4 +554,4 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 
 ## Suggested next step
 
-Next is **M9**, local multiplayer: one input slot per player, a "press any button to join" screen for controllers on the TV, Rhett's Smash-style versus arena, and co-op through the Wooded Trail. Decide first how players defend in versus (Open decisions, item 8).
+Next is **M10**, XP, levels and the skill tree. Before that, Rhett should try M9 with real controllers on the iPad and the TV (AirPlay mirroring vs an HDMI adapter), since that's where delay shows up.

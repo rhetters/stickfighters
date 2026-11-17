@@ -2,6 +2,13 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M9 · Local multiplayer: co-op and versus
+- Players screen: up to 4 players join with controllers (any button; B leaves), touch, keyboard or a second keyboard player.
+- Per-player input slots, health, Surge, meter, combo and HUD rows. Any controller pauses; touch controls hide when nobody uses touch.
+- Versus: The Clearing, 2-4 players, best of 3, 60-second rounds, countdown, KO slow motion, winner screen, rematch. Block works.
+- Co-op: Wooded Trail and Arcade; enemies scale with players; revive a teammate by standing next to them for 2 seconds.
+- Self-test fingerprints unchanged for one player (Arcade `c87c9470`, Level `21292ab5`).
+
 ## Buttons and controller menus (November 16, 2026)
 - Settings > Buttons: change keyboard keys and controller buttons for every action, including Pause. Controller mappings are saved per controller type, with Xbox, Switch and PlayStation button names.
 - Fixed: after pressing Start on a controller, the pause menu couldn't be used with the controller. Every menu now works with a controller (d-pad/stick, confirm, back, Start resumes).

@@ -299,6 +299,7 @@ function makeQueue(n) {
 function nextWave() {
   wave++;
   queue = makeQueue(wave);
+  coopExtra(queue);
   bn(wave % 5 === 0 ? 'WAVE ' + wave + ': CAPTAIN!' : 'WAVE ' + wave);
   spawnT = 60;
   cl = 0;

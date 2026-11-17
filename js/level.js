@@ -130,6 +130,7 @@ function hurtGate(g, d) {
 }
 function levelTick() {
   LV.t++;
+  reviveTick();
   if (LV.go > 0) LV.go--;
   const alive = PL.filter(p => p.st !== 'dead'),
     lead = Math.max(...alive.map(p => p.x)),
@@ -147,6 +148,7 @@ function levelTick() {
     if (ne && CAM.x >= ne.lock - 0.5) {
       ne.st = 1;
       ne.q = ne.list.slice();
+      coopExtra(ne.q);
       wave = ne.lvl;
       spawnT = 30;
       LV.go = 0;
@@ -156,7 +158,7 @@ function levelTick() {
   }
   levelWalls();
   if (ae) {
-    if (ae.q.length && --spawnT <= 0 && E.filter(e => !e.dying).length < ae.max) {
+    if (ae.q.length && --spawnT <= 0 && E.filter(e => !e.dying).length < ae.max + PL.length - 1) {
       spawn(ae.q.shift());
       spawnT = 40;
     }
@@ -216,6 +218,8 @@ function levelClear() {
     (nb ? 'New best score! ' : 'Best ' + PROG[id].score + '. ') +
     (nt ? 'New best time!' : 'Best time ' + fmtT(PROG[id].time) + '.');
   $('c-l3').textContent = 'Next: ' + LV.def.next;
+  $('c-h1').textContent = 'LEVEL CLEAR!';
+  $('b-next').textContent = 'PLAY AGAIN';
   show('s-clear');
 }
 function levelFail() {
@@ -285,5 +289,6 @@ const LEVEL = {
   over: levelFail,
   bg: () => drawWoods(),
   fg: () => drawWoodsFg(),
-  hud: levelHud
+  hud: levelHud,
+  revive: 1
 };

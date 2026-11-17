@@ -4,12 +4,13 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Play:** https://rhetters.github.io/stickfighters/
 
-**Status:** M0–M8 done: the Wooded Trail level and Arcade waves are both playable. Next: M9, local multiplayer (versus and co-op on the TV). Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Status:** M0–M9 done: Wooded Trail, Arcade, and local multiplayer (Versus and Co-op for up to 4 players). Next: M10, XP and the skill tree. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Modes
 
 - **Play: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.
 - **Arcade: Endless Waves** is the original game: waves on one screen, with a Captain every fifth wave.
+- **Multiplayer: Versus & Co-op** opens the Players screen. Up to 4 players: controllers join by pressing any button (B leaves), or join with touch, the keyboard, or a second keyboard player (arrows + number pad; press 0 on the number pad). Then pick **Versus** (best of 3 rounds in The Clearing) or **Co-op** (Wooded Trail or Arcade; stand next to a downed teammate for 2 seconds to revive them).
 - **Training Room** has dummies, hitboxes, frame data and the Feel / Moves / Info panels.
 
 ## Controls
@@ -58,6 +59,7 @@ Only a few enemies attack at once; the rest circle at a distance waiting their t
 - Ragdolls, death poses, confetti cleanup.
 - Training Room: spawn 1–6, hitboxes, frame data, speeds, freeze/step, Feel / Moves / Info.
 - Gamepad works; rotate-to-landscape prompt; the game pauses when you switch apps.
+- Multiplayer: 2+ controllers join on the Players screen, each controls its own fighter, Versus plays to a winner, co-op revive works. Try the TV with AirPlay and with an HDMI adapter.
 - For developers: `index.html?selftest` shows the fingerprint in docs/ARCHITECTURE.md.
 
 ## For developers

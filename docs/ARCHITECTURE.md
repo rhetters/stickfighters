@@ -4,7 +4,7 @@ How the code fits together. Update this at the end of every milestone.
 
 ## Files and load order
 
-`index.html` holds the markup and loads one stylesheet and 20 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
+`index.html` holds the markup and loads one stylesheet and 22 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
 
 | # | File | What's in it |
 |---|---|---|
@@ -19,15 +19,17 @@ How the code fits together. Update this at the end of every milestone.
 | 9 | `js/enemies.js` | `updE`, AI director, `aiThink`, boss framework, `spawn`, `makeQueue`, `nextWave` |
 | 10 | `js/modes.js` | The mode interface and `ARCADE` (endless waves); `MODE` = the mode being played |
 | 11 | `js/level.js` | `LEVEL` mode: `buildLevel`, `startLevel`, `continueLevel`, camera and walls (`levelWalls`), encounters, gates, level clear/fail, level HUD |
-| 12 | `js/ragdoll.js` | Verlet ragdoll, death poses, corpse settle and confetti dissolve |
-| 13 | `js/scenery.js` | Level drawing only: parallax layers, props, the log gate, foreground grass, leaves and fireflies |
-| 14 | `js/render.js` | Gear, figures, background, effects, HUD, `render()` |
-| 15 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
-| 16 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
-| 17 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
-| 18 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
-| 19 | `js/selftest.js` | `selfTest()` determinism check |
-| 20 | `js/main.js` | Screens, settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
+| 12 | `js/versus.js` | `VERSUS` mode: rounds, countdown, KO, timer, winner screen, player push-apart |
+| 13 | `js/ragdoll.js` | Verlet ragdoll, death poses, corpse settle and confetti dissolve |
+| 14 | `js/scenery.js` | Level drawing only: parallax layers, props, the log gate, foreground grass, leaves and fireflies |
+| 15 | `js/render.js` | Gear, figures, background, effects, HUD, `render()` |
+| 16 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
+| 17 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
+| 18 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
+| 19 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; `startMulti()` |
+| 20 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
+| 21 | `js/selftest.js` | `selfTest()` determinism check |
+| 22 | `js/main.js` | Screens, settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
 
 Nothing runs game code at load except data setup; boot (`init(); applySet(); resize(); bindSettings(); syncTrain(); openTitle(); requestAnimationFrame(loop)`) is the last thing in `main.js`.
 
@@ -46,6 +48,10 @@ Nothing runs game code at load except data setup; boot (`init(); applySet(); res
 - A level (`LEVELS[id]`) is an ordered list of chunk ids; `buildLevel()` lays the chunks end to end and makes a run-time copy (`LV`) with encounters (`st` 0 waiting, 1 fighting, 2 done), gates and the checkpoint `cp`. Data is never changed at run time.
 - The level camera only moves forward, and stops at the next encounter's lock position or in front of a gate. The ground is still flat (`groundY`).
 - Gameplay randomness: `rnd()` only. `Math.random()` only for cosmetics (screen shake, Surge sparkle, noise buffer, unseeded run seed).
+
+## Players (M9)
+
+`ROSTER` (input.js) is the list of players in a multiplayer game: `{slot, dev, col, d2, name}` where `dev` is `touch`, `kb`, `kb2` or `pad:N`. It is empty in one-player games, and then every device drives Player 1 as before. `init()` builds `PL` from the roster. `devSlot(dev)` routes a device to its player's input slot (`INP[0..3]`); devices without a player are ignored. Each player carries its own `combo`, `comboT`, `meter` and `hpT`; `score` and `maxc` are shared. `MODE.pvp` (Versus) lets players' attacks hit other players through `pvpHit()`. Co-op rules live in modes.js: `coopScale()`, `coopExtra()`, `reviveTick()`. `MODE.pre()` can hold the simulation (the Versus countdown). Still legacy: `use(p)` binds `P`/`K`/`STM` to the player being updated.
 
 ## Input
 
