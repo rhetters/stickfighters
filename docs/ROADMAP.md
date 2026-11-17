@@ -10,7 +10,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 
 **Why this order.** Input comes first because every combo depends on knowing which direction is held. Then the combat engine, then Surge (your stamina system), because Surge modifies moves. Collision feel and ragdoll come before levels and progression, since you called them the core of the game and there’s no point building five levels on combat that will change. Progression and the shop come once there’s a real level to earn XP in. Levels 2–6 come last, when the systems stop moving.
 
-**Where things stand.** M0 to M9 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M10 (ninja stars, store, character creation) is next.
+**Where things stand.** M0 to M10 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M11 (XP, levels and the skill tree) is next.
 
 **Why this order after M7 (reordered November 16, 2026).** Ron and Rhett approved the order from the restructure plan. M8 builds the level framework so the world is no longer one screen and each game type is a separate "mode". Local multiplayer comes next (M9) so Rhett gets Smash-style versus early, and because network play later needs the same per-player groundwork. The ninja star store with character creation (M10) and then progression with the skill tree (M11) follow (swapped on November 16 at Rhett's request), then the rest of the campaign (M12–M15, ending in the v1.0 release). The level creator, network play and the house builder come after that. The old numbers are listed under "Renumbering" below.
 
@@ -37,8 +37,8 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 | M7.5 | Restructure: files, docs, self-test | Done | M | M7 | Same game; code split into files, docs in the repo, `?selftest` determinism check |
 | M8 | Level framework, modes, Level 1: Wooded Trail | Done | L | M7.5 | Scrolling level with parallax layers; the wave game becomes Arcade mode |
 | M9 | Local multiplayer: co-op and versus | Done | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
-| M10 | Ninja stars, cosmetic store, character creation | Next | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
-| M11 | XP, levels, skill tree | Planned | L | M3, M8, M10 | Level-ups, skill points, tree screen |
+| M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
+| M11 | XP, levels, skill tree | Next | L | M3, M8, M10 | Level-ups, skill points, tree screen |
 | M12 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M10, M11 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
 | M13 | Boss level | Planned | L | M12 | Multi-phase boss fight |
 | M14 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
@@ -336,6 +336,18 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 **Done when:** Stars drop and collect, you can buy and equip cosmetics, create and load fighters that look right in every move and death pose, and a backup restores on another device.
 
+**Status: complete** (pending Rhett's test on the iPad).
+
+- **Ninja stars:** defeated enemies drop them (Grunt 1–2, Runner 2–3, Flanker 3–5, Guard 4–6, Brute 8–12, Captain 20–30, plus 1 for every 10 hits of combo, up to 5). They pop out, bounce, then fly to the nearest player and go straight into your wallet. Wave clears (Arcade) and level clears (50 the first time, 20 after) give more. A shuriken counter sits next to the score; the results screen shows what the run earned. No stars in Versus or the Training Room. One wallet per device, shared by every fighter.
+- **Gifts:** a Captain always drops a gift box (a Brute sometimes does): a random item from the gift-only set that you don't own yet, or 40 stars once you have them all.
+- **Character screen** (title → Character): three saved fighters (tabs at the top). Body tab: name (or RANDOM for a random look and name), head size, line thickness, stance (Classic, Boxer, Low, Loose). Shelves: Colors (6 free, 6 to buy), Hats (12), Bands (6), Scarves (6), Gloves (5), Shoes (5), Trails (6, the color of the swoosh on big hits) and Victory poses (7). Every shelf is also the store: tap something you own to wear it (tap again to take it off); tap something you don't own to try it on, then tap again to buy it. Prices run from 25 to 300 stars. A live preview shows your stance, a roundhouse (with your trail) and your victory pose.
+- **Unlocks:** Ranger Hat (clear the Wooded Trail), Gold Band (20-hit combo), Halo (Arcade wave 10), Champion pose (win a Versus match). Older saves get what they already earned the first time M10 loads.
+- **Looks in the game:** hats, bands, scarves, gloves and shoes follow the body in every move, in ragdolls and death poses, and in the Tornado Kick. Victory poses play when you clear a level (the results wait a moment so you see it) and for the winner of each Versus round.
+- **Players screen (Mario Kart style):** each player picks one of the saved fighters or plays as a guest, and can change color and hat for that session: with their controller (left/right = fighter, top button = color, left button = hat) or by tapping their card. No two players get the same color, and names that match get a number.
+- **Back up / Restore** (Settings → Save): the whole save as a text code to copy, or a file to keep. Restoring reads it as data only, shows what's in it, asks for a second press, keeps a copy of the old save, then reloads.
+- **Save version 4** adds the wallet, owned items and fighters, migrating from every older version.
+- Self-test fingerprints unchanged: Arcade `c87c9470`, Level `21292ab5`. Star drops use their own seeded roll, not the gameplay random sequence.
+
 ### M11 · XP, levels, skill tree
 
 **Goal:** A reason to keep fighting. (Moved after the store and character creation on November 16 at Rhett's request; ninja stars already exist by then, so respecs can cost stars from day one.)
@@ -558,4 +570,4 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 
 ## Suggested next step
 
-Next is **M10**: ninja stars, the cosmetic store and character creation, including each player customizing their own look on the Players screen in local multiplayer (like Mario Kart). The skill tree follows in M11.
+Next is **M11**: XP, levels and the skill tree, with the starting style (Brawler, Kicker or Sprinter) added to character creation. Decide the unlock approach first (Open decisions, item 6).

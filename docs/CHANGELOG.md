@@ -2,6 +2,16 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M10 · Ninja stars, cosmetic store, character creation
+- Ninja stars drop from defeated enemies (more for tough ones and big combos), fly to you and go in your wallet; wave and level clears give more. A star counter sits next to the score, and the results screen shows what you earned.
+- Captains drop gifts with a random gift-only item.
+- Character screen: three saved fighters with name, head size, line thickness and stance, plus shelves (Colors, Hats, Bands, Scarves, Gloves, Shoes, Trails, Victory poses) that are also the store: tap to try on, tap again to buy. 59 items, all looks only. Unlocks for clearing the Wooded Trail, a 20-hit combo, Arcade wave 10 and winning a Versus match.
+- Looks follow the body in every move, ragdoll, death pose and the Tornado Kick. Victory poses on level clear and for Versus round winners.
+- Players screen: each player picks a saved fighter or guest, and changes color and hat with their own controller or by tapping. No shared colors.
+- Settings → Save: Back up / Restore with a code or a file.
+- Save version 4 (wallet, items, fighters), migrating from all older saves; earned unlocks are granted on first load.
+- Self-test fingerprints unchanged: Arcade `c87c9470`, Level `21292ab5`.
+
 ## Roadmap: M10 and M11 swapped (November 16, 2026)
 - At Rhett's request: M10 is now ninja stars, the cosmetic store and character creation (including per-player looks in local multiplayer); M11 is XP, levels and the skill tree.
 - The starting style (Brawler, Kicker or Sprinter), which sets your first skill point, moves from character creation to M11 with the skill tree. Respecs costing stars works from day one, since stars come first.
