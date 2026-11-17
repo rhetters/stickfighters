@@ -14,7 +14,7 @@ The title says **PRESS START**: press any key, button or tap. **Solo** opens Cam
 - **Play: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.
 - **Arcade: Endless Waves** is the original game: waves on one screen, with a Captain every fifth wave.
 - **Multiplayer: Versus & Co-op** opens the Players screen. Up to 4 players: controllers join by pressing any button (B leaves), or join with touch, the keyboard, or a second keyboard player (arrows + number pad; press 0 on the number pad). Then pick **Versus** (best of 3 rounds in The Clearing; free-for-all or teams, chosen with the Versus button, and tap TEAM on a card to switch sides; grab another player with punch + kick, mash to break free) or **Co-op** (Wooded Trail or Arcade; stand next to a downed teammate for 2 seconds to revive them).
-- **Character** holds three saved fighters. Change the name, head size, line thickness and stance, and dress them from the shelves: colors, hats, headbands, scarves, gloves, shoes, trails and victory poses. Each shelf is also the store: tap an item to try it on, tap again to buy it with ninja stars. Defeated enemies drop the stars, and Captains drop gifts. Everything is looks only and never changes how you fight. In multiplayer, each player picks a fighter on the Players screen and can change their color and hat.
+- **Character** holds four saved fighters. Change the name, height, head size, line thickness and stance, and dress them from the tabs: Colors, Head (hair, hats, headbands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge (the color of your Surge) and Poses (up to 4 on your pose wheel; the first is your victory pose). Each shelf is also the store: tap an item to try it on, tap again to buy it with ninja stars. Delete a fighter from the Body tab. Defeated enemies drop the stars, and Captains drop gifts. Everything is looks only and never changes how you fight. In multiplayer, each player picks a fighter on the Players screen and can change their color and hat.
 - **Back up your save** in Settings → Save: copy a code or save a file, and restore it on any device.
 - **Training Room** has dummies, hitboxes, frame data and the Feel / Moves / Info panels.
 
@@ -30,6 +30,7 @@ The title says **PRESS START**: press any key, button or tap. **Solo** opens Cam
 | Block (hits from the front cost Surge instead of health; drops when Surge runs out) | Shift + S, standing still | SURGE + stick down | Bumper + d-pad down |
 | Grab | J + K together | PUNCH + KICK | X + B |
 | Tornado Kick (blue meter full) | U | ULT | Y |
+| Pose wheel (hold, aim, let go) | T | POSE (hold, aim with the stick) | Select / View / − |
 | Pause | Esc or P | II | Start |
 
 **Changing buttons:** Settings → **Buttons** lets you change the keyboard keys and controller buttons for every action. Tap + then press the key or button; tap a key to remove it. Controller mappings are saved per kind of controller (Switch, Xbox, PlayStation) on that device, so any controller of that kind uses them.

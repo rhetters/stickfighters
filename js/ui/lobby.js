@@ -14,7 +14,7 @@ let LOBBY = [],
 // Like Mario Kart: each player picks a saved fighter (or plays as a guest) and can change the colour and hat for
 // this session, with their own controller (left/right = fighter, top button = colour, left button = hat) or by
 // tapping their card. Saved fighters aren't changed. No two players share a colour.
-const lbChoices = () => [-1, ...[0, 1, 2].filter(i => CHR.list[i])];
+const lbChoices = () => [-1, ...CHR.list.map((c, i) => i).filter(i => CHR.list[i])];
 function lbBase(r) {
   const f = r.pick >= 0 ? fighter(r.pick) : null;
   return f || normFighter({ ...FIGHTER0, name: PCOL[r.slot][2], col: GUESTCOL[r.slot] });
@@ -71,8 +71,10 @@ function lbDraw(cv2, r) {
   k.setTransform(2, 0, 0, 2, 0, 0);
   k.clearRect(0, 0, w, h);
   withCtx(k, () => {
-    drawFig(30, 68, 1, S, 0.72, L.col, L.d2, 0, 1, L.lw, o, L.head);
-    drawLook(f, { ...o, face: 1, s: 0.72 }, 1);
+    drawFig(30, 68, 1, S, 0.72 * L.ht, L.col, L.d2, 0, 1, L.lw, o, L.head, U =>
+      drawLookUnder(f, { ...U, face: 1, s: 0.72 * L.ht }, 1)
+    );
+    drawLook(f, { ...o, face: 1, s: 0.72 * L.ht }, 1);
   });
 }
 function openLobby() {

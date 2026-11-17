@@ -37,8 +37,13 @@ function dropScan() {
         a: q * 6
       });
     }
-    if (e.tk === 'c' || (e.tk === 'b' && dropRoll(i + 99) < 0.04))
-      PK.push({ k: 'g', x: e.x, y: e.y - 60, vx: 0, vy: -8, t: -10, v: 0, a: 0, r: dropRoll(i + 555) });
+    if (e.tk === 'c' || (e.tk === 'b' && dropRoll(i + 99) < 0.04)) {
+      // the gift is chosen as it drops, so it can show what's inside (not something already on the ground)
+      const ground = PK.filter(k => k.k === 'g').map(k => k.item),
+        pool = SELFTESTING ? [] : giftPool().filter(it => !ground.includes(it.id)),
+        it = pool.length ? pool[Math.floor(dropRoll(i + 555) * pool.length) % pool.length] : null;
+      PK.push({ k: 'g', x: e.x, y: e.y - 60, vx: 0, vy: -8, t: -10, v: 0, a: 0, item: it ? it.id : null });
+    }
   });
 }
 function pickTick() {
@@ -87,7 +92,7 @@ function collect(k, p) {
     sfx(1200 + Math.min(600, (STARHUD.bump || 0) * 40), 0.05, 'triangle', 0.025, 400);
     fxp({ k: 'r', x: k.x, y: k.y, r: 14, l: 10, m: 10 });
   } else {
-    const it = SELFTESTING ? null : openGift(k.r);
+    const it = SELFTESTING ? null : openGift(k.item);
     txt(p.x, p.y - 130, it ? 'NEW: ' + it.name.toUpperCase() + '!' : '+40 STARS', '#ff7a00', 24);
     ring(p.x, p.y - 50, 70);
     sfx(660, 0.4, 'triangle', 0.06, 600);
@@ -122,31 +127,34 @@ function shuriken(x, y, r, a) {
   ctx.stroke();
   ctx.restore();
 }
-function giftBox(x, y, s) {
+// A gift shows the item inside, in a bubble (or a big ninja star when it's stars)
+function giftDraw(k) {
+  const y = k.y - 6 + Math.sin(fr * 0.15) * 3,
+    it = k.item && ITEM[k.item];
   ctx.save();
-  ctx.translate(x, y);
+  ctx.fillStyle = 'rgba(255,253,248,.92)';
+  ctx.strokeStyle = '#ffd400';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(k.x, y, 23, 0, 7);
+  ctx.fill();
+  ctx.stroke();
   ctx.strokeStyle = INK;
-  ctx.lineWidth = 2.5;
-  ctx.fillStyle = '#3ec5ff';
-  ctx.fillRect(-11 * s, -10 * s, 22 * s, 18 * s);
-  ctx.strokeRect(-11 * s, -10 * s, 22 * s, 18 * s);
-  ctx.fillStyle = '#ffd400';
-  ctx.fillRect(-3 * s, -10 * s, 6 * s, 18 * s);
-  ctx.fillRect(-13 * s, -14 * s, 26 * s, 6 * s);
-  ctx.strokeRect(-13 * s, -14 * s, 26 * s, 6 * s);
-  for (const sx of [-1, 1]) {
-    ctx.beginPath();
-    ctx.ellipse(sx * 5 * s, -17 * s, 5 * s, 3 * s, sx * 0.5, 0, 7);
-    ctx.fill();
-    ctx.stroke();
-  }
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(k.x, y, 22, 0, 7);
+  ctx.clip();
+  if (it) drawItemIcon(it, k.x, y + 2, 40, (PL[0] && PL[0].col) || '#ff7a00');
+  else shuriken(k.x, y, 14, fr * 0.05);
   ctx.restore();
+  if ((fr >> 3) % 2) star4(k.x + 18, y - 18, 5, '#ffd400');
 }
 function drawPickups() {
   for (const k of PK) {
     if (k.t < 0) continue;
     if (k.k === 's') shuriken(k.x, k.y, 7, k.a);
-    else giftBox(k.x, k.y + Math.sin(fr * 0.15) * 2, 1);
+    else giftDraw(k);
   }
 }
 // HUD: your ninja stars, next to the score

@@ -1,8 +1,9 @@
-// Orange vs. the Pink Army: Character screen (M10): three saved fighters, their look, and the store.
-// Every shelf (Colors, Hats, Headbands...) is also the store: tap an item you own to wear it; tap one you don't
-// to try it on, then tap again to buy it with ninja stars. Everything is cosmetic.
+// Orange vs. the Pink Army: Character screen (M10): four saved fighters, their look, and the store.
+// Every shelf is also the store: tap an item you own to wear it (or None to take it off); tap one you don't own
+// to try it on, then tap again to buy it with ninja stars. Poses go on the pose wheel instead of being worn.
+// Everything here is cosmetic.
 // ===== CHARACTER & STORE (M10) =====
-const CH = { tab: 'body', tryOn: {}, sel: null, raf: 0, t: 0, msg: '' };
+const CH = { tab: 'body', tryOn: {}, pose: null, raf: 0, t: 0, msg: '', del: -1, hist: [] };
 const NAMES = [
   'BLAZE',
   'ZIGZAG',
@@ -13,19 +14,20 @@ const NAMES = [
   'COMET',
   'BISCUIT',
   'NINJA',
-  'SPARKY',
-  'MANGO',
-  'THUNDER',
-  'PEBBLE',
-  'WIZZ',
-  'DASH'
+  'SPARKY'
 ];
+NAMES.push('MANGO', 'THUNDER', 'PEBBLE', 'WIZZ', 'DASH');
 const fighterNow = () => fighter(CHR.cur) || normFighter(FIGHTER0);
 function openChar() {
-  // the first visit makes Fighter 1 from the default
-  if (!CHR.list[CHR.cur]) saveFighter(CHR.cur, FIGHTER0);
+  // there is always at least one fighter
+  if (!CHR.list[CHR.cur]) {
+    const n = CHR.list.findIndex(Boolean);
+    if (n >= 0) CHR.cur = n;
+    else saveFighter(CHR.cur, FIGHTER0);
+  }
   CH.tryOn = {};
   CH.msg = '';
+  CH.del = -1;
   show('s-char');
   renderChar();
   cancelAnimationFrame(CH.raf);
@@ -57,7 +59,25 @@ function charSlot(i) {
   CHR.cur = i;
   CH.tryOn = {};
   CH.msg = '';
+  CH.del = -1;
   ecoSave(true);
+  renderChar();
+}
+// Delete: the first tap asks, the second deletes
+function charDelete() {
+  const c = fighterNow();
+  if (CH.del !== CHR.cur) {
+    CH.del = CHR.cur;
+    CH.msg = 'Tap DELETE again to delete ' + c.name + ' for good. Your items stay yours.';
+    renderChar();
+    return;
+  }
+  deleteFighter(CHR.cur);
+  CH.del = -1;
+  if (!CHR.list.some(Boolean)) saveFighter(0, FIGHTER0);
+  if (!CHR.list[CHR.cur]) CHR.cur = CHR.list.findIndex(Boolean);
+  CH.msg = c.name + ' was deleted.';
+  sfx(220, 0.2, 'square', 0.05, -100);
   renderChar();
 }
 // A random look from what you own, and a random name
@@ -66,13 +86,13 @@ function charRandom() {
   setChar(c => {
     c.name = pick(NAMES);
     c.col = pick(ITEMS.filter(i => i.slot === 'color' && owns(i.id))).id;
+    c.ht = pick([0.9, 0.95, 1, 1, 1.05, 1.1]);
     c.head = pick([0.9, 1, 1, 1.1, 1.2]);
     c.lw = pick([6, 7, 7, 8]);
     c.stance = pick(STANCES).id;
-    for (const s of SLOTS) {
-      if (s.id === 'color') continue;
-      const mine = ITEMS.filter(i => i.slot === s.id && owns(i.id)).map(i => i.id);
-      c.eq[s.id] = s.id === 'pose' ? pick(mine) : Math.random() < 0.55 && mine.length ? pick(mine) : null;
+    for (const s of EQ) {
+      const mine = ITEMS.filter(i => i.slot === s && owns(i.id)).map(i => i.id);
+      c.eq[s] = mine.length && Math.random() < 0.5 ? pick(mine) : null;
     }
   });
   CH.tryOn = {};
@@ -82,23 +102,35 @@ function previewFighter() {
   const c = fighterNow();
   for (const s in CH.tryOn) {
     if (s === 'color') c.col = CH.tryOn[s];
-    else c.eq[s] = CH.tryOn[s];
+    else if (s !== 'pose') c.eq[s] = CH.tryOn[s];
   }
-  // normFighter would take off unowned items, so build the look by hand
-  const col = ITEM[c.col].c,
-    L = { col, d2: shade(col, -0.22), head: c.head, lw: c.lw, stance: c.stance, name: c.name };
-  for (const s in c.eq) L[s] = c.eq[s] ? ITEM[c.eq[s]] : null;
-  return L;
+  return lookRaw(c);
+}
+function wear(c, it) {
+  if (it.slot === 'color') c.col = it.id;
+  else if (it.slot === 'pose') {
+    if (!c.wheel.includes(it.id)) c.wheel.push(it.id);
+  } else c.eq[it.slot] = it.id;
 }
 function itemTap(id) {
   const it = ITEM[id];
   CH.msg = '';
+  CH.del = -1;
+  if (it.slot === 'pose') CH.pose = id;
   if (owns(id)) {
     delete CH.tryOn[it.slot];
-    setChar(c => {
-      if (it.slot === 'color') c.col = id;
-      else c.eq[it.slot] = c.eq[it.slot] === id && it.slot !== 'pose' ? null : id;
-    });
+    const c = fighterNow();
+    if (it.slot === 'pose') {
+      // poses go on and off the wheel
+      if (c.wheel.includes(id)) {
+        if (c.wheel.length === 1) CH.msg = 'Your wheel needs at least one pose.';
+        else c.wheel = c.wheel.filter(x => x !== id);
+      } else if (c.wheel.length >= WHEEL_MAX)
+        CH.msg = 'Your pose wheel is full (' + WHEEL_MAX + '). Tap a pose on it to take it off first.';
+      else c.wheel.push(id);
+    } else wear(c, it);
+    saveFighter(CHR.cur, c);
+    renderChar();
     return;
   }
   const trying = CH.tryOn[it.slot] === id;
@@ -112,14 +144,17 @@ function itemTap(id) {
   else if (buyItem(id)) {
     delete CH.tryOn[it.slot];
     sfx(880, 0.25, 'triangle', 0.06, 600);
+    const c = fighterNow();
+    if (it.slot !== 'pose' || c.wheel.length < WHEEL_MAX) wear(c, it);
+    saveFighter(CHR.cur, c);
     CH.msg = 'Bought ' + it.name + '!';
-    setChar(c => {
-      if (it.slot === 'color') c.col = id;
-      else c.eq[it.slot] = id;
-    });
-    return;
   } else CH.msg = 'You need ' + (it.price - ECO.stars) + ' more stars for ' + it.name + '.';
   renderChar();
+}
+function noneTap(slot) {
+  delete CH.tryOn[slot];
+  CH.msg = '';
+  setChar(c => (c.eq[slot] = null));
 }
 function renderChar() {
   const c = fighterNow();
@@ -130,7 +165,7 @@ function renderChar() {
   CHR.list.forEach((f, i) => {
     const b = document.createElement('button');
     b.className = 'chslot' + (i === CHR.cur ? ' on' : '');
-    b.textContent = f ? f.name : '+ NEW';
+    b.textContent = f ? normFighter(f).name : '+ NEW';
     if (f) b.style.setProperty('--fc', ITEM[normFighter(f).col].c);
     b.onclick = () => charSlot(i);
     sl.appendChild(b);
@@ -140,14 +175,20 @@ function renderChar() {
   // tabs
   const tb = $('ch-tabs');
   tb.innerHTML = '';
-  for (const t of [{ id: 'body', name: 'Body' }, ...SLOTS]) {
+  for (const t of TABS) {
     const b = document.createElement('button');
     b.className = 'chtab' + (CH.tab === t.id ? ' on' : '');
-    const fresh = ITEMS.some(i => i.slot === t.id && ECO.own.includes(i.id) && !ECO.seen.includes(i.id));
+    const fresh = ITEMS.some(
+      i => t.secs.includes(i.sec) && ECO.own.includes(i.id) && !ECO.seen.includes(i.id)
+    );
     b.innerHTML = t.name + (fresh ? ' <i>NEW</i>' : '');
     b.onclick = () => {
-      CH.tab = t.id;
-      CH.msg = '';
+      if (CH.tab !== t.id) {
+        CH.tab = t.id;
+        CH.msg = '';
+        CH.hist = [];
+        $('ch-grid').scrollTop = 0;
+      }
       renderChar();
       $('ch-tabs').querySelector('.on').focus({ preventScroll: true });
     };
@@ -160,8 +201,11 @@ function renderChar() {
   $('ch-msg').textContent = CH.msg;
 }
 function renderBody(c) {
+  $('ch-ht').textContent = Math.round(c.ht * 100) + '%';
   $('ch-head').textContent = Math.round(c.head * 100) + '%';
   $('ch-lw').textContent = c.lw;
+  $('ch-del').textContent = CH.del === CHR.cur ? 'TAP AGAIN TO DELETE' : 'DELETE THIS FIGHTER';
+  $('ch-del').classList.toggle('warn', CH.del === CHR.cur);
   const st = $('ch-stance');
   st.innerHTML = '';
   for (const s of STANCES) {
@@ -172,55 +216,103 @@ function renderBody(c) {
     st.appendChild(b);
   }
 }
+function card(g, cls, label, status, draw, onTap, id) {
+  const b = document.createElement('button'),
+    cv2 = document.createElement('canvas'),
+    n = document.createElement('b'),
+    p = document.createElement('small');
+  b.className = 'chitem ' + cls;
+  if (id) b.dataset.id = id;
+  cv2.width = 128;
+  cv2.height = 104;
+  n.textContent = label;
+  if (typeof status === 'number') p.innerHTML = '<span class="shk"></span>' + status;
+  else p.textContent = status;
+  b.append(cv2, n, p);
+  b.onclick = onTap;
+  g.appendChild(b);
+  const k = cv2.getContext('2d');
+  k.setTransform(2, 0, 0, 2, 0, 0);
+  withCtx(k, draw);
+  return b;
+}
 function renderShelf(c) {
   const g = $('ch-grid'),
-    slot = CH.tab,
-    worn = slot === 'color' ? c.col : c.eq[slot],
+    tab = TABS.find(t => t.id === CH.tab),
     keep =
-      document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.id : null;
+      document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.id : null,
+    base = ITEM[c.col].c;
   g.innerHTML = '';
-  for (const it of ITEMS.filter(i => i.slot === slot)) {
-    const own = owns(it.id),
-      b = document.createElement('button'),
-      cv2 = document.createElement('canvas');
-    b.className =
-      'chitem' +
-      (own ? ' own' : '') +
-      (worn === it.id ? ' on' : '') +
-      (CH.tryOn[slot] === it.id ? ' try' : '');
-    b.dataset.id = it.id;
-    cv2.width = 128;
-    cv2.height = 104;
-    const st = own
-      ? worn === it.id
-        ? 'WEARING'
-        : 'OWNED'
-      : it.how
-        ? it.how.drop
-          ? 'GIFT ONLY'
-          : 'LOCKED'
-        : '';
-    b.appendChild(cv2);
-    const n = document.createElement('b');
-    n.textContent = it.name;
-    b.appendChild(n);
-    const p = document.createElement('small');
-    if (st) p.textContent = st;
-    else p.innerHTML = '<span class="shk"></span>' + it.price;
-    b.appendChild(p);
-    if (ECO.own.includes(it.id) && !ECO.seen.includes(it.id)) {
-      const nw = document.createElement('i');
-      nw.textContent = 'NEW';
-      b.appendChild(nw);
+  let legsDone = false;
+  for (const sec of tab.secs) {
+    const S = SECS[sec],
+      slot = S.slot,
+      h = document.createElement('h4');
+    h.innerHTML = S.name + (S.note ? ' <small>' + S.note + '</small>' : '');
+    g.appendChild(h);
+    const row = document.createElement('div');
+    row.className = 'chshelf';
+    g.appendChild(row);
+    const worn = slot === 'color' ? c.col : slot === 'pose' ? null : c.eq[slot];
+    // None: one per slot (pants, shorts, skirts and dresses share one)
+    if (slot !== 'color' && slot !== 'pose' && !(slot === 'legs' && legsDone)) {
+      card(
+        row,
+        'own' + (!worn && !CH.tryOn[slot] ? ' on' : ''),
+        'None',
+        !worn ? 'WEARING' : '',
+        () => {
+          ctx.strokeStyle = '#c9bfae';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(32, 26, 15, 0, 7);
+          ctx.moveTo(21, 37);
+          ctx.lineTo(43, 15);
+          ctx.stroke();
+        },
+        () => noneTap(slot),
+        'none-' + slot
+      );
+      if (slot === 'legs') legsDone = true;
     }
-    b.onclick = () => itemTap(it.id);
-    g.appendChild(b);
-    itemIcon(cv2, it);
+    for (const it of ITEMS.filter(i => i.sec === sec)) {
+      const own = owns(it.id),
+        wi = slot === 'pose' ? c.wheel.indexOf(it.id) : -1,
+        st = own
+          ? slot === 'pose'
+            ? wi >= 0
+              ? 'WHEEL ' + (wi + 1) + (wi === 0 ? ' · VICTORY' : '')
+              : 'TAP TO ADD'
+            : worn === it.id
+              ? 'WEARING'
+              : 'OWNED'
+          : it.how
+            ? it.how.drop
+              ? 'GIFT ONLY'
+              : 'LOCKED'
+            : it.price,
+        b = card(
+          row,
+          (own ? 'own' : '') +
+            (worn === it.id || wi >= 0 ? ' on' : '') +
+            (CH.tryOn[slot] === it.id ? ' try' : ''),
+          it.name,
+          st,
+          () => drawItemIcon(it, 32, 26, 56, base),
+          () => itemTap(it.id),
+          it.id
+        );
+      if (ECO.own.includes(it.id) && !ECO.seen.includes(it.id)) {
+        const nw = document.createElement('i');
+        nw.textContent = 'NEW';
+        b.appendChild(nw);
+      }
+    }
   }
-  // everything on this shelf has now been seen
+  // everything on these shelves has now been seen
   let seen = 0;
   for (const it of ITEMS)
-    if (it.slot === slot && owns(it.id) && !ECO.seen.includes(it.id) && ECO.own.includes(it.id)) {
+    if (tab.secs.includes(it.sec) && ECO.own.includes(it.id) && !ECO.seen.includes(it.id)) {
       ECO.seen.push(it.id);
       seen = 1;
     }
@@ -230,59 +322,8 @@ function renderShelf(c) {
     if (b) b.focus({ preventScroll: true });
   }
 }
-// A small picture of an item: a head (or a whole fighter for colours, poses and trails) wearing it
-function itemIcon(cv2, it) {
-  const k = cv2.getContext('2d');
-  k.setTransform(2, 0, 0, 2, 0, 0);
-  const c = fighterNow(),
-    col = it.slot === 'color' ? it.c : ITEM[c.col].c,
-    L = { col, d2: shade(col, -0.22), head: 1, lw: 7, stance: 'classic' };
-  L[it.slot] = it;
-  const f = { look: L, x: 32, y: 50, face: 1, s: 1, slot: 0, vx: 0, col, d2: L.d2 };
-  withCtx(k, () => {
-    if (it.slot === 'hat' || it.slot === 'band') {
-      // just the head, big
-      const J = { hd: [30, 38], nk: [30, 52], hr: 11, face: 1, s: 1.3 };
-      k.lineWidth = 6;
-      k.strokeStyle = col;
-      k.lineCap = 'round';
-      k.beginPath();
-      k.moveTo(30, 50);
-      k.lineTo(30, 60);
-      k.stroke();
-      k.beginPath();
-      k.arc(30, 38, 11, 0, 7);
-      k.stroke();
-      drawLook(f, J, 1);
-    } else if (it.slot === 'trail') {
-      for (let i = 1; i < 7; i++) {
-        k.strokeStyle = trailCol(f, i, 7);
-        k.globalAlpha = 0.25 + i * 0.1;
-        k.lineWidth = 3 + i * 1.6;
-        k.lineCap = 'round';
-        k.beginPath();
-        k.arc(32, 34, 20, Math.PI * (0.7 + i * 0.12), Math.PI * (0.82 + i * 0.12));
-        k.stroke();
-      }
-      k.globalAlpha = 1;
-      if (it.c === 'hearts')
-        for (let i = 2; i < 7; i += 2)
-          heart(
-            32 + Math.cos(Math.PI * (0.76 + i * 0.12)) * 20,
-            34 + Math.sin(Math.PI * (0.76 + i * 0.12)) * 20,
-            3 + i * 0.4
-          );
-    } else {
-      const pose = it.slot === 'pose' ? VPOSE[it.id](20) : STANCES[0].p,
-        o = {},
-        sc = 0.62;
-      drawFig(32, 50, 1, pose, sc, col, L.d2, pose[9], 1, 7, o, 1);
-      f.s = sc;
-      drawLook(f, { ...o, face: 1, s: sc }, 1);
-    }
-  });
-}
-// The big preview: stance, a roundhouse (to show the trail), then the victory pose
+// ===== THE BIG PREVIEW =====
+// Body and clothes: your stance. Surge: running, punching and kicking with your Surge style. Poses: the pose.
 function charAnim() {
   if ($('s-char').hidden || $('ui').hidden) {
     CH.raf = 0;
@@ -300,17 +341,47 @@ function charAnim() {
   }
   CH.t++;
   const L = previewFighter(),
-    t = CH.t % 420,
-    sc = Math.min(w / 100, h / 135),
-    f = CH.fig || (CH.fig = { face: 1, slot: 0, pl: 1, st: 'free', vx: 0, trail: [] });
-  Object.assign(f, { look: L, x: w / 2, y: h - 18, s: sc, col: L.col, d2: L.d2 });
-  let pose;
-  if (t < 170) {
-    const b = Math.sin(CH.t * 0.1) * 3,
+    base = Math.min(w / 100, h / 135),
+    sc = base * L.ht,
+    t = CH.t,
+    f = {
+      look: L,
+      x: w / 2,
+      y: h - 18,
+      s: sc,
+      col: L.col,
+      d2: L.d2,
+      face: 1,
+      slot: 0,
+      pl: 1,
+      st: 'free',
+      vx: 0
+    };
+  let pose,
+    surge = false;
+  if (CH.tab === 'surge') {
+    // run, then jab, cross, kick, high kick, all with Surge on
+    const u = t % 200,
+      mv = u < 80 ? null : u < 100 ? 'jab' : u < 118 ? 'cross' : u < 146 ? 'kick' : u < 174 ? 'high' : null;
+    surge = true;
+    f.vx = mv ? 0 : 7;
+    if (!mv) pose = runPose({ t });
+    else {
+      const st = { jab: 80, cross: 100, kick: 118, high: 146 }[mv],
+        len = { jab: 20, cross: 18, kick: 28, high: 28 }[mv];
+      pose = kf(A[mv].k, Math.min(1, (u - st) / len));
+      pose[9] = 0;
+    }
+  } else if (CH.tab === 'poses') {
+    const id = CH.tryOn.pose || CH.pose || (L.wheel[0] && L.wheel[0].id) || 'pose-flex';
+    pose = VPOSE[id](t);
+  } else {
+    const b = Math.sin(t * 0.1) * 3,
       S = (STANCES.find(s => s.id === L.stance) || STANCES[0]).p;
     pose = [S[0] + b / 2, S[1] + b, S[2] - b, S[3] - b, S[4] + b, S[5], S[6], S[7], S[8], 0];
-  } else if (t < 214) pose = kf(A.round.k, (t - 170) / 44);
-  else pose = VPOSE[(L.pose && L.pose.id) || 'pose-flex'](t - 214);
+  }
+  CH.hist.unshift(pose);
+  if (CH.hist.length > 9) CH.hist.length = 9;
   k.setTransform(d, 0, 0, d, 0, 0);
   k.clearRect(0, 0, w, h);
   withCtx(k, () => {
@@ -318,41 +389,72 @@ function charAnim() {
     k.beginPath();
     k.ellipse(f.x, f.y + 4, 22 * sc, 5, 0, 0, 7);
     k.fill();
-    // the roundhouse swoosh in the trail colour
-    if (f.trail.length > 1) {
-      const tr = f.trail;
-      k.lineCap = 'round';
-      for (let i = 1; i < tr.length; i++) {
-        k.strokeStyle = trailCol(f, i, tr.length);
-        k.globalAlpha = 0.15 + (0.45 * i) / tr.length;
-        k.lineWidth = (4 + i * 2.4) * sc * 0.6;
+    if (surge) {
+      // speed lines and afterimages behind, then the glow
+      k.strokeStyle = surgeCol(L, 0);
+      k.lineWidth = 2;
+      for (let i = 0; i < 5; i++) {
+        const yy = f.y - 10 - ((i * 37 + t * 3) % 90) * sc * 0.9,
+          xx = f.x - 30 * sc - ((t * 9 + i * 53) % 60);
+        k.globalAlpha = 0.6;
         k.beginPath();
-        k.moveTo(tr[i - 1][0], tr[i - 1][1]);
-        k.lineTo(tr[i][0], tr[i][1]);
+        k.moveTo(xx, yy);
+        k.lineTo(xx - 30, yy);
         k.stroke();
       }
       k.globalAlpha = 1;
-      if (L.trail && L.trail.c === 'hearts')
-        for (let i = 1; i < tr.length; i += 2) heart(tr[i][0], tr[i][1], (3 + i * 0.6) * sc * 0.5);
+      for (let i = 4; i >= 1; i--) {
+        const p = CH.hist[i * 2] || pose,
+          c = surgeCol(L, i + t);
+        drawFig(
+          f.x - i * 11 * sc * (f.vx ? 1 : 0.5),
+          f.y,
+          1,
+          p,
+          sc,
+          c,
+          c,
+          0,
+          0.32 - i * 0.05,
+          7,
+          null,
+          L.head
+        );
+      }
+      const c = surgeCol(L, t >> 2);
+      drawFig(f.x, f.y, 1, pose, sc, c, c, 0, 0.45 + 0.2 * Math.sin(t * 0.4), 17, null, L.head);
     }
     const o = {};
-    drawFig(f.x, f.y, 1, pose, sc, L.col, L.d2, pose[9], 1, L.lw, o, L.head);
+    k.save();
+    if (pose.sx !== undefined) {
+      k.translate(f.x, 0);
+      k.scale(Math.abs(pose.sx) < 0.08 ? 0.08 * Math.sign(pose.sx || 1) : pose.sx, 1);
+      k.translate(-f.x, 0);
+    }
+    drawFig(f.x, f.y, 1, pose, sc, L.col, L.d2, pose[9], 1, L.lw, o, L.head, U =>
+      drawLookUnder(f, { ...U, face: 1, s: sc }, 1)
+    );
     drawLook(f, { ...o, face: 1, s: sc }, 1);
-    if (t >= 178 && t < 196 && o.f) f.trail.push(o.f);
-    if (f.trail.length > 8 || (t >= 196 && f.trail.length)) f.trail.shift();
+    k.restore();
+    if (surge) surgeExtra(f);
   });
 }
 $('b-char').onclick = openChar;
 $('b-charback').onclick = closeChar;
 $('ch-rnd').onclick = charRandom;
+$('ch-del').onclick = charDelete;
 $('ch-name').addEventListener('input', () => setChar(c => (c.name = $('ch-name').value)));
 $('ch-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') e.target.blur();
 });
-$('ch-head-').onclick = () => setChar(c => (c.head = Math.max(0.8, Math.round((c.head - 0.1) * 10) / 10)));
-$('ch-head+').onclick = () => setChar(c => (c.head = Math.min(1.4, Math.round((c.head + 0.1) * 10) / 10)));
-$('ch-lw-').onclick = () => setChar(c => (c.lw = Math.max(5, c.lw - 1)));
-$('ch-lw+').onclick = () => setChar(c => (c.lw = Math.min(10, c.lw + 1)));
+const chStep = (key, d, lo, hi, q) =>
+  setChar(c => (c[key] = Math.max(lo, Math.min(hi, Math.round((c[key] + d) * q) / q))));
+$('ch-ht-').onclick = () => chStep('ht', -0.05, 0.85, 1.15, 20);
+$('ch-ht+').onclick = () => chStep('ht', 0.05, 0.85, 1.15, 20);
+$('ch-head-').onclick = () => chStep('head', -0.1, 0.8, 1.4, 10);
+$('ch-head+').onclick = () => chStep('head', 0.1, 0.8, 1.4, 10);
+$('ch-lw-').onclick = () => chStep('lw', -1, 5, 10, 1);
+$('ch-lw+').onclick = () => chStep('lw', 1, 5, 10, 1);
 addEventListener('keydown', e => {
   if (e.key !== 'Escape' || $('ui').hidden || CAP) return;
   if (!$('s-char').hidden && document.activeElement !== $('ch-name')) closeChar();

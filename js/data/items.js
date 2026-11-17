@@ -1,91 +1,263 @@
 // Orange vs. the Pink Army: Cosmetics, colors, stances and star drops (plain data; VISION.md rules R3 and R8)
 // ===== ITEMS (M10) =====
 // Store items are cosmetic only: nothing here changes how a fighter plays.
-// An item: { id (never rename it, saves keep it), slot, name, price in ninja stars, c / c2 colors, how }
+// An item: { id (never rename it, saves keep it), sec (shelf section), name, price in ninja stars, c / c2 colors,
+//   k (drawing style), how }
 //   how missing     = buy it in the store for `price`
 //   how.free        = everyone owns it from the start
 //   how.lvl         = unlocked by clearing that level      how.combo = by landing a combo that long
 //   how.wave        = by reaching that Arcade wave         how.vs    = by winning a Versus match
 //   how.drop        = only from gifts that Captains drop (random, one you don't own yet)
-const SLOTS = [
-  { id: 'color', name: 'Colors' },
-  { id: 'hat', name: 'Hats' },
-  { id: 'band', name: 'Bands' },
-  { id: 'scarf', name: 'Scarves' },
-  { id: 'gloves', name: 'Gloves' },
-  { id: 'shoes', name: 'Shoes' },
-  { id: 'trail', name: 'Trails' },
-  { id: 'pose', name: 'Victory' }
+// Tabs on the Character screen, each with its shelf sections (patch: Head, Neck, Upper Body, Lower Body).
+const TABS = [
+  { id: 'body', name: 'Body', secs: [] },
+  { id: 'colors', name: 'Colors', secs: ['color'] },
+  { id: 'head', name: 'Head', secs: ['hair', 'hat', 'band'] },
+  { id: 'neck', name: 'Neck', secs: ['scarf', 'tie'] },
+  { id: 'upper', name: 'Upper Body', secs: ['shirt', 'jacket', 'gloves'] },
+  { id: 'lower', name: 'Lower Body', secs: ['pants', 'shorts', 'skirt', 'dress', 'shoes'] },
+  { id: 'surge', name: 'Surge', secs: ['surge'] },
+  { id: 'poses', name: 'Poses', secs: ['pose'] }
 ];
+// A section's slot: you wear one item per slot. Pants, shorts, skirts and dresses share the "legs" slot.
+const SECS = {
+  color: { name: 'Body color', slot: 'color' },
+  hair: { name: 'Hair', slot: 'hair' },
+  hat: { name: 'Hats', slot: 'hat' },
+  band: { name: 'Headbands', slot: 'band' },
+  scarf: { name: 'Scarves', slot: 'scarf' },
+  tie: { name: 'Ties', slot: 'tie' },
+  shirt: { name: 'Shirts', slot: 'shirt' },
+  jacket: { name: 'Jackets', slot: 'jacket' },
+  gloves: { name: 'Gloves', slot: 'gloves' },
+  pants: { name: 'Pants', slot: 'legs', note: 'one of pants, shorts, skirts or dresses' },
+  shorts: { name: 'Shorts', slot: 'legs' },
+  skirt: { name: 'Skirts', slot: 'legs' },
+  dress: { name: 'Dresses', slot: 'legs' },
+  shoes: { name: 'Shoes', slot: 'shoes' },
+  surge: { name: 'Surge style', slot: 'surge', note: 'the glow and afterimages when you use Surge' },
+  pose: { name: 'Poses', slot: 'pose', note: 'up to 4 on your pose wheel; the first is your victory pose' }
+};
+// The slots a fighter wears (colour and the pose wheel are kept separately)
+const EQ = ['hair', 'hat', 'band', 'scarf', 'tie', 'shirt', 'jacket', 'gloves', 'legs', 'shoes', 'surge'];
+const WHEEL_MAX = 4;
 const ITEMS = [
   // body colors: all of them stand out against the pink army
-  { id: 'col-orange', slot: 'color', name: 'Orange', c: '#ff7a00', how: { free: 1 } },
-  { id: 'col-sky', slot: 'color', name: 'Sky Blue', c: '#2fb5ff', how: { free: 1 } },
-  { id: 'col-green', slot: 'color', name: 'Green', c: '#3ccf6e', how: { free: 1 } },
-  { id: 'col-purple', slot: 'color', name: 'Purple', c: '#a36bff', how: { free: 1 } },
-  { id: 'col-red', slot: 'color', name: 'Red', c: '#e8212b', how: { free: 1 } },
-  { id: 'col-gold', slot: 'color', name: 'Gold', c: '#f2b600', how: { free: 1 } },
-  { id: 'col-teal', slot: 'color', name: 'Teal', c: '#0fa39a', price: 40 },
-  { id: 'col-lime', slot: 'color', name: 'Lime', c: '#8cc800', price: 40 },
-  { id: 'col-navy', slot: 'color', name: 'Navy', c: '#2a55c9', price: 40 },
-  { id: 'col-cyan', slot: 'color', name: 'Cyan', c: '#00bcd4', price: 40 },
-  { id: 'col-brown', slot: 'color', name: 'Brown', c: '#8a5a2b', price: 60 },
-  { id: 'col-slate', slot: 'color', name: 'Slate', c: '#4a5262', price: 80 },
+  { id: 'col-orange', sec: 'color', name: 'Orange', c: '#ff7a00', how: { free: 1 } },
+  { id: 'col-sky', sec: 'color', name: 'Sky Blue', c: '#2fb5ff', how: { free: 1 } },
+  { id: 'col-green', sec: 'color', name: 'Green', c: '#3ccf6e', how: { free: 1 } },
+  { id: 'col-purple', sec: 'color', name: 'Purple', c: '#a36bff', how: { free: 1 } },
+  { id: 'col-red', sec: 'color', name: 'Red', c: '#e8212b', how: { free: 1 } },
+  { id: 'col-gold', sec: 'color', name: 'Gold', c: '#f2b600', how: { free: 1 } },
+  { id: 'col-teal', sec: 'color', name: 'Teal', c: '#0fa39a', price: 40 },
+  { id: 'col-lime', sec: 'color', name: 'Lime', c: '#8cc800', price: 40 },
+  { id: 'col-navy', sec: 'color', name: 'Navy', c: '#2a55c9', price: 40 },
+  { id: 'col-cyan', sec: 'color', name: 'Cyan', c: '#00bcd4', price: 40 },
+  { id: 'col-brown', sec: 'color', name: 'Brown', c: '#8a5a2b', price: 60 },
+  { id: 'col-slate', sec: 'color', name: 'Slate', c: '#4a5262', price: 80 },
+  // hair (drawn under a hat)
+  { id: 'hair-spiky', sec: 'hair', name: 'Spiky', c: '#2b2533', price: 40 },
+  { id: 'hair-messy', sec: 'hair', name: 'Messy', c: '#6b4420', price: 40 },
+  { id: 'hair-flat', sec: 'hair', name: 'Flat Top', c: '#2b2533', price: 40 },
+  { id: 'hair-pony', sec: 'hair', name: 'Ponytail', c: '#e0b040', price: 60 },
+  { id: 'hair-long', sec: 'hair', name: 'Long Hair', c: '#6b4420', price: 60 },
+  { id: 'hair-bun', sec: 'hair', name: 'Bun', c: '#2b2533', price: 50 },
+  { id: 'hair-pigtails', sec: 'hair', name: 'Pigtails', c: '#c0561c', price: 60 },
+  { id: 'hair-afro', sec: 'hair', name: 'Afro', c: '#2b2533', price: 80 },
+  { id: 'hair-mohawk', sec: 'hair', name: 'Mohawk', c: '#2fb5ff', price: 100 },
   // hats
-  { id: 'hat-cap', slot: 'hat', name: 'Ball Cap', c: '#e8212b', price: 40 },
-  { id: 'hat-beanie', slot: 'hat', name: 'Beanie', c: '#2a55c9', c2: '#ffd400', price: 40 },
-  { id: 'hat-party', slot: 'hat', name: 'Party Hat', c: '#3ccf6e', c2: '#ffd400', price: 60 },
-  { id: 'hat-headphones', slot: 'hat', name: 'Headphones', c: '#1c1626', c2: '#ff7a00', price: 80 },
-  { id: 'hat-chef', slot: 'hat', name: 'Chef Hat', c: '#ffffff', price: 90 },
-  { id: 'hat-cowboy', slot: 'hat', name: 'Cowboy Hat', c: '#a8743e', c2: '#6b4420', price: 120 },
-  { id: 'hat-top', slot: 'hat', name: 'Top Hat', c: '#2b2533', c2: '#e8212b', price: 150 },
-  { id: 'hat-wizard', slot: 'hat', name: 'Wizard Hat', c: '#4a3cb8', c2: '#ffd400', price: 220 },
-  { id: 'hat-ranger', slot: 'hat', name: 'Ranger Hat', c: '#5f8a3a', c2: '#3d5c24', how: { lvl: 'woods1' } },
-  { id: 'hat-halo', slot: 'hat', name: 'Halo', c: '#ffd400', how: { wave: 10 } },
-  { id: 'hat-viking', slot: 'hat', name: 'Viking Helmet', c: '#9aa3b5', c2: '#f4ead2', how: { drop: 1 } },
-  { id: 'hat-propeller', slot: 'hat', name: 'Propeller Cap', c: '#ff7a00', c2: '#2fb5ff', how: { drop: 1 } },
+  { id: 'hat-cap', sec: 'hat', name: 'Ball Cap', c: '#e8212b', price: 40 },
+  { id: 'hat-beanie', sec: 'hat', name: 'Beanie', c: '#2a55c9', c2: '#ffd400', price: 40 },
+  { id: 'hat-party', sec: 'hat', name: 'Party Hat', c: '#3ccf6e', c2: '#ffd400', price: 60 },
+  { id: 'hat-headphones', sec: 'hat', name: 'Headphones', c: '#1c1626', c2: '#ff7a00', price: 80 },
+  { id: 'hat-chef', sec: 'hat', name: 'Chef Hat', c: '#ffffff', price: 90 },
+  { id: 'hat-cowboy', sec: 'hat', name: 'Cowboy Hat', c: '#a8743e', c2: '#6b4420', price: 120 },
+  { id: 'hat-top', sec: 'hat', name: 'Top Hat', c: '#2b2533', c2: '#e8212b', price: 150 },
+  { id: 'hat-wizard', sec: 'hat', name: 'Wizard Hat', c: '#4a3cb8', c2: '#ffd400', price: 220 },
+  { id: 'hat-ranger', sec: 'hat', name: 'Ranger Hat', c: '#5f8a3a', c2: '#3d5c24', how: { lvl: 'woods1' } },
+  { id: 'hat-halo', sec: 'hat', name: 'Halo', c: '#ffd400', how: { wave: 10 } },
+  { id: 'hat-viking', sec: 'hat', name: 'Viking Helmet', c: '#9aa3b5', c2: '#f4ead2', how: { drop: 1 } },
+  { id: 'hat-propeller', sec: 'hat', name: 'Propeller Cap', c: '#ff7a00', c2: '#2fb5ff', how: { drop: 1 } },
   // headbands: a band and two tails that flutter behind
-  { id: 'band-red', slot: 'band', name: 'Red Band', c: '#e8212b', price: 25 },
-  { id: 'band-blue', slot: 'band', name: 'Blue Band', c: '#2a55c9', price: 25 },
-  { id: 'band-white', slot: 'band', name: 'White Band', c: '#ffffff', price: 35 },
-  { id: 'band-black', slot: 'band', name: 'Ninja Band', c: '#2b2533', price: 50 },
-  { id: 'band-gold', slot: 'band', name: 'Gold Band', c: '#ffd400', how: { combo: 20 } },
-  { id: 'band-rainbow', slot: 'band', name: 'Rainbow Band', c: 'rainbow', how: { drop: 1 } },
+  { id: 'band-red', sec: 'band', name: 'Red Band', c: '#e8212b', price: 25 },
+  { id: 'band-blue', sec: 'band', name: 'Blue Band', c: '#2a55c9', price: 25 },
+  { id: 'band-white', sec: 'band', name: 'White Band', c: '#ffffff', price: 35 },
+  { id: 'band-black', sec: 'band', name: 'Ninja Band', c: '#2b2533', price: 50 },
+  { id: 'band-gold', sec: 'band', name: 'Gold Band', c: '#ffd400', how: { combo: 20 } },
+  { id: 'band-rainbow', sec: 'band', name: 'Rainbow Band', c: 'rainbow', how: { drop: 1 } },
   // scarves
-  { id: 'scarf-red', slot: 'scarf', name: 'Red Scarf', c: '#e8212b', price: 50 },
-  { id: 'scarf-blue', slot: 'scarf', name: 'Blue Scarf', c: '#2a55c9', price: 50 },
-  { id: 'scarf-green', slot: 'scarf', name: 'Green Scarf', c: '#3ccf6e', price: 50 },
-  { id: 'scarf-stripe', slot: 'scarf', name: 'Striped Scarf', c: '#ffffff', c2: '#e8212b', price: 100 },
-  { id: 'scarf-gold', slot: 'scarf', name: 'Gold Scarf', c: '#ffd400', price: 250 },
-  { id: 'scarf-royal', slot: 'scarf', name: 'Royal Scarf', c: '#6a2fc9', c2: '#ffd400', how: { drop: 1 } },
+  { id: 'scarf-red', sec: 'scarf', name: 'Red Scarf', c: '#e8212b', price: 50 },
+  { id: 'scarf-blue', sec: 'scarf', name: 'Blue Scarf', c: '#2a55c9', price: 50 },
+  { id: 'scarf-green', sec: 'scarf', name: 'Green Scarf', c: '#3ccf6e', price: 50 },
+  { id: 'scarf-stripe', sec: 'scarf', name: 'Striped Scarf', c: '#ffffff', c2: '#e8212b', price: 100 },
+  { id: 'scarf-gold', sec: 'scarf', name: 'Gold Scarf', c: '#ffd400', price: 250 },
+  { id: 'scarf-royal', sec: 'scarf', name: 'Royal Scarf', c: '#6a2fc9', c2: '#ffd400', how: { drop: 1 } },
+  // ties
+  { id: 'tie-red', sec: 'tie', name: 'Red Tie', c: '#e8212b', k: 'tie', price: 30 },
+  { id: 'tie-blue', sec: 'tie', name: 'Blue Tie', c: '#2a55c9', k: 'tie', price: 30 },
+  { id: 'tie-stripe', sec: 'tie', name: 'Striped Tie', c: '#3ccf6e', c2: '#ffd400', k: 'tie', price: 60 },
+  { id: 'tie-gold', sec: 'tie', name: 'Gold Tie', c: '#ffd400', k: 'tie', price: 150 },
+  { id: 'tie-bow', sec: 'tie', name: 'Bow Tie', c: '#2b2533', k: 'bow', price: 40 },
+  { id: 'tie-bowred', sec: 'tie', name: 'Red Bow Tie', c: '#e8212b', k: 'bow', price: 40 },
+  // shirts
+  { id: 'shirt-white', sec: 'shirt', name: 'White Tee', c: '#ffffff', k: 'tee', price: 30 },
+  { id: 'shirt-red', sec: 'shirt', name: 'Red Tee', c: '#e8212b', k: 'tee', price: 30 },
+  { id: 'shirt-blue', sec: 'shirt', name: 'Blue Tee', c: '#2a55c9', k: 'tee', price: 30 },
+  { id: 'shirt-stripe', sec: 'shirt', name: 'Striped Tee', c: '#ffffff', c2: '#2a55c9', k: 'tee', price: 60 },
+  { id: 'shirt-tank', sec: 'shirt', name: 'Tank Top', c: '#3ccf6e', k: 'tank', price: 40 },
+  { id: 'shirt-long', sec: 'shirt', name: 'Long Sleeves', c: '#2b2533', k: 'long', price: 50 },
+  { id: 'shirt-jersey', sec: 'shirt', name: 'Jersey', c: '#ffd400', c2: '#2a55c9', k: 'tee', price: 90 },
+  // jackets
+  { id: 'jacket-vest', sec: 'jacket', name: 'Denim Vest', c: '#4f78b8', k: 'vest', price: 60 },
+  { id: 'jacket-hoodie', sec: 'jacket', name: 'Hoodie', c: '#9aa3b5', k: 'hoodie', price: 80 },
+  { id: 'jacket-gi', sec: 'jacket', name: 'Karate Gi', c: '#ffffff', c2: '#2b2533', k: 'gi', price: 120 },
+  { id: 'jacket-leather', sec: 'jacket', name: 'Leather Jacket', c: '#2b2533', k: 'coat', price: 150 },
+  {
+    id: 'jacket-varsity',
+    sec: 'jacket',
+    name: 'Varsity Jacket',
+    c: '#e8212b',
+    c2: '#ffffff',
+    k: 'coat',
+    price: 150
+  },
+  { id: 'jacket-cape', sec: 'jacket', name: 'Hero Cape', c: '#e8212b', c2: '#ffd400', k: 'cape', price: 200 },
   // gloves
-  { id: 'gloves-white', slot: 'gloves', name: 'White Gloves', c: '#ffffff', price: 30 },
-  { id: 'gloves-red', slot: 'gloves', name: 'Red Boxing Gloves', c: '#e8212b', price: 60 },
-  { id: 'gloves-blue', slot: 'gloves', name: 'Blue Boxing Gloves', c: '#2a55c9', price: 60 },
-  { id: 'gloves-gold', slot: 'gloves', name: 'Gold Gloves', c: '#ffd400', price: 250 },
-  { id: 'gloves-slime', slot: 'gloves', name: 'Slime Gloves', c: '#8cc800', how: { drop: 1 } },
+  { id: 'gloves-white', sec: 'gloves', name: 'White Dots', c: '#ffffff', k: 'dot', price: 20 },
+  { id: 'gloves-dotred', sec: 'gloves', name: 'Red Dots', c: '#e8212b', k: 'dot', price: 20 },
+  {
+    id: 'gloves-mitten',
+    sec: 'gloves',
+    name: 'Mittens',
+    c: '#e8212b',
+    c2: '#ffffff',
+    k: 'mitten',
+    price: 40
+  },
+  { id: 'gloves-wrap', sec: 'gloves', name: 'Hand Wraps', c: '#ffffff', k: 'wrap', price: 50 },
+  { id: 'gloves-work', sec: 'gloves', name: 'Work Gloves', c: '#e8b02a', k: 'work', price: 50 },
+  { id: 'gloves-drive', sec: 'gloves', name: 'Driving Gloves', c: '#7a4a22', k: 'drive', price: 70 },
+  { id: 'gloves-red', sec: 'gloves', name: 'Red Boxing Gloves', c: '#e8212b', k: 'boxing', price: 60 },
+  { id: 'gloves-blue', sec: 'gloves', name: 'Blue Boxing Gloves', c: '#2a55c9', k: 'boxing', price: 60 },
+  { id: 'gloves-gold', sec: 'gloves', name: 'Gold Boxing Gloves', c: '#ffd400', k: 'boxing', price: 250 },
+  { id: 'gloves-slime', sec: 'gloves', name: 'Slime Mitts', c: '#8cc800', k: 'mitten', how: { drop: 1 } },
+  // pants, shorts, skirts, dresses (one at a time)
+  { id: 'pants-jeans', sec: 'pants', name: 'Jeans', c: '#3d63a8', k: 'pants', price: 50 },
+  { id: 'pants-black', sec: 'pants', name: 'Black Pants', c: '#2b2533', k: 'pants', price: 50 },
+  { id: 'pants-khaki', sec: 'pants', name: 'Khakis', c: '#c9a86a', k: 'pants', price: 40 },
+  {
+    id: 'pants-track',
+    sec: 'pants',
+    name: 'Track Pants',
+    c: '#e8212b',
+    c2: '#ffffff',
+    k: 'pants',
+    price: 80
+  },
+  { id: 'pants-gi', sec: 'pants', name: 'Gi Pants', c: '#ffffff', k: 'pants', price: 60 },
+  { id: 'shorts-blue', sec: 'shorts', name: 'Blue Shorts', c: '#2a55c9', k: 'shorts', price: 30 },
+  {
+    id: 'shorts-red',
+    sec: 'shorts',
+    name: 'Gym Shorts',
+    c: '#e8212b',
+    c2: '#ffffff',
+    k: 'shorts',
+    price: 30
+  },
+  { id: 'shorts-cargo', sec: 'shorts', name: 'Cargo Shorts', c: '#8a7a4a', k: 'shorts', price: 40 },
+  {
+    id: 'shorts-boxer',
+    sec: 'shorts',
+    name: 'Boxing Trunks',
+    c: '#ffd400',
+    c2: '#2b2533',
+    k: 'shorts',
+    price: 120
+  },
+  { id: 'skirt-blue', sec: 'skirt', name: 'Blue Skirt', c: '#2a55c9', k: 'skirt', price: 40 },
+  {
+    id: 'skirt-plaid',
+    sec: 'skirt',
+    name: 'Plaid Skirt',
+    c: '#e8212b',
+    c2: '#2b2533',
+    k: 'skirt',
+    price: 70
+  },
+  { id: 'skirt-tutu', sec: 'skirt', name: 'Tutu', c: '#b98cff', k: 'tutu', price: 90 },
+  { id: 'dress-red', sec: 'dress', name: 'Red Dress', c: '#e8212b', k: 'dress', price: 80 },
+  { id: 'dress-yellow', sec: 'dress', name: 'Sunny Dress', c: '#ffd400', k: 'dress', price: 80 },
+  {
+    id: 'dress-dots',
+    sec: 'dress',
+    name: 'Polka Dot Dress',
+    c: '#2a55c9',
+    c2: '#ffffff',
+    k: 'dress',
+    price: 120
+  },
+  { id: 'dress-gown', sec: 'dress', name: 'Royal Gown', c: '#6a2fc9', c2: '#ffd400', k: 'dress', price: 200 },
   // shoes
-  { id: 'shoes-red', slot: 'shoes', name: 'Red Sneakers', c: '#e8212b', price: 30 },
-  { id: 'shoes-blue', slot: 'shoes', name: 'Blue Sneakers', c: '#2a55c9', price: 30 },
-  { id: 'shoes-black', slot: 'shoes', name: 'Black Boots', c: '#2b2533', price: 50 },
-  { id: 'shoes-gold', slot: 'shoes', name: 'Gold Shoes', c: '#ffd400', price: 250 },
-  { id: 'shoes-rocket', slot: 'shoes', name: 'Rocket Shoes', c: '#9aa3b5', c2: '#ff7a00', how: { drop: 1 } },
-  // trails: the colour of the swoosh behind big hits
-  { id: 'trail-ink', slot: 'trail', name: 'Ink Trail', c: '#1c1626', price: 60 },
-  { id: 'trail-fire', slot: 'trail', name: 'Fire Trail', c: 'fire', price: 150 },
-  { id: 'trail-ice', slot: 'trail', name: 'Ice Trail', c: 'ice', price: 150 },
-  { id: 'trail-gold', slot: 'trail', name: 'Gold Trail', c: '#ffd400', price: 200 },
-  { id: 'trail-rainbow', slot: 'trail', name: 'Rainbow Trail', c: 'rainbow', price: 300 },
-  { id: 'trail-hearts', slot: 'trail', name: 'Heart Trail', c: 'hearts', how: { drop: 1 } },
-  // victory poses: shown when you clear a level or win a Versus round
-  { id: 'pose-flex', slot: 'pose', name: 'Flex', how: { free: 1 } },
-  { id: 'pose-wave', slot: 'pose', name: 'Wave', price: 40 },
-  { id: 'pose-point', slot: 'pose', name: 'Point to the Sky', price: 60 },
-  { id: 'pose-bow', slot: 'pose', name: 'Bow', price: 60 },
-  { id: 'pose-dance', slot: 'pose', name: 'Dance', price: 120 },
-  { id: 'pose-cheer', slot: 'pose', name: 'Champion', how: { vs: 1 } },
-  { id: 'pose-spin', slot: 'pose', name: 'Twirl', how: { drop: 1 } }
+  { id: 'shoes-dot', sec: 'shoes', name: 'Black Dots', c: '#2b2533', k: 'dot', price: 20 },
+  { id: 'shoes-red', sec: 'shoes', name: 'Red Sneakers', c: '#e8212b', k: 'sneaker', price: 30 },
+  { id: 'shoes-blue', sec: 'shoes', name: 'Blue Sneakers', c: '#2a55c9', k: 'sneaker', price: 30 },
+  {
+    id: 'shoes-hightop',
+    sec: 'shoes',
+    name: 'High-Tops',
+    c: '#e8212b',
+    c2: '#ffffff',
+    k: 'hightop',
+    price: 60
+  },
+  { id: 'shoes-sandal', sec: 'shoes', name: 'Sandals', c: '#a8743e', k: 'sandal', price: 30 },
+  { id: 'shoes-slipper', sec: 'shoes', name: 'Fuzzy Slippers', c: '#d9c8ff', k: 'slipper', price: 70 },
+  { id: 'shoes-black', sec: 'shoes', name: 'Black Boots', c: '#2b2533', k: 'boot', price: 50 },
+  {
+    id: 'shoes-cowboy',
+    sec: 'shoes',
+    name: 'Cowboy Boots',
+    c: '#a8743e',
+    c2: '#6b4420',
+    k: 'boot',
+    price: 90
+  },
+  { id: 'shoes-gold', sec: 'shoes', name: 'Gold Sneakers', c: '#ffd400', k: 'sneaker', price: 250 },
+  {
+    id: 'shoes-rocket',
+    sec: 'shoes',
+    name: 'Rocket Shoes',
+    c: '#9aa3b5',
+    c2: '#ff7a00',
+    k: 'boot',
+    how: { drop: 1 }
+  },
+  // Surge styles: the glow and afterimages when you use Surge (the ids say "trail" for older saves)
+  { id: 'trail-ink', sec: 'surge', name: 'Ink Surge', c: '#1c1626', price: 60 },
+  { id: 'surge-toxic', sec: 'surge', name: 'Toxic Surge', c: '#62e000', price: 120 },
+  { id: 'trail-fire', sec: 'surge', name: 'Fire Surge', c: 'fire', price: 150 },
+  { id: 'trail-ice', sec: 'surge', name: 'Ice Surge', c: 'ice', price: 150 },
+  { id: 'surge-shadow', sec: 'surge', name: 'Shadow Surge', c: '#6a2fc9', price: 150 },
+  { id: 'trail-gold', sec: 'surge', name: 'Gold Surge', c: '#ff9f1a', price: 200 },
+  { id: 'surge-bolt', sec: 'surge', name: 'Lightning Surge', c: 'bolt', price: 250 },
+  { id: 'trail-rainbow', sec: 'surge', name: 'Rainbow Surge', c: 'rainbow', price: 300 },
+  { id: 'trail-hearts', sec: 'surge', name: 'Heart Surge', c: 'hearts', how: { drop: 1 } },
+  // poses: put up to 4 on your pose wheel (hold T, Select or POSE in a fight); the first is your victory pose
+  { id: 'pose-flex', sec: 'pose', name: 'Flex', how: { free: 1 } },
+  { id: 'pose-wave', sec: 'pose', name: 'Wave', how: { free: 1 } },
+  { id: 'pose-thumbs', sec: 'pose', name: 'Thumbs Up', price: 30 },
+  { id: 'pose-salute', sec: 'pose', name: 'Salute', price: 40 },
+  { id: 'pose-point', sec: 'pose', name: 'Point to the Sky', price: 60 },
+  { id: 'pose-bow', sec: 'pose', name: 'Bow', price: 60 },
+  { id: 'pose-laugh', sec: 'pose', name: 'Laugh', price: 60 },
+  { id: 'pose-sit', sec: 'pose', name: 'Sit Down', price: 80 },
+  { id: 'pose-kneel', sec: 'pose', name: 'Ninja Kneel', price: 80 },
+  { id: 'pose-dance', sec: 'pose', name: 'Dance', price: 120 },
+  { id: 'pose-cheer', sec: 'pose', name: 'Champion', how: { vs: 1 } },
+  { id: 'pose-spin', sec: 'pose', name: 'Twirl', how: { drop: 1 } }
 ];
+for (const it of ITEMS) it.slot = SECS[it.sec].slot;
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 // Idle stances (cosmetic: only how you stand while waiting). Same pose format as moves.js.
 const STANCES = [
@@ -94,15 +266,18 @@ const STANCES = [
   { id: 'low', name: 'Low', p: [20, 40, 95, 25, 105, 38, 60, -32, 48, 0] },
   { id: 'loose', name: 'Loose', p: [0, 12, 25, -8, 30, 12, 8, -12, 6, 0] }
 ];
-// A new fighter (and the look of anyone without a saved fighter)
+// A new fighter (and the look of anyone without a saved fighter). ht = height (drawing only).
 const FIGHTER0 = {
   name: 'ORANGE',
   col: 'col-orange',
+  ht: 1,
   head: 1,
   lw: 7,
   stance: 'classic',
-  eq: { hat: null, band: null, scarf: null, gloves: null, shoes: null, trail: null, pose: 'pose-flex' }
+  eq: Object.fromEntries(EQ.map(s => [s, null])),
+  wheel: ['pose-flex', 'pose-wave']
 };
+const FIGHTERS = 4; // saved fighter slots
 // Ninja stars dropped per enemy type [min, max]; plus 1 more for every 10 hits of combo (up to 5 more)
 const STAR_DROP = { g: [1, 2], r: [2, 3], b: [8, 12], u: [4, 6], f: [3, 5], c: [20, 30] };
 // Stars for finishing things

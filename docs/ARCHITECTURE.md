@@ -13,8 +13,8 @@ How the code fits together. Update this at the end of every milestone.
 | 3 | `js/data/moves.js` | Poses (`IDLE`, `HURT`…), `kf`/`lerpA`, player move table `A`, `ROUTE`, `SURGE`, `INFO` |
 | 4 | `js/data/enemies.js` | Enemy moves `EA`, enemy types `T`, `TNAME`, `TTIP`; the loop that decorates every move with its `INFO` |
 | 5 | `js/data/levels.js` | Level data: `CHUNKS` (width, props, encounter, gate, dusk, fireflies) and `LEVELS` (ordered chunk lists) |
-| 6 | `js/data/items.js` | Cosmetics data (M10): `SLOTS`, `ITEMS`/`ITEM` (id, slot, name, price, colors, `how` to unlock), `STANCES`, `FIGHTER0`, `STAR_DROP`, `STAR_BONUS` |
-| 7 | `js/economy.js` | The one gate for stars and items (M10): `grantStars`, `spendStars`, `owns`, `grantItem`, `buyItem`, `checkUnlocks`, `openGift`, `runEnd`; fighters: `normFighter`, `fighter`, `curFighter`, `lookOf`, `saveFighter`, `shade` |
+| 6 | `js/data/items.js` | Cosmetics data (M10): `TABS` (Character screen tabs and their sections), `SECS` (section → slot), `EQ` (worn slots), `WHEEL_MAX`, `ITEMS`/`ITEM` (id, sec, slot, name, price, colors, `k` drawing style, `how` to unlock), `STANCES`, `FIGHTER0`, `FIGHTERS`, `STAR_DROP`, `STAR_BONUS` |
+| 7 | `js/economy.js` | The one gate for stars and items (M10): `grantStars`, `spendStars`, `owns`, `grantItem`, `buyItem`, `checkUnlocks`, `openGift`, `runEnd`; fighters: `normFighter`, `fighter`, `curFighter`, `lookRaw`, `lookOf`, `saveFighter`, `deleteFighter`, `shade`; `giftPool` |
 | 8 | `js/player.js` | Game-state globals (`PL`, `P`, `E`, `FX`, `wave`, `score`…), Surge stamina, `pick`, `F`/`F0`, `mkPlayer`, `use`, `addPlayer`, `tgt`, `init`, `updP` |
 | 9 | `js/effects.js` | Effect spawners: `fxp`, `spark`, `ring`, `dust`, `txt`, `ghost` |
 | 10 | `js/combat.js` | Hitboxes, `startAtk`/`tickAtk`/`endAtk`, blocking, grab/pummel/throw, hit weights and `impact`, `hurtE`/`hurtP`, `bowl`, `sep`, `groundY`, physics, pose helpers |
@@ -25,14 +25,14 @@ How the code fits together. Update this at the end of every milestone.
 | 15 | `js/pickups.js` | Star pickups and gifts (M10): `PK`, `dropRoll`, `dropScan`, `pickTick`, `collect`, `collectAll`, drawing (`shuriken`, `giftBox`, `drawPickups`, `starHud`) |
 | 16 | `js/ragdoll.js` | Verlet ragdoll, death poses, corpse settle and confetti dissolve, `drawRag`, `drawTatsu` |
 | 17 | `js/scenery.js` | Level drawing only: parallax layers, props, the log gate, foreground grass, leaves and fireflies |
-| 18 | `js/looks.js` | Drawing a fighter's look (M10): `drawLook` (hats, bands, scarves, gloves, shoes), `trailCol`, `VPOSE` victory poses, `lookPose` (stance and victory blending), `cheering` |
+| 18 | `js/looks.js` | Drawing a fighter's look (M10): `drawLookUnder` (cape, hood), `drawLook` (legs, shoes, shirts, jackets, dresses, ties, gloves, scarf, hair, band, hat), `drawHat`, `drawHair`, `surgeCol`/`surgeExtra`, `VPOSE` poses, `lookPose` (stance, victory and pose-wheel blending), `cheering`, `drawWheel`, `drawItemIcon` |
 | 19 | `js/render.js` | Gear, figures (`drawFig`), background, effects, HUD, `render()` |
 | 20 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
 | 21 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
 | 22 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
 | 23 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
 | 24 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
-| 25 | `js/ui/character.js` | Character screen and store (M10): fighter slots, Body tab, shelves, try-on and buying, item icons, animated preview |
+| 25 | `js/ui/character.js` | Character screen and store (M10): four fighter slots, Body tab (height, head, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
 | 26 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
 | 27 | `js/selftest.js` | `selfTest()` determinism check |
 | 28 | `js/main.js` | Screens, settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
@@ -68,7 +68,7 @@ Every device calls `setA(src, action, on, slot)`. Each slot (`INP[n]`) has `K` (
 
 ## Save
 
-localStorage key `orangeArmy.v1` (never change it) holds `{saveVersion, set, best, prog, eco, chr}`. `SET` holds settings, feel knobs and touch layouts; `BEST` the Arcade records; `PROG` level progress (`{woods1: {done, score, time, combo}}`). `SET.binds` holds custom keys and controller buttons (null = defaults; see `KEYDEF`/`PADDEF` in `input.js`). `ECO` (M10) = `{stars, got, own: [item ids], seen: [item ids]}`; `CHR` = `{cur, list: [fighter|null] x3}`, a fighter being `{name, col (a color item id), head, lw, stance, eq: {hat, band, scarf, gloves, shoes, trail, pose}}`. `migrate()` in `core.js` upgrades older saves one version at a time: v1 had no `saveVersion` and no `prog`; v2 had no `binds`; v3 had no `eco`/`chr`. `loadSave()` copies a save into the live objects keeping only the expected shapes. Any new shape change bumps `SAVE_VERSION` and adds a step. Nothing is saved while the self-test runs.
+localStorage key `orangeArmy.v1` (never change it) holds `{saveVersion, set, best, prog, eco, chr}`. `SET` holds settings, feel knobs and touch layouts; `BEST` the Arcade records; `PROG` level progress (`{woods1: {done, score, time, combo}}`). `SET.binds` holds custom keys and controller buttons (null = defaults; see `KEYDEF`/`PADDEF` in `input.js`). `ECO` (M10) = `{stars, got, own: [item ids], seen: [item ids]}`; `CHR` = `{cur, list: [fighter|null] x4}`, a fighter being `{name, col (a color item id), ht, head, lw, stance, eq: {hair, hat, band, scarf, tie, shirt, jacket, gloves, legs, shoes, surge}, wheel: [up to 4 pose ids]}`. `normFighter()` upgrades older fighters (`eq.trail` → `eq.surge`, `eq.pose` → first on the wheel). `migrate()` in `core.js` upgrades older saves one version at a time: v1 had no `saveVersion` and no `prog`; v2 had no `binds`; v3 had no `eco`/`chr`; v4 had three fighter slots. `loadSave()` copies a save into the live objects keeping only the expected shapes. Any new shape change bumps `SAVE_VERSION` and adds a step. Nothing is saved while the self-test runs.
 
 Backups (Settings → Save) are `"OVPA-"` + base64 of the save's JSON. Restoring parses it as data, rejects newer versions, migrates it, keeps the old save under `orangeArmy.v1.before-restore`, writes it and reloads.
 
@@ -77,6 +77,9 @@ Backups (Settings → Save) are `"OVPA-"` + base64 of the save's JSON. Restoring
 - Stars change only in `grantStars`/`spendStars`, ownership only in `grantItem`/`buyItem` (`economy.js`). Writes are batched (`ecoSave`).
 - `dropScan()` gives each newly dying enemy its stars once (`e.dropped`). Pickups (`PK`) bounce, then fly to the nearest player and are banked on touch. Their rolls come from `dropRoll()`, a hash of `SEED`, `fr` and the enemy's index that never advances `rnd()`, and pickups never touch fighters, so the fingerprints did not change. `collectAll()` banks what's left at the end of a run (`runEnd`).
 - A player's look is `p.look` (from `lookOf()`): colors, head size, line width, stance and the item object per slot. It's drawing only: `drawFig` takes a head size and line width, then `drawLook` draws items on the joints it reports (`out.hd`, `nk`, `h`, `hb`, `f`, `fb`, `hr`). `drawRag` and `drawTatsu` report their own joints. `lookPose()` blends the idle stance and the victory pose at draw time; its blend state lives in a `WeakMap`, never on the fighter.
+- Height (`look.ht`) scales only the drawing in `drawF` (ragdolls keep their size); hitboxes never change.
+- Pose wheel: action `e` (T, Select, touch POSE). While it's held on the ground `updP` keeps the player still and stores the aimed slot in `f.wheel.sel`; letting go sets `f.emote = {i}`. Moving, jumping, Surge or attacking clears it. Nothing else reads these, so a fight plays the same with or without poses; `lookPose()` draws the pose from the fighter's wheel and `drawWheel()` the wheel. Older saved key/button bindings without `e` use its defaults.
+- Surge afterimages (`GH`) remember their owner (`own`) so they can be drawn in the owner's Surge style.
 - `withCtx(canvas2d, fn)` points every drawing function at another canvas (store icons, the character preview, Players screen cards).
 
 ## Self-test
