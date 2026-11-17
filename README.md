@@ -8,9 +8,12 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 ## Modes
 
+The title says **PRESS START**: press any key, button or tap. **Play** opens Campaign (the Wooded Trail), Arcade and Multiplayer; **Character** is coming in M11.
+
+
 - **Play: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.
 - **Arcade: Endless Waves** is the original game: waves on one screen, with a Captain every fifth wave.
-- **Multiplayer: Versus & Co-op** opens the Players screen. Up to 4 players: controllers join by pressing any button (B leaves), or join with touch, the keyboard, or a second keyboard player (arrows + number pad; press 0 on the number pad). Then pick **Versus** (best of 3 rounds in The Clearing) or **Co-op** (Wooded Trail or Arcade; stand next to a downed teammate for 2 seconds to revive them).
+- **Multiplayer: Versus & Co-op** opens the Players screen. Up to 4 players: controllers join by pressing any button (B leaves), or join with touch, the keyboard, or a second keyboard player (arrows + number pad; press 0 on the number pad). Then pick **Versus** (best of 3 rounds in The Clearing; free-for-all or teams, chosen with the Versus button, and tap TEAM on a card to switch sides; grab another player with punch + kick, mash to break free) or **Co-op** (Wooded Trail or Arcade; stand next to a downed teammate for 2 seconds to revive them).
 - **Training Room** has dummies, hitboxes, frame data and the Feel / Moves / Info panels.
 
 ## Controls
@@ -33,7 +36,7 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Touch layout:** Settings → Touch layout → **Customize** lets you drag every button and the stick where you want them, resize them, and save named layouts (Default and Left-handed are built in).
 
-The **Training Room** (title screen) has spawnable dummies, hitbox and frame-data overlays, and three colored buttons at the top: **Feel** (**F**, live feel tuning), **Moves** (**M**, every combo) and **Info** (**I**, health, speed, damage, height and how to beat each enemy). Feel tuning covers hit-stop, screen shake, knockback, gravity, bounce and how long bodies stay.
+The **Training Room** (title screen) has spawnable dummies, hitbox and frame-data overlays, and three colored buttons at the top: **Feel** (**F**, live feel tuning), **Moves** (**M**, every combo) and **Info** (**I**, health, speed, damage, height and how to beat each enemy). Feel tuning (also in Settings, so it can be changed mid-match from the pause menu) covers hit-stop, screen shake, knockback, gravity, bounce and how long bodies stay.
 
 ## Enemies
 

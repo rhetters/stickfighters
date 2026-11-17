@@ -7,7 +7,8 @@ const PCOL = [
   ['#3ccf6e', '#26a052', 'GREEN'],
   ['#a36bff', '#7a46d6', 'PURPLE']
 ];
-let LOBBY = [];
+let LOBBY = [],
+  TEAMS = false;
 function openLobby() {
   closePanels();
   releaseAll();
@@ -28,7 +29,7 @@ function lobbyJoin(dev) {
   let slot = 0;
   while (LOBBY.some(r => r.slot === slot)) slot++;
   const [col, d2, name] = PCOL[slot];
-  LOBBY.push({ slot, dev, col, d2, name });
+  LOBBY.push({ slot, dev, col, d2, name, team: slot < 2 ? 0 : 1 });
   LOBBY.sort((a, b) => a.slot - b.slot);
   sfx(520 + slot * 80, 0.12, 'square', 0.05, 300);
   renderLobby();
@@ -51,22 +52,39 @@ function renderLobby() {
         (s + 1) +
         ' · ' +
         r.name +
-        '</b><span class="pfig"></span><small></small><button class="pleave" title="Leave">Leave</button>'
+        '</b><span class="pfig"></span><small></small>' +
+        (TEAMS ? '<button class="pteam">TEAM ' + (r.team + 1) + '</button>' : '') +
+        '<button class="pleave" title="Leave">Leave</button>'
       : '<b>P' +
         (s + 1) +
         '</b><span class="pfig off"></span><small>Press any button on a controller to join</small>';
     if (r) {
       c.querySelector('small').textContent = devLabel(r.dev);
       c.querySelector('.pleave').onclick = () => lobbyLeave(s);
+      if (TEAMS)
+        c.querySelector('.pteam').onclick = () => {
+          r.team = 1 - r.team;
+          renderLobby();
+          const b = document.querySelectorAll('.pcard')[s].querySelector('.pteam');
+          if (b) b.focus({ preventScroll: true });
+        };
     }
     box.appendChild(c);
   }
   const n = LOBBY.length;
   $('lb-touch').hidden = LOBBY.some(r => r.dev === 'touch') || n >= 4;
   $('lb-kb').hidden = LOBBY.some(r => r.dev === 'kb') || n >= 4;
-  $('lb-vs').disabled = n < 2;
+  const t0 = LOBBY.filter(r => r.team === 0).length,
+    vsOk = n >= 2 && (!TEAMS || (t0 > 0 && t0 < n));
+  $('lb-vs').disabled = !vsOk;
+  $('lb-teams').textContent = TEAMS ? 'VERSUS: TEAMS' : 'VERSUS: FREE-FOR-ALL';
   $('lb-coop').disabled = $('lb-arc').disabled = n < 1;
-  $('lb-msg').textContent = n < 2 ? 'Versus needs 2 or more players.' : n + ' players ready.';
+  $('lb-msg').textContent =
+    n < 2
+      ? 'Versus needs 2 or more players.'
+      : !vsOk
+        ? 'Teams need at least one player on each team.'
+        : n + ' players ready.';
 }
 // Controllers on the Players screen: any face button or Start on a new controller joins; Back on a joined one leaves.
 function lobbyPad(g, now, down) {
@@ -92,7 +110,7 @@ addEventListener('keydown', e => {
   else if (e.key === 'Escape') openTitle();
 });
 function startMulti(kind) {
-  ROSTER = LOBBY.map(r => ({ ...r }));
+  ROSTER = LOBBY.map(r => ({ ...r, team: kind === 'vs' && TEAMS ? r.team : undefined }));
   applyTouchVis();
   if (kind === 'vs') startVersus();
   else if (kind === 'level') startLevel('woods1');
@@ -102,6 +120,10 @@ $('b-multi').onclick = openLobby;
 $('lb-touch').onclick = () => lobbyJoin('touch');
 $('lb-kb').onclick = () => lobbyJoin('kb');
 $('lb-vs').onclick = () => startMulti('vs');
+$('lb-teams').onclick = () => {
+  TEAMS = !TEAMS;
+  renderLobby();
+};
 $('lb-coop').onclick = () => startMulti('level');
 $('lb-arc').onclick = () => startMulti('arcade');
 $('lb-back').onclick = () => openTitle();

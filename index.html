@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Orange vs. the Pink Army</title>
-<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
 <div id="wrap">
@@ -34,14 +34,19 @@
 <div id="ui">
  <div class="screen" id="s-title">
   <h1>ORANGE vs. PINK ARMY</h1>
-  <p id="best"></p>
-  <button class="btn" id="b-level">PLAY: WOODED TRAIL</button>
-  <button class="btn alt" id="b-start">ARCADE: ENDLESS WAVES</button>
-  <button class="btn alt" id="b-multi">MULTIPLAYER: VERSUS &amp; CO-OP</button>
-  <button class="btn alt" id="b-train">TRAINING ROOM</button>
-  <button class="btn alt" id="b-set1">SETTINGS</button>
-  <p class="kbhint"><b>A/D</b> move &middot; <b>W/S</b> aim up/down &middot; <b>Space</b> jump &middot; <b>J</b> punch &middot; <b>K</b> kick &middot; <b>Shift</b> Surge (hold, or tap on/off in Settings): + &larr;/&rarr; to run through enemies, + Space super jump, + J/K Surge moves, + <b>S</b> (standing still) to block &middot; <b>U</b> ultimate &middot; <b>Esc</b> pause &middot; change keys in Settings &gt; Buttons</p>
-  <p class="tchint">Left stick: move, and push up/down to aim &middot; JUMP &middot; PUNCH &middot; KICK &middot; hold SURGE + stick to run through enemies, + JUMP / PUNCH / KICK for Surge moves, + stick down (standing still) to block &middot; ULT when the blue bar is full</p>
+  <p id="press">PRESS START</p>
+  <div id="tmenu" hidden>
+   <button class="btn" id="b-play">PLAY</button>
+   <div id="playrow" class="lbrow" hidden><button class="btn" id="b-level">CAMPAIGN</button><button class="btn" id="b-start">ARCADE</button><button class="btn" id="b-multi">MULTIPLAYER</button></div>
+   <button class="btn alt" id="b-char">CHARACTER</button>
+   <button class="btn alt" id="b-train">TRAINING ROOM</button>
+   <button class="btn alt" id="b-set1">SETTINGS</button>
+  </div>
+ </div>
+ <div class="screen" id="s-char" hidden>
+  <h2>CHARACTER</h2>
+  <p>Character creation is coming in M11: your name, colors, hats, headbands, scarves and more, bought with ninja stars.</p>
+  <button class="btn" id="b-charback">BACK</button>
  </div>
  <div class="screen" id="s-lobby" hidden>
   <h2>PLAYERS</h2>
@@ -49,7 +54,7 @@
   <p class="lbhelp">Controllers: press any button to join, B to leave. Keyboard 2: press 0 on the number pad.</p>
   <div class="lbrow"><button class="btn alt" id="lb-touch">JOIN WITH TOUCH</button><button class="btn alt" id="lb-kb">JOIN WITH KEYBOARD</button><button class="btn alt" id="lb-back">BACK</button></div>
   <p id="lb-msg"></p>
-  <div class="lbrow"><button class="btn" id="lb-vs">VERSUS</button><button class="btn" id="lb-coop">CO-OP: WOODED TRAIL</button><button class="btn" id="lb-arc">CO-OP: ARCADE</button></div>
+  <div class="lbrow"><button class="btn alt" id="lb-teams">VERSUS: FREE-FOR-ALL</button><button class="btn" id="lb-vs">VERSUS</button><button class="btn" id="lb-coop">CO-OP: WOODED TRAIL</button><button class="btn" id="lb-arc">CO-OP: ARCADE</button></div>
  </div>
  <div class="screen" id="s-pause" hidden>
   <h2>PAUSED</h2>
@@ -72,6 +77,7 @@
    <label for="o-hist">Input display</label><input id="o-hist" type="checkbox">
    <label for="o-calm">Reduce screen shake</label><input id="o-calm" type="checkbox">
    <label for="o-seed">Seed (blank = random)</label><input id="o-seed" type="text" maxlength="12">
+   <div id="o-feel" class="setfeel"></div>
   </div>
   <button class="btn" id="b-back">BACK</button>
  </div>
@@ -104,27 +110,27 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=5" defer></script>
-<script src="js/input.js?v=5" defer></script>
-<script src="js/data/moves.js?v=5" defer></script>
-<script src="js/data/enemies.js?v=5" defer></script>
-<script src="js/data/levels.js?v=5" defer></script>
-<script src="js/player.js?v=5" defer></script>
-<script src="js/effects.js?v=5" defer></script>
-<script src="js/combat.js?v=5" defer></script>
-<script src="js/enemies.js?v=5" defer></script>
-<script src="js/modes.js?v=5" defer></script>
-<script src="js/level.js?v=5" defer></script>
-<script src="js/versus.js?v=5" defer></script>
-<script src="js/ragdoll.js?v=5" defer></script>
-<script src="js/scenery.js?v=5" defer></script>
-<script src="js/render.js?v=5" defer></script>
-<script src="js/ui/panels.js?v=5" defer></script>
-<script src="js/ui/training.js?v=5" defer></script>
-<script src="js/ui/touch-layout.js?v=5" defer></script>
-<script src="js/ui/lobby.js?v=5" defer></script>
-<script src="js/ui/bindings.js?v=5" defer></script>
-<script src="js/selftest.js?v=5" defer></script>
-<script src="js/main.js?v=5" defer></script>
+<script src="js/core.js?v=6" defer></script>
+<script src="js/input.js?v=6" defer></script>
+<script src="js/data/moves.js?v=6" defer></script>
+<script src="js/data/enemies.js?v=6" defer></script>
+<script src="js/data/levels.js?v=6" defer></script>
+<script src="js/player.js?v=6" defer></script>
+<script src="js/effects.js?v=6" defer></script>
+<script src="js/combat.js?v=6" defer></script>
+<script src="js/enemies.js?v=6" defer></script>
+<script src="js/modes.js?v=6" defer></script>
+<script src="js/level.js?v=6" defer></script>
+<script src="js/versus.js?v=6" defer></script>
+<script src="js/ragdoll.js?v=6" defer></script>
+<script src="js/scenery.js?v=6" defer></script>
+<script src="js/render.js?v=6" defer></script>
+<script src="js/ui/panels.js?v=6" defer></script>
+<script src="js/ui/training.js?v=6" defer></script>
+<script src="js/ui/touch-layout.js?v=6" defer></script>
+<script src="js/ui/lobby.js?v=6" defer></script>
+<script src="js/ui/bindings.js?v=6" defer></script>
+<script src="js/selftest.js?v=6" defer></script>
+<script src="js/main.js?v=6" defer></script>
 </body>
 </html>

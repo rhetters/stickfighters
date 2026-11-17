@@ -9,7 +9,7 @@ let paused = false,
 const gridC = document.createElement('canvas'),
   coarseMQ = matchMedia('(pointer:coarse)'),
   portraitMQ = matchMedia('(orientation:portrait) and (pointer:coarse)');
-const SCREENS = ['s-title', 's-lobby', 's-pause', 's-settings', 's-binds', 's-over', 's-clear'];
+const SCREENS = ['s-title', 's-char', 's-lobby', 's-pause', 's-settings', 's-binds', 's-over', 's-clear'];
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
   $('ui').hidden = !id;
@@ -43,15 +43,8 @@ function openTitle() {
   $('trainpanel').hidden = true;
   newSeed();
   init();
-  const lp = PROG.woods1;
-  $('best').textContent =
-    (lp && lp.done ? 'Wooded Trail cleared: best ' + lp.score + ' pts in ' + fmtT(lp.time) + '. ' : '') +
-    (BEST.score
-      ? 'Arcade best: ' + BEST.score + ' pts · wave ' + BEST.wave + ' · ' + BEST.combo + '-hit combo'
-      : lp && lp.done
-        ? ''
-        : 'No runs yet. Pick a mode.');
   show('s-title');
+  titleView();
 }
 function start() {
   $('moves').hidden = true;
@@ -204,7 +197,66 @@ function bindSettings() {
 }
 $('b-start').onclick = start;
 $('b-train').onclick = startTrain;
+// ===== TITLE MENU (post-M9) =====
+// First visit: a flashing PRESS START; any key, tap or controller button opens the menu.
+// PLAY splits into CAMPAIGN, ARCADE and MULTIPLAYER side by side; Back folds them up again.
+const TITLE = { ready: false, keepOpen: false };
+function titleView() {
+  $('press').hidden = TITLE.ready;
+  $('tmenu').hidden = !TITLE.ready;
+  playFold(!TITLE.keepOpen);
+  if (TITLE.ready) $(TITLE.keepOpen ? 'b-level' : 'b-play').focus({ preventScroll: true });
+}
+function titleReveal() {
+  if (TITLE.ready) return false;
+  TITLE.ready = true;
+  sfx(520, 0.15, 'square', 0.05, 400);
+  titleView();
+  return true;
+}
+function playFold(fold) {
+  $('b-play').hidden = !fold;
+  $('playrow').hidden = fold;
+  $(fold ? 'b-play' : 'b-level').focus({ preventScroll: true });
+}
+const pressMode = () => !$('s-title').hidden && !$('ui').hidden && !TITLE.ready;
+// used by the automated tests: open everything at once
+function titleOpenAll() {
+  TITLE.ready = TITLE.keepOpen = true;
+  titleView();
+}
+$('b-play').onclick = () => playFold(false);
+$('b-char').onclick = () => show('s-char');
+$('b-charback').onclick = () => {
+  show('s-title');
+  titleView();
+};
+$('s-title').addEventListener('pointerdown', e => {
+  if (pressMode()) {
+    titleReveal();
+    e.preventDefault();
+  }
+});
+addEventListener(
+  'keydown',
+  e => {
+    if (pressMode()) {
+      titleReveal();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    } else if (
+      e.key === 'Escape' &&
+      !$('s-title').hidden &&
+      !$('ui').hidden &&
+      !$('playrow').hidden &&
+      !TITLE.keepOpen
+    )
+      playFold(true);
+  },
+  true
+);
 $('b-set1').onclick = () => {
+  renderSetFeel();
   back = 's-title';
   show('s-settings');
 };
@@ -216,6 +268,7 @@ $('b-restart').onclick = () => {
   else start();
 };
 $('b-set2').onclick = () => {
+  renderSetFeel();
   back = 's-pause';
   show('s-settings');
 };

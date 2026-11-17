@@ -317,7 +317,9 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **Versus:** The Clearing arena, 2–4 players, free-for-all, best of 3 rounds: countdown, 60-second rounds, last one standing (or the most health when time runs out), slow-motion KO, winner screen and Rematch. Light hits stagger briefly so strings connect; launches and knockdowns give protection until you're back up (no juggles in versus yet); long combos scale down faster than against the army. Block works in versus. Equal stats for everyone. Players push each other apart unless they're phasing with Surge.
 - **Co-op:** Wooded Trail and Arcade with 2–4 players. No friendly fire. Enemies get 35% more health and about 30% more grunts per extra player, and more can fight at once. A downed player is revived (40% health) when a teammate stands next to them for 2 seconds; if everyone is down, Continue works as before. The camera follows the player furthest along; players who fall behind are pushed along by the left edge of the screen.
 - **Choices made (Rhett can change them):** versus is last-one-standing with a health bar, free-for-all only (no 2v2 yet), and co-op revive is "stand next to them for 2 seconds".
-- **Not yet:** grabbing another player in versus, juggles in versus, 2v2 teams, per-player character looks (comes with M11).
+- **Not yet:** juggles in versus, per-player character looks (comes with M11).
+
+**Post-M9 patch:** title PRESS START → PLAY (Campaign / Arcade / Multiplayer) · Character (placeholder) · Training Room · Settings; Feel sliders in Settings for mid-match tuning; grabbing and throwing players in Versus (mash to break free; grabs beat blocks); Versus teams (free-for-all or teams, picked in the lobby).
 - Self-test fingerprints unchanged (one player): Arcade `c87c9470`, Level `21292ab5`.
 
 ### M10 · XP, levels, skill tree

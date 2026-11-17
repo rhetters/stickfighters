@@ -2,6 +2,13 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Post-M9 patch (November 16, 2026)
+- Title: flashing PRESS START, then PLAY (splits into Campaign / Arcade / Multiplayer side by side), Character (placeholder for M11), Training Room, Settings. Stats and controls text removed from the title.
+- Settings: all six Feel sliders (hit-stop, shake, knockback, gravity, bounce, bodies stay), adjustable mid-match from the pause menu.
+- Versus: grab another player (punch + kick), knee, four throws; the held player mashes to break free. A grab gets through a block.
+- Versus 2v2 (or 2v1, 3v1) teams: no friendly fire, team wins, teams start on opposite sides. Lobby toggle Versus: Free-for-all / Teams, TEAM button on each card.
+- Self-test fingerprints unchanged.
+
 ## M9 · Local multiplayer: co-op and versus
 - Players screen: up to 4 players join with controllers (any button; B leaves), touch, keyboard or a second keyboard player.
 - Per-player input slots, health, Surge, meter, combo and HUD rows. Any controller pauses; touch controls hide when nobody uses touch.

@@ -187,6 +187,7 @@ function init() {
   PL = R.map((r, i) => {
     const p = mkPlayer(W / 2 + (i - (R.length - 1) / 2) * 80, r.slot, r.col, r.d2);
     p.name = r.name || 'ORANGE';
+    p.team = r.team;
     return p;
   });
   use(PL[0]);
@@ -246,6 +247,34 @@ function updP() {
       f.vx *= 0.85;
     }
     if (f.deadT > 110 && PL.every(p => p.st === 'dead')) over();
+  } else if (f.st === 'held') {
+    // Grabbed by another player (Versus): mash punch, kick or jump to break free
+    tp = HURT;
+    f.vx = f.vy = 0;
+    const g = f.held;
+    if (want('p') || want('k') || want('j')) {
+      eat('p');
+      eat('k');
+      eat('j');
+      f.esc = (f.esc || 0) + 1;
+      f.flash = 2;
+    }
+    if (!g || g.st !== 'grab' || g.gt !== f) {
+      f.st = 'free';
+      f.held = null;
+      f.esc = 0;
+    } else if (f.esc >= 6) {
+      g.st = 'free';
+      g.gt = null;
+      g.vx = -g.face * 4;
+      f.st = 'free';
+      f.held = null;
+      f.esc = 0;
+      f.inv = 30;
+      f.vx = g.face * 4;
+      txt(f.x, f.y - 110, 'BROKE FREE!', f.col, 18);
+      sfx(400, 0.12, 'square', 0.05, 200);
+    }
   } else if (f.st === 'hurt') {
     tp = HURT;
     f.vx *= 0.92;

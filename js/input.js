@@ -350,6 +350,10 @@ function pollPad() {
       else if (performance.now() - CAP.t > 6000) bindDone(null);
       continue;
     }
+    if (pressMode() && now.some((v, n) => v && !prev[n])) {
+      titleReveal();
+      continue;
+    }
     if (lobbyPad(g, now, down)) continue;
     // Which player this controller drives: its own slot in multiplayer, otherwise the first controller drives Player 1
     const slot = ROSTER.length ? devSlot('pad:' + g.index) : g === pads[0] ? 0 : -1;
@@ -457,4 +461,7 @@ function navBack() {
   if (sc.id === 's-pause') pause(false);
   else if (sc.id === 's-settings') $('b-back').click();
   else if (sc.id === 's-binds') $('bd-back').click();
+  else if (sc.id === 's-char') $('b-charback').click();
+  else if (sc.id === 's-lobby') openTitle();
+  else if (sc.id === 's-title' && !$('playrow').hidden && !TITLE.keepOpen) playFold(true);
 }

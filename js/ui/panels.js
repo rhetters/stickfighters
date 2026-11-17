@@ -232,3 +232,34 @@ function toggleFeel() {
   $('t-feel').classList.toggle('on', !el.hidden);
   if (!el.hidden) renderFeel();
 }
+
+// Settings copy of the Feel sliders (post-M9), so players can change them from the pause menu mid-match.
+function renderSetFeel() {
+  const el = $('o-feel');
+  el.innerHTML = '<b>Feel (1.0 = default)</b>';
+  for (const [k, l, a, b, st] of FEELUI) {
+    const lab = document.createElement('label'),
+      inp = document.createElement('input'),
+      out = document.createElement('span');
+    lab.textContent = l;
+    lab.htmlFor = inp.id = 'o-f-' + k;
+    Object.assign(inp, { type: 'range', min: a, max: b, step: st || 0.05, value: FEEL[k] });
+    out.textContent = fmtF(k);
+    inp.oninput = () => {
+      FEEL[k] = parseFloat(inp.value);
+      out.textContent = fmtF(k);
+      SET.feel = { ...FEEL };
+      save();
+    };
+    el.append(lab, inp, out);
+  }
+  const r = document.createElement('button');
+  r.textContent = 'Reset feel';
+  r.onclick = () => {
+    Object.assign(FEEL, FEELDEF);
+    SET.feel = { ...FEEL };
+    save();
+    renderSetFeel();
+  };
+  el.appendChild(r);
+}

@@ -5,7 +5,7 @@ let VS = null;
 function startVersus() {
   closePanels();
   newSeed();
-  VS = { round: 1, wins: {}, phase: 'count', t: 0, time: 3600 };
+  VS = { round: 1, wins: {}, phase: 'count', t: 0, time: 3600, teams: ROSTER.some(r => r.team != null) };
   vsRound();
   paused = false;
   releaseAll();
@@ -18,24 +18,29 @@ function vsRound() {
   LV = buildLevel('arena');
   CAM.x = WB.l = WW.l = 0;
   WB.r = WW.r = W;
-  const n = PL.length;
-  PL.forEach((p, i) => {
+  // free-for-all: spread across the arena; teams: team 1 starts on the left, team 2 on the right
+  const order = VS.teams ? [...PL].sort((a, b) => a.team - b.team || a.slot - b.slot) : PL,
+    n = order.length;
+  order.forEach((p, i) => {
     p.x = n === 1 ? W / 2 : 150 + (i * (W - 300)) / (n - 1);
     p.face = p.x < W / 2 ? 1 : -1;
   });
   Object.assign(VS, { phase: 'count', t: 0, time: 3600 });
 }
+// Who scores: a player in free-for-all, a team in 2v2
+const vsKey = p => (VS.teams ? 'T' + p.team : 'P' + p.slot);
+const vsName = p => (VS.teams ? 'TEAM ' + (p.team + 1) : p.name);
 function vsKO(w) {
   VS.phase = 'ko';
   VS.t = 0;
   slow = Math.max(slow, 60);
   VS.maxc = Math.max(VS.maxc || 0, maxc);
-  if (w) VS.wins[w.slot] = (VS.wins[w.slot] || 0) + 1;
-  bn(w ? w.name + ' WINS ROUND ' + VS.round + '!' : 'DRAW!');
+  if (w) VS.wins[vsKey(w)] = (VS.wins[vsKey(w)] || 0) + 1;
+  bn(w ? vsName(w) + ' WINS ROUND ' + VS.round + '!' : 'DRAW!');
   sfx(260, 0.5, 'sawtooth', 0.07, -120);
 }
 function vsNext() {
-  const champ = PL.find(p => (VS.wins[p.slot] || 0) >= 2);
+  const champ = PL.find(p => (VS.wins[vsKey(p)] || 0) >= 2);
   if (champ) return vsEnd(champ);
   VS.round++;
   vsRound();
@@ -43,10 +48,22 @@ function vsNext() {
 function vsEnd(w) {
   VS.phase = 'end';
   state = 'clear';
-  $('c-h1').textContent = w.name + ' WINS!';
-  $('c-l1').textContent = PL.map(p => 'P' + (p.slot + 1) + ' ' + p.name + ': ' + (VS.wins[p.slot] || 0)).join(
-    ' · '
-  );
+  $('c-h1').textContent = vsName(w) + ' WINS!';
+  $('c-l1').textContent = VS.teams
+    ? [0, 1]
+        .map(
+          t =>
+            'TEAM ' +
+            (t + 1) +
+            ' (' +
+            PL.filter(p => p.team === t)
+              .map(p => p.name)
+              .join(' + ') +
+            '): ' +
+            (VS.wins['T' + t] || 0)
+        )
+        .join(' · ')
+    : PL.map(p => 'P' + (p.slot + 1) + ' ' + p.name + ': ' + (VS.wins['P' + p.slot] || 0)).join(' · ');
   $('c-l2').textContent = 'Best combo ' + VS.maxc + ' hits';
   $('c-l3').textContent = '';
   $('b-next').textContent = 'REMATCH';
@@ -95,14 +112,17 @@ const VERSUS = {
   update() {
     vsSep();
     if (VS.phase !== 'fight') return;
-    const alive = PL.filter(p => p.st !== 'dead');
+    const alive = PL.filter(p => p.st !== 'dead'),
+      sides = [...new Set(alive.map(vsKey))];
     if (--VS.time <= 0) {
-      const best = Math.max(...alive.map(p => p.hp / p.max)),
-        top = alive.filter(p => p.hp / p.max === best);
+      // time up: the side with the most health left (summed over a team) wins
+      const hpOf = k => alive.filter(p => vsKey(p) === k).reduce((n, p) => n + p.hp / p.max, 0),
+        best = Math.max(...sides.map(hpOf)),
+        top = sides.filter(k => hpOf(k) === best);
       bn('TIME!');
-      return vsKO(top.length === 1 ? top[0] : null);
+      return vsKO(top.length === 1 ? alive.find(p => vsKey(p) === top[0]) : null);
     }
-    if (alive.length <= 1) vsKO(alive[0] || null);
+    if (sides.length <= 1) vsKO(alive[0] || null);
   },
   // everyone went down at the same moment: a draw
   over() {
@@ -111,5 +131,6 @@ const VERSUS = {
   bg: () => drawWoods(),
   fg: () => drawWoodsFg(),
   hud: vsHud,
-  wins: q => (VS ? VS.wins[q.slot] || 0 : 0)
+  wins: q => (VS ? VS.wins[vsKey(q)] || 0 : 0),
+  team: q => (VS && VS.teams ? q.team + 1 : 0)
 };

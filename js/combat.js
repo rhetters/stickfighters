@@ -136,7 +136,7 @@ function tickAtk(f) {
   if (d.ring && a.f === d.h[0]) ring(f.x + f.face * 50, f.y - 45, 60);
   if (a.f >= d.h[0] && a.f <= d.h[1]) {
     const hb = hbox(f);
-    for (const e of f.pl ? (MODE.pvp ? [...E, ...PL.filter(q => q !== f)] : E) : PL) {
+    for (const e of f.pl ? (MODE.pvp ? [...E, ...foes(f)] : E) : PL) {
       if (
         a.hit.has(e) ||
         e.gone ||
@@ -193,8 +193,8 @@ function tickAtk(f) {
       shake = Math.max(shake, 12);
     }
     if (d.area && f.pl && MODE.pvp)
-      for (const q of PL) {
-        if (q === f || q.inv > 0 || q.st === 'dead' || q.y < G - 24 || Math.abs(q.x - f.x) > d.area) continue;
+      for (const q of foes(f)) {
+        if (q.inv > 0 || q.st === 'dead' || q.y < G - 24 || Math.abs(q.x - f.x) > d.area) continue;
         pvpHit(q, { dmg: d.adm || 12, kb: 9, lift: -7, ef: 'kd' }, q.x >= f.x ? 1 : -1, f);
       }
     if (d.area && f.pl)
@@ -292,10 +292,14 @@ function block(e, d, dr) {
   } else txt(e.x, e.y - 104 * e.s, 'BLOCK', '#7a6e80', 15);
 }
 // Grab: reach 52 px in front, standing enemies only; a big enemy needs its poise broken first.
+// Players this player can hit: in Versus everyone except themselves and their teammates (2v2).
+const sameTeam = (a, b) => a.team != null && a.team === b.team;
+const foes = f => PL.filter(q => q !== f && !sameTeam(q, f));
 function tryGrab(f) {
   let tg = null;
-  for (const e of E) {
+  for (const e of MODE.pvp ? [...E, ...foes(f)] : E) {
     if (e.gone || e.dying || !(e.st === 'free' || e.st === 'hurt' || e.st === 'atk')) continue;
+    if (e.pl && e.inv > 0) continue;
     const dx = (e.x - f.x) * f.face;
     if (dx > -6 && dx < 52 && Math.abs(e.y - f.y) < 24) {
       tg = e;
@@ -349,6 +353,31 @@ function pummel(f, e) {
 }
 // Throws: K while holding. Forward/neutral and back throw the enemy as a projectile into the crowd; Up launches; Down slams.
 function throwE(f, e, dir) {
+  // Versus (post-M9): throwing another player
+  if (e.pl) {
+    e.held = null;
+    e.st = 'free';
+    e.esc = 0;
+    const mv = { f: 'tfwd', b: 'tback', u: 'tup', d: 'tslam' }[dir];
+    if (dir === 'b') {
+      f.face *= -1;
+      e.x = f.x + f.face * 20;
+    }
+    startAtk(f, A[mv], 0);
+    f.st = 'atk';
+    e.inv = 0;
+    pvpHit(
+      e,
+      dir === 'u'
+        ? { dmg: 7, kb: 4, lift: -13, ef: 'launch', w: 'M' }
+        : dir === 'd'
+          ? { dmg: 11, kb: 5, ef: 'bounce', w: 'H' }
+          : { dmg: 9, kb: 12, lift: -6, ef: 'splat', w: 'H' },
+      f.face,
+      f
+    );
+    return;
+  }
   e.held = null;
   e.st = 'fly';
   e.y = f.y - 10;

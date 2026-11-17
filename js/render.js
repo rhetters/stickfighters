@@ -404,6 +404,7 @@ function hudPlayers() {
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fff';
     ctx.fillText('P' + (q.slot + 1), 29, y + 17);
+    if (MODE.team && MODE.team(q)) txt0('T' + MODE.team(q), 240, y + 22, INK);
     ctx.textAlign = 'left';
     ctx.fillStyle = INK;
     ctx.fillRect(50, y, 184, 14);
