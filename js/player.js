@@ -10,11 +10,7 @@ let PL = [],
   camY = 0,
   wave,
   score,
-  combo,
-  comboT,
   maxc,
-  meter,
-  hpT,
   stop,
   slow,
   shake,
@@ -147,6 +143,7 @@ function mkPlayer(x, slot, col, d2) {
   const p = F(x, 0, 1);
   p.slot = slot;
   p.stm = { v: SURGE.max, last: -999, winded: 0, flash: 0 };
+  Object.assign(p, { combo: 0, comboT: 0, meter: 0, hpT: 100 });
   if (col) {
     p.col = col;
     p.d2 = d2;
@@ -186,14 +183,18 @@ function init() {
   CAM.x = WB.l = WW.l = 0;
   WB.r = WW.r = W;
   MODE = ARCADE;
-  PL = [mkPlayer(W / 2, 0)];
+  const R = ROSTER.length ? ROSTER : [{ slot: 0 }];
+  PL = R.map((r, i) => {
+    const p = mkPlayer(W / 2 + (i - (R.length - 1) / 2) * 80, r.slot, r.col, r.d2);
+    p.name = r.name || 'ORANGE';
+    return p;
+  });
   use(PL[0]);
   camX = camY = 0;
   E = [];
   FX = [];
   GH = [];
-  score = combo = comboT = maxc = meter = stop = slow = shake = zoom = cl = deadT = 0;
-  hpT = 100;
+  score = maxc = stop = slow = shake = zoom = cl = deadT = 0;
   banner = null;
   queue = [];
   spawnT = 0;
@@ -230,7 +231,7 @@ function updP() {
     f.sj--;
     if (f.t % 2 === 0) ghost(f, '#ffd400');
   }
-  if (comboT > 0 && --comboT === 0) combo = 0;
+  if (f.comboT > 0 && --f.comboT === 0) f.combo = 0;
   let tp = f.pose,
     k = 0.3;
   if (f.st === 'dead') {
@@ -419,9 +420,9 @@ function updP() {
       f.running = 0;
       dust(f.x, G, 6);
       sfx(300, 0.2, 'sawtooth', 0.04, -200);
-    } else if (want('x') && meter >= 100) {
+    } else if (want('x') && f.meter >= 100) {
       eat('x');
-      meter = 0;
+      f.meter = 0;
       go(A.tornado);
       f.inv = 999;
       f.vy = -6;

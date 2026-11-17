@@ -16,7 +16,7 @@ const mkSlot = () => {
   for (const a of ACT) I.K[a] = 0;
   return I;
 };
-const INP = [mkSlot(), mkSlot()],
+const INP = [mkSlot(), mkSlot(), mkSlot(), mkSlot()],
   SRC = INP[0].src,
   HIST = [];
 let fr = 0;
@@ -26,8 +26,36 @@ let K = INP[0].K,
   AIM = INP[0].AIM,
   SRG = INP[0].SRG;
 const SYM = { l: '←', r: '→', u: '↑', d: '↓', j: 'JUMP', p: 'P', k: 'K', s: 'SURGE', x: 'ULT' };
+// ===== PLAYERS AND DEVICES (M9) =====
+// ROSTER = the players in a multiplayer game: [{ slot, dev, col, d2, name }], where dev is 'touch', 'kb' (the main
+// keyboard keys), 'kb2' (arrows + number pad) or 'pad:N' (controller N). Empty = one player, and every device drives
+// Player 1 like before. Devices with no player are ignored during a multiplayer game.
+let ROSTER = [];
+function devSlot(dev) {
+  if (!ROSTER.length) return 0;
+  const r = ROSTER.find(r => r.dev === dev);
+  return r ? r.slot : -1;
+}
+// Second keyboard player: arrows to move and aim, number pad 0 jump, 1 punch, 2 kick, 3 Surge, Enter ultimate
+const KB2 = {
+  arrowleft: 'l',
+  arrowright: 'r',
+  arrowup: 'u',
+  arrowdown: 'd',
+  Numpad0: 'j',
+  Numpad1: 'p',
+  Numpad2: 'k',
+  Numpad3: 's',
+  NumpadEnter: 'x'
+};
+const kb2Act = e =>
+  devSlot('kb2') >= 0 && ROSTER.length ? KB2[e.code] || KB2[(e.key || '').toLowerCase()] : null;
 // Toggle mode (Settings > Surge button): each press flips Surge on/off and letting go does nothing.
 function setA(src, a, on, slot) {
+  if (slot === undefined) {
+    slot = devSlot(src === 'tc' ? 'touch' : 'kb');
+    if (slot < 0) return;
+  }
   const I = INP[slot || 0],
     S = I.src;
   on = on ? 1 : 0;
@@ -153,6 +181,12 @@ addEventListener(
 );
 addEventListener('keydown', e => {
   if (CAP) return;
+  const k2 = kb2Act(e);
+  if (k2) {
+    if (live() && !e.repeat) setA('kb', k2, 1, devSlot('kb2'));
+    e.preventDefault();
+    return;
+  }
   const key = (e.key || '').toLowerCase(),
     a = KEYS[key];
   if (a === 'pause') {
@@ -169,6 +203,8 @@ addEventListener('keydown', e => {
   unlockAudio();
 });
 addEventListener('keyup', e => {
+  const k2 = kb2Act(e);
+  if (k2) return setA('kb', k2, 0, devSlot('kb2'));
   const key = (e.key || '').toLowerCase(),
     a = KEYS[key];
   if (!a || a === 'pause') return;
@@ -292,52 +328,56 @@ function touchWatch() {
     }
   });
 }
-let padPrev = [],
-  padNav = { dir: '', t: 0 };
+// One entry per pad index: its buttons last frame (for presses) and its menu-repeat state
+let padPrev = {},
+  padNav = {};
 function pollPad() {
   touchWatch();
-  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
-  let g = null;
-  for (const p of pads)
-    if (p && p.connected) {
-      g = p;
-      break;
+  const pads = [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(p => p && p.connected),
+    used = new Set();
+  for (const g of pads) {
+    const B = i => !!(g.buttons[i] && g.buttons[i].pressed),
+      ax = i => g.axes[i] || 0,
+      now = g.buttons.map(b => !!(b && b.pressed)),
+      prev = padPrev[g.index] || [],
+      down = i => now[i] && !prev[i],
+      M = padBinds(g),
+      any = a => (M[a] || []).some(B);
+    padPrev[g.index] = now;
+    if (CAP && CAP.dev === 'pad') {
+      const i = now.findIndex((v, n) => v && !prev[n]);
+      if (i >= 0 && performance.now() - CAP.t > 250) bindDone(i, g);
+      else if (performance.now() - CAP.t > 6000) bindDone(null);
+      continue;
     }
-  if (!g) {
-    for (const a of ACT) if (SRC.gp[a]) setA('gp', a, 0);
-    padPrev = [];
-    return;
+    if (lobbyPad(g, now, down)) continue;
+    // Which player this controller drives: its own slot in multiplayer, otherwise the first controller drives Player 1
+    const slot = ROSTER.length ? devSlot('pad:' + g.index) : g === pads[0] ? 0 : -1;
+    if (slot >= 0) {
+      used.add(slot);
+      setA('gp', 'l', ax(0) < -0.4 || any('l'), slot);
+      setA('gp', 'r', ax(0) > 0.4 || any('r'), slot);
+      setA('gp', 'u', ax(1) < -0.5 || any('u'), slot);
+      setA('gp', 'd', ax(1) > 0.5 || any('d'), slot);
+      for (const a of ['j', 'p', 'k', 's', 'x']) setA('gp', a, any(a), slot);
+    }
+    // Start pauses; on the pause menu it resumes. Any controller can pause.
+    if ((M.pause || []).some(down)) {
+      if (live()) pause(true);
+      else if (paused && !$('s-pause').hidden) pause(false);
+    }
+    if (!live()) padMenu(g, now, down, ax);
   }
-  const B = i => !!(g.buttons[i] && g.buttons[i].pressed),
-    ax = i => g.axes[i] || 0,
-    now = g.buttons.map(b => !!(b && b.pressed)),
-    prev = padPrev,
-    down = i => now[i] && !prev[i],
-    M = padBinds(g),
-    any = a => (M[a] || []).some(B);
-  padPrev = now;
-  if (CAP && CAP.dev === 'pad') {
-    const i = now.findIndex((v, n) => v && !prev[n]);
-    if (i >= 0 && performance.now() - CAP.t > 250) bindDone(i, g);
-    else if (performance.now() - CAP.t > 6000) bindDone(null);
-    return;
-  }
-  setA('gp', 'l', ax(0) < -0.4 || any('l'));
-  setA('gp', 'r', ax(0) > 0.4 || any('r'));
-  setA('gp', 'u', ax(1) < -0.5 || any('u'));
-  setA('gp', 'd', ax(1) > 0.5 || any('d'));
-  for (const a of ['j', 'p', 'k', 's', 'x']) setA('gp', a, any(a));
-  // Start pauses; on the pause menu it resumes
-  if ((M.pause || []).some(down)) {
-    if (live()) pause(true);
-    else if (paused && !$('s-pause').hidden) pause(false);
-  }
-  if (!live()) padMenu(g, now, down, ax);
+  // a controller that went away lets go of everything it was holding
+  INP.forEach((I, n) => {
+    if (!used.has(n)) for (const a of ACT) if (I.src.gp[a]) setA('gp', a, 0, n);
+  });
 }
 // Controller menus: d-pad or stick moves between buttons, left/right changes sliders and lists,
 // confirm (A) presses, back (B) goes back or resumes, Start on a menu presses the highlighted button.
 function padMenu(g, now, down, ax) {
-  const sw = padFamily(g) === 'switch',
+  const nav = (padNav[g.index] = padNav[g.index] || { dir: '', t: 0 }),
+    sw = padFamily(g) === 'switch',
     OK = sw ? 1 : 0,
     BACK = sw ? 0 : 1,
     dir =
@@ -351,12 +391,12 @@ function padMenu(g, now, down, ax) {
               ? 'r'
               : '',
     t = performance.now();
-  if (dir !== padNav.dir) {
-    padNav.dir = dir;
-    padNav.t = t + 380;
+  if (dir !== nav.dir) {
+    nav.dir = dir;
+    nav.t = t + 380;
     if (dir) navMove(dir);
-  } else if (dir && t >= padNav.t) {
-    padNav.t = t + 120;
+  } else if (dir && t >= nav.t) {
+    nav.t = t + 120;
     navMove(dir);
   }
   if (down(OK)) navPress();

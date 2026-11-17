@@ -258,8 +258,8 @@ function block(e, d, dr) {
   stop = Math.max(stop, 2);
   sfx(700, 0.06, 'square', 0.04, -200);
   noise(0.04, 0.05, 3000);
-  combo++;
-  comboT = 100;
+  P.combo++;
+  P.comboT = 100;
   if (e.gm <= 0) {
     e.gm = 0;
     e.noShield = 240;
@@ -321,12 +321,12 @@ function tryGrab(f) {
   txt(tg.x, tg.y - 110 * tg.s, 'GRAB!', '#ff7a00', 20);
   sfx(260, 0.08, 'square', 0.05, -60);
   noise(0.05, 0.05, 1800);
-  combo++;
-  comboT = 100;
-  maxc = Math.max(maxc, combo);
+  f.combo++;
+  f.comboT = 100;
+  maxc = Math.max(maxc, f.combo);
 }
 function pummel(f, e) {
-  const dmg = Math.max(1, Math.round(4 * (combo < 4 ? 1 : Math.max(0.45, 1 - (combo - 3) * 0.04))));
+  const dmg = Math.max(1, Math.round(4 * (f.combo < 4 ? 1 : Math.max(0.45, 1 - (f.combo - 3) * 0.04))));
   e.hp -= dmg;
   e.flash = 4;
   e.hs = 3;
@@ -334,10 +334,10 @@ function pummel(f, e) {
   spark(e.x - f.face * 6, e.y - 40 * e.s, 14, '#fff3a0');
   txt(e.x, e.y - 95 * e.s, dmg, INK);
   impact('L', f.face, e.x, e.y - 40);
-  combo++;
-  comboT = 100;
-  meter = Math.min(100, meter + 3);
-  maxc = Math.max(maxc, combo);
+  f.combo++;
+  f.comboT = 100;
+  f.meter = Math.min(100, f.meter + 3);
+  maxc = Math.max(maxc, f.combo);
   if (e.hp <= 0) throwE(f, e, 'f');
 }
 // Throws: K while holding. Forward/neutral and back throw the enemy as a projectile into the crowd; Up launches; Down slams.
@@ -388,8 +388,9 @@ const JUGMAX = 7,
   EFVY = { pop: -5, launch: -10, kd: -4, trip: -4, splat: -3 };
 function hurtE(e, d, dr, src) {
   if (e.dying) return;
-  const w = wtOf(d),
-    dmg = Math.max(1, Math.round(d.dmg * (combo < 4 ? 1 : Math.max(0.45, 1 - (combo - 3) * 0.04)))); // long combos deal less per hit
+  const ap = src && src.pl ? src : P,
+    w = wtOf(d),
+    dmg = Math.max(1, Math.round(d.dmg * (ap.combo < 4 ? 1 : Math.max(0.45, 1 - (ap.combo - 3) * 0.04)))); // long combos deal less per hit
   if (fr - (e.lh || -999) > 60) e.jug = 0;
   e.lh = fr;
   if (src && src.pl) {
@@ -489,16 +490,16 @@ function hurtE(e, d, dr, src) {
   if (w !== 'L') ring(px, py, w === 'H' ? 55 : 35);
   txt(e.x, e.y - 95 * e.s, dmg, INK);
   impact(w, dr, px, py, e.hp <= 0);
-  combo++;
-  comboT = 100;
-  meter = Math.min(100, meter + 4);
-  maxc = Math.max(maxc, combo);
-  const cw = { 5: 'NICE!', 10: 'GREAT!', 20: 'AMAZING!', 35: 'UNSTOPPABLE!', 50: 'GODLIKE!' }[combo];
+  ap.combo++;
+  ap.comboT = 100;
+  ap.meter = Math.min(100, ap.meter + 4);
+  maxc = Math.max(maxc, ap.combo);
+  const cw = { 5: 'NICE!', 10: 'GREAT!', 20: 'AMAZING!', 35: 'UNSTOPPABLE!', 50: 'GODLIKE!' }[ap.combo];
   if (cw) txt(P.x, P.y - 120, cw, '#ff7a00', 26);
   if (e.hp <= 0) {
-    const sc = Math.round(e.T.sc * (1 + combo * 0.1));
+    const sc = Math.round(e.T.sc * (1 + ap.combo * 0.1));
     score += sc;
-    meter = Math.min(100, meter + 6);
+    ap.meter = Math.min(100, ap.meter + 6);
     txt(e.x, e.y - 120 * e.s, '+' + sc, '#ff4fa3', 20);
     if (!queue.length && E.every(x => x.dying)) slow = 55;
   }
@@ -518,9 +519,10 @@ function groundHit(e, d, dr, src) {
   spark(e.x, e.y - 18, 14, '#ffd400');
   sfxHit('L');
   stop = Math.max(stop, 2);
-  combo++;
-  comboT = 100;
-  maxc = Math.max(maxc, combo);
+  const ap = src && src.pl ? src : P;
+  ap.combo++;
+  ap.comboT = 100;
+  maxc = Math.max(maxc, ap.combo);
 }
 // Block (combat patch): hold Down + Surge while standing still. Hits from the front cost Surge instead of health,
 // with no stun. When the bar runs out you're Winded, the block drops, and hits land again.
@@ -564,8 +566,8 @@ function hurtP(q, d, dr) {
   q.inv = 65;
   q.flash = 4;
   q.hs = 7;
-  combo = 0;
-  comboT = 0;
+  q.combo = 0;
+  q.comboT = 0;
   q.att = null;
   q.pose[9] = 0;
   q.flip = 0;

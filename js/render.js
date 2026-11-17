@@ -387,52 +387,109 @@ function drawFX(x) {
     ctx.globalAlpha = 1;
   }
 }
+// Multiplayer HUD (M9): one compact row per player, in their color: health, Surge, blue meter, and round wins in versus.
+function hudPlayers() {
+  PL.forEach((q, i) => {
+    const y = 10 + i * 30;
+    q.hpT += (q.hp - q.hpT) * 0.1;
+    ctx.fillStyle = q.col;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(12, y, 34, 24, 6);
+    else ctx.rect(12, y, 34, 24);
+    ctx.fill();
+    ctx.stroke();
+    ctx.font = '900 14px Impact,"Arial Black",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('P' + (q.slot + 1), 29, y + 17);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = INK;
+    ctx.fillRect(50, y, 184, 14);
+    ctx.fillStyle = '#ff4fa3';
+    ctx.fillRect(53, y + 3, (178 * Math.max(0, q.hpT)) / q.max, 8);
+    ctx.fillStyle = q.st === 'dead' ? '#7a6e80' : q.col;
+    ctx.fillRect(53, y + 3, (178 * Math.max(0, q.hp)) / q.max, 8);
+    ctx.fillStyle = INK;
+    ctx.fillRect(50, y + 16, 184, 8);
+    ctx.fillStyle = q.stm.winded ? '#b8202c' : '#ffd400';
+    ctx.fillRect(52, y + 18, (q.stm.winded ? 0.3 : q.stm.v / SURGE.max) * 120, 4);
+    ctx.fillStyle = q.meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
+    ctx.fillRect(176, y + 18, (q.meter / 100) * 56, 4);
+    if (q.st === 'dead' && MODE.revive)
+      txt0(q.rv > 0 ? 'REVIVING' : 'DOWN: stand next to them', 242, y + 13, '#e8212b');
+    if (MODE.wins) for (let w = 0; w < MODE.wins(q); w++) star5(250 + w * 20, y + 12);
+  });
+}
+function txt0(t, x, y, c) {
+  ctx.font = '900 13px Impact,"Arial Black",sans-serif';
+  ctx.fillStyle = c;
+  ctx.fillText(t, x, y);
+}
+function star5(x, y) {
+  ctx.fillStyle = '#ffd400';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? 4 : 9,
+      a = -Math.PI / 2 + (i * Math.PI) / 5;
+    ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+}
 function hud() {
   ctx.save();
   ctx.textAlign = 'left';
-  hpT += (P.hp - hpT) * 0.1;
-  ctx.fillStyle = INK;
-  ctx.fillRect(14, 12, 264, 24);
-  ctx.fillStyle = '#ff4fa3';
-  ctx.fillRect(18, 16, (256 * Math.max(0, hpT)) / P.max, 16);
-  ctx.fillStyle = '#ff7a00';
-  ctx.fillRect(18, 16, (256 * Math.max(0, P.hp)) / P.max, 16);
-  // Surge bar (yellow): flashes when low, red when you can't afford a move, refills from red while Winded
-  const sv = STM.v / SURGE.max,
-    bl = (fr >> 2) % 2,
-    held = K.s && live();
-  ctx.fillStyle = INK;
-  ctx.fillRect(14, 40, 224, 16);
-  ctx.fillStyle = STM.winded
-    ? '#b8202c'
-    : STM.flash > 0 && bl
-      ? '#e8212b'
-      : sv < 0.25 && bl
-        ? '#fff3a0'
-        : '#ffd400';
-  ctx.fillRect(17, 43, STM.winded ? 218 * (1 - STM.winded / (SURGE.winded * 60)) : 218 * sv, 10);
-  if (held && !STM.winded) {
-    ctx.strokeStyle = '#ffd400';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(11, 37, 230, 22);
-  }
-  ctx.font = '900 15px Impact,"Arial Black",sans-serif';
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = INK;
-  const sl = STM.winded ? 'WINDED' : 'SURGE';
-  ctx.fillStyle = STM.winded ? '#e8212b' : held ? '#ffd400' : '#fff8ee';
-  ctx.strokeText(sl, 248, 54);
-  ctx.fillText(sl, 248, 54);
-  // Ultimate meter (blue)
-  ctx.fillStyle = INK;
-  ctx.fillRect(14, 60, 184, 12);
-  ctx.fillStyle = meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
-  ctx.fillRect(17, 63, (178 * meter) / 100, 6);
-  if (meter >= 100) {
-    ctx.font = '900 14px Impact,"Arial Black",sans-serif';
-    ctx.fillStyle = '#3ec5ff';
-    ctx.strokeText('U: TORNADO!', 206, 73);
-    ctx.fillText('U: TORNADO!', 206, 73);
+  if (PL.length > 1) hudPlayers();
+  else {
+    P.hpT += (P.hp - P.hpT) * 0.1;
+    ctx.fillStyle = INK;
+    ctx.fillRect(14, 12, 264, 24);
+    ctx.fillStyle = '#ff4fa3';
+    ctx.fillRect(18, 16, (256 * Math.max(0, P.hpT)) / P.max, 16);
+    ctx.fillStyle = '#ff7a00';
+    ctx.fillRect(18, 16, (256 * Math.max(0, P.hp)) / P.max, 16);
+    // Surge bar (yellow): flashes when low, red when you can't afford a move, refills from red while Winded
+    const sv = STM.v / SURGE.max,
+      bl = (fr >> 2) % 2,
+      held = K.s && live();
+    ctx.fillStyle = INK;
+    ctx.fillRect(14, 40, 224, 16);
+    ctx.fillStyle = STM.winded
+      ? '#b8202c'
+      : STM.flash > 0 && bl
+        ? '#e8212b'
+        : sv < 0.25 && bl
+          ? '#fff3a0'
+          : '#ffd400';
+    ctx.fillRect(17, 43, STM.winded ? 218 * (1 - STM.winded / (SURGE.winded * 60)) : 218 * sv, 10);
+    if (held && !STM.winded) {
+      ctx.strokeStyle = '#ffd400';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(11, 37, 230, 22);
+    }
+    ctx.font = '900 15px Impact,"Arial Black",sans-serif';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = INK;
+    const sl = STM.winded ? 'WINDED' : 'SURGE';
+    ctx.fillStyle = STM.winded ? '#e8212b' : held ? '#ffd400' : '#fff8ee';
+    ctx.strokeText(sl, 248, 54);
+    ctx.fillText(sl, 248, 54);
+    // Ultimate meter (blue)
+    ctx.fillStyle = INK;
+    ctx.fillRect(14, 60, 184, 12);
+    ctx.fillStyle = P.meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
+    ctx.fillRect(17, 63, (178 * P.meter) / 100, 6);
+    if (P.meter >= 100) {
+      ctx.font = '900 14px Impact,"Arial Black",sans-serif';
+      ctx.fillStyle = '#3ec5ff';
+      ctx.strokeText('U: TORNADO!', 206, 73);
+      ctx.fillText('U: TORNADO!', 206, 73);
+    }
   }
   {
     const B = E.find(e => e.T.boss && !e.dying && !e.gone);
@@ -459,22 +516,6 @@ function hud() {
       ctx.textAlign = 'left';
     }
   }
-  if (PL[1]) {
-    const q = PL[1];
-    ctx.fillStyle = INK;
-    ctx.fillRect(W - 200, 104, 186, 14);
-    ctx.fillStyle = q.col;
-    ctx.fillRect(W - 197, 107, (180 * Math.max(0, q.hp)) / q.max, 8);
-    ctx.fillStyle = INK;
-    ctx.fillRect(W - 200, 120, 186, 9);
-    ctx.fillStyle = '#ffd400';
-    ctx.fillRect(W - 197, 122, (180 * q.stm.v) / SURGE.max, 5);
-    ctx.font = '900 13px Impact,"Arial Black",sans-serif';
-    ctx.fillStyle = INK;
-    ctx.textAlign = 'right';
-    ctx.fillText('P2', W - 206, 116);
-    ctx.textAlign = 'left';
-  }
   ctx.textAlign = 'right';
   ctx.font = '900 26px Impact,"Arial Black",sans-serif';
   ctx.fillStyle = INK;
@@ -490,6 +531,9 @@ function hud() {
       W / 2,
       30
     );
+  const CP = PL.reduce((a, b) => (b.combo > a.combo ? b : a), PL[0]),
+    combo = CP.combo,
+    comboT = CP.comboT;
   if (combo > 1) {
     const sz = 30 + Math.min(combo, 30) * 0.8 + (comboT > 95 ? 6 : 0);
     ctx.textAlign = 'right';

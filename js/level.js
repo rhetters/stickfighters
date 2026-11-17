@@ -60,11 +60,11 @@ function startLevel(id) {
 }
 // After a KO: back to the last checkpoint with full health. Score and the level clock carry on.
 function continueLevel() {
-  const keep = { score, maxc, meter };
+  const keep = { score, maxc, meter: PL[0].meter };
   init();
   score = keep.score;
   maxc = keep.maxc;
-  meter = keep.meter;
+  PL[0].meter = keep.meter;
   LV.encs.forEach((e, i) => {
     if (i > LV.cp) {
       e.st = 0;

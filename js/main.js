@@ -9,7 +9,7 @@ let paused = false,
 const gridC = document.createElement('canvas'),
   coarseMQ = matchMedia('(pointer:coarse)'),
   portraitMQ = matchMedia('(orientation:portrait) and (pointer:coarse)');
-const SCREENS = ['s-title', 's-pause', 's-settings', 's-binds', 's-over', 's-clear'];
+const SCREENS = ['s-title', 's-lobby', 's-pause', 's-settings', 's-binds', 's-over', 's-clear'];
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
   $('ui').hidden = !id;
@@ -37,6 +37,8 @@ function openTitle() {
   state = 'menu';
   paused = false;
   releaseAll();
+  ROSTER = [];
+  applyTouchVis();
   document.body.classList.remove('train');
   $('trainpanel').hidden = true;
   newSeed();
@@ -113,7 +115,8 @@ function over() {
 function applyTouchVis() {
   $('wrap').classList.toggle(
     'touch-on',
-    SET.touch === 'on' || (SET.touch === 'auto' && (coarseMQ.matches || sawTouch))
+    (SET.touch === 'on' || (SET.touch === 'auto' && (coarseMQ.matches || sawTouch))) &&
+      !(ROSTER.length && devSlot('touch') < 0)
   );
 }
 function applySet() {
