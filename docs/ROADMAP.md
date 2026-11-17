@@ -346,6 +346,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **Players screen (Mario Kart style):** each player picks one of the saved fighters or plays as a guest, and can change color and hat for that session: with their controller (left/right = fighter, top button = color, left button = hat) or by tapping their card. No two players get the same color, and names that match get a number.
 - **Back up / Restore** (Settings → Save): the whole save as a text code to copy, or a file to keep. Restoring reads it as data only, shows what's in it, asks for a second press, keeps a copy of the old save, then reloads.
 - **Save version 4** adds the wallet, owned items and fighters, migrating from every older version.
+- **M10 patch (Rhett's 16 fixes, November 16):** tabs became Body, Colors, Head (hair, hats, bands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge and Poses, each with a None card; 143 items. Trails became Surge styles (the glow and afterimages when you use Surge). Victory poses became a **pose wheel**: up to 4 poses (the first is the victory pose); hold T, Select or POSE in a fight, aim, let go. Height setting, four fighter slots, delete a fighter, gifts show the item inside, headphones fixed, no more spinning in the preview. Save version 5.
 - Self-test fingerprints unchanged: Arcade `c87c9470`, Level `21292ab5`. Star drops use their own seeded roll, not the gameplay random sequence.
 
 ### M11 · XP, levels, skill tree

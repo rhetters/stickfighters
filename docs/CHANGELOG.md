@@ -2,6 +2,17 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M10 patch (November 16, 2026): Rhett's 16 fixes
+- Character screen tabs are now Body, Colors, Head (hair, hats, headbands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge and Poses. Sections scroll; wear one item from each section (pants, shorts, skirts and dresses are one at a time). Every section has a None card.
+- New items: 9 hairstyles, 6 ties, 7 shirts, 6 jackets (including a hood and a hero cape), 16 pants/shorts/skirts/dresses, more gloves (mittens, hand wraps, work, driving, boxing) and shoes (sneakers, high-tops, sandals, fuzzy slippers, boots, cowboy boots). 143 items in all.
+- Trails became Surge styles: they color the Surge glow, afterimages and sparkles (Lightning adds sparks, Hearts adds hearts). The Surge tab preview runs, punches and kicks with Surge on.
+- Victory became Poses: put up to 4 on your pose wheel (the first is your victory pose). In a fight, hold T (keyboard), Select/View/minus (controller) or the POSE button (touch), aim with the stick or arrows, let go to strike the pose. Moving or attacking ends it. Twirl now really turns.
+- Height setting (85%–115%), drawing only. Four fighter slots, and Delete this fighter (tap twice).
+- No more spinning and arms-up in the preview: Body and clothes tabs show your stance, Poses shows the pose.
+- Headphones fixed (the band goes over the head from the ear cup). Gifts show the item inside.
+- Save version 5 (fourth fighter slot); older fighters keep their trail as their Surge style and their victory pose at the top of the wheel.
+- Self-test fingerprints unchanged.
+
 ## M10 · Ninja stars, cosmetic store, character creation
 - Ninja stars drop from defeated enemies (more for tough ones and big combos), fly to you and go in your wallet; wave and level clears give more. A star counter sits next to the score, and the results screen shows what you earned.
 - Captains drop gifts with a random gift-only item.
