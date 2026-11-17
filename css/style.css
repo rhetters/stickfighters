@@ -1147,14 +1147,39 @@ body.padnav #ui select:focus {
   font-size: 10px;
 }
 #ch-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: 6px;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-  padding: 2px 4px 6px 2px;
-  align-content: start;
+  padding: 0 4px 6px 2px;
+}
+#ch-grid h4 {
+  margin: 6px 0 4px;
+  font:
+    900 15px Impact,
+    'Arial Black',
+    sans-serif;
+  letter-spacing: 0.5px;
+}
+#ch-grid h4 small {
+  font:
+    700 11px 'Trebuchet MS',
+    sans-serif;
+  color: #7a6e80;
+  letter-spacing: 0;
+}
+.chshelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 6px;
+}
+.chdel {
+  margin-top: 6px;
+  border-color: #b8202c !important;
+  color: #b8202c !important;
+}
+.chdel.warn {
+  background: #e8212b !important;
+  color: #fff !important;
 }
 #ch-grid[hidden],
 #ch-body[hidden] {
@@ -1358,4 +1383,37 @@ body.padnav #ui select:focus {
   margin-right: 2px;
   background: #1c1626;
   border: 0;
+}
+/* Pose wheel touch button (M10 patch): hold it, aim with the stick, let go */
+#posebtn {
+  position: absolute;
+  z-index: 4;
+  left: calc(50% + 34px);
+  top: 11%;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 20px;
+  border: 3px solid #1c1626;
+  background: rgba(255, 248, 238, 0.85);
+  font:
+    900 13px Impact,
+    sans-serif;
+  color: #1c1626;
+  display: none;
+  touch-action: none;
+}
+.playing.touch-on #posebtn {
+  display: block;
+}
+#posebtn.on {
+  background: #ffd400;
+}
+.chtab i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0;
+  vertical-align: 2px;
 }

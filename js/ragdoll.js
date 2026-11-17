@@ -391,13 +391,44 @@ function drawRag(f, a) {
     s = f.s,
     fl = f.flash > 0,
     c1 = fl ? INK : f.col,
-    c2 = fl ? INK : f.d2;
+    c2 = fl ? INK : f.d2,
+    lk = f.look,
+    lw = (lk ? lk.lw : 7) * Math.pow(s, 0.7),
+    // a bigger head (character creation) sits further out along the neck
+    hk = lk ? lk.head : 1,
+    nx = Q[0].x - Q[1].x,
+    ny = Q[0].y - Q[1].y,
+    nd = Math.hypot(nx, ny) || 1,
+    hx = Q[0].x + (nx / nd) * 9 * s * (hk - 1),
+    hy = Q[0].y + (ny / nd) * 9 * s * (hk - 1),
+    pt = i => [Q[i].x, Q[i].y],
+    J = lk
+      ? {
+          hd: [hx, hy],
+          hr: 9 * s * hk,
+          nk: pt(1),
+          sh: pt(2),
+          hp: pt(4),
+          ea: pt(5),
+          h: pt(6),
+          eb: pt(7),
+          hb: pt(8),
+          kf: pt(9),
+          f: pt(10),
+          kb: pt(11),
+          fb: pt(12),
+          face: f.face,
+          s,
+          lw,
+          col: c1
+        }
+      : null;
+  if (J) drawLookUnder(f, J, a);
   ctx.save();
   ctx.globalAlpha = a;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  const lk = f.look;
-  ctx.lineWidth = (lk ? lk.lw : 7) * Math.pow(s, 0.7);
+  ctx.lineWidth = lw;
   const L = (c, ids) => {
     ctx.strokeStyle = c;
     ctx.beginPath();
@@ -410,35 +441,11 @@ function drawRag(f, a) {
   L(c1, [4, 3, 2, 1]);
   L(c1, [4, 9, 10]);
   L(c1, [2, 5, 6]);
-  // a bigger head (character creation) sits further out along the neck
-  const hk = lk ? lk.head : 1,
-    nx = Q[0].x - Q[1].x,
-    ny = Q[0].y - Q[1].y,
-    nd = Math.hypot(nx, ny) || 1,
-    hx = Q[0].x + (nx / nd) * 9 * s * (hk - 1),
-    hy = Q[0].y + (ny / nd) * 9 * s * (hk - 1);
   ctx.beginPath();
   ctx.arc(hx, hy, 9 * s * hk, 0, 7);
   ctx.stroke();
   ctx.restore();
-  if (lk) {
-    const pt = i => [Q[i].x, Q[i].y];
-    drawLook(
-      f,
-      {
-        hd: [hx, hy],
-        hr: 9 * s * hk,
-        nk: pt(1),
-        h: pt(6),
-        hb: pt(8),
-        f: pt(10),
-        fb: pt(12),
-        face: f.face,
-        s
-      },
-      a
-    );
-  }
+  if (J) drawLook(f, J, a);
 }
 // Tornado Kick drawing: the fighter stays upright and turns around its own vertical axis, one leg locked straight out.
 // The leg's sideways reach is cos(angle); when it swings behind the body it's drawn in the back colour, before the body.
@@ -535,12 +542,20 @@ function drawTatsu(f, a, fl) {
         hd: [x + f.face * 3 * s, hy0],
         hr: 9 * s * hk,
         nk: [x + f.face * 2 * s, shY - 4 * s],
+        sh: [x, shY],
+        hp: [x, hipY],
+        ea: el,
         h: hd,
+        eb: el2,
         hb: hd2,
+        kf: knee,
         f: leg,
+        kb: tk,
         fb: tf,
         face: f.face,
-        s
+        s,
+        lw: lw0 * Math.pow(s, 0.7),
+        col: c1
       },
       a
     );

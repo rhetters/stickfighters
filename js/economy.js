@@ -70,17 +70,16 @@ function checkUnlocks(extra) {
   }
   return got;
 }
-// A gift from a Captain: one random item from the gift pool you don't own yet, or stars if you have them all.
-// r is a number 0..1 from the drop's own seeded roll.
-function openGift(r) {
-  const pool = ITEMS.filter(i => i.how && i.how.drop && !owns(i.id));
-  if (!pool.length) {
+const giftPool = () => ITEMS.filter(i => i.how && i.how.drop && !owns(i.id));
+// A gift from a Captain: the item chosen when it dropped (pickups.js), or 40 stars if there was none left to give
+// or you got it some other way meanwhile.
+function openGift(id) {
+  if (!id || owns(id)) {
     grantStars(40, 'gift');
     return null;
   }
-  const it = pool[Math.floor(r * pool.length) % pool.length];
-  grantItem(it.id, 'gift');
-  return it;
+  grantItem(id, 'gift');
+  return ITEM[id];
 }
 // ===== SAVED FIGHTERS =====
 // Darker shade of a colour, for the far arm and leg.
@@ -90,15 +89,19 @@ function shade(hex, k) {
   return '#' + [f(n >> 16), f((n >> 8) & 255), f(n & 255)].map(v => v.toString(16).padStart(2, '0')).join('');
 }
 // A fighter with every field present and valid: unknown or unowned items are taken off, odd numbers clamped.
+// Older fighters: eq.trail became eq.surge, and eq.pose (one victory pose) became the pose wheel.
 function normFighter(c) {
   const d = FIGHTER0,
     f = c && typeof c === 'object' ? c : {},
+    fe = (f.eq && typeof f.eq === 'object' && f.eq) || {},
+    ok = (id, slot) => !!id && !!ITEM[id] && ITEM[id].slot === slot && owns(id),
     eq = {};
-  for (const s of SLOTS)
-    if (s.id !== 'color') {
-      const id = f.eq && f.eq[s.id];
-      eq[s.id] = id && ITEM[id] && ITEM[id].slot === s.id && owns(id) ? id : d.eq[s.id];
-    }
+  for (const s of EQ) {
+    const id = s === 'surge' && !('surge' in fe) ? fe.trail : fe[s];
+    eq[s] = ok(id, s) ? id : null;
+  }
+  const w0 = Array.isArray(f.wheel) ? f.wheel : fe.pose ? [fe.pose, ...d.wheel] : d.wheel,
+    wheel = [...new Set(w0)].filter(id => ok(id, 'pose')).slice(0, WHEEL_MAX);
   const num = (v, lo, hi, def) =>
     typeof v === 'number' && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : def;
   return {
@@ -108,25 +111,39 @@ function normFighter(c) {
         .replace(/[^A-Z0-9 !?.-]/g, '')
         .slice(0, 10)
         .trim() || d.name,
-    col: ITEM[f.col] && ITEM[f.col].slot === 'color' && owns(f.col) ? f.col : d.col,
+    col: ok(f.col, 'color') ? f.col : d.col,
+    ht: Math.round(num(f.ht, 0.85, 1.15, 1) * 20) / 20,
     head: Math.round(num(f.head, 0.8, 1.4, 1) * 10) / 10,
     lw: Math.round(num(f.lw, 5, 10, 7)),
     stance: STANCES.some(s => s.id === f.stance) ? f.stance : d.stance,
-    eq
+    eq,
+    wheel: wheel.length ? wheel : ['pose-flex']
   };
 }
 const fighter = i => (CHR.list[i] ? normFighter(CHR.list[i]) : null);
 const curFighter = () => fighter(CHR.cur) || normFighter(FIGHTER0);
-// What the renderer needs to draw a fighter: colours and the item objects for each slot.
-function lookOf(c) {
-  const f = normFighter(c),
-    col = ITEM[f.col].c,
-    L = { col, d2: shade(col, -0.22), head: f.head, lw: f.lw, stance: f.stance, name: f.name };
-  for (const s in f.eq) L[s] = f.eq[s] ? ITEM[f.eq[s]] : null;
+// What the renderer needs to draw a fighter: colours, sizes, the item object for each slot, and the pose wheel.
+// lookRaw skips the ownership check (the store's try-on preview); everything in the game uses lookOf.
+function lookRaw(f) {
+  const col = ITEM[f.col].c,
+    L = { col, d2: shade(col, -0.22), ht: f.ht, head: f.head, lw: f.lw, stance: f.stance, name: f.name };
+  for (const s of EQ) L[s] = f.eq[s] ? ITEM[f.eq[s]] : null;
+  L.wheel = f.wheel.map(id => ITEM[id]).filter(Boolean);
+  L.pose = L.wheel[0] || ITEM['pose-flex'];
   return L;
 }
+const lookOf = c => lookRaw(normFighter(c));
 function saveFighter(i, c) {
   CHR.list[i] = normFighter(c);
+  ecoSave(true);
+}
+// Delete a saved fighter. If it was the current one, the first fighter left becomes current.
+function deleteFighter(i) {
+  CHR.list[i] = null;
+  if (CHR.cur === i) {
+    const n = CHR.list.findIndex(Boolean);
+    CHR.cur = n < 0 ? 0 : n;
+  }
   ecoSave(true);
 }
 // End of a run: bank anything still on the ground, check unlocks, and write the stars line for the results screen.

@@ -309,6 +309,18 @@ $('b-next').onclick = () => (MODE === VERSUS ? startVersus() : startLevel(LV.id)
 $('b-title2').onclick = openTitle;
 $('b-title').onclick = openTitle;
 $('pausebtn').onclick = () => pause(true);
+// Pose wheel on touch (M10 patch): hold POSE, aim with the stick, let go to strike the pose
+{
+  const pb = $('posebtn'),
+    on = v => e => {
+      e.preventDefault();
+      pb.classList.toggle('on', v);
+      setA('tc', 'e', v);
+    };
+  pb.addEventListener('pointerdown', on(1));
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) pb.addEventListener(ev, on(0));
+  pb.addEventListener('pointerdown', e => pb.setPointerCapture && pb.setPointerCapture(e.pointerId));
+}
 // training panel + hotkeys (1/2/3 spawn, 0 clear, H boxes, [ ] speed, \ freeze, . step)
 function syncTrain() {
   document

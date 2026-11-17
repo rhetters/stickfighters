@@ -21,4 +21,4 @@ const dust = (x, y, n) => {
 };
 const txt = (x, y, t, c, sz = 16) => fxp({ k: 't', x, y, t, c, sz, l: 40, m: 40 });
 const ghost = (f, c) =>
-  GH.push({ x: f.x, y: f.y, face: f.face, pose: f.pose.slice(), s: f.s, col: c || f.col, l: 9 });
+  GH.push({ x: f.x, y: f.y, face: f.face, pose: f.pose.slice(), s: f.s, col: c || f.col, l: 9, own: f });

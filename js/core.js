@@ -21,14 +21,15 @@ let SET = { ...DEF },
 // Ninja stars and owned cosmetics (M10). Change these only through economy.js (grantStars, spendStars, grantItem).
 //   stars = wallet, got = stars ever earned, own = item ids owned, seen = item ids already shown as NEW
 const ECO = { stars: 0, got: 0, own: [], seen: [] };
-// Saved fighters (M10): three slots, cur = the one Player 1 uses. A slot is null until it's created.
-const CHR = { cur: 0, list: [null, null, null] };
+// Saved fighters (M10): four slots, cur = the one Player 1 uses. A slot is null until it's created.
+const CHR = { cur: 0, list: [null, null, null, null] };
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
 //   v2 (M8): adds prog = { levelId: { done, score, time, combo } }
 //   v3: adds set.binds = custom keys and controller buttons (null = defaults)
 //   v4 (M10): adds eco = { stars, got, own, seen } and chr = { cur, list: [fighter|null] x3 }
-const SAVE_VERSION = 4;
+//   v5 (M10 patch): a fourth fighter slot; fighters gain ht and wheel (normFighter upgrades old fighters)
+const SAVE_VERSION = 5;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -42,6 +43,10 @@ function migrate(s) {
     s.eco = s.eco || { stars: 0, got: 0, own: [], seen: [] };
     s.chr = s.chr || { cur: 0, list: [null, null, null] };
     s.saveVersion = 4;
+  }
+  if (s.saveVersion === 4) {
+    if (s.chr && Array.isArray(s.chr.list)) while (s.chr.list.length < 4) s.chr.list.push(null);
+    s.saveVersion = 5;
   }
   return s;
 }
@@ -57,8 +62,8 @@ function loadSave(s) {
   ECO.own = ids(e.own);
   ECO.seen = ids(e.seen);
   const c = s.chr || {};
-  CHR.list = [0, 1, 2].map(i => (c.list && c.list[i] && typeof c.list[i] === 'object' ? c.list[i] : null));
-  CHR.cur = [0, 1, 2].includes(c.cur) ? c.cur : 0;
+  CHR.list = [0, 1, 2, 3].map(i => (c.list && c.list[i] && typeof c.list[i] === 'object' ? c.list[i] : null));
+  CHR.cur = [0, 1, 2, 3].includes(c.cur) ? c.cur : 0;
 }
 try {
   loadSave(migrate(JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')));

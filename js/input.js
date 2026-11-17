@@ -3,7 +3,8 @@
 // Every device (keyboard, touch, gamepad) calls setA(); nothing else reads raw input.
 //   l r  move        u d  aim (the direction held when an attack is pressed picks the branch in M2)
 //   j    jump        p k  punch / kick        s  Surge (hold)        x  ultimate
-const ACT = ['l', 'r', 'u', 'd', 'j', 'p', 'k', 's', 'x'];
+//   e    pose wheel (hold, aim to pick a pose, let go to strike it; looks only)
+const ACT = ['l', 'r', 'u', 'd', 'j', 'p', 'k', 's', 'x', 'e'];
 // One input slot per player (M4 groundwork for M9 multiplayer). Devices feed slot 0 today; M9 maps a second device to slot 1.
 const mkSlot = () => {
   const I = {
@@ -25,7 +26,7 @@ let K = INP[0].K,
   press = INP[0].press,
   AIM = INP[0].AIM,
   SRG = INP[0].SRG;
-const SYM = { l: '←', r: '→', u: '↑', d: '↓', j: 'JUMP', p: 'P', k: 'K', s: 'SURGE', x: 'ULT' };
+const SYM = { l: '←', r: '→', u: '↑', d: '↓', j: 'JUMP', p: 'P', k: 'K', s: 'SURGE', x: 'ULT', e: 'POSE' };
 // ===== PLAYERS AND DEVICES (M9) =====
 // ROSTER = the players in a multiplayer game: [{ slot, dev, col, d2, name }], where dev is 'touch', 'kb' (the main
 // keyboard keys), 'kb2' (arrows + number pad) or 'pad:N' (controller N). Empty = one player, and every device drives
@@ -46,7 +47,8 @@ const KB2 = {
   Numpad1: 'p',
   Numpad2: 'k',
   Numpad3: 's',
-  NumpadEnter: 'x'
+  NumpadEnter: 'x',
+  Numpad4: 'e'
 };
 const kb2Act = e =>
   devSlot('kb2') >= 0 && ROSTER.length ? KB2[e.code] || KB2[(e.key || '').toLowerCase()] : null;
@@ -108,7 +110,7 @@ addEventListener('pointerdown', unlockAudio, { passive: true });
 // SET.binds = { kb: {action: [keys]}, pad: {controllerType: {action: [button numbers]}} }.
 // Controller buttons use the browser's standard layout: 0 bottom, 1 right, 2 left, 3 top face button, 4/5 bumpers,
 // 6/7 triggers, 8 select/minus, 9 start/plus, 10/11 stick clicks, 12-15 d-pad up/down/left/right.
-const BIND_ACTS = ['l', 'r', 'u', 'd', 'j', 'p', 'k', 's', 'x', 'pause'];
+const BIND_ACTS = ['l', 'r', 'u', 'd', 'j', 'p', 'k', 's', 'x', 'e', 'pause'];
 const KEYDEF = {
   l: ['arrowleft', 'a'],
   r: ['arrowright', 'd'],
@@ -119,6 +121,7 @@ const KEYDEF = {
   k: ['k'],
   s: ['shift', 'l'],
   x: ['u'],
+  e: ['t'],
   pause: ['escape', 'p']
 };
 const PADDEF = {
@@ -131,6 +134,7 @@ const PADDEF = {
   k: [1],
   s: [4, 5, 6, 7],
   x: [3],
+  e: [8],
   pause: [9]
 };
 let KEYS = {};
@@ -138,7 +142,8 @@ const kbBinds = () => (SET.binds && SET.binds.kb) || KEYDEF;
 function applyBinds() {
   KEYS = {};
   const B = kbBinds();
-  for (const a of BIND_ACTS) for (const k of B[a] || []) KEYS[k] = a;
+  // an action missing from older saved bindings (the pose wheel) uses its default keys
+  for (const a of BIND_ACTS) for (const k of (a in B ? B[a] : KEYDEF[a]) || []) KEYS[k] = a;
 }
 applyBinds();
 // Controller type: the same model of controller shares one mapping on this device.
@@ -342,7 +347,7 @@ function pollPad() {
       prev = padPrev[g.index] || [],
       down = i => now[i] && !prev[i],
       M = padBinds(g),
-      any = a => (M[a] || []).some(B);
+      any = a => ((a in M ? M[a] : PADDEF[a]) || []).some(B);
     padPrev[g.index] = now;
     if (CAP && CAP.dev === 'pad') {
       const i = now.findIndex((v, n) => v && !prev[n]);
@@ -363,7 +368,7 @@ function pollPad() {
       setA('gp', 'r', ax(0) > 0.4 || any('r'), slot);
       setA('gp', 'u', ax(1) < -0.5 || any('u'), slot);
       setA('gp', 'd', ax(1) > 0.5 || any('d'), slot);
-      for (const a of ['j', 'p', 'k', 's', 'x']) setA('gp', a, any(a), slot);
+      for (const a of ['j', 'p', 'k', 's', 'x', 'e']) setA('gp', a, any(a), slot);
     }
     // Start pauses; on the pause menu it resumes. Any controller can pause.
     if ((M.pause || []).some(down)) {

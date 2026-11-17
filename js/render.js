@@ -79,8 +79,9 @@ function stars(x, y) {
   ctx.restore();
 }
 // ===== RENDER =====
-// hk = head size (1 = normal; character creation can change it)
-function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk) {
+// hk = head size (1 = normal; character creation can change it). out (optional) receives the joint positions,
+// and under(out) (optional) draws things that go behind the body, such as a cape.
+function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, under) {
   const th = 15 * s,
     sh = 15 * s,
     ua = 13 * s,
@@ -116,6 +117,14 @@ function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk) {
     out.sh = R(sho);
     out.nk = R(neck);
     out.hr = hr;
+    out.ea = R(eA);
+    out.eb = R(eB);
+    out.hp = R([x, hy]);
+    out.kf = R(kF);
+    out.kb = R(kB);
+    out.lw = lw * Math.pow(s, 0.7);
+    out.col = col;
+    if (under) under(out);
   }
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -152,18 +161,14 @@ function drawF(f) {
     const t = f.trail;
     ctx.save();
     ctx.lineCap = 'round';
+    ctx.strokeStyle = f.col;
     for (let i = 1; i < t.length; i++) {
-      ctx.strokeStyle = trailCol(f, i, t.length);
       ctx.globalAlpha = 0.1 + (0.4 * i) / t.length;
       ctx.lineWidth = 4 + i * 2.4;
       ctx.beginPath();
       ctx.moveTo(t[i - 1][0], t[i - 1][1]);
       ctx.lineTo(t[i][0], t[i][1]);
       ctx.stroke();
-    }
-    if (f.look && f.look.trail && f.look.trail.c === 'hearts') {
-      ctx.globalAlpha = 1;
-      for (let i = 1; i < t.length; i += 2) heart(t[i][0], t[i][1], 3 + i * 0.6);
     }
     ctx.restore();
   }
@@ -179,23 +184,35 @@ function drawF(f) {
   }
   const o = {},
     L = f.look,
-    pz = L ? lookPose(f) : f.pose;
+    pz = L ? lookPose(f) : f.pose,
+    ds = f.s * (L ? L.ht : 1), // height (character creation) is drawing only
+    fa = a * (1 - rA);
   if (!(rOn && R.blend >= 1)) {
+    ctx.save();
+    if (pz.sx !== undefined) {
+      // Twirl: squash sideways to fake turning on the spot
+      ctx.translate(f.x, 0);
+      ctx.scale(Math.abs(pz.sx) < 0.08 ? 0.08 * Math.sign(pz.sx || 1) : pz.sx, 1);
+      ctx.translate(-f.x, 0);
+    }
     drawFig(
       f.x + vib,
-      f.y + (lying ? 26 * f.s : 0),
+      f.y + (lying ? 26 * ds : 0),
       f.face,
       pz,
-      f.s,
+      ds,
       fl ? INK : f.col,
       fl ? INK : f.d2,
       pz[9],
-      a * (1 - rA),
+      fa,
       L ? L.lw : 7,
       o,
-      L ? L.head : 1
+      L ? L.head : 1,
+      L ? U => drawLookUnder(f, { ...U, face: f.face, s: ds }, fa) : null
     );
-    if (L) drawLook(f, { ...o, h: o.h, hb: o.hb, f: o.f, fb: o.fb, face: f.face, s: f.s }, a * (1 - rA));
+    if (L) drawLook(f, { ...o, face: f.face, s: ds }, fa);
+    ctx.restore();
+    if (f.wheel && L) drawWheel(f);
   }
   if (!f.dying && (f.st === 'down' || f.st === 'getup') && !(f.pl && f.st === 'dead'))
     stars(R ? R.p[0].x : f.x, (R ? R.p[0].y : f.y - 50 * f.s) - 16); // dazed
@@ -601,15 +618,21 @@ function render() {
     ctx.fill();
   }
   for (const g of GH) {
-    drawFig(g.x, g.y, g.face, g.pose, g.s, g.col, g.col, g.pose[9], (g.l / 9) * 0.35, 7);
+    // Surge afterimages take the owner's Surge style (M10 patch)
+    const c = g.col === '#ffd400' && g.own && g.own.look ? surgeCol(g.own.look, g.l + fr) : g.col,
+      gs = g.s * (g.own && g.own.look ? g.own.look.ht : 1);
+    drawFig(g.x, g.y, g.face, g.pose, gs, c, c, g.pose[9], (g.l / 9) * 0.35, 7);
   }
   for (const e of E) drawF(e);
   drawPickups();
   for (const p of PL) {
     use(p);
     if (K.s && live() && P.st !== 'dead' && !STM.winded) {
-      const pul = 0.45 + 0.2 * Math.sin(fr * 0.4);
-      drawFig(P.x, P.y, P.face, P.pose, P.s, '#ffd400', '#ffd400', P.pose[9], pul, 17);
+      const pul = 0.45 + 0.2 * Math.sin(fr * 0.4),
+        sc = surgeCol(P.look, fr >> 2),
+        hs = P.s * (P.look ? P.look.ht : 1);
+      drawFig(P.x, P.y, P.face, P.pose, hs, sc, sc, P.pose[9], pul, 17);
+      surgeExtra(P);
       if (fr % 4 === 0)
         fxp({
           k: 'd',
@@ -620,7 +643,7 @@ function render() {
           r: 2 + Math.random() * 2,
           l: 16,
           m: 16,
-          c: '#ffd400'
+          c: surgeCol(P.look, fr)
         });
     }
     drawF(P);

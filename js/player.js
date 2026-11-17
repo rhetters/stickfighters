@@ -356,6 +356,24 @@ function updP() {
   }
   f.blk = 0;
   if (f.blkT > 0) f.blkT--;
+  // Pose wheel (M10 patch; looks only): hold the pose button on the ground to stand still and aim at one of four
+  // poses, let go to strike it. Moving, jumping, Surge or attacking ends the pose.
+  if (f.emote && (f.st !== 'free' || K.l || K.r || K.j || K.p || K.k || K.s || K.x)) f.emote = null;
+  if (f.st === 'free' && K.e && f.y >= G - 1) {
+    f.wheel = f.wheel || { sel: 0 };
+    f.wheel.sel = K.u ? 0 : K.r ? 1 : K.d ? 2 : K.l ? 3 : f.wheel.sel;
+    f.vx *= 0.78;
+    f.running = 0;
+    for (const b of ['p', 'k', 'j', 'x', 'd']) eat(b);
+    smooth(f, freePose(f), 0.3);
+    phys(f);
+    ragTick(f);
+    return;
+  }
+  if (f.wheel) {
+    f.emote = { i: f.wheel.sel };
+    f.wheel = null;
+  }
   if (f.st === 'free') {
     const g = f.y >= G - 1,
       m = (K.r ? 1 : 0) - (K.l ? 1 : 0);

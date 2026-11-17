@@ -11,6 +11,7 @@ const ACTNAME = {
   k: 'Kick',
   s: 'Surge (+ Down = block)',
   x: 'Ultimate',
+  e: 'Pose wheel (hold)',
   pause: 'Pause'
 };
 const KEYNAME = {
@@ -107,11 +108,13 @@ function bindsFor(dev, g) {
   SET.binds = SET.binds || {};
   if (dev === 'kb') {
     if (!SET.binds.kb) SET.binds.kb = JSON.parse(JSON.stringify(KEYDEF));
+    for (const a of BIND_ACTS) if (!(a in SET.binds.kb)) SET.binds.kb[a] = KEYDEF[a].slice();
     return SET.binds.kb;
   }
   SET.binds.pad = SET.binds.pad || {};
   const t = padType(g);
   if (!SET.binds.pad[t]) SET.binds.pad[t] = JSON.parse(JSON.stringify(PADDEF));
+  for (const a of BIND_ACTS) if (!(a in SET.binds.pad[t])) SET.binds.pad[t][a] = PADDEF[a].slice();
   return SET.binds.pad[t];
 }
 function renderBinds() {
@@ -137,7 +140,8 @@ function renderBinds() {
     row.className = 'brow';
     lab.textContent = ACTNAME[a];
     ch.className = 'chips';
-    for (const v of M[a] || []) {
+    const cur = (a in M ? M[a] : (pad ? PADDEF : KEYDEF)[a]) || [];
+    for (const v of cur) {
       const b = document.createElement('button');
       b.className = 'chip';
       b.textContent = (pad ? btnName(v, g) : keyName(v)) + ' ×';
@@ -150,7 +154,7 @@ function renderBinds() {
       };
       ch.appendChild(b);
     }
-    if (!(M[a] || []).length) {
+    if (!cur.length) {
       const n = document.createElement('i');
       n.textContent = 'none';
       ch.appendChild(n);
