@@ -1119,7 +1119,8 @@ const SURGE = {
   runSpeed: 7.5,
   jumpCost: 15,
   hopCost: 15,
-  slideCost: 10
+  slideCost: 10,
+  blockDrain: 8
 };
 // Chart name, effect shown in the readout, effect code used by the hit system, unlock tier (M10 gates tiers; everything is open until then).
 const INFO = {

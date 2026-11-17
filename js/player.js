@@ -199,6 +199,25 @@ function init() {
   spawnT = 0;
 }
 // ===== PLAYER =====
+// Kneeling block pose. It trembles harder as the Surge bar empties, and flinches when a hit is blocked.
+function blockPose(f) {
+  const weak = 1 - STM.v / SURGE.max,
+    amp = 1 + weak * 7 + (f.blkT > 0 ? f.blkT * 0.8 : 0),
+    j = Math.sin(f.t * 1.9) * amp,
+    j2 = Math.cos(f.t * 2.3) * amp;
+  return [
+    10 + j * 0.6 - (f.blkT || 0) * 0.8,
+    85 + j2,
+    85 + j,
+    65 - j2,
+    105 - j,
+    90,
+    90 + j * 0.3,
+    -15,
+    75,
+    0
+  ];
+}
 function updP() {
   const f = P;
   f.t++;
@@ -298,9 +317,24 @@ function updP() {
     if (f.t % 2 === 0 && f.att && (f.att.d.cost || f.att.d.dmg >= 9 || f.att.d.dive))
       ghost(f, f.att.d.cost ? '#ffd400' : 0);
   }
+  f.blk = 0;
+  if (f.blkT > 0) f.blkT--;
   if (f.st === 'free') {
     const g = f.y >= G - 1,
       m = (K.r ? 1 : 0) - (K.l ? 1 : 0);
+    // Block: Down + Surge, standing still on the ground. Drains Surge slowly while held (see blockHit).
+    if (g && K.d && K.s && !m && !f.flip && canSurge()) {
+      f.blk = 1;
+      f.vx *= 0.6;
+      if (!infS()) {
+        STM.v -= SURGE.blockDrain / 60;
+        STM.last = fr;
+        if (STM.v <= 0) {
+          wind();
+          f.blk = 0;
+        }
+      }
+    }
     if (g) {
       f.jumps = 0;
       f.hop = 0;
@@ -402,8 +436,9 @@ function updP() {
         f.pose[9] = f.flip > 0 ? (1 - f.flip / 24) * 360 : 0;
         tp = TUCK;
       } else
-        tp =
-          f.running && g
+        tp = f.blk
+          ? blockPose(f)
+          : f.running && g
             ? runPose(f)
             : STM.winded && g && !m
               ? [TIRED[0] + Math.sin(f.t * 0.25) * 4, ...TIRED.slice(1)]

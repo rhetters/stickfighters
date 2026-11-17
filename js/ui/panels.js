@@ -90,7 +90,7 @@ function renderMoves() {
     DONE.size +
     ' of ' +
     tot +
-    ' tried.</b> Keys: P = J, K = K, ↑ = W, ↓ = S, S = Shift (hold), Jump = Space. Touch: PUNCH, KICK, stick up/down, SURGE. For strings, press again while the move plays.</p>';
+    ' tried.</b> Keys: P = J, K = K, ↑ = W, ↓ = S, S = Shift (hold), Jump = Space. Block = S + ↓ while standing still (hits from the front cost Surge instead of health). Touch: PUNCH, KICK, stick up/down, SURGE. For strings, press again while the move plays.</p>';
   for (const [t, rows] of MOVELIST) {
     h += '<h3>' + t + '</h3><table>';
     for (const [i, k] of rows) {

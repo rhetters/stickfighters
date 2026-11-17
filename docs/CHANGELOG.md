@@ -2,6 +2,11 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Combat patch (November 16, 2026)
+- Block: Down + Surge, standing still. Hits from the front cost Surge instead of health, no stun; the kneeling pose trembles more as Surge drains; Winded when it runs out, then hits land.
+- Ground hits: downed enemies can be hit (half damage, ragdoll flop) without extending their knockdown.
+- Self-test fingerprints: Arcade `c87c9470`, Level `21292ab5`.
+
 ## M8 · Level framework and Level 1: Wooded Trail
 - Modes: Arcade and Level run on the same engine. Title: Play Wooded Trail / Arcade: Endless Waves.
 - Wooded Trail: 6 chunks, 5 ambushes, a breakable fallen log, checkpoints with Continue, level-clear screen with time bonus.

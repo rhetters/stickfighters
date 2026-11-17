@@ -140,7 +140,7 @@ function tickAtk(f) {
       if (
         a.hit.has(e) ||
         e.gone ||
-        (e.st === 'down' && (!d.otg || e.otgU)) ||
+        (!f.pl && e.st === 'down' && (!d.otg || e.otgU)) ||
         e.st === 'getup' ||
         e.st === 'held'
       )
@@ -153,7 +153,8 @@ function tickAtk(f) {
           block(e, d, dr);
           continue;
         }
-        if (f.pl) {
+        if (f.pl && e.st === 'down' && (!d.otg || e.otgU)) groundHit(e, d, dr, f);
+        else if (f.pl) {
           hurtE(
             e,
             d.spikeAt && a.f >= d.spikeAt
@@ -164,6 +165,8 @@ function tickAtk(f) {
             dr,
             f
           );
+        }
+        if (f.pl) {
           if (diving && !d.area) {
             f.vy = -8;
             f.vx = -f.face * 3;
@@ -500,7 +503,52 @@ function hurtE(e, d, dr, src) {
     if (!queue.length && E.every(x => x.dying)) slow = 55;
   }
 }
+// Ground hits (combat patch): a downed enemy can still be hit. Half damage and a ragdoll flop, but the hit never
+// adds down time or juggle count, so it gets up when its knockdown runs out. A finishing hit uses the normal path.
+function groundHit(e, d, dr, src) {
+  if (e.dying) return;
+  const dmg = Math.max(1, Math.round((d.dmg || 4) * 0.5));
+  if (e.hp - dmg <= 0) return hurtE(e, { ...d, ef: 'kd' }, dr, src);
+  e.hp -= dmg;
+  e.flash = 4;
+  e.hs = 3;
+  e.lh = fr;
+  e.vx += (dr * 2) / (e.T.m || 1);
+  e.ri = { dr, ef: wtOf(d) === 'H' ? 'launch' : 'kd' };
+  spark(e.x, e.y - 18, 14, '#ffd400');
+  sfxHit('L');
+  stop = Math.max(stop, 2);
+  combo++;
+  comboT = 100;
+  maxc = Math.max(maxc, combo);
+}
+// Block (combat patch): hold Down + Surge while standing still. Hits from the front cost Surge instead of health,
+// with no stun. When the bar runs out you're Winded, the block drops, and hits land again.
+function blockHit(q, d, dr) {
+  const S = q.stm,
+    cost = Math.max(6, (d.dmg || d.adm || 6) * 2);
+  q.vx = dr * Math.min(6, 1.5 + (d.kb || 4) * 0.35);
+  q.blkT = 10;
+  spark(q.x - dr * 16, q.y - 46, 16, '#ffd400');
+  txt(q.x, q.y - 112, 'BLOCK', '#e8a400', 15);
+  sfx(520, 0.07, 'square', 0.05, -250);
+  noise(0.05, 0.06, 2500);
+  stop = Math.max(stop, 3);
+  shake = Math.max(shake, 3);
+  if (infS()) return;
+  S.v -= cost;
+  S.last = fr;
+  if (S.v <= 0) {
+    S.v = 0;
+    const k = P;
+    use(q);
+    wind();
+    use(k);
+    q.blk = 0;
+  }
+}
 function hurtP(q, d, dr) {
+  if (q.blk && dr === -q.face && q.st === 'free' && !q.inv) return blockHit(q, d, dr);
   if (state === 'train' && TR.god) return;
   if (q.inv > 0 || q.st === 'dead' || (q.att && q.att.d.invul)) return;
   if (q.st === 'grab' && q.gt) {

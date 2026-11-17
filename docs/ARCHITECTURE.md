@@ -58,7 +58,7 @@ localStorage key `orangeArmy.v1` (never change it) holds `{saveVersion, set, bes
 
 Open the game with `?selftest`. It resets feel knobs to defaults, plays 3,600 frames of Arcade waves with scripted inputs, adds a Guard, Flanker and Captain, plays 1,800 more frames, and fingerprints positions, health, states, score, wave and the random generator. Then it plays up to 7,200 frames of the Wooded Trail with scripted inputs (it never saves progress) and fingerprints the level state. Run it before and after any refactor; the fingerprints must not change. A gameplay change is expected to change them: note the new values in the CHANGELOG.
 
-Current fingerprints: Arcade `39f01735`, Level `8c67f67e`.
+Current fingerprints: Arcade `c87c9470`, Level `21292ab5` (since the combat patch).
 
 ## Still assuming a flat world
 

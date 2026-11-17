@@ -28,7 +28,7 @@ linked from rhetters.github.io). Read docs/VISION.md before designing anything n
 See docs/ARCHITECTURE.md (keep it updated). Roadmap: docs/ROADMAP.md. History: docs/CHANGELOG.md.
 
 ## Checks
-- `index.html?selftest` prints two determinism fingerprints (Arcade `39f01735`, Level `8c67f67e`). A refactor must not
+- `index.html?selftest` prints two determinism fingerprints (Arcade `c87c9470`, Level `21292ab5`). A refactor must not
   change them; a gameplay change will, so record the new value in CHANGELOG.md and ARCHITECTURE.md.
 - No console errors on load, in play, and in the Training Room.
 - iPad checklist: README "Test checklist".

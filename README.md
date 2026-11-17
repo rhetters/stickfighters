@@ -21,6 +21,7 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 | Jump (twice for a flip) | Space | JUMP | A |
 | Punch / Kick | J / K | PUNCH / KICK | X / B |
 | Surge (hold, or tap on/off: Settings → Surge button): run through enemies, super jump, Surge moves | Shift | SURGE | Bumpers / triggers |
+| Block (hits from the front cost Surge instead of health; drops when Surge runs out) | Shift + S, standing still | SURGE + stick down | Bumper + d-pad down |
 | Grab | J + K together | PUNCH + KICK | X + B |
 | Tornado Kick (blue meter full) | U | ULT | Y |
 | Pause | Esc or P | II | Start |
@@ -48,6 +49,7 @@ Only a few enemies attack at once; the rest circle at a distance waiting their t
 - Wooded Trail: the camera stops for each fight, GO → appears after each, the log blocks the way until smashed, Continue after a KO, and the level-clear screen at the arch.
 - Custom touch layouts still appear, and drag, resize, save and delete work.
 - Combos from each Move List section (A–G), Surge moves, Winded, grab and all four throws, Tornado Kick.
+- Block (Surge + down, standing still): kneels and shakes harder as Surge drains; hits from behind and hits after Surge runs out land. Hitting a downed enemy flops it around and it still gets up on time.
 - A Guard breaking, a Flanker leap, a Captain on wave 5 (enrages at about half health).
 - Ragdolls, death poses, confetti cleanup.
 - Training Room: spawn 1–6, hitboxes, frame data, speeds, freeze/step, Feel / Moves / Info.

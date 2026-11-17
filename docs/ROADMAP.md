@@ -272,6 +272,12 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **Self-test:** a second fingerprint plays the Wooded Trail with scripted inputs (`8c67f67e`); the Arcade fingerprint is unchanged (`39f01735`).
 - **Decision gate G1 (platforms):** still open. The trail is flat; M14 decides on platforms.
 
+
+**Combat patch (after M8, at Rhett's request):**
+
+- **Block:** Down + Surge while standing still. Kneeling guard that shakes harder as the Surge bar empties. Blocked hits from the front cost Surge (2× the hit's damage) with a small pushback and no stun; holding the block drains 8 Surge per second. When Surge runs out you're Winded, the block drops, and hits land normally. Hits from behind are never blocked.
+- **Ground hits:** a knocked-down enemy can be hit by any move. Half damage and a ragdoll flop, but no extra down time and no juggle count, so it stands up when its original knockdown ends. A finishing hit on the ground kills it normally.
+- Self-test fingerprints are now Arcade `c87c9470`, Level `21292ab5`.
 ### M9 · Local multiplayer: co-op and versus
 
 **Goal:** Up to four people play on one screen (the TV setup): together through levels, or against each other in an arena.
@@ -498,6 +504,7 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 | S+D+K | Phase Sweep | Slide through enemies while sweeping | Trips everyone in path | 20 |
 | S+J, then P | Air Rave | Four hovering aerial hits | Spike | 25 |
 | S+J, then K | Comet Kick | Surge dive, longer reach | Splat, Knockdown | 25 |
+| S+Down (standing still) | Block | Kneel with arms up; trembles harder as Surge drains | Hits from the front cost Surge (2× the hit's damage) instead of health, no stun; holding drains 8/s; when Surge runs out you're Winded and hits land | 8/s + per hit |
 
 **Stamina starting values:** max 100, regen 25 per second after a 0.6 second delay, empty bar means a 1.5 second Winded state. All tunable.
 
@@ -533,7 +540,7 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 5. **Grab and throw.** Decided: yes, built in M4. Punch + Kick together grabs, and a throw sends the enemy into others.
 6. **Unlock approach.** For now every move is unlocked, and each carries its tier (FST-1, LEG-2 and so on) so M10 can lock them. Decide before M10: start with base strings and unlock the rest, or start with everything and unlock upgrades?
 7. **Level style.** I assumed side-scrolling levels with “GO →” prompts, rather than single-screen arenas. Decide before M8.
-8. **Defense for versus.** Versus needs a way to block or avoid hits, such as holding Back to block, with a parry on a well-timed press. It would also help against bosses. Decide before M9 (versus).
+8. **Defense for versus.** Decided (combat patch, November 16): hold **Down + Surge** while standing still to block. Hits from the front cost Surge instead of health with no stun or dizziness; the kneeling pose trembles more as Surge drains; when Surge runs out you're Winded and hits land. Hits from behind always land.
 
 ## Suggested next step
 
