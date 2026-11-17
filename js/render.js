@@ -79,9 +79,11 @@ function stars(x, y) {
   ctx.restore();
 }
 // ===== RENDER =====
-// hk = head size (1 = normal; character creation can change it). out (optional) receives the joint positions,
-// and under(out) (optional) draws things that go behind the body, such as a cape.
-function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, under) {
+// hk = head size (1 = normal; character creation can change it). out (optional) receives the joint positions.
+// lay (optional) = functions called with out between the body's layers so clothes sit at the right depth:
+//   under (behind everything: capes), back (after the far arm and leg), mid (after the torso and head),
+//   legs (after the near leg); whatever the caller draws afterwards lands on top of the near arm.
+function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, lay) {
   const th = 15 * s,
     sh = 15 * s,
     ua = 13 * s,
@@ -124,32 +126,43 @@ function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, under) {
     out.kb = R(kB);
     out.lw = lw * Math.pow(s, 0.7);
     out.col = col;
-    if (under) under(out);
   }
-  ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.translate(x, cy);
-  ctx.rotate(spin * face * D);
-  ctx.translate(-x, -cy);
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = lw * Math.pow(s, 0.7);
-  const L = (c, pts) => {
-    ctx.strokeStyle = c;
+  const hook = k => lay && out && lay[k] && lay[k](out),
+    L = (c, pts) => {
+      ctx.strokeStyle = c;
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      ctx.stroke();
+    },
+    layer = fn => {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(x, cy);
+      ctx.rotate(spin * face * D);
+      ctx.translate(-x, -cy);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = lw * Math.pow(s, 0.7);
+      fn();
+      ctx.restore();
+    };
+  hook('under');
+  layer(() => {
+    L(col2, [sho, eB, hB]);
+    L(col2, [[x, hy], kB, fB]);
+  });
+  hook('back');
+  layer(() => {
+    L(col, [[x, hy], neck]);
     ctx.beginPath();
-    ctx.moveTo(pts[0][0], pts[0][1]);
-    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.arc(head[0], head[1], hr, 0, 7);
     ctx.stroke();
-  };
-  L(col2, [sho, eB, hB]);
-  L(col2, [[x, hy], kB, fB]);
-  L(col, [[x, hy], neck]);
-  L(col, [[x, hy], kF, fF]);
-  L(col, [sho, eA, hA]);
-  ctx.beginPath();
-  ctx.arc(head[0], head[1], hr, 0, 7);
-  ctx.stroke();
-  ctx.restore();
+  });
+  hook('mid');
+  layer(() => L(col, [[x, hy], kF, fF]));
+  hook('legs');
+  layer(() => L(col, [sho, eA, hA]));
 }
 function drawF(f) {
   let a = 1;
@@ -208,9 +221,9 @@ function drawF(f) {
       L ? L.lw : 7,
       o,
       L ? L.head : 1,
-      L ? U => drawLookUnder(f, { ...U, face: f.face, s: ds }, fa) : null
+      L ? lookLayers(f, { face: f.face, s: ds }, fa) : null
     );
-    if (L) drawLook(f, { ...o, face: f.face, s: ds }, fa);
+    if (L) drawLook(f, { ...o, face: f.face, s: ds }, fa, 'front');
     ctx.restore();
     if (f.wheel && L) drawWheel(f);
   }

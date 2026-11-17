@@ -383,18 +383,27 @@ function drawHair(it, r, w, capped, wv) {
         w
       );
       break;
-    case 'hair-mohawk':
+    case 'hair-mohawk': {
+      // a strip of spikes that follows the curve of the head, tallest in the middle
       if (capped) return;
+      const n = 11,
+        a0 = Math.PI + 0.45,
+        a1 = 2 * Math.PI - 0.3,
+        st = (a1 - a0) / n;
       ctx.beginPath();
-      ctx.moveTo(-0.95 * r, -0.35 * r);
-      for (let i = 0; i <= 6; i++) {
-        const a = Math.PI + 0.3 + (i / 6) * (Math.PI - 0.8),
-          q = i % 2 ? 1.75 : 1.0;
-        ctx.lineTo(Math.cos(a) * r * q, Math.sin(a) * r * q);
+      ctx.moveTo(Math.cos(a0) * r * 0.9, Math.sin(a0) * r * 0.9);
+      for (let i = 0; i < n; i++) {
+        const t = (i + 0.5) / n,
+          a = a0 + st * (i + 0.5),
+          h = 1.3 + 0.38 * Math.sin(Math.PI * t);
+        ctx.lineTo(Math.cos(a - st * 0.15) * r * h, Math.sin(a - st * 0.15) * r * h);
+        ctx.lineTo(Math.cos(a0 + st * (i + 1)) * r * 1.02, Math.sin(a0 + st * (i + 1)) * r * 1.02);
       }
+      ctx.arc(0, 0, r * 0.9, a1, a0, true);
       ctx.closePath();
-      shapeDo(c, w);
+      shapeDo(c, w * 0.45);
       break;
+    }
     case 'hair-afro':
       if (capped) {
         ctx.beginPath();
@@ -579,15 +588,13 @@ function drawJacket(it, J, front) {
   }
 }
 // Pants, shorts, skirts, tutus and dresses (the "legs" slot)
-function drawLegs(it, J) {
+// which = 'back' / 'front' (one pant leg) or 'over' (skirts, tutus, dresses)
+function drawLegs(it, J, which) {
   const lw = J.lw,
     c = it.c,
     k = it.k;
   if (k === 'pants' || k === 'shorts') {
-    for (const [kn, ft, back] of [
-      [J.kb, J.fb, 1],
-      [J.kf, J.f, 0]
-    ]) {
+    for (const [kn, ft, back] of which === 'back' ? [[J.kb, J.fb, 1]] : [[J.kf, J.f, 0]]) {
       if (!kn || !ft) continue;
       const col = back ? shade(c === '#ffffff' ? '#f0ece2' : c, -0.12) : c;
       if (k === 'pants') {
@@ -600,7 +607,7 @@ function drawLegs(it, J) {
           col
         );
     }
-    if (it.c2 && k === 'shorts') seg([J.hp, lerp2(J.hp, J.sh, 0.08)], lw * 2.3, it.c2);
+    if (it.c2 && k === 'shorts' && which === 'front') seg([J.hp, lerp2(J.hp, J.sh, 0.08)], lw * 2.3, it.c2);
     return;
   }
   const u = unit(sub(J.sh, J.hp)),
@@ -684,13 +691,17 @@ function drawTie(it, J) {
     );
     return;
   }
-  const end = fw(lerp2(J.nk, J.hp, 0.62), 1.15 + Math.sin(fr * 0.15) * 0.1);
-  inked([top, end], lw * 0.65, it.c);
-  if (it.c2) {
-    ctx.setLineDash([lw * 0.35, lw * 0.35]);
-    seg([top, end], lw * 0.65, it.c2);
-    ctx.setLineDash([]);
-  }
+  // a real tie: a knot, then a blade that widens and ends in a point, lying on the chest
+  const sw = Math.sin(fr * 0.15) * 0.08,
+    P = (t, k) => fw(lerp2(J.nk, J.hp, t), 0.85 + k + sw * t),
+    // across = the direction across the chest (along the body's forward axis)
+    ax = n,
+    pt = (t, half) => [P(t, 0)[0] + ax[0] * half * lw, P(t, 0)[1] + ax[1] * half * lw];
+  poly([pt(0.04, -0.32), pt(0.04, 0.32), pt(0.14, 0.2), pt(0.14, -0.2)], it.c, 1.6);
+  const blade = [pt(0.14, -0.2), pt(0.14, 0.2), pt(0.52, 0.42), pt(0.6, 0), pt(0.52, -0.42)];
+  poly(blade, it.c, 1.6);
+  if (it.c2)
+    for (const t of [0.24, 0.36, 0.48]) seg([pt(t - 0.03, -0.3), pt(t + 0.03, 0.3)], lw * 0.18, it.c2);
 }
 // ===== GLOVES AND SHOES =====
 function drawGlove(it, J, back) {
@@ -843,77 +854,94 @@ function drawShoe(f, it, J, back) {
   });
 }
 // ===== THE WHOLE LOOK =====
-function drawLook(f, J, a) {
+// The look is drawn in layers between the body's own lines (see drawFig's lay): phase 'back' after the far arm
+// and leg, 'mid' after the torso and head, 'legs' after the near leg, 'front' after the near arm. No phase = all.
+function lookLayers(f, extra, a) {
+  const go = ph => o => drawLook(f, { ...o, ...extra }, a, ph);
+  return {
+    under: o => drawLookUnder(f, { ...o, ...extra }, a),
+    back: go('back'),
+    mid: go('mid'),
+    legs: go('legs')
+  };
+}
+function drawLook(f, J, a, ph) {
   const L = f.look;
   if (!L || !J.hd || !J.nk) return;
+  if (!ph) {
+    for (const p of ['back', 'mid', 'legs', 'front']) drawLook(f, J, a, p);
+    return;
+  }
   const s = J.s,
     r = J.hr,
     w = 2.2 * Math.pow(s, 0.7),
     wv = Math.sin(fr * 0.22 + (f.slot || 0)) * 0.35,
-    body = J.sh && J.hp;
+    body = J.sh && J.hp,
+    pants = L.legs && (L.legs.k === 'pants' || L.legs.k === 'shorts');
   J.lw = J.lw || 7 * Math.pow(s, 0.7);
   ctx.save();
   ctx.globalAlpha = a;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  if (body) {
-    if (L.legs && (L.legs.k === 'pants' || L.legs.k === 'shorts')) drawLegs(L.legs, J);
-    if (L.shoes) {
-      drawShoe(f, L.shoes, J, 1);
-      drawShoe(f, L.shoes, J, 0);
-    }
-    if (L.shirt) drawShirt(L.shirt, J, 0);
-    if (L.jacket) drawJacket(L.jacket, J, 0);
-    if (L.shirt) drawShirt(L.shirt, J, 1);
-    if (L.legs && L.legs.k !== 'pants' && L.legs.k !== 'shorts') drawLegs(L.legs, J);
-    if (L.jacket) drawJacket(L.jacket, J, 1);
-    // the front arm goes back on top of the clothes, then its sleeves
-    if ((L.shirt || L.jacket || (L.legs && L.legs.k === 'dress')) && J.ea && J.h)
-      seg([J.sh, J.ea, J.h], J.lw, J.col || f.col);
-    if (L.shirt) drawShirt(L.shirt, J, 2);
-    if (L.jacket) drawJacket(L.jacket, J, 2);
-    if (L.tie) drawTie(L.tie, J);
-  } else if (L.shoes) {
-    drawShoe(f, L.shoes, J, 1);
-    drawShoe(f, L.shoes, J, 0);
+  if (ph === 'back') {
+    if (body && pants) drawLegs(L.legs, J, 'back');
+    if (L.shoes) drawShoe(f, L.shoes, J, 1);
+    if (body && L.shirt) drawShirt(L.shirt, J, 0);
+    if (body && L.jacket) drawJacket(L.jacket, J, 0);
+    if (L.gloves) drawGlove(L.gloves, J, 1);
+  } else if (ph === 'mid') {
+    if (body && L.shirt) drawShirt(L.shirt, J, 1);
+    if (body && L.jacket) drawJacket(L.jacket, J, 1);
+    lookHead(f, J, L, r, w, wv);
+  } else if (ph === 'legs') {
+    if (body && pants) drawLegs(L.legs, J, 'front');
+    if (L.shoes) drawShoe(f, L.shoes, J, 0);
+    if (body && L.legs && !pants) drawLegs(L.legs, J, 'over');
+    if (body && L.tie) drawTie(L.tie, J);
+    if (L.scarf) lookScarf(f, J, L, r, w, wv);
+  } else {
+    if (body && L.shirt) drawShirt(L.shirt, J, 2);
+    if (body && L.jacket) drawJacket(L.jacket, J, 2);
+    if (L.gloves) drawGlove(L.gloves, J, 0);
   }
-  if (L.gloves) {
-    drawGlove(L.gloves, J, 1);
-    drawGlove(L.gloves, J, 0);
-  }
-  if (L.scarf)
-    headFrame(J, J.nk, () => {
-      // the tail hangs down when standing and streams out behind when moving fast
-      const c = L.scarf.c,
-        m = Math.min(1, Math.abs(f.vx || 0) / 6),
-        ex = -(1.3 + 1.3 * m) * r,
-        ey = (1.75 - 1.2 * m + wv * 0.6) * r,
-        cx = -(0.9 + 0.5 * m) * r,
-        cy = (0.35 + wv * 0.5) * r;
-      inked(
-        [
-          [-0.3 * r, 0.25 * r],
-          [cx, cy, ex, ey]
-        ],
-        0.5 * r,
-        c
-      );
-      if (L.scarf.c2) {
-        ctx.setLineDash([0.28 * r, 0.32 * r]);
-        ctx.strokeStyle = L.scarf.c2;
-        ctx.lineWidth = 0.5 * r;
-        ctx.beginPath();
-        ctx.moveTo(-0.5 * r, 0.27 * r);
-        ctx.quadraticCurveTo(cx, cy, ex, ey);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
+  ctx.restore();
+}
+function lookScarf(f, J, L, r, w, wv) {
+  headFrame(J, J.nk, () => {
+    // the tail hangs down when standing and streams out behind when moving fast
+    const c = L.scarf.c,
+      m = Math.min(1, Math.abs(f.vx || 0) / 6),
+      ex = -(1.3 + 1.3 * m) * r,
+      ey = (1.75 - 1.2 * m + wv * 0.6) * r,
+      cx = -(0.9 + 0.5 * m) * r,
+      cy = (0.35 + wv * 0.5) * r;
+    inked(
+      [
+        [-0.3 * r, 0.25 * r],
+        [cx, cy, ex, ey]
+      ],
+      0.5 * r,
+      c
+    );
+    if (L.scarf.c2) {
+      ctx.setLineDash([0.28 * r, 0.32 * r]);
+      ctx.strokeStyle = L.scarf.c2;
+      ctx.lineWidth = 0.5 * r;
       ctx.beginPath();
-      ctx.ellipse(0, 0.25 * r, 0.75 * r, 0.32 * r, 0, 0, 7);
-      shapeDo(c, w);
-    });
+      ctx.moveTo(-0.5 * r, 0.27 * r);
+      ctx.quadraticCurveTo(cx, cy, ex, ey);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.beginPath();
+    ctx.ellipse(0, 0.25 * r, 0.75 * r, 0.32 * r, 0, 0, 7);
+    shapeDo(c, w);
+  });
+}
+function lookHead(f, J, L, r, w, wv) {
   headFrame(J, J.hd, () => {
-    if (L.hair) drawHair(L.hair, r, w, !!L.hat, wv);
+    // halos and headphones don't cover the top of the head, so the hair stays
+    if (L.hair) drawHair(L.hair, r, w, !!L.hat && !L.hat.open, wv);
     if (L.band) {
       inked(
         [
@@ -935,7 +963,6 @@ function drawLook(f, J, a) {
     }
     if (L.hat) drawHat(L.hat, r, w);
   });
-  ctx.restore();
 }
 // ===== SURGE STYLES =====
 // The colour of Surge for a look (the glow, afterimages and sparkles); classic yellow without a style.
@@ -1053,11 +1080,8 @@ function lookPose(f) {
       !f.flip &&
       !f.pose[9],
     W = f.look.wheel || [],
-    id = cheering(f)
-      ? f.look.pose && f.look.pose.id
-      : f.emote && idle && W[f.emote.i]
-        ? W[f.emote.i].id
-        : null;
+    em = f.emote && idle && W.length ? W[wheelSeg(f.emote.d, W.length)] : null,
+    id = cheering(f) ? f.look.pose && f.look.pose.id : em ? em.id : null;
   if (id && id !== k.id) k.vt = 0;
   if (id) k.id = id;
   k.st += ((idle && !id ? 1 : 0) - k.st) * 0.15;
@@ -1076,42 +1100,52 @@ function lookPose(f) {
   }
   return p;
 }
-// The pose wheel over a fighter holding the pose button: up, right, down, left
+// Which of n wheel slices an aimed direction picks (d in eighths of a turn from up; slice 0 is at the top)
+const wheelSeg = (d, n) => Math.round(((d || 0) * 45) / (360 / n)) % n;
+// The pose wheel over a fighter holding the pose button: up to 8 slices, the first at the top, going clockwise.
+// It stays the same size however many poses are on it; long names are cut short.
 function drawWheel(f) {
   const W = (f.look && f.look.wheel) || [],
+    n = Math.max(1, W.length),
     cx = f.x,
-    cy = f.y - 150 * f.s,
-    R = 44;
+    cy = f.y - 160 * f.s,
+    R = 80,
+    r0 = 16,
+    sel = wheelSeg(f.wheel.d, n),
+    step = (Math.PI * 2) / n,
+    maxW = n === 1 ? 120 : n <= 2 ? 100 : n <= 4 ? 70 : n <= 6 ? 50 : 40;
   ctx.save();
-  ctx.globalAlpha = 0.92;
-  ctx.fillStyle = 'rgba(28,22,38,.55)';
-  ctx.beginPath();
-  ctx.arc(cx, cy, R + 26, 0, 7);
-  ctx.fill();
-  ctx.textAlign = 'center';
-  ctx.font = '900 12px "Trebuchet MS",sans-serif';
-  [
-    [0, -1],
-    [1, 0],
-    [0, 1],
-    [-1, 0]
-  ].forEach(([dx, dy], i) => {
-    const x = cx + dx * R,
-      y = cy + dy * R,
-      on = f.wheel.sel === i,
-      nm = W[i] ? W[i].name.toUpperCase() : '—';
-    const tw = Math.max(46, ctx.measureText(nm).width + 12);
-    ctx.fillStyle = on ? '#ffd400' : '#fff8ee';
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = on ? 3 : 2;
+  ctx.lineJoin = 'round';
+  for (let i = 0; i < n; i++) {
+    const a0 = -Math.PI / 2 + (i - 0.5) * step;
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(x - tw / 2, y - 11, tw, 22, 8);
-    else ctx.rect(x - tw / 2, y - 11, tw, 22);
+    if (n === 1) ctx.arc(cx, cy, R, 0, 7);
+    else {
+      ctx.moveTo(cx + Math.cos(a0) * r0, cy + Math.sin(a0) * r0);
+      ctx.arc(cx, cy, R, a0, a0 + step);
+      ctx.arc(cx, cy, r0, a0 + step, a0, true);
+      ctx.closePath();
+    }
+    ctx.fillStyle = i === sel ? 'rgba(255,212,0,.95)' : 'rgba(255,248,238,.9)';
     ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2;
     ctx.stroke();
-    ctx.fillStyle = W[i] ? INK : '#7a6e80';
-    ctx.fillText(nm, x, y + 4);
-  });
+  }
+  ctx.font = '900 ' + (n >= 6 ? 9 : 11) + 'px "Trebuchet MS",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = INK;
+  for (let i = 0; i < n; i++) {
+    const a = -Math.PI / 2 + i * step,
+      rr = n === 1 ? R * 0.55 : (R + r0) / 2 + 8;
+    let t = W[i] ? W[i].name.toUpperCase() : '—';
+    if (ctx.measureText(t).width > maxW) {
+      while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+      t += '…';
+    }
+    ctx.fillText(t, cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+  }
   ctx.restore();
 }
 // ===== ITEM PICTURES =====
@@ -1184,8 +1218,8 @@ function drawItemIcon(it, cx, cy, sz, baseCol) {
     drawFig(x, y, 1, pz, sc, surgeCol(L, 0), surgeCol(L, 0), 0, 0.5, 15, null, 1);
   }
   const J = {};
-  drawFig(x, y, 1, pz, sc, col, L.d2, pz[9], 1, 7, J, 1, U => drawLookUnder(f, { ...U, face: 1, s: sc }, 1));
-  drawLook(f, { ...J, face: 1, s: sc, col }, 1);
+  drawFig(x, y, 1, pz, sc, col, L.d2, pz[9], 1, 7, J, 1, lookLayers(f, { face: 1, s: sc }, 1));
+  drawLook(f, { ...J, face: 1, s: sc, col }, 1, 'front');
   ctx.restore();
 }
 function withAlpha0(fn) {

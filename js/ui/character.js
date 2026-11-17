@@ -242,6 +242,8 @@ function renderShelf(c) {
     keep =
       document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.id : null,
     base = ITEM[c.col].c;
+  // rebuilding the shelves would jump back to the top, so keep the scroll position (patch 2)
+  const top = g.scrollTop;
   g.innerHTML = '';
   let legsDone = false;
   for (const sec of tab.secs) {
@@ -317,6 +319,7 @@ function renderShelf(c) {
       seen = 1;
     }
   if (seen) ecoSave();
+  g.scrollTop = top;
   if (keep) {
     const b = g.querySelector('[data-id="' + keep + '"]');
     if (b) b.focus({ preventScroll: true });
@@ -431,10 +434,22 @@ function charAnim() {
       k.scale(Math.abs(pose.sx) < 0.08 ? 0.08 * Math.sign(pose.sx || 1) : pose.sx, 1);
       k.translate(-f.x, 0);
     }
-    drawFig(f.x, f.y, 1, pose, sc, L.col, L.d2, pose[9], 1, L.lw, o, L.head, U =>
-      drawLookUnder(f, { ...U, face: 1, s: sc }, 1)
+    drawFig(
+      f.x,
+      f.y,
+      1,
+      pose,
+      sc,
+      L.col,
+      L.d2,
+      pose[9],
+      1,
+      L.lw,
+      o,
+      L.head,
+      lookLayers(f, { face: 1, s: sc }, 1)
     );
-    drawLook(f, { ...o, face: 1, s: sc }, 1);
+    drawLook(f, { ...o, face: 1, s: sc }, 1, 'front');
     k.restore();
     if (surge) surgeExtra(f);
   });

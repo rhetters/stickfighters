@@ -78,7 +78,10 @@ Backups (Settings → Save) are `"OVPA-"` + base64 of the save's JSON. Restoring
 - `dropScan()` gives each newly dying enemy its stars once (`e.dropped`). Pickups (`PK`) bounce, then fly to the nearest player and are banked on touch. Their rolls come from `dropRoll()`, a hash of `SEED`, `fr` and the enemy's index that never advances `rnd()`, and pickups never touch fighters, so the fingerprints did not change. `collectAll()` banks what's left at the end of a run (`runEnd`).
 - A player's look is `p.look` (from `lookOf()`): colors, head size, line width, stance and the item object per slot. It's drawing only: `drawFig` takes a head size and line width, then `drawLook` draws items on the joints it reports (`out.hd`, `nk`, `h`, `hb`, `f`, `fb`, `hr`). `drawRag` and `drawTatsu` report their own joints. `lookPose()` blends the idle stance and the victory pose at draw time; its blend state lives in a `WeakMap`, never on the fighter.
 - Height (`look.ht`) scales only the drawing in `drawF` (ragdolls keep their size); hitboxes never change.
-- Pose wheel: action `e` (T, Select, touch POSE). While it's held on the ground `updP` keeps the player still and stores the aimed slot in `f.wheel.sel`; letting go sets `f.emote = {i}`. Moving, jumping, Surge or attacking clears it. Nothing else reads these, so a fight plays the same with or without poses; `lookPose()` draws the pose from the fighter's wheel and `drawWheel()` the wheel. Older saved key/button bindings without `e` use its defaults.
+- Clothes are drawn in layers between the body's own lines: `drawFig(…, lay)` and `drawRag` call `lay.under/back/mid/legs` (from `lookLayers()`) after the far limbs, torso and head, and near leg; the caller then draws `drawLook(…, 'front')` over the near arm. So the far hand sits behind a dress and ties and scarves sit under the near arm.
+- Pose wheel: action `e` (T, Select, touch POSE). While it's held on the ground `updP` keeps the player still and stores the aimed direction in `f.wheel.d` (eighths of a turn from up); letting go sets `f.emote = {d}`. `wheelSeg(d, n)` turns a direction into one of the n (up to 8) slices when drawing. Moving, jumping, Surge or attacking clears it. Nothing else reads these, so a fight plays the same with or without poses; `lookPose()` draws the pose from the fighter's wheel and `drawWheel()` the wheel. Older saved key/button bindings without `e` use its defaults.
+- `MODE.locked(p)` (Versus after a KO) makes `use(p)` read `NO_INPUT`, an idle slot, so the players can't move.
+- Controller menus (`navMove`) pick the nearest control in the pressed direction by on-screen position.
 - Surge afterimages (`GH`) remember their owner (`own`) so they can be drawn in the owner's Surge style.
 - `withCtx(canvas2d, fn)` points every drawing function at another canvas (store icons, the character preview, Players screen cards).
 
@@ -90,4 +93,4 @@ Current fingerprints: Arcade `c87c9470`, Level `21292ab5` (since the combat patc
 
 ## Still assuming a flat world
 
-The ground is flat everywhere (`groundY` returns `G`), and several places compare against `G` directly (`f.y>=G-1`, `bowl`, `sep`, death poses). M14 (platforms) routes these through `groundY()` or an `onGround(f)` helper.
+The ground is flat everywhere (`groundY` returns `G`), and several places compare against `G` directly (`f.y>=G-1`, `bowl`, `sep`, death poses). M15 (platforms) routes these through `groundY()` or an `onGround(f)` helper.

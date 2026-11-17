@@ -1417,3 +1417,14 @@ body.padnav #ui select:focus {
   font-size: 0;
   vertical-align: 2px;
 }
+/* iPad: Safari may not pass the controller to the page until the screen has been touched once (patch 2) */
+#press .tapalso {
+  display: none;
+  font-size: 0.32em;
+  letter-spacing: 1px;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+.touch-on #press .tapalso {
+  display: block;
+}

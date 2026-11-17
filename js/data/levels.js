@@ -9,7 +9,7 @@
 //   enc    an encounter: the camera stops so that x = at is the middle of the screen, and the list of enemies
 //          drops in from the treetops, at most `max` fighting at once. lvl = toughness (same scale as Arcade waves).
 //   gate   an obstacle that blocks the trail until broken: { k: 'log', x, hp }
-// The M16 level creator will save chunks in this same format, and M12's generator will pick chunks from pools.
+// The M17 level creator will save chunks in this same format, and M13's generator will pick chunks from pools.
 const CHUNKS = {
   trailhead: {
     w: 1100,
@@ -103,7 +103,7 @@ const LEVELS = {
     name: 'WOODED TRAIL',
     num: 1,
     theme: 'woods',
-    next: 'Sewer Entrance (coming in M12)',
+    next: 'Sewer Entrance (coming in M13)',
     chunks: ['trailhead', 'birches', 'fallenlog', 'clearing', 'grove', 'trailend']
   },
   arena: { name: 'THE CLEARING', num: 0, theme: 'woods', next: '', chunks: ['arena'] }
