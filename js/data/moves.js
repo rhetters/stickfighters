@@ -1109,7 +1109,7 @@ for (const n of [
   'tornado'
 ])
   A[n].limb = 'f';
-// Every Surge number lives here so the skill tree (M10) can change them.
+// Every Surge number lives here so the skill tree (M11) can change them.
 const SURGE = {
   max: 100,
   regen: 25,
@@ -1122,7 +1122,7 @@ const SURGE = {
   slideCost: 10,
   blockDrain: 8
 };
-// Chart name, effect shown in the readout, effect code used by the hit system, unlock tier (M10 gates tiers; everything is open until then).
+// Chart name, effect shown in the readout, effect code used by the hit system, unlock tier (M11 gates tiers; everything is open until then).
 const INFO = {
   jab: ['Jab', 'Stagger', 'stagger', 'Start'],
   cross: ['Cross', 'Stagger', 'stagger', 'Start'],

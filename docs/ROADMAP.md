@@ -10,9 +10,9 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 
 **Why this order.** Input comes first because every combo depends on knowing which direction is held. Then the combat engine, then Surge (your stamina system), because Surge modifies moves. Collision feel and ragdoll come before levels and progression, since you called them the core of the game and there’s no point building five levels on combat that will change. Progression and the shop come once there’s a real level to earn XP in. Levels 2–6 come last, when the systems stop moving.
 
-**Where things stand.** M0 to M9 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M10 is next.
+**Where things stand.** M0 to M9 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M10 (ninja stars, store, character creation) is next.
 
-**Why this order after M7 (reordered November 16, 2026).** Ron and Rhett approved the order from the restructure plan. M8 builds the level framework so the world is no longer one screen and each game type is a separate "mode". Local multiplayer comes next (M9) so Rhett gets Smash-style versus early, and because network play later needs the same per-player groundwork. Progression (M10) and the ninja star store with character creation (M11) follow, then the rest of the campaign (M12–M15, ending in the v1.0 release). The level creator, network play and the house builder come after that. The old numbers are listed under "Renumbering" below.
+**Why this order after M7 (reordered November 16, 2026).** Ron and Rhett approved the order from the restructure plan. M8 builds the level framework so the world is no longer one screen and each game type is a separate "mode". Local multiplayer comes next (M9) so Rhett gets Smash-style versus early, and because network play later needs the same per-player groundwork. The ninja star store with character creation (M10) and then progression with the skill tree (M11) follow (swapped on November 16 at Rhett's request), then the rest of the campaign (M12–M15, ending in the v1.0 release). The level creator, network play and the house builder come after that. The old numbers are listed under "Renumbering" below.
 
 ## Ground rules
 
@@ -37,15 +37,15 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 | M7.5 | Restructure: files, docs, self-test | Done | M | M7 | Same game; code split into files, docs in the repo, `?selftest` determinism check |
 | M8 | Level framework, modes, Level 1: Wooded Trail | Done | L | M7.5 | Scrolling level with parallax layers; the wave game becomes Arcade mode |
 | M9 | Local multiplayer: co-op and versus | Done | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
-| M10 | XP, levels, skill tree | Next | L | M3, M8 | Level-ups, skill points, tree screen |
-| M11 | Ninja stars, cosmetic store, character creation | Planned | L | M10 | Star drops, store by slot, create and dress your fighter, save backup |
-| M12 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M11 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
+| M10 | Ninja stars, cosmetic store, character creation | Next | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
+| M11 | XP, levels, skill tree | Planned | L | M3, M8, M10 | Level-ups, skill points, tree screen |
+| M12 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M10, M11 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
 | M13 | Boss level | Planned | L | M12 | Multi-phase boss fight |
 | M14 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M15 | Polish, audio, balance, v1.0 release | Planned | L | M8–M14 | Release candidate |
 | M16 | Level creator | Planned | L | M8, M12 | Rhett builds levels that join the procedural pools |
 | M17 | Network multiplayer on home Wi-Fi | Planned | XL | M9 | Each kid on their own iPad, co-op first, then versus |
-| M18 | House builder and visiting | Planned | L | M11, M17 | Build a house with stars, invite friends over |
+| M18 | House builder and visiting | Planned | L | M10, M17 | Build a house with stars, invite friends over |
 | Someday | Cloud saves, Steam | Maybe | — | — | Desktop app, Steam Workshop, server-backed stars |
 
 ## Milestone details
@@ -92,7 +92,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 
 **Done when:** Every row in sections A–D is playable, hits correctly, and shows frame data in the training room.
 
-**Status: complete.** All 30 moves in sections A–D work and land every hit of their strings, mixed finishers included. Also added: the hit effects in section F (basic Splat and Bounce; M4 adds the full physics), a juggle cap of 7, damage scaling in long combos (4% less per hit after the third, never below 45%), a get-up with protection, player knockdown, and motion smears on heavy moves. The training room's Move list (M key) ticks off every chart row as you land it. Every move is unlocked until M10 (see Open decisions).
+**Status: complete.** All 30 moves in sections A–D work and land every hit of their strings, mixed finishers included. Also added: the hit effects in section F (basic Splat and Bounce; M4 adds the full physics), a juggle cap of 7, damage scaling in long combos (4% less per hit after the third, never below 45%), a get-up with protection, player knockdown, and motion smears on heavy moves. The training room's Move list (M key) ticks off every chart row as you land it. Every move is unlocked until M11 (see Open decisions).
 
 ### M3 · Surge (stamina) system
 
@@ -103,7 +103,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 - Surge jump: higher, longer, with an air burst.
 - Surge strings: Combat Chart section E. Holding Surge swaps each branch to its Surge version.
 - Visuals: yellow afterimages, speed lines, bar flash when low.
-- Every number is tunable (max, regen, costs) so the skill tree can change them in M10.
+- Every number is tunable (max, regen, costs) so the skill tree can change them in M11.
 
 **Done when:** You can chain Surge run, phase through a crowd, and finish with Surge strings, with the bar draining and recovering predictably.
 
@@ -317,18 +317,33 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **Versus:** The Clearing arena, 2–4 players, free-for-all, best of 3 rounds: countdown, 60-second rounds, last one standing (or the most health when time runs out), slow-motion KO, winner screen and Rematch. Light hits stagger briefly so strings connect; launches and knockdowns give protection until you're back up (no juggles in versus yet); long combos scale down faster than against the army. Block works in versus. Equal stats for everyone. Players push each other apart unless they're phasing with Surge.
 - **Co-op:** Wooded Trail and Arcade with 2–4 players. No friendly fire. Enemies get 35% more health and about 30% more grunts per extra player, and more can fight at once. A downed player is revived (40% health) when a teammate stands next to them for 2 seconds; if everyone is down, Continue works as before. The camera follows the player furthest along; players who fall behind are pushed along by the left edge of the screen.
 - **Choices made (Rhett can change them):** versus is last-one-standing with a health bar, free-for-all only (no 2v2 yet), and co-op revive is "stand next to them for 2 seconds".
-- **Not yet:** juggles in versus, per-player character looks (comes with M11).
+- **Not yet:** juggles in versus, per-player character looks (comes with M10).
 
 **Post-M9 patch:** title PRESS START → SOLO (Campaign | Arcade) · MULTIPLAYER (Local | Online placeholder) · Character (placeholder) · Training Room · Settings; Feel sliders in Settings for mid-match tuning; grabbing and throwing players in Versus (mash to break free; grabs beat blocks); Versus teams (free-for-all or teams, picked in the lobby).
 - Self-test fingerprints unchanged (one player): Arcade `c87c9470`, Level `21292ab5`.
 
-### M10 · XP, levels, skill tree
+### M10 · Ninja stars, cosmetic store, character creation
 
-**Goal:** A reason to keep fighting.
+**Goal:** Collect stars, spend them on your look, and make the fighter yours. Merges the old "items and shop" and "character creation" milestones.
+
+- Ninja stars drop from defeated enemies (Grunt 1–2, Runner 2–3, Brute 8–12, more for Guards, Flankers and Captains), with a bonus at high combo counts and a magnet pickup arc. They're credited at the end of a run through one function (rule R7).
+- **Store items are cosmetic only** (rule R8): heads and hats, headbands, scarves, gloves, shoes, colors, trails, victory poses. The store is organized by slot. Some items are fixed unlocks (beat a level, land a combo) and some are random drops.
+- Changed from the original shop plan: gear that changed stats, charms and bought consumables are out of the store, so purchases never make anyone stronger. Health and Surge pickups can still appear in levels as part of play.
+- Character creation: name, body color (swatches that always contrast with the pink army), head ring size, line thickness, idle stance, and equipping owned cosmetics. Live preview, randomize, three save slots. (A starting style that sets your first skill point is added in M11, with the skill tree.)
+- Accessories attach to joints and follow the ragdoll. In multiplayer, each player's look is shared as item IDs and drawn by every device.
+- **Character creation in local multiplayer** (like Mario Kart): on the Players screen, each player picks or customizes their own fighter with their own controller (or touch), side by side, before Versus or Co-op. Their name and look carry into the match, the HUD and the winner screen. Each player can load a saved fighter or tweak one for that session.
+- Save version and migrations, plus **Back up / Restore save** (a file or a text code), so hours of grinding survive Safari clearing data.
+
+**Done when:** Stars drop and collect, you can buy and equip cosmetics, create and load fighters that look right in every move and death pose, and a backup restores on another device.
+
+### M11 · XP, levels, skill tree
+
+**Goal:** A reason to keep fighting. (Moved after the store and character creation on November 16 at Rhett's request; ninja stars already exist by then, so respecs can cost stars from day one.)
 
 - XP from kills (by enemy type), combo bonuses, variety bonuses (using many different moves), no-damage bonuses, and level clears.
 - Level curve: XP needed per level = 100 × level^1.4, cap 30 for v1. One skill point per level, plus a bonus point every fifth level.
 - Skill tree screen that works by touch and controller, with tooltips and a button to preview a move’s animation. Respec costs ninja stars.
+- Starting style in character creation: Brawler, Kicker or Sprinter, which sets your first skill point.
 - Stats system: HP, damage, Surge max, regen, and costs, all editable by skills. Progress lives in the save (with a save version, rule R6).
 
 **Draft skill tree (five branches):**
@@ -342,20 +357,6 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 | Fortune | Star magnet | Bonus XP | Treasure sense (hidden chests sparkle) | Lucky Streak (combo-based star bonus) |
 
 **Done when:** Level-ups give points, spending them changes your moves and stats visibly, and everything saves.
-
-### M11 · Ninja stars, cosmetic store, character creation
-
-**Goal:** Collect stars, spend them on your look, and make the fighter yours. Merges the old "items and shop" and "character creation" milestones.
-
-- Ninja stars drop from defeated enemies (Grunt 1–2, Runner 2–3, Brute 8–12, more for Guards, Flankers and Captains), with a bonus at high combo counts and a magnet pickup arc. They're credited at the end of a run through one function (rule R7).
-- **Store items are cosmetic only** (rule R8): heads and hats, headbands, scarves, gloves, shoes, colors, trails, victory poses. The store is organized by slot. Some items are fixed unlocks (beat a level, land a combo) and some are random drops.
-- Changed from the old M10 plan: gear that changed stats, charms and bought consumables are out of the store, so purchases never make anyone stronger. Health and Surge pickups can still appear in levels as part of play.
-- Character creation: name, body color (swatches that always contrast with the pink army), head ring size, line thickness, idle stance, and equipping owned cosmetics. Starting style (Brawler, Kicker or Sprinter) sets your first skill point. Live preview, randomize, three save slots.
-- Accessories attach to joints and follow the ragdoll. In multiplayer, each player's look is shared as item IDs and drawn by every device.
-- **Character creation in local multiplayer** (like Mario Kart): on the Players screen, each player picks or customizes their own fighter with their own controller (or touch), side by side, before Versus or Co-op. Their name and look carry into the match, the HUD and the winner screen. Each player can load a saved fighter or tweak one for that session.
-- Save version and migrations, plus **Back up / Restore save** (a file or a text code), so hours of grinding survive Safari clearing data.
-
-**Done when:** Stars drop and collect, you can buy and equip cosmetics, create and load fighters that look right in every move and death pose, and a backup restores on another device.
 
 ### M12 · Levels 2–5, themes and procedural runs
 
@@ -425,9 +426,9 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 |---|---|---|
 | Level framework, Level 1 | M8 | M8 |
 | Multiplayer (local) | M12 Stages A–B | M9 |
-| XP and skill tree | M9 | M10 |
-| Ninja stars, shop | M10 | M11 (merged, cosmetics only) |
-| Character creation | M11 | M11 (merged) |
+| XP and skill tree | M9 | M11 (after the store, swapped at Rhett's request) |
+| Ninja stars, shop | M10 | M10 (merged, cosmetics only) |
+| Character creation | M11 | M10 (merged) |
 | Levels 2–5 | M13 | M12 (plus procedural runs) |
 | Boss level | M14 | M13 |
 | Platforms (optional) | M15 | M14 |
@@ -547,14 +548,14 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 ## Open decisions
 
 1. **Name of the stamina button.** Decided: **Surge**, with a yellow bar.
-2. **Phasing rules.** Decided: phasing skips enemy bodies only, so you can still be hit while running through. A skill in M10 could add dodging attacks.
+2. **Phasing rules.** Decided: phasing skips enemy bodies only, so you can still be hit while running through. A skill in M11 could add dodging attacks.
 3. **Ultimate.** Decided for now: the Tornado Kick keeps its own blue meter, separate from Surge. Renaming it Typhoon is still open.
 4. **Back moves.** Add Back+P Backfist and Back+K Back Kick, which hit behind you? Not in the chart yet.
 5. **Grab and throw.** Decided: yes, built in M4. Punch + Kick together grabs, and a throw sends the enemy into others.
-6. **Unlock approach.** For now every move is unlocked, and each carries its tier (FST-1, LEG-2 and so on) so M10 can lock them. Decide before M10: start with base strings and unlock the rest, or start with everything and unlock upgrades?
+6. **Unlock approach.** For now every move is unlocked, and each carries its tier (FST-1, LEG-2 and so on) so M11 can lock them. Decide before M11: start with base strings and unlock the rest, or start with everything and unlock upgrades?
 7. **Level style.** I assumed side-scrolling levels with “GO →” prompts, rather than single-screen arenas. Decide before M8.
 8. **Defense for versus.** Decided (combat patch, November 16): hold **Down + Surge** while standing still to block. Hits from the front cost Surge instead of health with no stun or dizziness; the kneeling pose trembles more as Surge drains; when Surge runs out you're Winded and hits land. Hits from behind always land.
 
 ## Suggested next step
 
-Next is **M10**, XP, levels and the skill tree. Before that, Rhett should try M9 with real controllers on the iPad and the TV (AirPlay mirroring vs an HDMI adapter), since that's where delay shows up.
+Next is **M10**: ninja stars, the cosmetic store and character creation, including each player customizing their own look on the Players screen in local multiplayer (like Mario Kart). The skill tree follows in M11.

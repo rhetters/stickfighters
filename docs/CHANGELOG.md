@@ -2,6 +2,10 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Roadmap: M10 and M11 swapped (November 16, 2026)
+- At Rhett's request: M10 is now ninja stars, the cosmetic store and character creation (including per-player looks in local multiplayer); M11 is XP, levels and the skill tree.
+- The starting style (Brawler, Kicker or Sprinter), which sets your first skill point, moves from character creation to M11 with the skill tree. Respecs costing stars works from day one, since stars come first.
+
 ## Menu fixes (November 16, 2026)
 - Title menu is now SOLO (splits into Campaign | Arcade) and MULTIPLAYER (splits into Local | Online; Online is a placeholder for M17), then Character, Training Room, Settings.
 - The split row sits on top of the button it replaces, so the title and other buttons no longer move or resize.
