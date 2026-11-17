@@ -18,11 +18,17 @@ let SET = { ...DEF },
   BEST = { score: 0, wave: 0, combo: 0 },
   PROG = {},
   LAST = null;
+// Ninja stars and owned cosmetics (M10). Change these only through economy.js (grantStars, spendStars, grantItem).
+//   stars = wallet, got = stars ever earned, own = item ids owned, seen = item ids already shown as NEW
+const ECO = { stars: 0, got: 0, own: [], seen: [] };
+// Saved fighters (M10): three slots, cur = the one Player 1 uses. A slot is null until it's created.
+const CHR = { cur: 0, list: [null, null, null] };
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
 //   v2 (M8): adds prog = { levelId: { done, score, time, combo } }
 //   v3: adds set.binds = custom keys and controller buttons (null = defaults)
-const SAVE_VERSION = 3;
+//   v4 (M10): adds eco = { stars, got, own, seen } and chr = { cur, list: [fighter|null] x3 }
+const SAVE_VERSION = 4;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -32,20 +38,36 @@ function migrate(s) {
     if (s.set) s.set.binds = s.set.binds || null;
     s.saveVersion = 3;
   }
+  if (s.saveVersion === 3) {
+    s.eco = s.eco || { stars: 0, got: 0, own: [], seen: [] };
+    s.chr = s.chr || { cur: 0, list: [null, null, null] };
+    s.saveVersion = 4;
+  }
   return s;
 }
+// Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).
+function loadSave(s) {
+  if (s.set && typeof s.set === 'object') Object.assign(SET, s.set);
+  if (s.best && typeof s.best === 'object') Object.assign(BEST, s.best);
+  if (s.prog && typeof s.prog === 'object') Object.assign(PROG, s.prog);
+  const e = s.eco || {},
+    ids = a => (Array.isArray(a) ? a.filter(x => typeof x === 'string').slice(0, 500) : []);
+  ECO.stars = Math.max(0, Math.floor(+e.stars || 0));
+  ECO.got = Math.max(ECO.stars, Math.floor(+e.got || 0));
+  ECO.own = ids(e.own);
+  ECO.seen = ids(e.seen);
+  const c = s.chr || {};
+  CHR.list = [0, 1, 2].map(i => (c.list && c.list[i] && typeof c.list[i] === 'object' ? c.list[i] : null));
+  CHR.cur = [0, 1, 2].includes(c.cur) ? c.cur : 0;
+}
 try {
-  const s = migrate(JSON.parse(localStorage.getItem(SAVE_KEY) || '{}'));
-  if (s.set) Object.assign(SET, s.set);
-  if (s.best) Object.assign(BEST, s.best);
-  if (s.prog) Object.assign(PROG, s.prog);
+  loadSave(migrate(JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')));
 } catch (e) {}
+const saveData = () => ({ saveVersion: SAVE_VERSION, set: SET, best: BEST, prog: PROG, eco: ECO, chr: CHR });
 const save = () => {
   try {
-    localStorage.setItem(
-      SAVE_KEY,
-      JSON.stringify({ saveVersion: SAVE_VERSION, set: SET, best: BEST, prog: PROG })
-    );
+    if (typeof SELFTESTING !== 'undefined' && SELFTESTING) return;
+    localStorage.setItem(SAVE_KEY, JSON.stringify(saveData()));
   } catch (e) {}
 };
 // ===== SEEDED RANDOM (M0): same seed = same spawns, AI rolls and particle noise =====

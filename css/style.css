@@ -999,3 +999,363 @@ body.padnav #ui select:focus {
 .split .btn {
   min-width: 0;
 }
+
+/* Character & store (M10) */
+.screen.wide {
+  justify-content: flex-start;
+  padding: 8px 12px 6px;
+  gap: 4px;
+}
+.chtop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.chtop h2 {
+  margin: 0;
+}
+#ch-slots {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+.chslot,
+.chtab,
+.chopt,
+#ch-body .chrow > button,
+#ch-rnd {
+  font:
+    800 clamp(11px, 1.5vw, 14px) 'Trebuchet MS',
+    sans-serif;
+  border: 3px solid #1c1626;
+  border-radius: 10px;
+  background: #fff8ee;
+  color: #1c1626;
+  padding: 5px 10px;
+  min-height: 34px;
+  cursor: pointer;
+}
+.chslot {
+  border-left: 10px solid var(--fc, #c9bfae);
+  min-width: 84px;
+}
+.chslot.on,
+.chtab.on,
+.chopt.on {
+  background: #ff7a00;
+  color: #fff;
+}
+.chstars,
+.lbstars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font:
+    900 22px Impact,
+    'Arial Black',
+    sans-serif;
+}
+.shk {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.12em;
+  background: #c9ced8;
+  border: 2px solid #1c1626;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+}
+.chstars .shk {
+  width: 22px;
+  height: 22px;
+  background: #1c1626;
+  position: relative;
+}
+.chmain {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+.chleft {
+  width: 31%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#ch-prev {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  aspect-ratio: auto;
+  border: 3px solid #1c1626;
+  border-radius: 12px;
+  background:
+    #fbfaf4 repeating-linear-gradient(0deg, transparent 0 21px, #e3e9f2 21px 22px),
+    repeating-linear-gradient(90deg, transparent 0 21px, #e3e9f2 21px 22px);
+}
+.chname {
+  display: flex;
+  gap: 6px;
+}
+#ch-name {
+  flex: 1;
+  min-width: 0;
+  font:
+    900 18px Impact,
+    'Arial Black',
+    sans-serif;
+  border: 3px solid #1c1626;
+  border-radius: 10px;
+  padding: 4px 8px;
+  text-transform: uppercase;
+  background: #fff;
+  color: #1c1626;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.chright {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+#ch-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.chtab {
+  padding: 3px 7px;
+  min-height: 30px;
+}
+#ch-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.chtab i,
+.chitem i {
+  font-style: normal;
+  background: #e8212b;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0 4px;
+  font-size: 10px;
+}
+#ch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 2px 4px 6px 2px;
+  align-content: start;
+}
+#ch-grid[hidden],
+#ch-body[hidden] {
+  display: none;
+}
+.chitem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border: 3px solid #1c1626;
+  border-radius: 12px;
+  background: #f1ece2;
+  color: #1c1626;
+  padding: 3px 3px 4px;
+  cursor: pointer;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+.chitem.own {
+  background: #fffdf8;
+}
+.chitem.on {
+  background: #fff3c4;
+  box-shadow: inset 0 0 0 3px #ffd400;
+}
+.chitem.try {
+  border-style: dashed;
+  border-color: #ff7a00;
+}
+.chitem canvas {
+  width: 64px;
+  height: 52px;
+  aspect-ratio: auto;
+}
+.chitem:not(.own) canvas {
+  opacity: 0.8;
+}
+.chitem b {
+  font-size: 11px;
+  line-height: 1.1;
+}
+.chitem small {
+  font-size: 11px;
+  font-weight: 800;
+  color: #7a6e80;
+}
+.chitem.on small {
+  color: #ff7a00;
+}
+.chitem i {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+#ch-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+.chrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: clamp(12px, 1.6vw, 15px);
+}
+.chrow > span {
+  min-width: 110px;
+}
+.chrow > b {
+  min-width: 44px;
+  text-align: center;
+}
+#ch-body .chrow > button {
+  min-width: 40px;
+  font-size: 18px;
+  padding: 0 8px;
+}
+#ch-stance {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.chhelp {
+  color: #7a6e80;
+  max-width: none !important;
+}
+#ch-msg {
+  min-height: 1.2em;
+  margin: 0;
+  font-weight: 800;
+  color: #c45200;
+  max-width: none;
+}
+#s-char .btn {
+  min-height: 38px;
+  padding: 4px 26px;
+  margin: 0 0 4px;
+}
+.stl {
+  font-weight: 800;
+  color: #c45200;
+}
+/* Players screen fighter picks (M10) */
+.ppick {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.pcv {
+  width: 60px;
+  height: 72px;
+  aspect-ratio: auto;
+}
+.pprev,
+.pnext,
+.pcol,
+.phat {
+  font:
+    800 11px 'Trebuchet MS',
+    sans-serif;
+  border: 2px solid #1c1626;
+  border-radius: 6px;
+  background: #fff;
+  color: #1c1626;
+  cursor: pointer;
+  padding: 3px 6px;
+  min-height: 28px;
+}
+.pprev,
+.pnext {
+  min-width: 28px;
+}
+.pbtns {
+  display: flex;
+  gap: 4px;
+}
+.pcard .pname {
+  color: var(--pc);
+}
+#s-lobby {
+  justify-content: flex-start;
+  gap: 2px;
+  padding-top: 6px;
+}
+#s-lobby h2 {
+  margin: 0;
+}
+.pcard {
+  gap: 2px;
+  padding: 5px 4px;
+}
+.pcard.in small {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+}
+.pbtns {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+/* Back up / Restore (M10) */
+#bk-code {
+  width: min(620px, 92%);
+  height: 70px;
+  font: 11px monospace;
+  border: 3px solid #1c1626;
+  border-radius: 10px;
+  padding: 6px;
+  resize: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.bkrow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.bkrow .btn {
+  min-width: 0;
+  font-size: clamp(13px, 2.2vw, 17px);
+  padding: 6px 16px;
+  min-height: 38px;
+}
+#bk-msg {
+  font-weight: 800;
+  color: #c45200;
+  min-height: 1.3em;
+}
+.chtab {
+  white-space: nowrap;
+}
+.chitem small .shk {
+  width: 10px;
+  height: 10px;
+  margin-right: 2px;
+  background: #1c1626;
+  border: 0;
+}

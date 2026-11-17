@@ -79,13 +79,14 @@ function stars(x, y) {
   ctx.restore();
 }
 // ===== RENDER =====
-function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out) {
+// hk = head size (1 = normal; character creation can change it)
+function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk) {
   const th = 15 * s,
     sh = 15 * s,
     ua = 13 * s,
     fa = 13 * s,
     to = 26 * s,
-    hr = 9 * s,
+    hr = 9 * s * (hk || 1),
     [ln, aS, aE, bS, bE, lH, lK, rH, rK] = p;
   const fy = (h, k) => th * Math.cos(h * D) + sh * Math.cos((h - k) * D),
     hy = y - Math.max(fy(lH, lK), fy(rH, rK));
@@ -113,6 +114,8 @@ function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out) {
     out.fb = R(fB);
     out.hd = R(head);
     out.sh = R(sho);
+    out.nk = R(neck);
+    out.hr = hr;
   }
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -149,14 +152,18 @@ function drawF(f) {
     const t = f.trail;
     ctx.save();
     ctx.lineCap = 'round';
-    ctx.strokeStyle = f.col;
     for (let i = 1; i < t.length; i++) {
+      ctx.strokeStyle = trailCol(f, i, t.length);
       ctx.globalAlpha = 0.1 + (0.4 * i) / t.length;
       ctx.lineWidth = 4 + i * 2.4;
       ctx.beginPath();
       ctx.moveTo(t[i - 1][0], t[i - 1][1]);
       ctx.lineTo(t[i][0], t[i][1]);
       ctx.stroke();
+    }
+    if (f.look && f.look.trail && f.look.trail.c === 'hearts') {
+      ctx.globalAlpha = 1;
+      for (let i = 1; i < t.length; i += 2) heart(t[i][0], t[i][1], 3 + i * 0.6);
     }
     ctx.restore();
   }
@@ -170,21 +177,26 @@ function drawF(f) {
     drawTatsu(f, a, fl);
     return;
   }
-  const o = {};
-  if (!(rOn && R.blend >= 1))
+  const o = {},
+    L = f.look,
+    pz = L ? lookPose(f) : f.pose;
+  if (!(rOn && R.blend >= 1)) {
     drawFig(
       f.x + vib,
       f.y + (lying ? 26 * f.s : 0),
       f.face,
-      f.pose,
+      pz,
       f.s,
       fl ? INK : f.col,
       fl ? INK : f.d2,
-      f.pose[9],
+      pz[9],
       a * (1 - rA),
-      7,
-      o
+      L ? L.lw : 7,
+      o,
+      L ? L.head : 1
     );
+    if (L) drawLook(f, { ...o, h: o.h, hb: o.hb, f: o.f, fb: o.fb, face: f.face, s: f.s }, a * (1 - rA));
+  }
   if (!f.dying && (f.st === 'down' || f.st === 'getup') && !(f.pl && f.st === 'dead'))
     stars(R ? R.p[0].x : f.x, (R ? R.p[0].y : f.y - 50 * f.s) - 16); // dazed
   const at = f.att;
@@ -521,6 +533,7 @@ function hud() {
   ctx.font = '900 26px Impact,"Arial Black",sans-serif';
   ctx.fillStyle = INK;
   if (state !== 'train' && !MODE.pvp) ctx.fillText(String(score).padStart(7, '0'), W - 16, 34);
+  if (state !== 'train' && MODE.drops) starHud();
   ctx.textAlign = 'center';
   ctx.font = '900 18px Impact,"Arial Black",sans-serif';
   if (MODE.hud && state !== 'train') MODE.hud();
@@ -591,6 +604,7 @@ function render() {
     drawFig(g.x, g.y, g.face, g.pose, g.s, g.col, g.col, g.pose[9], (g.l / 9) * 0.35, 7);
   }
   for (const e of E) drawF(e);
+  drawPickups();
   for (const p of PL) {
     use(p);
     if (K.s && live() && P.st !== 'dead' && !STM.winded) {

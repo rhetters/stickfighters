@@ -36,6 +36,7 @@ function vsKO(w) {
   slow = Math.max(slow, 60);
   VS.maxc = Math.max(VS.maxc || 0, maxc);
   if (w) VS.wins[vsKey(w)] = (VS.wins[vsKey(w)] || 0) + 1;
+  VS.lastW = w ? vsKey(w) : null; // the winner does their victory pose (looks.js)
   bn(w ? vsName(w) + ' WINS ROUND ' + VS.round + '!' : 'DRAW!');
   sfx(260, 0.5, 'sawtooth', 0.07, -120);
 }
@@ -66,6 +67,7 @@ function vsEnd(w) {
     : PL.map(p => 'P' + (p.slot + 1) + ' ' + p.name + ': ' + (VS.wins['P' + p.slot] || 0)).join(' · ');
   $('c-l2').textContent = 'Best combo ' + VS.maxc + ' hits';
   $('c-l3').textContent = '';
+  runEnd('c-st', { vs: 1 });
   $('b-next').textContent = 'REMATCH';
   sfx(520, 0.5, 'square', 0.05, 500);
   show('s-clear');

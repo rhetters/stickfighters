@@ -21,12 +21,14 @@ const ARCADE = {
         bn('WAVE CLEAR!');
         for (const p of PL) if (p.st !== 'dead') p.hp = Math.min(p.max, p.hp + 30);
         score += wave * 50;
+        grantStars(wave * STAR_BONUS.wavePer, 'wave');
         sfx(600, 0.3, 'square', 0.05, 400);
       } else if (--cl <= 0) nextWave();
     }
   }
 };
 ARCADE.revive = 1;
+ARCADE.drops = 1; // enemies drop ninja stars (M10)
 let MODE = ARCADE;
 // ===== CO-OP RULES (M9) =====
 // Enemies get 35% more health per extra player, and each fight gets about 30% more grunts per extra player.
