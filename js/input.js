@@ -350,7 +350,7 @@ function pollPad() {
       else if (performance.now() - CAP.t > 6000) bindDone(null);
       continue;
     }
-    if (pressMode() && now.some((v, n) => v && !prev[n])) {
+    if (pressMode() && (now.some((v, n) => v && !prev[n]) || g.axes.some(v => Math.abs(v) > 0.6))) {
       titleReveal();
       continue;
     }
@@ -418,7 +418,11 @@ function navItems() {
   const sc = navScreen();
   if (!sc) return [];
   return [...sc.querySelectorAll('button, input, select')].filter(
-    e => !e.disabled && e.offsetParent !== null && !e.closest('[hidden]')
+    e =>
+      !e.disabled &&
+      e.offsetParent !== null &&
+      !e.closest('[hidden]') &&
+      getComputedStyle(e).visibility !== 'hidden'
   );
 }
 function navMove(dir) {
@@ -463,5 +467,6 @@ function navBack() {
   else if (sc.id === 's-binds') $('bd-back').click();
   else if (sc.id === 's-char') $('b-charback').click();
   else if (sc.id === 's-lobby') openTitle();
-  else if (sc.id === 's-title' && !$('playrow').hidden && !TITLE.keepOpen) playFold(true);
+  else if (sc.id === 's-online') $('b-onlineback').click();
+  else if (sc.id === 's-title') titleBack();
 }

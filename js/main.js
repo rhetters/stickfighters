@@ -9,7 +9,17 @@ let paused = false,
 const gridC = document.createElement('canvas'),
   coarseMQ = matchMedia('(pointer:coarse)'),
   portraitMQ = matchMedia('(orientation:portrait) and (pointer:coarse)');
-const SCREENS = ['s-title', 's-char', 's-lobby', 's-pause', 's-settings', 's-binds', 's-over', 's-clear'];
+const SCREENS = [
+  's-title',
+  's-online',
+  's-char',
+  's-lobby',
+  's-pause',
+  's-settings',
+  's-binds',
+  's-over',
+  's-clear'
+];
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
   $('ui').hidden = !id;
@@ -199,13 +209,15 @@ $('b-start').onclick = start;
 $('b-train').onclick = startTrain;
 // ===== TITLE MENU (post-M9) =====
 // First visit: a flashing PRESS START; any key, tap or controller button opens the menu.
-// PLAY splits into CAMPAIGN, ARCADE and MULTIPLAYER side by side; Back folds them up again.
+// SOLO splits into CAMPAIGN | ARCADE and MULTIPLAYER into LOCAL | ONLINE, in place: the split row sits on top of
+// the button it replaces, so the title and the other buttons never move or resize. Back folds it up again.
 const TITLE = { ready: false, keepOpen: false };
+const SPLITS = { solo: ['b-solo', 'solorow', 'b-level'], mp: ['b-mp', 'mprow', 'b-multi'] };
 function titleView() {
   $('press').hidden = TITLE.ready;
   $('tmenu').hidden = !TITLE.ready;
-  playFold(!TITLE.keepOpen);
-  if (TITLE.ready) $(TITLE.keepOpen ? 'b-level' : 'b-play').focus({ preventScroll: true });
+  for (const k in SPLITS) splitShow(k, TITLE.keepOpen, true);
+  if (TITLE.ready) $(TITLE.keepOpen ? 'b-level' : 'b-solo').focus({ preventScroll: true });
 }
 function titleReveal() {
   if (TITLE.ready) return false;
@@ -214,10 +226,25 @@ function titleReveal() {
   titleView();
   return true;
 }
-function playFold(fold) {
-  $('b-play').hidden = !fold;
-  $('playrow').hidden = fold;
-  $(fold ? 'b-play' : 'b-level').focus({ preventScroll: true });
+function splitShow(k, open, quiet) {
+  const [btn, row, first] = SPLITS[k];
+  $(btn).style.visibility = open ? 'hidden' : '';
+  $(row).hidden = !open;
+  if (!quiet) $(open ? first : btn).focus({ preventScroll: true });
+}
+function splitOpen(k) {
+  for (const o in SPLITS) if (o !== k) splitShow(o, false, true);
+  splitShow(k, true);
+}
+// Back on the title: fold whichever row is open. Returns true if something was folded.
+function titleBack() {
+  if (TITLE.keepOpen) return false;
+  for (const k in SPLITS)
+    if (!$(SPLITS[k][1]).hidden) {
+      splitShow(k, false);
+      return true;
+    }
+  return false;
 }
 const pressMode = () => !$('s-title').hidden && !$('ui').hidden && !TITLE.ready;
 // used by the automated tests: open everything at once
@@ -225,12 +252,23 @@ function titleOpenAll() {
   TITLE.ready = TITLE.keepOpen = true;
   titleView();
 }
-$('b-play').onclick = () => playFold(false);
+$('b-solo').onclick = () => splitOpen('solo');
+$('b-mp').onclick = () => splitOpen('mp');
+$('b-online').onclick = () => show('s-online');
+$('b-onlineback').onclick = () => {
+  show('s-title');
+  titleView();
+  splitOpen('mp');
+  $('b-online').focus({ preventScroll: true });
+};
 $('b-char').onclick = () => show('s-char');
 $('b-charback').onclick = () => {
   show('s-title');
   titleView();
 };
+addEventListener('gamepadconnected', () => {
+  if (pressMode()) titleReveal();
+});
 $('s-title').addEventListener('pointerdown', e => {
   if (pressMode()) {
     titleReveal();
@@ -244,14 +282,7 @@ addEventListener(
       titleReveal();
       e.preventDefault();
       e.stopImmediatePropagation();
-    } else if (
-      e.key === 'Escape' &&
-      !$('s-title').hidden &&
-      !$('ui').hidden &&
-      !$('playrow').hidden &&
-      !TITLE.keepOpen
-    )
-      playFold(true);
+    } else if (e.key === 'Escape' && !$('s-title').hidden && !$('ui').hidden) titleBack();
   },
   true
 );

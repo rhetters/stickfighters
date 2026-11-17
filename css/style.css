@@ -935,9 +935,6 @@ body.padnav #ui select:focus {
 #tmenu[hidden] {
   display: none;
 }
-#playrow .btn {
-  font-size: clamp(14px, 2.2vw, 20px);
-}
 /* Feel sliders in Settings */
 .setfeel {
   grid-column: 1 / -1;
@@ -969,8 +966,36 @@ body.padnav #ui select:focus {
   background: var(--pc) !important;
   color: #fff;
 }
-#playrow[hidden],
 .lbrow [hidden],
 #lb-cards [hidden] {
   display: none;
+}
+
+/* Title menu (menu v2): the title stays put, and a split row covers the button it replaces */
+#s-title {
+  justify-content: flex-start;
+  padding-top: clamp(6px, 5vh, 56px);
+}
+#tmenu .btn {
+  margin: 2px 0;
+}
+.tslot {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.split {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+.split[hidden] {
+  display: none;
+}
+.split .btn {
+  min-width: 0;
 }

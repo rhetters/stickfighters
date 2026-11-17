@@ -2,6 +2,12 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Menu fixes (November 16, 2026)
+- Title menu is now SOLO (splits into Campaign | Arcade) and MULTIPLAYER (splits into Local | Online; Online is a placeholder for M17), then Character, Training Room, Settings.
+- The split row sits on top of the button it replaces, so the title and other buttons no longer move or resize.
+- Fixed: a controller's Start on the PRESS START screen didn't open the menu on iPad. Now any button, stick movement, or the controller connecting opens it.
+- Roadmap: character creation in local multiplayer (each player customizes their look, Mario Kart style) added to M11.
+
 ## Post-M9 patch (November 16, 2026)
 - Title: flashing PRESS START, then PLAY (splits into Campaign / Arcade / Multiplayer side by side), Character (placeholder for M11), Training Room, Settings. Stats and controls text removed from the title.
 - Settings: all six Feel sliders (hit-stop, shake, knockback, gravity, bounce, bodies stay), adjustable mid-match from the pause menu.

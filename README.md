@@ -8,7 +8,7 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 ## Modes
 
-The title says **PRESS START**: press any key, button or tap. **Play** opens Campaign (the Wooded Trail), Arcade and Multiplayer; **Character** is coming in M11.
+The title says **PRESS START**: press any key, button or tap. **Solo** opens Campaign (the Wooded Trail) and Arcade; **Multiplayer** opens Local (up to 4 players on one screen) and Online (coming in M17); **Character** is coming in M11.
 
 
 - **Play: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.

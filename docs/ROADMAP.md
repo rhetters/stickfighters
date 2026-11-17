@@ -319,7 +319,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **Choices made (Rhett can change them):** versus is last-one-standing with a health bar, free-for-all only (no 2v2 yet), and co-op revive is "stand next to them for 2 seconds".
 - **Not yet:** juggles in versus, per-player character looks (comes with M11).
 
-**Post-M9 patch:** title PRESS START → PLAY (Campaign / Arcade / Multiplayer) · Character (placeholder) · Training Room · Settings; Feel sliders in Settings for mid-match tuning; grabbing and throwing players in Versus (mash to break free; grabs beat blocks); Versus teams (free-for-all or teams, picked in the lobby).
+**Post-M9 patch:** title PRESS START → SOLO (Campaign | Arcade) · MULTIPLAYER (Local | Online placeholder) · Character (placeholder) · Training Room · Settings; Feel sliders in Settings for mid-match tuning; grabbing and throwing players in Versus (mash to break free; grabs beat blocks); Versus teams (free-for-all or teams, picked in the lobby).
 - Self-test fingerprints unchanged (one player): Arcade `c87c9470`, Level `21292ab5`.
 
 ### M10 · XP, levels, skill tree
@@ -352,6 +352,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - Changed from the old M10 plan: gear that changed stats, charms and bought consumables are out of the store, so purchases never make anyone stronger. Health and Surge pickups can still appear in levels as part of play.
 - Character creation: name, body color (swatches that always contrast with the pink army), head ring size, line thickness, idle stance, and equipping owned cosmetics. Starting style (Brawler, Kicker or Sprinter) sets your first skill point. Live preview, randomize, three save slots.
 - Accessories attach to joints and follow the ragdoll. In multiplayer, each player's look is shared as item IDs and drawn by every device.
+- **Character creation in local multiplayer** (like Mario Kart): on the Players screen, each player picks or customizes their own fighter with their own controller (or touch), side by side, before Versus or Co-op. Their name and look carry into the match, the HUD and the winner screen. Each player can load a saved fighter or tweak one for that session.
 - Save version and migrations, plus **Back up / Restore save** (a file or a text code), so hours of grinding survive Safari clearing data.
 
 **Done when:** Stars drop and collect, you can buy and equip cosmetics, create and load fighters that look right in every move and death pose, and a backup restores on another device.
