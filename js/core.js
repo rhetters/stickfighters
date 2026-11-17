@@ -61,12 +61,23 @@ function rnd() {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 const cv = document.getElementById('c'),
-  ctx = cv.getContext('2d'),
   W = 900,
   H = 420,
   G = 345,
   D = Math.PI / 180,
   INK = '#1c1626';
+// The drawing context. Usually the game canvas; the character preview and store icons point it at their own
+// canvas for a moment (withCtx), so every drawing function works on any canvas.
+let ctx = cv.getContext('2d');
+function withCtx(c2, fn) {
+  const keep = ctx;
+  ctx = c2;
+  try {
+    fn();
+  } finally {
+    ctx = keep;
+  }
+}
 // World (M8). CAM.x = world x of the screen's left edge. WB = walls for living fighters (the screen, or a gate such
 // as the fallen log). WW = the whole world's edges, used by ragdolls. In Arcade and Training all three are the screen.
 const CAM = { x: 0 },
