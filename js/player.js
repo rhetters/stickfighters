@@ -185,11 +185,18 @@ function init() {
   MODE = ARCADE;
   const R = ROSTER.length ? ROSTER : [{ slot: 0 }];
   PL = R.map((r, i) => {
-    const p = mkPlayer(W / 2 + (i - (R.length - 1) / 2) * 80, r.slot, r.col, r.d2);
-    p.name = r.name || 'ORANGE';
+    // Looks (M10): a multiplayer player brings the look picked on the Players screen; one player uses the
+    // current saved fighter. Looks are drawing only.
+    const L = r.look || (ROSTER.length ? null : lookOf(curFighter())),
+      p = mkPlayer(W / 2 + (i - (R.length - 1) / 2) * 80, r.slot, L ? L.col : r.col, L ? L.d2 : r.d2);
+    p.look = L;
+    p.name = r.name || (L && L.name) || 'ORANGE';
     p.team = r.team;
     return p;
   });
+  PK = [];
+  RUN.stars = 0;
+  RUN.items = [];
   use(PL[0]);
   camX = camY = 0;
   E = [];

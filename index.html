@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Orange vs. the Pink Army</title>
-<link rel="stylesheet" href="css/style.css?v=8">
+<link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
 <div id="wrap">
@@ -48,15 +48,31 @@
   <p>Online play, with each player on their own iPad over home Wi-Fi, is coming in M17.</p>
   <button class="btn" id="b-onlineback">BACK</button>
  </div>
- <div class="screen" id="s-char" hidden>
-  <h2>CHARACTER</h2>
-  <p>Character creation is coming in M10: your name, colors, hats, headbands, scarves and more, bought with ninja stars.</p>
-  <button class="btn" id="b-charback">BACK</button>
+ <div class="screen wide" id="s-char" hidden>
+  <div class="chtop"><h2>CHARACTER</h2><div id="ch-slots"></div><div class="chstars"><span class="shk"></span><b id="ch-stars">0</b></div></div>
+  <div class="chmain">
+   <div class="chleft">
+    <canvas id="ch-prev" aria-label="Your fighter"></canvas>
+    <div class="chname"><input id="ch-name" type="text" maxlength="10" aria-label="Fighter name" autocomplete="off" spellcheck="false"><button id="ch-rnd" title="Random look">RANDOM</button></div>
+   </div>
+   <div class="chright">
+    <div id="ch-tabs"></div>
+    <div id="ch-body">
+     <div class="chrow"><span>Head size</span><button id="ch-head-" aria-label="Smaller head">&minus;</button><b id="ch-head"></b><button id="ch-head+" aria-label="Bigger head">+</button></div>
+     <div class="chrow"><span>Line thickness</span><button id="ch-lw-" aria-label="Thinner lines">&minus;</button><b id="ch-lw"></b><button id="ch-lw+" aria-label="Thicker lines">+</button></div>
+     <div class="chrow"><span>Stance</span><div id="ch-stance"></div></div>
+     <p class="chhelp">Colors, hats, headbands, scarves, gloves, shoes, trails and victory poses are on the other tabs. Win ninja stars by beating the pink army, then spend them there. Looks never change how you fight.</p>
+    </div>
+    <div id="ch-grid" hidden></div>
+    <p id="ch-msg" aria-live="polite"></p>
+   </div>
+  </div>
+  <button class="btn" id="b-charback">DONE</button>
  </div>
  <div class="screen" id="s-lobby" hidden>
   <h2>PLAYERS</h2>
   <div id="lb-cards"></div>
-  <p class="lbhelp">Controllers: press any button to join, B to leave. Keyboard 2: press 0 on the number pad.</p>
+  <p class="lbhelp">Controllers: any button joins, B leaves, left/right picks your fighter, the top button changes color, the left button changes hat. Keyboard 2: press 0 on the number pad.</p>
   <div class="lbrow"><button class="btn alt" id="lb-touch">JOIN WITH TOUCH</button><button class="btn alt" id="lb-kb">JOIN WITH KEYBOARD</button><button class="btn alt" id="lb-back">BACK</button></div>
   <p id="lb-msg"></p>
   <div class="lbrow"><button class="btn alt" id="lb-teams">VERSUS: FREE-FOR-ALL</button><button class="btn" id="lb-vs">VERSUS</button><button class="btn" id="lb-coop">CO-OP: WOODED TRAIL</button><button class="btn" id="lb-arc">CO-OP: ARCADE</button></div>
@@ -82,6 +98,7 @@
    <label for="o-hist">Input display</label><input id="o-hist" type="checkbox">
    <label for="o-calm">Reduce screen shake</label><input id="o-calm" type="checkbox">
    <label for="o-seed">Seed (blank = random)</label><input id="o-seed" type="text" maxlength="12">
+   <label for="o-backup">Save</label><div class="layrow"><button id="o-backup">Back up or restore your save</button></div>
    <div id="o-feel" class="setfeel"></div>
   </div>
   <button class="btn" id="b-back">BACK</button>
@@ -94,16 +111,26 @@
   <p id="bd-msg" aria-live="polite"></p>
   <div class="bdrow"><button class="btn alt" id="bd-reset">RESET TO DEFAULT</button><button class="btn" id="bd-back">BACK</button></div>
  </div>
+ <div class="screen" id="s-backup" hidden>
+  <h2>BACK UP YOUR SAVE</h2>
+  <p>Your ninja stars, items, fighters, best scores and settings are kept on this device, and the browser can clear them. Keep a copy: copy this code somewhere safe, or save it as a file.</p>
+  <textarea id="bk-code" aria-label="Save code" spellcheck="false"></textarea>
+  <div class="bkrow"><button class="btn alt" id="bk-copy">COPY CODE</button><button class="btn alt" id="bk-file">SAVE FILE</button></div>
+  <p>To restore on this or another device: paste a code into the box and press RESTORE, or load a save file.</p>
+  <div class="bkrow"><button class="btn alt" id="bk-restore">RESTORE FROM CODE</button><button class="btn alt" id="bk-load">LOAD FILE</button><input type="file" id="bk-input" accept=".json,.txt,application/json,text/plain" hidden></div>
+  <p id="bk-msg" aria-live="polite"></p>
+  <button class="btn" id="bk-back">BACK</button>
+ </div>
  <div class="screen" id="s-over" hidden>
   <h1>KO!</h1>
-  <p id="o-l1"></p><p id="o-l2"></p>
+  <p id="o-l1"></p><p id="o-l2"></p><p id="o-st" class="stl"></p>
   <button class="btn" id="b-cont" hidden>CONTINUE FROM CHECKPOINT</button>
   <button class="btn" id="b-again">FIGHT AGAIN</button>
   <button class="btn alt" id="b-title">TITLE</button>
  </div>
  <div class="screen" id="s-clear" hidden>
   <h1 id="c-h1">LEVEL CLEAR!</h1>
-  <p id="c-l1"></p><p id="c-l2"></p><p id="c-l3"></p>
+  <p id="c-l1"></p><p id="c-l2"></p><p id="c-l3"></p><p id="c-st" class="stl"></p>
   <button class="btn" id="b-next">PLAY AGAIN</button>
   <button class="btn alt" id="b-title2">TITLE</button>
  </div>
@@ -115,27 +142,33 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=8" defer></script>
-<script src="js/input.js?v=8" defer></script>
-<script src="js/data/moves.js?v=8" defer></script>
-<script src="js/data/enemies.js?v=8" defer></script>
-<script src="js/data/levels.js?v=8" defer></script>
-<script src="js/player.js?v=8" defer></script>
-<script src="js/effects.js?v=8" defer></script>
-<script src="js/combat.js?v=8" defer></script>
-<script src="js/enemies.js?v=8" defer></script>
-<script src="js/modes.js?v=8" defer></script>
-<script src="js/level.js?v=8" defer></script>
-<script src="js/versus.js?v=8" defer></script>
-<script src="js/ragdoll.js?v=8" defer></script>
-<script src="js/scenery.js?v=8" defer></script>
-<script src="js/render.js?v=8" defer></script>
-<script src="js/ui/panels.js?v=8" defer></script>
-<script src="js/ui/training.js?v=8" defer></script>
-<script src="js/ui/touch-layout.js?v=8" defer></script>
-<script src="js/ui/lobby.js?v=8" defer></script>
-<script src="js/ui/bindings.js?v=8" defer></script>
-<script src="js/selftest.js?v=8" defer></script>
-<script src="js/main.js?v=8" defer></script>
+<script src="js/core.js?v=9" defer></script>
+<script src="js/input.js?v=9" defer></script>
+<script src="js/data/moves.js?v=9" defer></script>
+<script src="js/data/enemies.js?v=9" defer></script>
+<script src="js/data/levels.js?v=9" defer></script>
+<script src="js/data/items.js?v=9" defer></script>
+<script src="js/economy.js?v=9" defer></script>
+<script src="js/player.js?v=9" defer></script>
+<script src="js/effects.js?v=9" defer></script>
+<script src="js/combat.js?v=9" defer></script>
+<script src="js/enemies.js?v=9" defer></script>
+<script src="js/modes.js?v=9" defer></script>
+<script src="js/level.js?v=9" defer></script>
+<script src="js/versus.js?v=9" defer></script>
+<script src="js/pickups.js?v=9" defer></script>
+<script src="js/ragdoll.js?v=9" defer></script>
+<script src="js/scenery.js?v=9" defer></script>
+<script src="js/looks.js?v=9" defer></script>
+<script src="js/render.js?v=9" defer></script>
+<script src="js/ui/panels.js?v=9" defer></script>
+<script src="js/ui/training.js?v=9" defer></script>
+<script src="js/ui/touch-layout.js?v=9" defer></script>
+<script src="js/ui/lobby.js?v=9" defer></script>
+<script src="js/ui/bindings.js?v=9" defer></script>
+<script src="js/ui/character.js?v=9" defer></script>
+<script src="js/ui/backup.js?v=9" defer></script>
+<script src="js/selftest.js?v=9" defer></script>
+<script src="js/main.js?v=9" defer></script>
 </body>
 </html>

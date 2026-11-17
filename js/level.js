@@ -211,6 +211,8 @@ function levelClear() {
     combo: Math.max(maxc, old.combo || 0)
   };
   save();
+  grantStars(old.done ? STAR_BONUS.level : STAR_BONUS.levelFirst, 'level');
+  runEnd('c-st', { combo: maxc });
   sfx(520, 0.5, 'square', 0.05, 500);
   $('c-l1').textContent =
     'Time ' + fmtT(LV.t) + ' · Score ' + score + ' (time bonus ' + tb + ') · Best combo ' + maxc;
@@ -220,10 +222,15 @@ function levelClear() {
   $('c-l3').textContent = 'Next: ' + LV.def.next;
   $('c-h1').textContent = 'LEVEL CLEAR!';
   $('b-next').textContent = 'PLAY AGAIN';
-  show('s-clear');
+  // a moment to see your victory pose (M10) before the results
+  bn('LEVEL CLEAR!');
+  setTimeout(() => {
+    if (state === 'clear' && MODE === LEVEL) show('s-clear');
+  }, 1800);
 }
 function levelFail() {
   state = 'over';
+  if (!SELFTESTING) runEnd('o-st', { combo: maxc });
   $('o-l1').textContent =
     LV.def.name +
     ' · Score ' +
@@ -285,6 +292,7 @@ function levelHud() {
 }
 const LEVEL = {
   id: 'level',
+  drops: 1,
   update: levelTick,
   over: levelFail,
   bg: () => drawWoods(),

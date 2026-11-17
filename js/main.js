@@ -17,6 +17,7 @@ const SCREENS = [
   's-pause',
   's-settings',
   's-binds',
+  's-backup',
   's-over',
   's-clear'
 ];
@@ -111,6 +112,7 @@ function over() {
   BEST.wave = Math.max(BEST.wave, wave);
   BEST.combo = Math.max(BEST.combo, maxc);
   save();
+  runEnd('o-st', { combo: maxc, wave });
   $('o-l1').textContent = 'Wave ' + wave + ' · Score ' + score + ' · Best combo ' + maxc;
   $('o-l2').textContent = nb ? 'New best score!' : 'Best: ' + BEST.score;
   show('s-over');
@@ -261,11 +263,6 @@ $('b-onlineback').onclick = () => {
   splitOpen('mp');
   $('b-online').focus({ preventScroll: true });
 };
-$('b-char').onclick = () => show('s-char');
-$('b-charback').onclick = () => {
-  show('s-title');
-  titleView();
-};
 addEventListener('gamepadconnected', () => {
   if (pressMode()) titleReveal();
 });
@@ -412,6 +409,8 @@ function update() {
   for (const e of E) updE(e);
   bowl();
   sep();
+  if (MODE.drops && state === 'play') dropScan();
+  pickTick();
   E = E.filter(e => !e.gone);
   {
     const cs = E.filter(e => e.corpse && e.rag && !e.rag.dis);
@@ -534,6 +533,7 @@ function loop(now) {
   render();
   requestAnimationFrame(loop);
 }
+checkUnlocks(); // older saves get what they already earned
 init();
 applySet();
 resize();

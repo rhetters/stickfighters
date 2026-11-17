@@ -4,16 +4,18 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Play:** https://rhetters.github.io/stickfighters/
 
-**Status:** M0–M9 done: Wooded Trail, Arcade, and local multiplayer (Versus and Co-op for up to 4 players). Next: M10, ninja stars, the cosmetic store and character creation; then M11, XP and the skill tree. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Status:** M0–M10 done: Wooded Trail, Arcade, local multiplayer (Versus and Co-op for up to 4 players), and ninja stars with the cosmetic store and character creation. Next: M11, XP and the skill tree. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Modes
 
-The title says **PRESS START**: press any key, button or tap. **Solo** opens Campaign (the Wooded Trail) and Arcade; **Multiplayer** opens Local (up to 4 players on one screen) and Online (coming in M17); **Character** is coming in M10.
+The title says **PRESS START**: press any key, button or tap. **Solo** opens Campaign (the Wooded Trail) and Arcade; **Multiplayer** opens Local (up to 4 players on one screen) and Online (coming in M17); **Character** is where you make up to three fighters and spend ninja stars on their look.
 
 
 - **Play: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.
 - **Arcade: Endless Waves** is the original game: waves on one screen, with a Captain every fifth wave.
 - **Multiplayer: Versus & Co-op** opens the Players screen. Up to 4 players: controllers join by pressing any button (B leaves), or join with touch, the keyboard, or a second keyboard player (arrows + number pad; press 0 on the number pad). Then pick **Versus** (best of 3 rounds in The Clearing; free-for-all or teams, chosen with the Versus button, and tap TEAM on a card to switch sides; grab another player with punch + kick, mash to break free) or **Co-op** (Wooded Trail or Arcade; stand next to a downed teammate for 2 seconds to revive them).
+- **Character** holds three saved fighters. Change the name, head size, line thickness and stance, and dress them from the shelves: colors, hats, headbands, scarves, gloves, shoes, trails and victory poses. Each shelf is also the store: tap an item to try it on, tap again to buy it with ninja stars. Defeated enemies drop the stars, and Captains drop gifts. Everything is looks only and never changes how you fight. In multiplayer, each player picks a fighter on the Players screen and can change their color and hat.
+- **Back up your save** in Settings → Save: copy a code or save a file, and restore it on any device.
 - **Training Room** has dummies, hitboxes, frame data and the Feel / Moves / Info panels.
 
 ## Controls

@@ -19,7 +19,7 @@ This is the destination, not a promise to build it all soon.
 4. **Local multiplayer on the TV.** An iPad mirrored or wired to the TV, Bluetooth controllers, and a "press any button to join" screen.
 5. **Network multiplayer.** Each kid on their own iPad over home Wi-Fi, for co-op and versus.
 6. **Ninja star economy.** Enemies drop ninja stars that buy cosmetics only, in a store organized by slot (head, shoes and so on). Purchases are saved, equipped in Character Creation, and visible to other players.
-7. **XP and skill tree** (roadmap M11).
+7. **XP and skill tree** (roadmap M11). The ninja star store and character creation arrived in M10.
 8. **House builder.** A grid where you drag out walls (charged in stars per square), add backgrounds, furniture and decorations, then invite friends to visit.
 9. **Level creator** for Rhett. Its levels are playable directly and can join the procedural pools.
 10. **Depth in 2D.** Parallax layers (foreground trees, far mountains, fighters in between) in the paper style.

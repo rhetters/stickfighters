@@ -396,7 +396,8 @@ function drawRag(f, a) {
   ctx.globalAlpha = a;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.lineWidth = 7 * Math.pow(s, 0.7);
+  const lk = f.look;
+  ctx.lineWidth = (lk ? lk.lw : 7) * Math.pow(s, 0.7);
   const L = (c, ids) => {
     ctx.strokeStyle = c;
     ctx.beginPath();
@@ -409,10 +410,35 @@ function drawRag(f, a) {
   L(c1, [4, 3, 2, 1]);
   L(c1, [4, 9, 10]);
   L(c1, [2, 5, 6]);
+  // a bigger head (character creation) sits further out along the neck
+  const hk = lk ? lk.head : 1,
+    nx = Q[0].x - Q[1].x,
+    ny = Q[0].y - Q[1].y,
+    nd = Math.hypot(nx, ny) || 1,
+    hx = Q[0].x + (nx / nd) * 9 * s * (hk - 1),
+    hy = Q[0].y + (ny / nd) * 9 * s * (hk - 1);
   ctx.beginPath();
-  ctx.arc(Q[0].x, Q[0].y, 9 * s, 0, 7);
+  ctx.arc(hx, hy, 9 * s * hk, 0, 7);
   ctx.stroke();
   ctx.restore();
+  if (lk) {
+    const pt = i => [Q[i].x, Q[i].y];
+    drawLook(
+      f,
+      {
+        hd: [hx, hy],
+        hr: 9 * s * hk,
+        nk: pt(1),
+        h: pt(6),
+        hb: pt(8),
+        f: pt(10),
+        fb: pt(12),
+        face: f.face,
+        s
+      },
+      a
+    );
+  }
 }
 // Tornado Kick drawing: the fighter stays upright and turns around its own vertical axis, one leg locked straight out.
 // The leg's sideways reach is cos(angle); when it swings behind the body it's drawn in the back colour, before the body.
@@ -438,9 +464,12 @@ function drawTatsu(f, a, fl) {
     hd = [x - cs * 22 * s, shY + 6 * s],
     el2 = [x + cs * 9 * s, shY + 8 * s],
     hd2 = [x + cs * 3 * s, shY + 15 * s];
+  const lk = f.look,
+    lw0 = lk ? lk.lw : 7,
+    hk = lk ? lk.head : 1;
   const ln = (c, pts, w) => {
     ctx.strokeStyle = c;
-    ctx.lineWidth = w || 7 * Math.pow(s, 0.7);
+    ctx.lineWidth = w || lw0 * Math.pow(s, 0.7);
     ctx.beginPath();
     ctx.moveTo(pts[0][0], pts[0][1]);
     for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
@@ -490,12 +519,29 @@ function drawTatsu(f, a, fl) {
     [x, hipY],
     [x + f.face * 2 * s, shY - 4 * s]
   ]);
+  const hy0 = y - 64 * s - 9 * s * (hk - 1);
   ctx.beginPath();
-  ctx.arc(x + f.face * 3 * s, y - 64 * s, 9 * s, 0, 7);
+  ctx.arc(x + f.face * 3 * s, hy0, 9 * s * hk, 0, 7);
   ctx.strokeStyle = c1;
   ctx.stroke();
   ln(c1, [[x, shY], el, hd]);
-  if (!behind) ln(c1, [[x, hipY], knee, leg], 8.5 * Math.pow(s, 0.7));
+  if (!behind) ln(c1, [[x, hipY], knee, leg], (lw0 + 1.5) * Math.pow(s, 0.7));
   arc(true);
   ctx.restore();
+  if (lk)
+    drawLook(
+      f,
+      {
+        hd: [x + f.face * 3 * s, hy0],
+        hr: 9 * s * hk,
+        nk: [x + f.face * 2 * s, shY - 4 * s],
+        h: hd,
+        hb: hd2,
+        f: leg,
+        fb: tf,
+        face: f.face,
+        s
+      },
+      a
+    );
 }

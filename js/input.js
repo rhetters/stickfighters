@@ -465,6 +465,7 @@ function navBack() {
   if (sc.id === 's-pause') pause(false);
   else if (sc.id === 's-settings') $('b-back').click();
   else if (sc.id === 's-binds') $('bd-back').click();
+  else if (sc.id === 's-backup') $('bk-back').click();
   else if (sc.id === 's-char') $('b-charback').click();
   else if (sc.id === 's-lobby') openTitle();
   else if (sc.id === 's-online') $('b-onlineback').click();
