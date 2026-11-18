@@ -121,27 +121,44 @@ function normFighter(c, any) {
     wheel: wheel.length ? wheel : ['pose-flex']
   };
 }
-// A house with every field valid: unknown squares, materials and items dropped, positions kept on the grid.
-// any = accept items without checking ownership (a host's house shown to visitors online)
+// A house with every field valid: unknown squares, materials, solids and items dropped, everything kept on the land.
+// any = accept unlock-only items without checking ownership (a host's house shown to visitors online).
+// A house marked flip7 (saved before version 7) has its rows turned over: they used to count 7 rows down from the top.
 function normHouse(h, any) {
   const src = h && typeof h === 'object' ? h : {},
-    ok = (id, sec) => !!ITEM[id] && ITEM[id].sec === sec && (any || owns(id)),
-    bgOk = ok(src.bg, 'hbg'),
-    cells = {},
-    items = [];
-  const c0 = src.cells && typeof src.cells === 'object' ? src.cells : {};
-  for (const k of Object.keys(c0).slice(0, HGRID.cols * HGRID.rows)) {
-    const m = /^(\d+),(\d+)$/.exec(k);
-    if (m && +m[1] < HGRID.cols && +m[2] < HGRID.rows && HTILE[c0[k]]) cells[+m[1] + ',' + +m[2]] = c0[k];
-  }
+    flip = !!src.flip7,
+    out = { bg: 'hbg-paper', cells: {}, solids: {}, items: [] },
+    inLand = (c, r) => c >= 0 && r >= 0 && c < HGRID.maxCols && r < HGRID.maxRows,
+    squares = (o, ok, dst) => {
+      const o0 = o && typeof o === 'object' ? o : {};
+      for (const k of Object.keys(o0).slice(0, HOUSE_MAX_SQUARES)) {
+        const m = /^(\d+),(\d+)$/.exec(k);
+        if (!m || !ok[o0[k]]) continue;
+        const c = +m[1],
+          r = flip ? 6 - +m[2] : +m[2];
+        if (inLand(c, r)) dst[c + ',' + r] = o0[k];
+      }
+    };
+  if (ITEM[src.bg] && ITEM[src.bg].sec === 'hbg' && (any || owns(src.bg))) out.bg = src.bg;
+  squares(src.cells, HTILE, out.cells);
+  squares(src.solids, HSOLID, out.solids);
   for (const it of Array.isArray(src.items) ? src.items.slice(0, HOUSE_MAX_ITEMS) : []) {
-    if (!it || !(ok(it.id, 'hfurn') || ok(it.id, 'hdecor'))) continue;
-    const d = ITEM[it.id],
-      x = Math.max(0, Math.min(HGRID.cols - d.w, Math.floor(+it.x || 0))),
-      y = Math.max(0, Math.min(HGRID.rows - d.h, Math.floor(+it.y || 0)));
-    items.push({ id: it.id, x, y });
+    const d = it && ITEM[it.id];
+    if (!d || (d.sec !== 'hfurn' && d.sec !== 'hdecor') || !(any || d.price || owns(d.id))) continue;
+    const y0 = Math.floor(+it.y || 0),
+      x = Math.max(0, Math.min(HGRID.maxCols - d.w, Math.floor(+it.x || 0))),
+      y = Math.max(0, Math.min(HGRID.maxRows - d.h, flip ? 7 - (y0 + d.h) : y0));
+    out.items.push({ id: d.id, x, y });
   }
-  return { bg: bgOk ? src.bg : 'hbg-paper', cells, items };
+  return out;
+}
+// Stars given back for something taken back (erasing in the house). Not counted as stars earned.
+function refundStars(n, reason) {
+  n = Math.floor(n);
+  if (!(n > 0)) return 0;
+  ECO.stars += n;
+  ecoSave();
+  return n;
 }
 const fighter = i => (CHR.list[i] ? normFighter(CHR.list[i]) : null);
 const curFighter = () => fighter(CHR.cur) || normFighter(FIGHTER0);

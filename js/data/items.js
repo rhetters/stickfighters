@@ -276,6 +276,7 @@ const ITEMS = [
   { id: 'hf-shelf', sec: 'hfurn', name: 'Bookshelf', k: 'shelf', w: 2, h: 3, c: '#8a5a33', price: 120 },
   { id: 'hf-lamp', sec: 'hfurn', name: 'Lamp', k: 'lamp', w: 1, h: 2, c: '#ffd400', price: 50 },
   { id: 'hf-tv', sec: 'hfurn', name: 'TV', k: 'tv', w: 2, h: 2, c: '#2a2a3a', price: 150 },
+  { id: 'hf-door', sec: 'hfurn', name: 'Door', k: 'door', w: 1, h: 2, c: '#a96e3a', price: 30 },
   { id: 'hf-fridge', sec: 'hfurn', name: 'Fridge', k: 'fridge', w: 1, h: 3, c: '#eef3f6', price: 120 },
   // House decorations
   { id: 'hd-plant', sec: 'hdecor', name: 'Plant', k: 'plant', w: 1, h: 1, c: '#3fae4a', how: { free: 1 } },
@@ -285,6 +286,18 @@ const ITEMS = [
   { id: 'hd-poster', sec: 'hdecor', name: 'Orange Poster', k: 'poster', w: 1, h: 2, c: '#ff7a00', price: 40 },
   { id: 'hd-clock', sec: 'hdecor', name: 'Clock', k: 'clock', w: 1, h: 1, c: '#ffffff', price: 50 },
   { id: 'hd-fish', sec: 'hdecor', name: 'Fish Tank', k: 'fish', w: 2, h: 1, c: '#7fd0ff', price: 150 },
+  { id: 'hd-flag', sec: 'hdecor', name: 'Flag', k: 'flag', w: 1, h: 2, c: '#ff7a00', price: 30 },
+  {
+    id: 'hd-balloon',
+    sec: 'hdecor',
+    name: 'Hot Air Balloon',
+    k: 'balloon',
+    w: 3,
+    h: 4,
+    c: '#e8212b',
+    c2: '#ffd400',
+    price: 250
+  },
   {
     id: 'hd-trophy',
     sec: 'hdecor',

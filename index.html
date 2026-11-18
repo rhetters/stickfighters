@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Orange vs. the Pink Army</title>
-<link rel="stylesheet" href="css/style.css?v=16">
+<link rel="stylesheet" href="css/style.css?v=17">
 </head>
 <body>
 <div id="wrap">
@@ -94,7 +94,7 @@
  <div class="screen wide" id="s-house" hidden>
   <div class="chtop"><h2>HOUSE</h2><p id="hs-msg" aria-live="polite"></p><div class="chstars"><span class="shk"></span><b id="hs-stars">0</b></div><div class="hsbtns"><button class="btn alt" id="b-hvisit">WALK AROUND</button><button class="btn" id="b-houseback">DONE</button></div></div>
   <div id="hs-view"><canvas id="hs-cv" width="900" height="420" aria-label="Your house"></canvas><div id="hs-cells"></div></div>
-  <div id="hs-tabs"></div>
+  <div class="hsrow"><div class="hsnav"><button id="hs-left" aria-label="Look left">&#9664;</button><button id="hs-down" aria-label="Look down">&#9660;</button><small id="hs-pos"></small><button id="hs-up" aria-label="Look up">&#9650;</button><button id="hs-right" aria-label="Look right">&#9654;</button></div><div id="hs-tabs"></div></div>
   <div id="hs-pal"></div>
  </div>
  <div class="screen" id="s-lobby" hidden>
@@ -170,40 +170,40 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=16" defer></script>
-<script src="js/input.js?v=16" defer></script>
-<script src="js/data/moves.js?v=16" defer></script>
-<script src="js/data/enemies.js?v=16" defer></script>
-<script src="js/data/levels.js?v=16" defer></script>
-<script src="js/data/items.js?v=16" defer></script>
-<script src="js/data/house.js?v=16" defer></script>
-<script src="js/economy.js?v=16" defer></script>
-<script src="js/player.js?v=16" defer></script>
-<script src="js/effects.js?v=16" defer></script>
-<script src="js/combat.js?v=16" defer></script>
-<script src="js/terrain.js?v=16" defer></script>
-<script src="js/enemies.js?v=16" defer></script>
-<script src="js/modes.js?v=16" defer></script>
-<script src="js/level.js?v=16" defer></script>
-<script src="js/versus.js?v=16" defer></script>
-<script src="js/pickups.js?v=16" defer></script>
-<script src="js/net/rtc.js?v=16" defer></script>
-<script src="js/net/session.js?v=16" defer></script>
-<script src="js/ragdoll.js?v=16" defer></script>
-<script src="js/scenery.js?v=16" defer></script>
-<script src="js/looks.js?v=16" defer></script>
-<script src="js/house.js?v=16" defer></script>
-<script src="js/render.js?v=16" defer></script>
-<script src="js/ui/panels.js?v=16" defer></script>
-<script src="js/ui/training.js?v=16" defer></script>
-<script src="js/ui/touch-layout.js?v=16" defer></script>
-<script src="js/ui/lobby.js?v=16" defer></script>
-<script src="js/ui/online.js?v=16" defer></script>
-<script src="js/ui/bindings.js?v=16" defer></script>
-<script src="js/ui/character.js?v=16" defer></script>
-<script src="js/ui/house.js?v=16" defer></script>
-<script src="js/ui/backup.js?v=16" defer></script>
-<script src="js/selftest.js?v=16" defer></script>
-<script src="js/main.js?v=16" defer></script>
+<script src="js/core.js?v=17" defer></script>
+<script src="js/input.js?v=17" defer></script>
+<script src="js/data/moves.js?v=17" defer></script>
+<script src="js/data/enemies.js?v=17" defer></script>
+<script src="js/data/levels.js?v=17" defer></script>
+<script src="js/data/items.js?v=17" defer></script>
+<script src="js/data/house.js?v=17" defer></script>
+<script src="js/economy.js?v=17" defer></script>
+<script src="js/player.js?v=17" defer></script>
+<script src="js/effects.js?v=17" defer></script>
+<script src="js/combat.js?v=17" defer></script>
+<script src="js/terrain.js?v=17" defer></script>
+<script src="js/enemies.js?v=17" defer></script>
+<script src="js/modes.js?v=17" defer></script>
+<script src="js/level.js?v=17" defer></script>
+<script src="js/versus.js?v=17" defer></script>
+<script src="js/pickups.js?v=17" defer></script>
+<script src="js/net/rtc.js?v=17" defer></script>
+<script src="js/net/session.js?v=17" defer></script>
+<script src="js/ragdoll.js?v=17" defer></script>
+<script src="js/scenery.js?v=17" defer></script>
+<script src="js/looks.js?v=17" defer></script>
+<script src="js/house.js?v=17" defer></script>
+<script src="js/render.js?v=17" defer></script>
+<script src="js/ui/panels.js?v=17" defer></script>
+<script src="js/ui/training.js?v=17" defer></script>
+<script src="js/ui/touch-layout.js?v=17" defer></script>
+<script src="js/ui/lobby.js?v=17" defer></script>
+<script src="js/ui/online.js?v=17" defer></script>
+<script src="js/ui/bindings.js?v=17" defer></script>
+<script src="js/ui/character.js?v=17" defer></script>
+<script src="js/ui/house.js?v=17" defer></script>
+<script src="js/ui/backup.js?v=17" defer></script>
+<script src="js/selftest.js?v=17" defer></script>
+<script src="js/main.js?v=17" defer></script>
 </body>
 </html>

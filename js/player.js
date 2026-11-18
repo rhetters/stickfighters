@@ -447,7 +447,17 @@ function updP(f) {
         });
       if (g && f.t % 6 === 0) dust(f.x, f.gy, 1);
     }
-    if (want('j') && K.s && canSurge(f) && (g || !f.hop) && spend(f, g ? SURGE.jumpCost : SURGE.hopCost)) {
+    // Down + Jump on a floor or stairs drops through it (terrain.js)
+    if (want('j') && K.d && !K.s && g && f.gy < G) {
+      eat('j');
+      terrainDrop(f);
+    } else if (
+      want('j') &&
+      K.s &&
+      canSurge(f) &&
+      (g || !f.hop) &&
+      spend(f, g ? SURGE.jumpCost : SURGE.hopCost)
+    ) {
       eat('j');
       if (g) {
         f.vy = -16.5;

@@ -1,15 +1,35 @@
-// Orange vs. the Pink Army: House screen: build walls square by square, pick a background, buy and place
-// furniture and decorations. Works with touch (tap or drag to paint), mouse, keyboard and controllers (every grid
-// square is a button, so menu navigation reaches it).
+// Orange vs. the Pink Army: House screen: build walls, floors and stairs square by square, place furniture and
+// decorations, pick a background. Everything placed costs stars and erasing gives them all back. The view shows
+// 20 x 7 squares of a much bigger land and moves with the arrow buttons; the land grows as you build.
+// Works with touch (tap or drag to paint), mouse, keyboard and controllers (every square in view is a button).
 // ===== HOUSE SCREEN =====
-const HS = { tab: 'walls', tile: 'wood', item: null, arm: null, paint: false, last: '' };
+const HS = {
+  tab: 'walls',
+  tile: 'wood',
+  solid: 'floor',
+  item: null,
+  arm: null,
+  paint: false,
+  last: '',
+  ox: 0,
+  oy: 0
+};
 const HS_TABS = [
   ['walls', 'WALLS'],
+  ['solids', 'FLOORS & STAIRS'],
   ['hfurn', 'FURNITURE'],
   ['hdecor', 'DECORATIONS'],
   ['hbg', 'BACKGROUND'],
   ['erase', 'ERASE']
 ];
+const HS_HELP = {
+  walls: 'Pick a material, then tap or drag. Walls are scenery behind you.',
+  solids: 'Floors and stairs hold you up: jump onto them, walk up stairs, Down + Jump to drop through.',
+  hfurn: 'Pick one, then tap where its bottom-left corner goes.',
+  hdecor: 'Pick one, then tap where its bottom-left corner goes.',
+  hbg: 'Tap a background to use it.',
+  erase: 'Tap or drag to remove things. You get all their stars back.'
+};
 function houseMsg(t) {
   $('hs-msg').textContent = t || '';
 }
@@ -23,7 +43,7 @@ function openHouse() {
   state = 'menu';
   Object.assign(HOUSE, normHouse(HOUSE));
   show('s-house');
-  houseMsg('');
+  houseMsg(HS_HELP[HS.tab]);
   houseCells();
   houseTabs();
   housePal();
@@ -37,88 +57,135 @@ function closeHouse() {
   splitOpen('cust');
   $('b-house').focus({ preventScroll: true });
 }
+// How far the view can move: the land you've built on plus some room to grow
+function houseLimits() {
+  const e = houseExt(HOUSE);
+  return {
+    x: Math.max(0, Math.min(HGRID.maxCols, e.cols + HGRID.grow) - HGRID.viewCols),
+    y: Math.max(0, Math.min(HGRID.maxRows, e.rows + HGRID.viewRows) - HGRID.viewRows) // a screen of sky above
+  };
+}
+function housePan(dx, dy) {
+  const L = houseLimits();
+  HS.ox = Math.max(0, Math.min(L.x, HS.ox + dx));
+  HS.oy = Math.max(0, Math.min(L.y, HS.oy + dy));
+  houseDraw();
+}
 function houseDraw() {
-  const c = $('hs-cv');
-  withCtx(c.getContext('2d'), () => {
-    drawHouse(HOUSE);
-    // the current fighter stands in the house
-    const L = lookOf(curFighter()),
-      S = (STANCES.find(s => s.id === L.stance) || STANCES[0]).p,
-      f = { look: L, face: 1, s: 1, slot: 0, vx: 0 },
-      o = {};
-    drawFig(110, G, 1, S, L.ht, L.col, L.d2, 0, 1, L.lw, o, L.head, lookLayers(f, { face: 1, s: L.ht }, 1));
-    drawLook(f, { ...o, face: 1, s: L.ht }, 1, 'front');
+  const s = HGRID.cell;
+  withCtx($('hs-cv').getContext('2d'), () => {
+    drawHouse(HOUSE, HS.ox * s, -HS.oy * s);
+    // the current fighter stands at the left of the land
+    if (HS.ox < 4 && HS.oy === 0) {
+      const L = lookOf(curFighter()),
+        S = (STANCES.find(t => t.id === L.stance) || STANCES[0]).p,
+        f = { look: L, face: 1, s: 1, slot: 0, vx: 0 },
+        o = {},
+        x = 110 - HS.ox * s;
+      drawFig(x, G, 1, S, L.ht, L.col, L.d2, 0, 1, L.lw, o, L.head, lookLayers(f, { face: 1, s: L.ht }, 1));
+      drawLook(f, { ...o, face: 1, s: L.ht }, 1, 'front');
+    }
   });
   $('hs-stars').textContent = ECO.stars;
+  const L = houseLimits();
+  $('hs-pos').textContent = 'Square ' + (HS.ox + 1) + ' · floor ' + (HS.oy + 1);
+  $('hs-left').disabled = HS.ox <= 0;
+  $('hs-right').disabled = HS.ox >= L.x;
+  $('hs-down').disabled = HS.oy <= 0;
+  $('hs-up').disabled = HS.oy >= L.y;
 }
-// One button per grid square, laid over the canvas
+// One button per square in view, laid over the canvas; the view's bottom row sits on the floor line
 function houseCells() {
-  const box = $('hs-cells');
+  const box = $('hs-cells'),
+    V = HGRID.viewRows,
+    s = HGRID.cell;
   box.innerHTML = '';
-  box.style.top = (HGRID.top / H) * 100 + '%';
-  box.style.height = ((HGRID.rows * HGRID.cell) / H) * 100 + '%';
-  box.style.gridTemplateColumns = 'repeat(' + HGRID.cols + ', 1fr)';
-  for (let r = 0; r < HGRID.rows; r++)
-    for (let c = 0; c < HGRID.cols; c++) {
+  box.style.top = ((G - V * s) / H) * 100 + '%';
+  box.style.height = ((V * s) / H) * 100 + '%';
+  box.style.gridTemplateColumns = 'repeat(' + HGRID.viewCols + ', 1fr)';
+  for (let vr = 0; vr < V; vr++)
+    for (let vc = 0; vc < HGRID.viewCols; vc++) {
       const b = document.createElement('button');
       b.className = 'hcell';
-      b.dataset.k = c + ',' + r;
-      b.setAttribute('aria-label', 'Square ' + (c + 1) + ', ' + (HGRID.rows - r));
+      b.dataset.v = vc + ',' + (V - 1 - vr); // view column, view row counted up from the bottom
+      b.setAttribute('aria-label', 'Square ' + (vc + 1) + ', row ' + (V - vr));
       // a tap acts on pointerdown; click only comes from a keyboard or controller (detail 0)
       b.onclick = e => {
-        if (!e.detail) houseAct(c, r);
+        if (!e.detail) houseActV(b.dataset.v);
       };
       box.appendChild(b);
     }
 }
+function houseActV(v) {
+  const [vc, vr] = v.split(',').map(Number);
+  houseAct(HS.ox + vc, HS.oy + vr);
+}
 function houseAt(e) {
   const el = document.elementFromPoint(e.clientX, e.clientY);
-  return el && el.classList && el.classList.contains('hcell') ? el.dataset.k : '';
+  return el && el.classList && el.classList.contains('hcell') ? el.dataset.v : '';
 }
 $('hs-cells').addEventListener('pointerdown', e => {
-  const k = houseAt(e);
-  if (!k) return;
+  const v = houseAt(e);
+  if (!v) return;
   e.preventDefault();
-  HS.paint = HS.tab === 'walls' || HS.tab === 'erase';
-  HS.last = k;
-  const [c, r] = k.split(',').map(Number);
-  houseAct(c, r);
+  HS.paint = HS.tab === 'walls' || HS.tab === 'solids' || HS.tab === 'erase';
+  HS.last = v;
+  houseActV(v);
 });
 $('hs-cells').addEventListener('pointermove', e => {
   if (!HS.paint) return;
-  const k = houseAt(e);
-  if (!k || k === HS.last) return;
-  HS.last = k;
-  const [c, r] = k.split(',').map(Number);
-  houseAct(c, r);
+  const v = houseAt(e);
+  if (!v || v === HS.last) return;
+  HS.last = v;
+  houseActV(v);
 });
 addEventListener('pointerup', () => (HS.paint = false));
 addEventListener('pointercancel', () => (HS.paint = false));
+// Paint one square of a layer (cells = walls, solids = floors and stairs): pay for the new piece, refund the old one
+function housePaint(layer, list, k, id) {
+  const old = HOUSE[layer][k];
+  if (old === id) return false;
+  if (Object.keys(HOUSE[layer]).length >= HOUSE_MAX_SQUARES)
+    return !houseMsg('That’s as big as a house can get!');
+  const t = list[id];
+  if (!spendStars(t.price, 'house'))
+    return !houseMsg('Not enough stars for ' + t.name + ' (' + t.price + ').');
+  if (old) refundStars(list[old].price, 'house');
+  HOUSE[layer] = { ...HOUSE[layer], [k]: id };
+  return true;
+}
 // What a tap on square (c, r) does, by tab
 function houseAct(c, r) {
   const k = c + ',' + r;
-  if (HS.tab === 'walls') {
-    if (HOUSE.cells[k] === HS.tile) return;
-    const t = HTILE[HS.tile];
-    if (!spendStars(t.price, 'house-' + t.id))
-      return houseMsg('Not enough stars for ' + t.name + ' (' + t.price + ').');
-    HOUSE.cells[k] = HS.tile;
-    sfx(300, 0.04, 'square', 0.03, 100);
-  } else if (HS.tab === 'erase') {
+  let done = false;
+  if (HS.tab === 'walls') done = housePaint('cells', HTILE, k, HS.tile);
+  else if (HS.tab === 'solids') done = housePaint('solids', HSOLID, k, HS.solid);
+  else if (HS.tab === 'erase') {
     const i = houseItemAt(c, r);
-    if (i >= 0) HOUSE.items.splice(i, 1);
-    else if (HOUSE.cells[k]) delete HOUSE.cells[k];
-    else return;
+    if (i >= 0) refundStars(ITEM[HOUSE.items.splice(i, 1)[0].id].price || 0, 'house');
+    else if (HOUSE.solids[k]) {
+      refundStars(HSOLID[HOUSE.solids[k]].price, 'house');
+      delete HOUSE.solids[k];
+    } else if (HOUSE.cells[k]) {
+      refundStars(HTILE[HOUSE.cells[k]].price, 'house');
+      delete HOUSE.cells[k];
+    } else return;
     sfx(200, 0.05, 'triangle', 0.03, -100);
+    done = true;
   } else if (HS.tab === 'hfurn' || HS.tab === 'hdecor') {
     if (!HS.item) return houseMsg('Pick something below first.');
     if (HOUSE.items.length >= HOUSE_MAX_ITEMS)
       return houseMsg('Your house is full (' + HOUSE_MAX_ITEMS + ' things).');
     const d = ITEM[HS.item];
+    if (d.price && !spendStars(d.price, d.id))
+      return houseMsg('Not enough stars for ' + d.name + ' (' + d.price + ').');
     // the tapped square is the bottom-left corner of the item
-    HOUSE.items.push({ id: d.id, x: Math.min(c, HGRID.cols - d.w), y: Math.max(0, r - d.h + 1) });
+    HOUSE.items.push({ id: d.id, x: Math.min(c, HGRID.maxCols - d.w), y: Math.min(r, HGRID.maxRows - d.h) });
     sfx(500, 0.06, 'square', 0.03, 200);
-  } else return;
+    done = true;
+  }
+  if (!done) return;
+  if (HS.tab === 'walls' || HS.tab === 'solids') sfx(300, 0.04, 'square', 0.03, 100);
   houseSave();
   houseDraw();
 }
@@ -141,15 +208,7 @@ function houseTabs() {
     b.onclick = () => {
       HS.tab = id;
       HS.arm = null;
-      houseMsg(
-        id === 'walls'
-          ? 'Pick a material, then tap or drag on the grid. Each square costs stars.'
-          : id === 'erase'
-            ? 'Tap a thing or a wall square to remove it.'
-            : id === 'hbg'
-              ? 'Tap a background to use it.'
-              : 'Pick one, then tap where its bottom-left corner goes.'
-      );
+      houseMsg(HS_HELP[id]);
       houseTabs();
       housePal();
       $('hs-tabs')
@@ -159,7 +218,7 @@ function houseTabs() {
     box.appendChild(b);
   }
 }
-// The cards under the tabs: wall materials, or the store items of that section
+// The cards under the tabs: wall materials, floors and stairs, or the store items of that section
 function housePal() {
   const box = $('hs-pal');
   box.innerHTML = '';
@@ -181,44 +240,75 @@ function housePal() {
         HS.tile === t.id,
         true,
         t.name,
-        t.price + ' per square',
+        t.price + ' a square',
         () => houseTile(t, 12, 2, 40),
         () => {
           HS.tile = t.id;
           housePal();
         }
       );
-  if (HS.tab === 'hfurn' || HS.tab === 'hdecor' || HS.tab === 'hbg')
-    for (const it of ITEMS.filter(i => i.sec === HS.tab)) {
+  if (HS.tab === 'solids')
+    for (const t of HSOLIDS)
+      card(
+        HS.solid === t.id,
+        true,
+        t.name,
+        t.price + ' a square',
+        () => houseSolid(t.id, 12, 2, 40),
+        () => {
+          HS.solid = t.id;
+          housePal();
+        }
+      );
+  if (HS.tab === 'hbg')
+    for (const it of ITEMS.filter(i => i.sec === 'hbg')) {
       const own = owns(it.id),
-        on = HS.tab === 'hbg' ? HOUSE.bg === it.id : HS.item === it.id;
+        on = HOUSE.bg === it.id;
       card(
         on,
         own,
         it.name,
         own ? (on ? 'IN USE' : 'Owned') : HS.arm === it.id ? 'Tap to buy' : howText(it),
         () => {
-          if (HS.tab === 'hbg') {
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(4, 2, 56, 46);
-            ctx.clip();
-            ctx.scale(0.08, 0.12);
-            houseBg(it);
-            ctx.restore();
-            ctx.strokeStyle = INK;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(4, 2, 56, 46);
-          } else {
-            const s = Math.min(56 / it.w, 48 / it.h);
-            houseThing(it, 32 - (it.w * s) / 2, 50 - it.h * s, it.w * s, it.h * s);
-          }
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(4, 2, 56, 46);
+          ctx.clip();
+          ctx.scale(0.08, 0.12);
+          houseBg(it);
+          ctx.restore();
+          ctx.strokeStyle = INK;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(4, 2, 56, 46);
         },
-        () => housePick(it)
+        () => houseBgPick(it)
+      );
+    }
+  if (HS.tab === 'hfurn' || HS.tab === 'hdecor')
+    for (const it of ITEMS.filter(i => i.sec === HS.tab)) {
+      const can = !!it.price || owns(it.id);
+      card(
+        HS.item === it.id,
+        can,
+        it.name,
+        it.price ? it.price + ' each' : can ? 'Free' : howText(it),
+        () => {
+          const s = Math.min(56 / it.w, 48 / it.h);
+          houseThing(it, 32 - (it.w * s) / 2, 50 - it.h * s, it.w * s, it.h * s);
+        },
+        () => {
+          if (!can) return houseMsg(howText(it) + '.');
+          HS.item = it.id;
+          houseMsg(
+            'Now tap where its bottom-left corner goes' + (it.price ? ' (' + it.price + ' stars).' : '.')
+          );
+          housePal();
+        }
       );
     }
 }
-function housePick(it) {
+// Backgrounds are bought once (tap twice to buy), then used as often as you like
+function houseBgPick(it) {
   if (!owns(it.id)) {
     if (HS.arm !== it.id) {
       HS.arm = it.id;
@@ -233,18 +323,17 @@ function housePick(it) {
     houseMsg('You bought ' + it.name + '!');
     sfx(700, 0.12, 'square', 0.05, 300);
   }
-  if (it.sec === 'hbg') {
-    HOUSE.bg = it.id;
-    houseSave();
-  } else {
-    HS.item = it.id;
-    if (owns(it.id)) houseMsg('Now tap where its bottom-left corner goes.');
-  }
+  HOUSE.bg = it.id;
+  houseSave();
   housePal();
   houseDraw();
 }
 $('b-house').onclick = openHouse;
 $('b-houseback').onclick = closeHouse;
+$('hs-left').onclick = () => housePan(-5, 0);
+$('hs-right').onclick = () => housePan(5, 0);
+$('hs-up').onclick = () => housePan(0, 3);
+$('hs-down').onclick = () => housePan(0, -3);
 $('b-hvisit').onclick = () => {
   ROSTER = [];
   startHouse({ ...normHouse(HOUSE), name: 'MY HOUSE' });
