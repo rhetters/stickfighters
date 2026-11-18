@@ -361,7 +361,19 @@ function updP() {
   if (f.blkT > 0) f.blkT--;
   // Pose wheel (M10 patch; looks only): hold the pose button on the ground to stand still and aim (8 directions)
   // at a pose, let go to strike it. Moving, jumping, Surge or attacking ends the pose.
-  if (f.emote && (f.st !== 'free' || K.l || K.r || K.j || K.p || K.k || K.s || K.x)) f.emote = null;
+  // a direction still held from aiming the wheel doesn't count; only a new press of left or right does
+  if (
+    f.emote &&
+    (f.st !== 'free' ||
+      (K.l && (press.l ?? -99) >= f.emote.at) ||
+      (K.r && (press.r ?? -99) >= f.emote.at) ||
+      K.j ||
+      K.p ||
+      K.k ||
+      K.s ||
+      K.x)
+  )
+    f.emote = null;
   if (f.st === 'free' && K.e && f.y >= G - 1) {
     // d = the aimed direction in eighths of a turn, clockwise from up (0 = up, 2 = right, 4 = down, 6 = left)
     f.wheel = f.wheel || { d: 0 };
@@ -377,7 +389,7 @@ function updP() {
     return;
   }
   if (f.wheel) {
-    f.emote = { d: f.wheel.d };
+    f.emote = { d: f.wheel.d, at: fr };
     f.wheel = null;
   }
   if (f.st === 'free') {

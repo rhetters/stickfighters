@@ -340,7 +340,9 @@ function corpseTick(f, dissolve) {
           vy: -1 - rnd() * 2.5,
           a: rnd() * 6,
           va: (rnd() - 0.5) * 0.4,
-          c: ['#ff4fa3', '#ff93c8', '#ffd1e8', '#ffffff'][(rnd() * 4) | 0],
+          c: (f.pl ? [f.col, f.d2, '#ffffff', '#ffd400'] : ['#ff4fa3', '#ff93c8', '#ffd1e8', '#ffffff'])[
+            (rnd() * 4) | 0
+          ],
           l: 34,
           m: 34
         });
@@ -367,7 +369,7 @@ function ragTick(f) {
     }
     if (f.corpse || f.st === 'dead') {
       R.pin = 0;
-      corpseTick(f, !f.pl);
+      corpseTick(f, !f.pl || f.left); // a player who left online dissolves like a defeated enemy (M11)
       return;
     }
     // alive: pin the mid-spine to the gameplay body

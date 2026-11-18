@@ -390,6 +390,19 @@ async function rtcJoin(code) {
   RTC.joinT = setTimeout(() => !P.answered && RTC.on.err('NOROOM'), 14000);
   return host;
 }
+// Connect directly to another device in the same room (guests connecting to each other, M11 patch)
+async function rtcConnect(id) {
+  if (RTC.peers[id]) return;
+  const P = rtcPeer(id);
+  P.cid = 'c' + Math.random().toString(36).slice(2, 10);
+  rtcChannel(P, P.pc.createDataChannel('game', { ordered: true }));
+  await P.pc.setLocalDescription(await P.pc.createOffer());
+  const offer = () =>
+    !P.answered && RTC.peers[id] === P && sigSend(id, 'OFFER', { sdp: P.pc.localDescription, cid: P.cid });
+  offer();
+  setTimeout(offer, 2500);
+  setTimeout(offer, 6000);
+}
 function rtcSend(id, m) {
   const P = RTC.peers[id];
   if (P && P.open && P.ch.readyState === 'open') P.ch.send(JSON.stringify(m));

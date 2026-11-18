@@ -225,7 +225,8 @@ function drawF(f) {
     );
     if (L) drawLook(f, { ...o, face: f.face, s: ds }, fa, 'front');
     ctx.restore();
-    if (f.wheel && L) drawWheel(f);
+    // the pose wheel shows only on the device of the player using it (online); everyone sees the pose
+    if (f.wheel && L && (!NET.match || f.slot === NET.mySlot)) drawWheel(f);
   }
   if (!f.dying && (f.st === 'down' || f.st === 'getup') && !(f.pl && f.st === 'dead'))
     stars(R ? R.p[0].x : f.x, (R ? R.p[0].y : f.y - 50 * f.s) - 16); // dazed
