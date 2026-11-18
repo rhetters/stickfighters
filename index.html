@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Orange vs. the Pink Army</title>
-<link rel="stylesheet" href="css/style.css?v=15">
+<link rel="stylesheet" href="css/style.css?v=16">
 </head>
 <body>
 <div id="wrap">
@@ -39,7 +39,7 @@
   <div id="tmenu" hidden>
    <div class="tslot"><button class="btn" id="b-solo">SOLO</button><div class="split" id="solorow" hidden><button class="btn" id="b-level">CAMPAIGN</button><button class="btn" id="b-start">ARCADE</button></div></div>
    <div class="tslot"><button class="btn" id="b-mp">MULTIPLAYER</button><div class="split" id="mprow" hidden><button class="btn" id="b-multi">LOCAL</button><button class="btn" id="b-online">ONLINE</button></div></div>
-   <button class="btn alt" id="b-char">CHARACTER</button>
+   <div class="tslot"><button class="btn alt" id="b-cust">CUSTOMIZE</button><div class="split" id="custrow" hidden><button class="btn" id="b-char">CHARACTER</button><button class="btn" id="b-house">HOUSE</button></div></div>
    <button class="btn alt" id="b-train">TRAINING ROOM</button>
    <button class="btn alt" id="b-set1">SETTINGS</button>
   </div>
@@ -61,7 +61,7 @@
   <div id="on-room" class="onpane" hidden>
    <p class="onroomcode">ROOM CODE <b id="on-code"></b></p>
    <div id="on-cards"></div>
-   <div class="onmodes" id="on-modes"><button data-mode="level">CO-OP TRAIL</button><button data-mode="arcade">ARCADE</button><button data-mode="vs">VERSUS</button></div>
+   <div class="onmodes" id="on-modes"><button data-mode="level">CO-OP TRAIL</button><button data-mode="arcade">ARCADE</button><button data-mode="vs">VERSUS</button><button data-mode="house">HOST'S HOUSE</button></div>
    <button class="btn" id="on-start">START</button>
    <p id="on-wait"></p>
    <p id="on-diag"></p>
@@ -90,6 +90,12 @@
    </div>
   </div>
   <button class="btn" id="b-charback">DONE</button>
+ </div>
+ <div class="screen wide" id="s-house" hidden>
+  <div class="chtop"><h2>HOUSE</h2><p id="hs-msg" aria-live="polite"></p><div class="chstars"><span class="shk"></span><b id="hs-stars">0</b></div><div class="hsbtns"><button class="btn alt" id="b-hvisit">WALK AROUND</button><button class="btn" id="b-houseback">DONE</button></div></div>
+  <div id="hs-view"><canvas id="hs-cv" width="900" height="420" aria-label="Your house"></canvas><div id="hs-cells"></div></div>
+  <div id="hs-tabs"></div>
+  <div id="hs-pal"></div>
  </div>
  <div class="screen" id="s-lobby" hidden>
   <h2>PLAYERS</h2>
@@ -164,36 +170,39 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=15" defer></script>
-<script src="js/input.js?v=15" defer></script>
-<script src="js/data/moves.js?v=15" defer></script>
-<script src="js/data/enemies.js?v=15" defer></script>
-<script src="js/data/levels.js?v=15" defer></script>
-<script src="js/data/items.js?v=15" defer></script>
-<script src="js/economy.js?v=15" defer></script>
-<script src="js/player.js?v=15" defer></script>
-<script src="js/effects.js?v=15" defer></script>
-<script src="js/combat.js?v=15" defer></script>
-<script src="js/enemies.js?v=15" defer></script>
-<script src="js/modes.js?v=15" defer></script>
-<script src="js/level.js?v=15" defer></script>
-<script src="js/versus.js?v=15" defer></script>
-<script src="js/pickups.js?v=15" defer></script>
-<script src="js/net/rtc.js?v=15" defer></script>
-<script src="js/net/session.js?v=15" defer></script>
-<script src="js/ragdoll.js?v=15" defer></script>
-<script src="js/scenery.js?v=15" defer></script>
-<script src="js/looks.js?v=15" defer></script>
-<script src="js/render.js?v=15" defer></script>
-<script src="js/ui/panels.js?v=15" defer></script>
-<script src="js/ui/training.js?v=15" defer></script>
-<script src="js/ui/touch-layout.js?v=15" defer></script>
-<script src="js/ui/lobby.js?v=15" defer></script>
-<script src="js/ui/online.js?v=15" defer></script>
-<script src="js/ui/bindings.js?v=15" defer></script>
-<script src="js/ui/character.js?v=15" defer></script>
-<script src="js/ui/backup.js?v=15" defer></script>
-<script src="js/selftest.js?v=15" defer></script>
-<script src="js/main.js?v=15" defer></script>
+<script src="js/core.js?v=16" defer></script>
+<script src="js/input.js?v=16" defer></script>
+<script src="js/data/moves.js?v=16" defer></script>
+<script src="js/data/enemies.js?v=16" defer></script>
+<script src="js/data/levels.js?v=16" defer></script>
+<script src="js/data/items.js?v=16" defer></script>
+<script src="js/data/house.js?v=16" defer></script>
+<script src="js/economy.js?v=16" defer></script>
+<script src="js/player.js?v=16" defer></script>
+<script src="js/effects.js?v=16" defer></script>
+<script src="js/combat.js?v=16" defer></script>
+<script src="js/enemies.js?v=16" defer></script>
+<script src="js/modes.js?v=16" defer></script>
+<script src="js/level.js?v=16" defer></script>
+<script src="js/versus.js?v=16" defer></script>
+<script src="js/pickups.js?v=16" defer></script>
+<script src="js/net/rtc.js?v=16" defer></script>
+<script src="js/net/session.js?v=16" defer></script>
+<script src="js/ragdoll.js?v=16" defer></script>
+<script src="js/scenery.js?v=16" defer></script>
+<script src="js/looks.js?v=16" defer></script>
+<script src="js/house.js?v=16" defer></script>
+<script src="js/render.js?v=16" defer></script>
+<script src="js/ui/panels.js?v=16" defer></script>
+<script src="js/ui/training.js?v=16" defer></script>
+<script src="js/ui/touch-layout.js?v=16" defer></script>
+<script src="js/ui/lobby.js?v=16" defer></script>
+<script src="js/ui/online.js?v=16" defer></script>
+<script src="js/ui/bindings.js?v=16" defer></script>
+<script src="js/ui/character.js?v=16" defer></script>
+<script src="js/ui/house.js?v=16" defer></script>
+<script src="js/ui/backup.js?v=16" defer></script>
+<script src="js/selftest.js?v=16" defer></script>
+<script src="js/main.js?v=16" defer></script>
 </body>
 </html>

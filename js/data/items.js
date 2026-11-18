@@ -36,7 +36,11 @@ const SECS = {
   dress: { name: 'Dresses', slot: 'legs' },
   shoes: { name: 'Shoes', slot: 'shoes' },
   surge: { name: 'Surge style', slot: 'surge', note: 'the glow and afterimages when you use Surge' },
-  pose: { name: 'Poses', slot: 'pose', note: 'up to 8 on your pose wheel; the first is your victory pose' }
+  pose: { name: 'Poses', slot: 'pose', note: 'up to 8 on your pose wheel; the first is your victory pose' },
+  // House builder (sold on the House screen, not the Character screen). w / h = size in grid squares.
+  hbg: { name: 'Backgrounds', slot: 'house' },
+  hfurn: { name: 'Furniture', slot: 'house' },
+  hdecor: { name: 'Decorations', slot: 'house' }
 };
 // The slots a fighter wears (colour and the pose wheel are kept separately)
 const EQ = ['hair', 'hat', 'band', 'scarf', 'tie', 'shirt', 'jacket', 'gloves', 'legs', 'shoes', 'surge'];
@@ -255,7 +259,42 @@ const ITEMS = [
   { id: 'pose-kneel', sec: 'pose', name: 'Ninja Kneel', price: 80 },
   { id: 'pose-dance', sec: 'pose', name: 'Dance', price: 120 },
   { id: 'pose-cheer', sec: 'pose', name: 'Champion', how: { vs: 1 } },
-  { id: 'pose-spin', sec: 'pose', name: 'Twirl', how: { drop: 1 } }
+  { id: 'pose-spin', sec: 'pose', name: 'Twirl', how: { drop: 1 } },
+  // House backgrounds: k = pattern
+  { id: 'hbg-paper', sec: 'hbg', name: 'Grid Paper', k: 'paper', c: '#fbfaf4', how: { free: 1 } },
+  { id: 'hbg-cream', sec: 'hbg', name: 'Cream', k: 'plain', c: '#f6e7c8', price: 40 },
+  { id: 'hbg-mint', sec: 'hbg', name: 'Mint', k: 'plain', c: '#cdeedd', price: 40 },
+  { id: 'hbg-stripes', sec: 'hbg', name: 'Stripes', k: 'stripes', c: '#ffe1ea', c2: '#ffc9d8', price: 80 },
+  { id: 'hbg-sky', sec: 'hbg', name: 'Sky', k: 'sky', c: '#bfe6ff', c2: '#ffffff', price: 80 },
+  { id: 'hbg-sunset', sec: 'hbg', name: 'Sunset', k: 'grad', c: '#ffcf6e', c2: '#ff7a8a', price: 120 },
+  { id: 'hbg-night', sec: 'hbg', name: 'Starry Night', k: 'night', c: '#1d2350', c2: '#ffd400', price: 150 },
+  // House furniture
+  { id: 'hf-chair', sec: 'hfurn', name: 'Chair', k: 'chair', w: 1, h: 1, c: '#c98a4f', how: { free: 1 } },
+  { id: 'hf-table', sec: 'hfurn', name: 'Table', k: 'table', w: 2, h: 1, c: '#a96e3a', how: { free: 1 } },
+  { id: 'hf-bed', sec: 'hfurn', name: 'Bed', k: 'bed', w: 3, h: 1, c: '#3ec5ff', c2: '#ffffff', price: 100 },
+  { id: 'hf-couch', sec: 'hfurn', name: 'Couch', k: 'couch', w: 3, h: 1, c: '#ff7a00', price: 120 },
+  { id: 'hf-shelf', sec: 'hfurn', name: 'Bookshelf', k: 'shelf', w: 2, h: 3, c: '#8a5a33', price: 120 },
+  { id: 'hf-lamp', sec: 'hfurn', name: 'Lamp', k: 'lamp', w: 1, h: 2, c: '#ffd400', price: 50 },
+  { id: 'hf-tv', sec: 'hfurn', name: 'TV', k: 'tv', w: 2, h: 2, c: '#2a2a3a', price: 150 },
+  { id: 'hf-fridge', sec: 'hfurn', name: 'Fridge', k: 'fridge', w: 1, h: 3, c: '#eef3f6', price: 120 },
+  // House decorations
+  { id: 'hd-plant', sec: 'hdecor', name: 'Plant', k: 'plant', w: 1, h: 1, c: '#3fae4a', how: { free: 1 } },
+  { id: 'hd-tree', sec: 'hdecor', name: 'Tall Plant', k: 'tree', w: 1, h: 2, c: '#2f8f3a', price: 60 },
+  { id: 'hd-rug', sec: 'hdecor', name: 'Rug', k: 'rug', w: 3, h: 1, c: '#e8212b', c2: '#ffd400', price: 60 },
+  { id: 'hd-picture', sec: 'hdecor', name: 'Picture', k: 'picture', w: 1, h: 1, c: '#3ec5ff', price: 40 },
+  { id: 'hd-poster', sec: 'hdecor', name: 'Orange Poster', k: 'poster', w: 1, h: 2, c: '#ff7a00', price: 40 },
+  { id: 'hd-clock', sec: 'hdecor', name: 'Clock', k: 'clock', w: 1, h: 1, c: '#ffffff', price: 50 },
+  { id: 'hd-fish', sec: 'hdecor', name: 'Fish Tank', k: 'fish', w: 2, h: 1, c: '#7fd0ff', price: 150 },
+  {
+    id: 'hd-trophy',
+    sec: 'hdecor',
+    name: 'Gold Trophy',
+    k: 'trophy',
+    w: 1,
+    h: 1,
+    c: '#ffd400',
+    how: { wave: 10 }
+  }
 ];
 for (const it of ITEMS) it.slot = SECS[it.sec].slot;
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));

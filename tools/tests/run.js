@@ -3,8 +3,8 @@
 //        node tools/tests/run.js net m10    only tests whose name contains "net" or "m10"
 // Screenshots go to tools/tests/out/shots (not committed).
 const {execFileSync}=require('child_process'),fs=require('fs'),path=require('path');
-const TESTS=['selftest','m4test','m5test','m6test','m7test','m7ui','m8test','cptest','bindtest','m9lobby','m9vs','pm9test',
-  'menu2test','m10test','navtest','spam','nettest','nettest2','nettest3','netlag'];
+const TESTS=['names','selftest','m4test','m5test','m6test','m7test','m7ui','m8test','cptest','bindtest','m9lobby','m9vs','pm9test',
+  'menu2test','m10test','navtest','m18test','spam','nettest','nettest2','nettest3','netlag'];
 const want=process.argv.slice(2),out=path.join(__dirname,'out');fs.mkdirSync(path.join(out,'shots'),{recursive:true});
 let bad=[];
 for(const t of TESTS.filter(t=>!want.length||want.some(w=>t.includes(w)))){

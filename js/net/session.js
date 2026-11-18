@@ -340,7 +340,9 @@ function netStart() {
       mode: NET.mode,
       D,
       feel: { ...FEEL },
-      players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid }))
+      players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid })),
+      // House mode visits the host's house (decoration only, so it can't affect the simulation)
+      house: NET.mode === 'house' ? normHouse(HOUSE) : undefined
     };
   netAll(msg);
   netStartLocal(msg);
@@ -375,7 +377,10 @@ function netStartLocal(m) {
   fr = 0;
   if (m.mode === 'vs') startVersus();
   else if (m.mode === 'level') startLevel('woods1');
-  else start();
+  else if (m.mode === 'house') {
+    const host = m.players.find(p => p.slot === 0);
+    startHouse({ ...normHouse(m.house, true), name: ((host && host.name) || 'HOST') + "'S HOUSE" });
+  } else start();
   fr = 0;
 }
 // Commands from the host after a match ends: play again, continue from the checkpoint, or back to the room
@@ -404,6 +409,7 @@ function netCmdLocal(m) {
   if (m.c === 'cont') continueLevel();
   else if (NET.mode === 'vs') startVersus();
   else if (NET.mode === 'level') startLevel('woods1');
+  else if (NET.mode === 'house') startHouse(HVIEW);
   else start();
   fr = 0;
 }

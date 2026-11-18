@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 · House builder and visiting (November 17, 2026)
+- Title: **Customize** opens **Character | House**.
+- House screen: a side view of your house on a 20 x 7 grid. Paint walls square by square in 7 materials (wood, plaster, pink paint, brick, stone, roof, window; 2 to 4 stars a square), tap or drag. 8 pieces of furniture and 8 decorations to buy once and place anywhere (chair, table and plant are free; the Gold Trophy unlocks at Arcade wave 10), 7 backgrounds, and Erase. Works with touch, mouse, keyboard and controllers.
+- **Walk around** puts your fighter in your house. Online, the host can pick **Host's House** and everyone visits it.
+- Save version 6 (adds the house); older saves upgrade with an empty house and keep everything else.
+- New test that catches two files using the same top-level name, after one such clash was found while building this.
+- Self-test fingerprints unchanged.
+- Version 16.
+
 ## Cleanup (November 17, 2026)
 - No gameplay change. The code no longer has a hidden "current player": every part of the game is handed the player it works on. This was the last big piece of old wiring and the groundwork rollback (M11.5) needs.
 - Fixed: pressing Start on a controller at PRESS START sometimes also opened the Solo menu.

@@ -121,6 +121,28 @@ function normFighter(c, any) {
     wheel: wheel.length ? wheel : ['pose-flex']
   };
 }
+// A house with every field valid: unknown squares, materials and items dropped, positions kept on the grid.
+// any = accept items without checking ownership (a host's house shown to visitors online)
+function normHouse(h, any) {
+  const src = h && typeof h === 'object' ? h : {},
+    ok = (id, sec) => !!ITEM[id] && ITEM[id].sec === sec && (any || owns(id)),
+    bgOk = ok(src.bg, 'hbg'),
+    cells = {},
+    items = [];
+  const c0 = src.cells && typeof src.cells === 'object' ? src.cells : {};
+  for (const k of Object.keys(c0).slice(0, HGRID.cols * HGRID.rows)) {
+    const m = /^(\d+),(\d+)$/.exec(k);
+    if (m && +m[1] < HGRID.cols && +m[2] < HGRID.rows && HTILE[c0[k]]) cells[+m[1] + ',' + +m[2]] = c0[k];
+  }
+  for (const it of Array.isArray(src.items) ? src.items.slice(0, HOUSE_MAX_ITEMS) : []) {
+    if (!it || !(ok(it.id, 'hfurn') || ok(it.id, 'hdecor'))) continue;
+    const d = ITEM[it.id],
+      x = Math.max(0, Math.min(HGRID.cols - d.w, Math.floor(+it.x || 0))),
+      y = Math.max(0, Math.min(HGRID.rows - d.h, Math.floor(+it.y || 0)));
+    items.push({ id: it.id, x, y });
+  }
+  return { bg: bgOk ? src.bg : 'hbg-paper', cells, items };
+}
 const fighter = i => (CHR.list[i] ? normFighter(CHR.list[i]) : null);
 const curFighter = () => fighter(CHR.cur) || normFighter(FIGHTER0);
 // What the renderer needs to draw a fighter: colours, sizes, the item object for each slot, and the pose wheel.

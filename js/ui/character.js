@@ -39,6 +39,7 @@ function closeChar() {
   CH.tryOn = {};
   show('s-title');
   titleView();
+  splitOpen('cust');
   $('b-char').focus({ preventScroll: true });
 }
 function setChar(fn) {
@@ -474,4 +475,5 @@ addEventListener('keydown', e => {
   if (e.key !== 'Escape' || $('ui').hidden || CAP) return;
   if (!$('s-char').hidden && document.activeElement !== $('ch-name')) closeChar();
   else if (!$('s-backup').hidden) $('bk-back').click();
+  else if (!$('s-house').hidden) closeHouse();
 });
