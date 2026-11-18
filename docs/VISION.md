@@ -17,7 +17,7 @@ This is the destination, not a promise to build it all soon.
 2. **Procedural co-op campaigns.** Choose co-op and a player count, everyone readies up in a lobby, and a theme is drawn. The biome order is fixed, but each biome is assembled from chunks by a seed, so no two runs match.
 3. **Versus mode.** Smash and Boomerang Fu style fixed-arena brawls for 2–8 players.
 4. **Local multiplayer on the TV.** An iPad mirrored or wired to the TV, Bluetooth controllers, and a "press any button to join" screen.
-5. **Network multiplayer.** Each kid on their own iPad over home Wi-Fi, for co-op and versus.
+5. **Online multiplayer.** Each player on their own device, house to house over the internet, PC, iPad and phone together (cross-play), for co-op and versus. Built in M11 with Host / Join room codes. Later: **matchmaking**, where players looking for a game are put in a room automatically, and on **Steam**, Steam lobbies and Steam networking. The game is split into a connection layer, a room layer and lockstep play so either can be swapped in without touching the rest. Matching strangers needs our own server (a small monthly cost) and kid-safety choices: no chat, only poses and preset messages, friends-only by default.
 6. **Ninja star economy.** Enemies drop ninja stars that buy cosmetics only, in a store organized by slot (head, shoes and so on). Purchases are saved, equipped in Character Creation, and visible to other players.
 7. **XP and skill tree** (roadmap M12). The ninja star store and character creation arrived in M10.
 8. **House builder.** A grid where you drag out walls (charged in stars per square), add backgrounds, furniture and decorations, then invite friends to visit.

@@ -10,7 +10,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 
 **Why this order.** Input comes first because every combo depends on knowing which direction is held. Then the combat engine, then Surge (your stamina system), because Surge modifies moves. Collision feel and ragdoll come before levels and progression, since you called them the core of the game and there’s no point building five levels on combat that will change. Progression and the shop come once there’s a real level to earn XP in. Levels 2–6 come last, when the systems stop moving.
 
-**Where things stand.** M0 to M10 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M11 (network multiplayer on home Wi-Fi) is next, moved up from M17 on November 17 at Rhett's request.
+**Where things stand.** M0 to M11 are complete and playable, both in the preview and on GitHub Pages (rhetters.github.io/stickfighters, linked from Rhett's game site). M3 was built before M2, which caused no problems because Surge reads your aim directly. M6, the custom touch layout, was added mid-way at Rhett's request, so the milestones after it each moved down one. M11 (online multiplayer, moved up from M17 at Rhett's request) is built and waiting for a real house-to-house test; M12 (XP, levels and the skill tree) is next.
 
 **Why this order after M7 (reordered November 16, 2026).** Ron and Rhett approved the order from the restructure plan. M8 builds the level framework so the world is no longer one screen and each game type is a separate "mode". Local multiplayer comes next (M9) so Rhett gets Smash-style versus early, and because network play later needs the same per-player groundwork. The ninja star store with character creation (M10) follows. Network play (M11) comes right after it (moved up from M17 on November 17 at Rhett's request; it only needs M9 and M10, and building it early means every later feature is made online-ready from the start). Then progression with the skill tree (M12), the rest of the campaign (M13–M16, ending in the v1.0 release), the level creator (M17) and the house builder (M18). The old numbers are listed under "Renumbering" below.
 
@@ -38,8 +38,8 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 | M8 | Level framework, modes, Level 1: Wooded Trail | Done | L | M7.5 | Scrolling level with parallax layers; the wave game becomes Arcade mode |
 | M9 | Local multiplayer: co-op and versus | Done | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
 | M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
-| M11 | Network multiplayer on home Wi-Fi | Next | XL | M9, M10 | Each kid on their own iPad, co-op first, then versus |
-| M12 | XP, levels, skill tree | Planned | L | M3, M8, M10 | Level-ups, skill points, tree screen |
+| M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
+| M12 | XP, levels, skill tree | Next | L | M3, M8, M10 | Level-ups, skill points, tree screen |
 | M13 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M10, M12 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
 | M14 | Boss level | Planned | L | M13 | Multi-phase boss fight |
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
@@ -349,15 +349,21 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **M10 patch (Rhett's 16 fixes, November 16):** tabs became Body, Colors, Head (hair, hats, bands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge and Poses, each with a None card; 143 items. Trails became Surge styles (the glow and afterimages when you use Surge). Victory poses became a **pose wheel**: up to 4 poses (the first is the victory pose); hold T, Select or POSE in a fight, aim, let go. Height setting, four fighter slots, delete a fighter, gifts show the item inside, headphones fixed, no more spinning in the preview. Save version 5.
 - Self-test fingerprints unchanged: Arcade `c87c9470`, Level `21292ab5`. Star drops use their own seeded roll, not the gameplay random sequence.
 
-### M11 · Network multiplayer on home Wi-Fi
+### M11 · Online multiplayer (internet, cross-play)
 
-*Moved up from M17 on November 17, 2026 at Rhett's request. It only needs M9 (players in slots, inputs through `setA`) and M10 (looks are shared at the start of a match), and doing it early means every later feature is built and tested with online play in mind instead of retrofitted.*
+*Moved up from M17 on November 17, 2026 at Rhett's request. It only needs M9 (players in slots, inputs through `setA`) and M10 (looks are shared at the start of a match), and doing it early means every later feature is built and tested with online play in mind instead of retrofitted. Widened the same day from home Wi-Fi to the internet (house to house) with cross-play between PCs, iPads and phones.*
 
-- Each kid plays on their own iPad. Every device runs the same simulation from a shared seed and only inputs are exchanged (rule R2). Co-op first, since it forgives some lag; then versus, with rollback if lag is a problem.
-- WebRTC peer-to-peer from GitHub Pages needs a small matchmaking ("signaling") step even at home. Options to evaluate then: NetplayJS, PeerJS, or a tiny free signaling service.
-- The self-test fingerprint doubles as a desync check: devices compare it every few seconds.
+- **Host / Join.** One player hosts and gets a room code (a word and a number, like COMET-76); others pick the code with arrows (no typing, so controllers work) and join. Up to 4 players, one per device. The room shows everyone's fighter; each player changes theirs with ◀ ▶. The host picks Co-op Trail, Arcade or Versus and starts.
+- **Any device with any device.** It runs in the browser, so PC, iPad and phone mix freely.
+- **Three layers**, so matchmaking or Steam can replace one without the others: the *connection* (`net/rtc.js`: WebRTC data channels, found through the free public PeerJS signaling server, spoken to in plain JavaScript; STUN for home routers), the *room* (who's in, fighters, mode, version check; the host decides) and *lockstep* (every device runs the same simulation and only button presses travel, rule R2).
+- **Lockstep with the host as hub:** each device sends its buttons for frame f + D; the host bundles everyone's buttons per frame and sends them out; every device simulates a frame only once its bundle arrives. D (input delay) is set from the slowest player's measured lag at the start of each match (3–12 frames).
+- **Same rules everywhere:** the host's seed and feel settings are used for the match; the game version must match to join; a fingerprint of the game state is compared every 2 seconds and the match stops if anyone drifts.
+- **Leaving:** if a guest leaves, the match goes on (their fighter stands still); if the host leaves, everyone returns to the online screen. The pause menu doesn't stop an online match; only the host can restart it or end it for everyone. After a match the host chooses Play again / Continue / Back to the room.
+- **Not yet:** a TURN relay for strict networks (some school, office or cellular networks block direct connections; add one to `NETCFG.ice` if a house can't connect); rollback for snappier Versus; more than one player per device online; public matchmaking with strangers (needs our own server and kid-safety decisions; see VISION.md).
 
-**Done when:** Two iPads finish Level 1 together over home Wi-Fi with a measured lag figure, and a versus match is playable or a clear decision is made to keep online co-op only.
+**Done when:** Two devices in different houses finish Level 1 together over the internet, and a Versus match is playable.
+
+**Status: built** (November 17, 2026). Tested here with two to three browsers on one machine through a local copy of the signaling server: joining, wrong codes, full rooms, co-op, Arcade, Versus, restarts, leaving and a deliberately broken game being caught. Still needs the real test between two houses (and an iPad with a PC). Self-test fingerprints unchanged.
 
 ### M12 · XP, levels, skill tree
 
@@ -573,4 +579,4 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 
 ## Suggested next step
 
-Next is **M11**: network multiplayer on home Wi-Fi, each kid on their own iPad. First step: choose how two iPads find each other from GitHub Pages (a small free signaling service, or pairing by a short code), then co-op on the Wooded Trail. The skill tree follows in M12.
+First, test M11 for real: host on one device and join from another house (and try an iPad with a PC). Then **M12**: XP, levels and the skill tree, with the starting style added to character creation. Decide the unlock approach first (Open decisions, item 6). Online play means skills and stats must be shared at the start of a match, like looks are.

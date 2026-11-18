@@ -1,0 +1,217 @@
+// Orange vs. the Pink Army: Online screen (M11): host or join a room, pick your fighter, start a match.
+// Works with touch, mouse and controllers (the room code is picked with arrows, no typing needed).
+// ===== ONLINE SCREEN (M11) =====
+const ONC = { w: 0, a: 1, b: 0 }; // the room code being picked: word, first digit, second digit
+const ONLINE_WHY = {
+  NOROOM: 'No room with that code. Check the code with the host.',
+  FULL: 'That room is full (4 players).',
+  PLAYING: 'That room is in the middle of a match. Try again when it ends.',
+  VERSION: 'Your game and the host’s are different versions. Reload the page on both devices.',
+  offline: 'Couldn’t reach the online service. Check the internet connection.',
+  taken: 'Couldn’t make a room right now. Try again.'
+};
+function onlineMsg(t) {
+  $('on-msg').textContent = t || '';
+}
+// Back on the online screen: the room if we're in one, otherwise Host / Join
+function openOnline(msg) {
+  closePanels();
+  releaseAll();
+  state = 'menu';
+  paused = false;
+  show('s-online');
+  onlineMsg(msg || '');
+  renderOnline();
+  const f = NET.on ? (NET.host ? $('on-start') : $('b-onlineback')) : $('on-host');
+  if (f) f.focus({ preventScroll: true });
+}
+function onlineCode() {
+  return ROOM_WORDS[ONC.w] + '-' + ONC.a + ONC.b;
+}
+function renderOnline() {
+  $('on-menu').hidden = NET.on;
+  $('on-room').hidden = !NET.on;
+  $('on-w').textContent = ROOM_WORDS[ONC.w];
+  $('on-a').textContent = ONC.a;
+  $('on-b').textContent = ONC.b;
+  $('b-onlineback').textContent = NET.on ? 'LEAVE ROOM' : 'BACK';
+  if (!NET.on) return;
+  $('on-code').textContent = NET.code;
+  const cards = $('on-cards');
+  cards.innerHTML = '';
+  for (let s = 0; s < MAX_ONLINE; s++) {
+    const p = NET.players.find(q => q.slot === s && !q.left),
+      c = document.createElement('div');
+    c.className = 'pcard' + (p ? ' in' : '');
+    if (!p) {
+      c.innerHTML = '<b>P' + (s + 1) + '</b><small>Waiting for a player</small>';
+      cards.appendChild(c);
+      continue;
+    }
+    const L = netLook(p),
+      me = s === NET.mySlot;
+    c.style.setProperty('--pc', L.col);
+    c.innerHTML =
+      '<b>P' +
+      (s + 1) +
+      ' · <span class="pname"></span></b><div class="ppick">' +
+      (me ? '<button class="pprev" aria-label="Previous fighter">&#9664;</button>' : '') +
+      '<canvas class="pcv" width="120" height="144"></canvas>' +
+      (me ? '<button class="pnext" aria-label="Next fighter">&#9654;</button>' : '') +
+      '</div><small></small>';
+    c.querySelector('.pname').textContent = L.name;
+    c.querySelector('small').textContent =
+      (p.id === 'host' ? 'HOST' : 'GUEST') +
+      (me ? ' · YOU' : '') +
+      (p.id !== 'host' && p.rtt ? ' · ' + p.rtt + ' ms' : '');
+    if (me) {
+      c.querySelector('.pprev').onclick = () => onlineFighter(-1);
+      c.querySelector('.pnext').onclick = () => onlineFighter(1);
+    }
+    lbDraw(c.querySelector('.pcv'), { look: L, slot: s });
+    cards.appendChild(c);
+  }
+  const live = NET.players.filter(p => !p.left).length;
+  for (const b of $('on-modes').querySelectorAll('button')) {
+    b.classList.toggle('on', b.dataset.mode === NET.mode);
+    b.disabled = !NET.host;
+  }
+  $('on-start').hidden = !NET.host;
+  $('on-start').disabled = NET.mode === 'vs' && live < 2;
+  $('on-wait').textContent = NET.host
+    ? live < 2
+      ? 'Tell your friends the room code. Co-op and Arcade also work alone; Versus needs 2 players.'
+      : ''
+    : 'Waiting for the host to start…';
+}
+// Change my fighter (my saved fighters, in order) and tell the room
+function onlineFighter(d) {
+  const ids = CHR.list.map((c, i) => i).filter(i => CHR.list[i]);
+  if (!ids.length) return;
+  CHR.cur = ids[(ids.indexOf(CHR.cur) + d + ids.length) % ids.length];
+  ecoSave();
+  const f = curFighter();
+  if (NET.host) {
+    const p = NET.players.find(q => q.slot === NET.mySlot);
+    p.f = f;
+    p.name = f.name;
+    netRoomChanged();
+  } else netSend(NET.hostId, { t: 'fighter', f });
+  sfx(500, 0.06, 'square', 0.03, 200);
+}
+// In an online match: a YOU marker over your fighter for the first seconds, and a note when the game is waiting
+// for someone's connection (drawing only).
+function onlineHud() {
+  const me = PL.find(p => p.slot === NET.mySlot);
+  if (me && NET.simF < 240 && state === 'play') {
+    const y = me.y - 125 * me.s - Math.abs(Math.sin(fr * 0.12)) * 6;
+    ctx.fillStyle = me.col;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.font = '900 18px Impact,"Arial Black",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.strokeText('YOU', me.x, y);
+    ctx.fillText('YOU', me.x, y);
+    ctx.beginPath();
+    ctx.moveTo(me.x - 7, y + 6);
+    ctx.lineTo(me.x + 7, y + 6);
+    ctx.lineTo(me.x, y + 15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+  if (NET.wait > 20 && state === 'play') {
+    ctx.fillStyle = 'rgba(28,22,38,.75)';
+    ctx.fillRect(W / 2 - 150, 120, 300, 36);
+    ctx.fillStyle = '#fff';
+    ctx.font = '900 16px "Trebuchet MS",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Waiting for the connection\u2026', W / 2, 144);
+  }
+}
+// The connection to the room was lost (the host left, or the internet dropped)
+function onlineGone(why) {
+  openOnline(why);
+}
+// Online versions of the pause and results screens: the match keeps running; only the host restarts or ends it
+function onlineScreens(id) {
+  const g = !NET.host;
+  if (id === 's-pause') {
+    $('p-seed').textContent = 'Online match: the game keeps going while this menu is open.';
+    $('b-restart').hidden = g;
+    $('b-set2').hidden = true;
+    $('b-quit').textContent = NET.host ? 'END MATCH FOR EVERYONE' : 'LEAVE THE MATCH';
+  }
+  if (id === 's-over' || id === 's-clear') {
+    for (const b of ['b-again', 'b-next']) $(b).hidden = g;
+    if (g) $('b-cont').hidden = true;
+    for (const b of ['b-title', 'b-title2']) $(b).textContent = NET.host ? 'BACK TO THE ROOM' : 'LEAVE';
+    for (const w of $(id).querySelectorAll('.netwait')) w.hidden = !g;
+  }
+}
+// Leaving online play puts the offline buttons back the way they were
+function onlineScreensReset() {
+  $('b-restart').hidden = false;
+  $('b-set2').hidden = false;
+  $('b-quit').textContent = 'QUIT TO TITLE';
+  for (const b of ['b-again', 'b-next']) $(b).hidden = false;
+  for (const b of ['b-title', 'b-title2']) $(b).textContent = 'TITLE';
+  for (const w of document.querySelectorAll('.netwait')) w.hidden = true;
+}
+$('on-host').onclick = async () => {
+  onlineMsg('Making a room…');
+  try {
+    await netHost();
+    onlineMsg('');
+    renderOnline();
+    $('on-start').focus({ preventScroll: true });
+  } catch (e) {
+    netReset();
+    rtcClose();
+    onlineMsg(ONLINE_WHY[e] || ONLINE_WHY.offline);
+  }
+};
+$('on-join').onclick = async () => {
+  onlineMsg('Joining ' + onlineCode() + '…');
+  try {
+    await netJoin(onlineCode());
+    onlineMsg('');
+    renderOnline();
+    $('b-onlineback').focus({ preventScroll: true });
+  } catch (e) {
+    rtcClose();
+    netReset();
+    onlineMsg(ONLINE_WHY[e] || ONLINE_WHY.offline);
+  }
+};
+const onStep = (k, n, d) => () => {
+  ONC[k] = (ONC[k] + d + n) % n;
+  if (k === 'a' && ONC.a === 0) ONC.a = d > 0 ? 1 : 9; // codes run 10 to 99
+  renderOnline();
+};
+$('on-w-').onclick = onStep('w', ROOM_WORDS.length, -1);
+$('on-w+').onclick = onStep('w', ROOM_WORDS.length, 1);
+$('on-a-').onclick = onStep('a', 10, -1);
+$('on-a+').onclick = onStep('a', 10, 1);
+$('on-b-').onclick = onStep('b', 10, -1);
+$('on-b+').onclick = onStep('b', 10, 1);
+for (const b of $('on-modes').querySelectorAll('button'))
+  b.onclick = () => {
+    if (!NET.host) return;
+    NET.mode = b.dataset.mode;
+    netRoomChanged();
+  };
+$('on-start').onclick = () => {
+  if (!netStart()) onlineMsg('Versus needs at least 2 players.');
+};
+$('b-onlineback').onclick = () => {
+  if (NET.on) {
+    netLeave();
+    openOnline();
+    return;
+  }
+  show('s-title');
+  titleView();
+  splitOpen('mp');
+  $('b-online').focus({ preventScroll: true });
+};

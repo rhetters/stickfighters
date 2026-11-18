@@ -4,7 +4,7 @@ How the code fits together. Update this at the end of every milestone.
 
 ## Files and load order
 
-`index.html` holds the markup and loads one stylesheet and 28 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
+`index.html` holds the markup and loads one stylesheet and 31 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
 
 | # | File | What's in it |
 |---|---|---|
@@ -23,19 +23,22 @@ How the code fits together. Update this at the end of every milestone.
 | 13 | `js/level.js` | `LEVEL` mode: `buildLevel`, `startLevel`, `continueLevel`, camera and walls (`levelWalls`), encounters, gates, level clear/fail, level HUD |
 | 14 | `js/versus.js` | `VERSUS` mode: rounds, countdown, KO, timer, winner screen, player push-apart |
 | 15 | `js/pickups.js` | Star pickups and gifts (M10): `PK`, `dropRoll`, `dropScan`, `pickTick`, `collect`, `collectAll`, drawing (`shuriken`, `giftBox`, `drawPickups`, `starHud`) |
-| 16 | `js/ragdoll.js` | Verlet ragdoll, death poses, corpse settle and confetti dissolve, `drawRag`, `drawTatsu` |
-| 17 | `js/scenery.js` | Level drawing only: parallax layers, props, the log gate, foreground grass, leaves and fireflies |
-| 18 | `js/looks.js` | Drawing a fighter's look (M10): `drawLookUnder` (cape, hood), `drawLook` (legs, shoes, shirts, jackets, dresses, ties, gloves, scarf, hair, band, hat), `drawHat`, `drawHair`, `surgeCol`/`surgeExtra`, `VPOSE` poses, `lookPose` (stance, victory and pose-wheel blending), `cheering`, `drawWheel`, `drawItemIcon` |
-| 19 | `js/render.js` | Gear, figures (`drawFig`), background, effects, HUD, `render()` |
-| 20 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
-| 21 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
-| 22 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
-| 23 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
-| 24 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
-| 25 | `js/ui/character.js` | Character screen and store (M10): four fighter slots, Body tab (height, head, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
-| 26 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
-| 27 | `js/selftest.js` | `selfTest()` determinism check |
-| 28 | `js/main.js` | Screens, settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
+| 16 | `js/net/rtc.js` | Online connection (M11): WebRTC data channels and the signaling-server talk (`NETCFG`, `RTC`, `rtcHost`, `rtcJoin`, `rtcSend`, `rtcClose`; callbacks `RTC.on.peer/msg/gone/err`). Knows nothing about the game. |
+| 17 | `js/net/session.js` | Online room and lockstep (M11): `NET` state, `NETIN` slots, `maskOf`/`applyMask`, `simHash`, `netHost`/`netJoin`/`netLeave`, host and guest messages, `netStart`/`netStartLocal`, `netCmd` (again / continue / room), `netTick`/`netStep`, desync check |
+| 18 | `js/ragdoll.js` | Verlet ragdoll, death poses, corpse settle and confetti dissolve, `drawRag`, `drawTatsu` |
+| 19 | `js/scenery.js` | Level drawing only: parallax layers, props, the log gate, foreground grass, leaves and fireflies |
+| 20 | `js/looks.js` | Drawing a fighter's look (M10): `drawLookUnder` (cape, hood), `drawLook` (legs, shoes, shirts, jackets, dresses, ties, gloves, scarf, hair, band, hat), `drawHat`, `drawHair`, `surgeCol`/`surgeExtra`, `VPOSE` poses, `lookPose` (stance, victory and pose-wheel blending), `cheering`, `drawWheel`, `drawItemIcon` |
+| 21 | `js/render.js` | Gear, figures (`drawFig`), background, effects, HUD, `render()` |
+| 22 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
+| 23 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
+| 24 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
+| 25 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
+| 26 | `js/ui/online.js` | Online screen (M11): Host / Join, room code picker, room cards, mode and Start, online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
+| 27 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
+| 28 | `js/ui/character.js` | Character screen and store (M10): four fighter slots, Body tab (height, head, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
+| 29 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
+| 30 | `js/selftest.js` | `selfTest()` determinism check |
+| 31 | `js/main.js` | Screens, settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
 
 Nothing runs game code at load except data setup; boot (`checkUnlocks(); init(); applySet(); resize(); bindSettings(); syncTrain(); openTitle(); requestAnimationFrame(loop)`) is the last thing in `main.js`.
 
@@ -94,3 +97,13 @@ Current fingerprints: Arcade `c87c9470`, Level `21292ab5` (since the combat patc
 ## Still assuming a flat world
 
 The ground is flat everywhere (`groundY` returns `G`), and several places compare against `G` directly (`f.y>=G-1`, `bowl`, `sep`, death poses). M15 (platforms) routes these through `groundY()` or an `onGround(f)` helper.
+
+## Online play (M11)
+
+Three layers, so each can be replaced on its own (matchmaking, Steam):
+
+1. **Connection** (`net/rtc.js`). WebRTC data channels, reliable and ordered. Devices find each other through the public PeerJS signaling server (`NETCFG.signal`, spoken to directly; `?signal=ws://…` points the game at another one, which the tests use). A host registers as `orangearmy-<room code>`; a guest sends it an offer. STUN servers in `NETCFG.ice`; add a TURN server there if some network can't connect. Messages are JSON objects and are only ever parsed, never run.
+2. **Room** (`net/session.js`). `NET.players` = `{slot, id, name, f (fighter), cid (color), rtt, left}`. Guests say `hello` with `GAME_VERSION` (core.js; bump it with `?v=`) and their fighter; the host replies `welcome` or `deny` (VERSION, FULL, PLAYING) and sends `room` updates. Fighters from other devices are checked with `normFighter(f, true)` (shape, not ownership); the host keeps colors unique.
+3. **Lockstep.** `start` carries the epoch, seed, mode, input delay D, the host's `FEEL` and the roster. Each device sends `{t:'i', e, f, m}` (its button mask for frame f + D, one bit per `ACT`); the host collects them, and once a frame has everyone (players who left count as zero) sends `{t:'F', e, f, m:[…]}` to all and keeps a copy. Each device simulates a frame only from a bundle: `applyMask()` feeds `NETIN[slot]` exactly like `setA`, `use(p)` reads `NETIN` during a match, then `fr++; update()`. `fr` starts at 0 for every match. Guests send `simHash()` every 120 frames; a mismatch ends the match (`desync`). After a match, `cmd` (again / cont / room) comes from the host with the frame it was at, so a guest that's a few frames behind catches up first.
+
+While `NET.match` is on: the main loop runs `netTick()` instead of `tick()` and never pauses; `devSlot()` maps every local device to `NET.mySlot`; `newSeed()` uses the host's seed; the pause menu hides Restart (guests) and Settings (everyone, so feel settings can't change mid-match).

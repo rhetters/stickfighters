@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Orange vs. the Pink Army</title>
-<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/style.css?v=12">
 </head>
 <body>
 <div id="wrap">
@@ -46,8 +46,27 @@
  </div>
  <div class="screen" id="s-online" hidden>
   <h2>ONLINE</h2>
-  <p>Online play, with each player on their own iPad over home Wi-Fi, is coming in M11.</p>
-  <button class="btn" id="b-onlineback">BACK</button>
+  <div id="on-menu" class="onpane">
+   <p>Play with friends on other devices, in this house or another one. One player hosts and gets a room code; everyone else joins with that code.</p>
+   <button class="btn" id="on-host">HOST A GAME</button>
+   <p class="onlabel">Join a game: pick the room code</p>
+   <div class="oncode">
+    <button id="on-w-" aria-label="Previous word">&#9664;</button><b id="on-w">TIGER</b><button id="on-w+" aria-label="Next word">&#9654;</button>
+    <span>-</span>
+    <button id="on-a-" aria-label="First digit down">&#9664;</button><b id="on-a">1</b><button id="on-a+" aria-label="First digit up">&#9654;</button>
+    <button id="on-b-" aria-label="Second digit down">&#9664;</button><b id="on-b">0</b><button id="on-b+" aria-label="Second digit up">&#9654;</button>
+   </div>
+   <button class="btn alt" id="on-join">JOIN</button>
+  </div>
+  <div id="on-room" class="onpane" hidden>
+   <p class="onroomcode">ROOM CODE <b id="on-code"></b></p>
+   <div id="on-cards"></div>
+   <div class="onmodes" id="on-modes"><button data-mode="level">CO-OP TRAIL</button><button data-mode="arcade">ARCADE</button><button data-mode="vs">VERSUS</button></div>
+   <button class="btn" id="on-start">START</button>
+   <p id="on-wait"></p>
+  </div>
+  <p id="on-msg" aria-live="polite"></p>
+  <button class="btn alt" id="b-onlineback">BACK</button>
  </div>
  <div class="screen wide" id="s-char" hidden>
   <div class="chtop"><h2>CHARACTER</h2><div id="ch-slots"></div><div class="chstars"><span class="shk"></span><b id="ch-stars">0</b></div></div>
@@ -125,14 +144,14 @@
  </div>
  <div class="screen" id="s-over" hidden>
   <h1>KO!</h1>
-  <p id="o-l1"></p><p id="o-l2"></p><p id="o-st" class="stl"></p>
+  <p id="o-l1"></p><p id="o-l2"></p><p id="o-st" class="stl"></p><p class="netwait" hidden>Waiting for the host to choose what’s next…</p>
   <button class="btn" id="b-cont" hidden>CONTINUE FROM CHECKPOINT</button>
   <button class="btn" id="b-again">FIGHT AGAIN</button>
   <button class="btn alt" id="b-title">TITLE</button>
  </div>
  <div class="screen" id="s-clear" hidden>
   <h1 id="c-h1">LEVEL CLEAR!</h1>
-  <p id="c-l1"></p><p id="c-l2"></p><p id="c-l3"></p><p id="c-st" class="stl"></p>
+  <p id="c-l1"></p><p id="c-l2"></p><p id="c-l3"></p><p id="c-st" class="stl"></p><p class="netwait" hidden>Waiting for the host to choose what’s next…</p>
   <button class="btn" id="b-next">PLAY AGAIN</button>
   <button class="btn alt" id="b-title2">TITLE</button>
  </div>
@@ -144,33 +163,36 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=11" defer></script>
-<script src="js/input.js?v=11" defer></script>
-<script src="js/data/moves.js?v=11" defer></script>
-<script src="js/data/enemies.js?v=11" defer></script>
-<script src="js/data/levels.js?v=11" defer></script>
-<script src="js/data/items.js?v=11" defer></script>
-<script src="js/economy.js?v=11" defer></script>
-<script src="js/player.js?v=11" defer></script>
-<script src="js/effects.js?v=11" defer></script>
-<script src="js/combat.js?v=11" defer></script>
-<script src="js/enemies.js?v=11" defer></script>
-<script src="js/modes.js?v=11" defer></script>
-<script src="js/level.js?v=11" defer></script>
-<script src="js/versus.js?v=11" defer></script>
-<script src="js/pickups.js?v=11" defer></script>
-<script src="js/ragdoll.js?v=11" defer></script>
-<script src="js/scenery.js?v=11" defer></script>
-<script src="js/looks.js?v=11" defer></script>
-<script src="js/render.js?v=11" defer></script>
-<script src="js/ui/panels.js?v=11" defer></script>
-<script src="js/ui/training.js?v=11" defer></script>
-<script src="js/ui/touch-layout.js?v=11" defer></script>
-<script src="js/ui/lobby.js?v=11" defer></script>
-<script src="js/ui/bindings.js?v=11" defer></script>
-<script src="js/ui/character.js?v=11" defer></script>
-<script src="js/ui/backup.js?v=11" defer></script>
-<script src="js/selftest.js?v=11" defer></script>
-<script src="js/main.js?v=11" defer></script>
+<script src="js/core.js?v=12" defer></script>
+<script src="js/input.js?v=12" defer></script>
+<script src="js/data/moves.js?v=12" defer></script>
+<script src="js/data/enemies.js?v=12" defer></script>
+<script src="js/data/levels.js?v=12" defer></script>
+<script src="js/data/items.js?v=12" defer></script>
+<script src="js/economy.js?v=12" defer></script>
+<script src="js/player.js?v=12" defer></script>
+<script src="js/effects.js?v=12" defer></script>
+<script src="js/combat.js?v=12" defer></script>
+<script src="js/enemies.js?v=12" defer></script>
+<script src="js/modes.js?v=12" defer></script>
+<script src="js/level.js?v=12" defer></script>
+<script src="js/versus.js?v=12" defer></script>
+<script src="js/pickups.js?v=12" defer></script>
+<script src="js/net/rtc.js?v=12" defer></script>
+<script src="js/net/session.js?v=12" defer></script>
+<script src="js/ragdoll.js?v=12" defer></script>
+<script src="js/scenery.js?v=12" defer></script>
+<script src="js/looks.js?v=12" defer></script>
+<script src="js/render.js?v=12" defer></script>
+<script src="js/ui/panels.js?v=12" defer></script>
+<script src="js/ui/training.js?v=12" defer></script>
+<script src="js/ui/touch-layout.js?v=12" defer></script>
+<script src="js/ui/lobby.js?v=12" defer></script>
+<script src="js/ui/online.js?v=12" defer></script>
+<script src="js/ui/bindings.js?v=12" defer></script>
+<script src="js/ui/character.js?v=12" defer></script>
+<script src="js/ui/backup.js?v=12" defer></script>
+<script src="js/selftest.js?v=12" defer></script>
+<script src="js/main.js?v=12" defer></script>
 </body>
 </html>
