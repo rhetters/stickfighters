@@ -1518,3 +1518,87 @@ body.padnav #ui select:focus {
   font-size: 11px;
   color: #7a6e80;
 }
+/* House screen */
+#hs-view {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  aspect-ratio: 900 / 420;
+  max-width: 100%;
+  align-self: center;
+  border: 3px solid #1c1626;
+  border-radius: 10px;
+  overflow: hidden;
+  touch-action: none;
+}
+#hs-cv {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#hs-cells {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  display: grid;
+}
+.hcell {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: 1px dashed rgba(28, 22, 38, 0.12);
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+.hcell:hover,
+.hcell:focus-visible {
+  background: rgba(255, 212, 0, 0.35);
+  outline: 2px solid #ff7a00;
+  outline-offset: -2px;
+}
+#hs-tabs,
+#hs-pal,
+.hsbtns {
+  flex-shrink: 0;
+}
+#hs-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#hs-pal {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 2px 2px 4px;
+}
+#hs-pal .chitem {
+  flex: 0 0 auto;
+  width: 86px;
+}
+#hs-msg {
+  flex: 1;
+  margin: 0;
+  font-weight: 800;
+  font-size: 13px;
+  text-align: center;
+  min-height: 1.2em;
+}
+.hsbtns {
+  display: flex;
+  gap: 6px;
+}
+.hsbtns .btn {
+  min-width: 0;
+  padding: 6px 14px;
+  font-size: 16px;
+}
+.chtab.on {
+  color: #1c1626;
+  background: #fff3c4;
+  box-shadow: inset 0 0 0 3px #ffd400;
+}

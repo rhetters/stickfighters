@@ -13,6 +13,7 @@ const SCREENS = [
   's-title',
   's-online',
   's-char',
+  's-house',
   's-lobby',
   's-pause',
   's-settings',
@@ -222,7 +223,11 @@ $('b-train').onclick = startTrain;
 // SOLO splits into CAMPAIGN | ARCADE and MULTIPLAYER into LOCAL | ONLINE, in place: the split row sits on top of
 // the button it replaces, so the title and the other buttons never move or resize. Back folds it up again.
 const TITLE = { ready: false, keepOpen: false };
-const SPLITS = { solo: ['b-solo', 'solorow', 'b-level'], mp: ['b-mp', 'mprow', 'b-multi'] };
+const SPLITS = {
+  solo: ['b-solo', 'solorow', 'b-level'],
+  mp: ['b-mp', 'mprow', 'b-multi'],
+  cust: ['b-cust', 'custrow', 'b-char']
+};
 function titleView() {
   $('press').hidden = TITLE.ready;
   $('tmenu').hidden = !TITLE.ready;
@@ -265,6 +270,7 @@ function titleOpenAll() {
 }
 $('b-solo').onclick = () => splitOpen('solo');
 $('b-mp').onclick = () => splitOpen('mp');
+$('b-cust').onclick = () => splitOpen('cust');
 $('b-online').onclick = () => openOnline();
 addEventListener('gamepadconnected', () => {
   if (pressMode()) titleReveal();
@@ -315,6 +321,7 @@ $('b-restart').onclick = () => {
   if (state === 'train') startTrain();
   else if (MODE === LEVEL) startLevel(LV.id);
   else if (MODE === VERSUS) startVersus();
+  else if (MODE === HOUSE_MODE) startHouse(HVIEW);
   else start();
 };
 $('b-set2').onclick = () => {
@@ -322,7 +329,7 @@ $('b-set2').onclick = () => {
   back = 's-pause';
   show('s-settings');
 };
-$('b-quit').onclick = netOr(openTitle, 'room');
+$('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? openHouse() : openTitle()), 'room');
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? startLevel(LV.id) : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');

@@ -501,6 +501,7 @@ function navBack() {
   else if (sc.id === 's-binds') $('bd-back').click();
   else if (sc.id === 's-backup') $('bk-back').click();
   else if (sc.id === 's-char') $('b-charback').click();
+  else if (sc.id === 's-house') $('b-houseback').click();
   else if (sc.id === 's-lobby') openTitle();
   else if (sc.id === 's-online') $('b-onlineback').click();
   else if (sc.id === 's-title') titleBack();

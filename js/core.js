@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 15;
+const GAME_VERSION = 16;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -26,13 +26,16 @@ let SET = { ...DEF },
 const ECO = { stars: 0, got: 0, own: [], seen: [] };
 // Saved fighters: four slots, cur = the one Player 1 uses. A slot is null until it's created.
 const CHR = { cur: 0, list: [null, null, null, null] };
+// The house (see data/house.js for its shape). Checked with normHouse() before it's used.
+const HOUSE = { bg: 'hbg-paper', cells: {}, items: [] };
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
 //   v2: adds prog = { levelId: { done, score, time, combo } }
 //   v3: adds set.binds = custom keys and controller buttons (null = defaults)
 //   v4: adds eco = { stars, got, own, seen } and chr = { cur, list: [fighter|null] x3 }
 //   v5: a fourth fighter slot; fighters gain ht and wheel (normFighter upgrades old fighters)
-const SAVE_VERSION = 5;
+//   v6: adds house = { bg, cells, items }
+const SAVE_VERSION = 6;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -51,6 +54,10 @@ function migrate(s) {
     if (s.chr && Array.isArray(s.chr.list)) while (s.chr.list.length < 4) s.chr.list.push(null);
     s.saveVersion = 5;
   }
+  if (s.saveVersion === 5) {
+    s.house = s.house || { bg: 'hbg-paper', cells: {}, items: [] };
+    s.saveVersion = 6;
+  }
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).
@@ -67,11 +74,23 @@ function loadSave(s) {
   const c = s.chr || {};
   CHR.list = [0, 1, 2, 3].map(i => (c.list && c.list[i] && typeof c.list[i] === 'object' ? c.list[i] : null));
   CHR.cur = [0, 1, 2, 3].includes(c.cur) ? c.cur : 0;
+  const h = s.house || {};
+  HOUSE.bg = typeof h.bg === 'string' ? h.bg : 'hbg-paper';
+  HOUSE.cells = h.cells && typeof h.cells === 'object' && !Array.isArray(h.cells) ? h.cells : {};
+  HOUSE.items = Array.isArray(h.items) ? h.items : [];
 }
 try {
   loadSave(migrate(JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')));
 } catch (e) {}
-const saveData = () => ({ saveVersion: SAVE_VERSION, set: SET, best: BEST, prog: PROG, eco: ECO, chr: CHR });
+const saveData = () => ({
+  saveVersion: SAVE_VERSION,
+  set: SET,
+  best: BEST,
+  prog: PROG,
+  eco: ECO,
+  chr: CHR,
+  house: HOUSE
+});
 const save = () => {
   try {
     if (typeof SELFTESTING !== 'undefined' && SELFTESTING) return;

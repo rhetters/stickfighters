@@ -33,7 +33,7 @@ await ev("$('ch-name').value='rhett!!<b>';$('ch-name').dispatchEvent(new Event('
 await tap(1);await W(100);ok(await ev("$('s-char').hidden&&!$('s-title').hidden"),'controller B leaves Character');
 await p.reload();await W(300);
 ok(await ev("ECO.stars===60&&owns('hat-cap')&&CHR.cur===1&&fighter(1).name==='RHETT!!B'"),'stars, items and fighters survive a reload');
-ok(await ev("JSON.parse(localStorage.getItem('orangeArmy.v1')).saveVersion===5"),'save version 5');
+ok(await ev("JSON.parse(localStorage.getItem('orangeArmy.v1')).saveVersion===SAVE_VERSION"),'save version is current');
 // play: drops and HUD
 await ev("SET.seed='7';start();PL[0].hp=PL[0].max=1e6");ok(await ev("PL[0].look&&PL[0].name==='RHETT!!B'"),'Player 1 uses the current fighter');
 await ev("for(let i=0;i<400;i++){fr++;update();} for(const e of E){e.hp=1;hurtE(e,A.jab,1,PL[0]);} for(let i=0;i<500;i++){fr++;update();}");

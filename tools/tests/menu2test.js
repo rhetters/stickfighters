@@ -9,7 +9,7 @@ const geo=()=>ev("['s-title','b-char','b-train','b-set1','b-mp'].map(id=>{const 
 ok(await p.isVisible('#press'),nm+': PRESS START');
 await tap(9);await W(100);ok(await p.isVisible('#tmenu'),nm+': Start on the controller opens the menu');
 const labels=await ev("[...document.querySelectorAll('#tmenu button')].filter(b=>b.offsetParent&&getComputedStyle(b).visibility!=='hidden').map(b=>b.textContent)");
-ok(JSON.stringify(labels)==='["SOLO","MULTIPLAYER","CHARACTER","TRAINING ROOM","SETTINGS"]',nm+': menu '+labels.join(', '));
+ok(JSON.stringify(labels)==='["SOLO","MULTIPLAYER","CUSTOMIZE","TRAINING ROOM","SETTINGS"]',nm+': menu '+labels.join(', '));
 const g0=await geo();await p.screenshot({path:S+'/shots/menu2-'+nm+'-a.png'});
 await tap(1);await W(100);ok(await ev("!$('solorow').hidden&&document.activeElement.id==='b-level'"),nm+': A on SOLO shows CAMPAIGN | ARCADE');
 const g1=await geo();ok(g0===g1,nm+': title and other buttons do not move or resize');
