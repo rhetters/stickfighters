@@ -1,6 +1,16 @@
 # Changelog
 
-One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
+One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
+
+## Cleanup (November 17, 2026)
+- No gameplay change. The code no longer has a hidden "current player": every part of the game is handed the player it works on. This was the last big piece of old wiring and the groundwork rollback (M11.5) needs.
+- Fixed: pressing Start on a controller at PRESS START sometimes also opened the Solo menu.
+- The Surge sparkles and the trailing health bar now update with the game instead of with the screen, so they look the same on 60 Hz and 120 Hz screens.
+- Removed unused code and styles; code comments describe the code instead of milestone history.
+- The automated tests and the preview builder now live in the repo (`tools/`), with one command to run them all; the self-test checks its own expected fingerprints.
+- Docs reorganized so each fact lives in one place: status only in ROADMAP, direction in VISION, code in ARCHITECTURE, moves in COMBAT, tests in TESTING, and README is the player's guide. Finished milestones' plans moved to a frozen archive.
+- Self-test fingerprints unchanged (Arcade `c87c9470`, Level `21292ab5`).
+- Version 15.
 
 ## M11 patch: less lag online (November 17, 2026)
 - Button presses now go straight from each device to every other device instead of round-tripping through the host, so the delay only covers one trip: about half the lag (at 58 ping, about 3 frames instead of 6; on the same Wi-Fi, 2). Guests connect to each other directly; if two guests can't, the host passes their buttons along.
