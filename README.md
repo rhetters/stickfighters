@@ -4,7 +4,7 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Play:** https://rhetters.github.io/stickfighters/
 
-**Status:** M0–M11 done: Wooded Trail, Arcade, local multiplayer (Versus and Co-op for up to 4 players), ninja stars with the cosmetic store and character creation, and online multiplayer (house to house, PC and iPad together). Next: M12, XP and the skill tree. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Status:** M0–M11 done: Wooded Trail, Arcade, local multiplayer (Versus and Co-op for up to 4 players), ninja stars with the cosmetic store and character creation, and online multiplayer (house to house, PC and iPad together). Online button presses now go straight between devices (less lag). Next: M12, XP and the skill tree, or rollback (M11.5) for even less online lag. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Modes
 

@@ -2,6 +2,13 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M11 patch: less lag online (November 17, 2026)
+- Button presses now go straight from each device to every other device instead of round-tripping through the host, so the delay only covers one trip: about half the lag (at 58 ping, about 3 frames instead of 6; on the same Wi-Fi, 2). Guests connect to each other directly; if two guests can't, the host passes their buttons along.
+- The pose wheel only shows on the screen of the player using it; everyone sees the pose. Keeping the direction held while letting go of the pose button no longer cancels the pose.
+- A player who leaves an online match falls and dissolves into confetti in their own colors, at the same moment on every screen, then is gone from the fight (and from later rounds).
+- Fingerprint checks also work when a guest is a little ahead of the host.
+- Version 14.
+
 ## M11 fix: connecting between houses (November 17, 2026)
 - The first real test failed everywhere ("No room with that code"). Room codes now travel through several free services at once (the PeerJS server and three public MQTT message boards); whichever gets through first wins, so one being down or blocked no longer stops play.
 - A free relay (TURN) server is added for networks that won't connect devices directly.
