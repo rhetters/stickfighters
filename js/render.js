@@ -625,7 +625,8 @@ function render() {
   ctx.scale(1 + zoom * cm, 1 + zoom * cm);
   ctx.translate(-W / 2, -H / 2);
   bg();
-  ctx.translate(-CAM.x, -CAM.y);
+  ctx.save();
+  camApply(CAM.x, CAM.y, CAM.z);
   for (const f of [...PL, ...E]) {
     const s = f.s * 16 * Math.max(0.4, 1 - (f.gy - f.y) / 400);
     ctx.fillStyle = 'rgba(0,0,0,.14)';
@@ -668,7 +669,7 @@ function render() {
       ctx.stroke();
     }
   if (state === 'train' && TR.boxes) drawBoxes();
-  ctx.translate(CAM.x, CAM.y);
+  ctx.restore();
   if (MODE.fg) MODE.fg();
   ctx.restore();
   if (state !== 'menu') hud();

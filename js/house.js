@@ -415,31 +415,34 @@ function houseTerrain(h) {
   });
 }
 // A whole house: the background fills the screen, the rest is drawn in world space seen from (cx, cy)
-function drawHouse(h, cx, cy) {
+function drawHouse(h, cx, cy, z = 1) {
   houseBg(ITEM[h.bg]);
   const s = HGRID.cell,
     L = houseLists(h),
+    vw = W / z,
+    top = G + cy - G / z,
+    bot = G + cy + (H - G) / z,
     c0 = Math.floor(cx / s) - 1,
-    c1 = Math.ceil((cx + W) / s) + 1,
-    seen = (c, r, w, hh) => c + w >= c0 && c <= c1 && HY(r + hh - 1) - cy < H && HY(r) + s - cy > 0;
+    c1 = Math.ceil((cx + vw) / s) + 1,
+    seen = (c, r, w, hh) => c + w >= c0 && c <= c1 && HY(r + hh - 1) < bot && HY(r) + s > top;
   ctx.save();
-  ctx.translate(-cx, -cy);
+  camApply(cx, cy, z);
   for (const [c, r, t] of L.tiles) if (seen(c, r, 1, 1)) houseTile(HTILE[t], HX(c), HY(r), s);
   // floor
   ctx.fillStyle = '#d9b98f';
-  ctx.fillRect(cx - 30, G, W + 60, H + 30);
+  ctx.fillRect(cx - 30, G, vw + 60, bot - G + 30);
   ctx.strokeStyle = '#b8956a';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  for (let x = Math.floor(cx / 90) * 90; x < cx + W + 90; x += 90) {
+  for (let x = Math.floor(cx / 90) * 90; x < cx + vw + 90; x += 90) {
     ctx.moveTo(x, G + 4);
-    ctx.lineTo(x, G + H);
+    ctx.lineTo(x, bot);
   }
   ctx.moveTo(cx - 30, G + 38);
-  ctx.lineTo(cx + W + 30, G + 38);
+  ctx.lineTo(cx + vw + 30, G + 38);
   ctx.stroke();
   ctx.fillStyle = INK;
-  ctx.fillRect(cx - 30, G, W + 60, 3);
+  ctx.fillRect(cx - 30, G, vw + 60, 3);
   for (const it of h.items) {
     const d = ITEM[it.id];
     if (d && seen(it.x, it.y, d.w, d.h)) houseThing(d, HX(it.x), HY(it.y + d.h - 1), d.w * s, d.h * s);
@@ -452,20 +455,38 @@ function drawHouse(h, cx, cy) {
 // house; everything else is decoration. The camera follows your own fighter (drawing only: in House mode nothing
 // in the simulation reads CAM).
 let HVIEW = null; // the house being visited
+// Everyone in the house stays on screen: the camera frames all players and zooms out as far as it must (down to
+// 8%, enough for the whole land), and back in to normal size when they're together. One player: just follows them.
 function houseCamera(snap) {
-  const me = (NET.match && PL.find(p => p.slot === NET.mySlot)) || PL[0],
-    tx = Math.max(WB.l, Math.min(WB.r - W, me.x - W / 2)),
-    ty = Math.min(0, me.y - 300),
-    k = snap ? 1 : 0.12;
-  CAM.x += (tx - CAM.x) * k;
-  CAM.y += (ty - CAM.y) * k;
+  const ps = PL.filter(p => !p.left),
+    minX = Math.min(...ps.map(p => p.x)),
+    maxX = Math.max(...ps.map(p => p.x)),
+    top = Math.min(...ps.map(p => p.y - 130 * p.s)),
+    bot = Math.max(...ps.map(p => p.y)),
+    midX = (minX + maxX) / 2,
+    midY = (top + bot) / 2,
+    fitW = W / (maxX - minX + 360),
+    fitH = (H / 2 - 20) / ((bot - top) / 2 + 40);
+  let z = Math.max(0.08, Math.min(1, fitW, fitH)),
+    cy = midY - G - (H / 2 - G) / z;
+  if (cy > 0) {
+    // near the floor: keep the floor at the bottom and make sure the highest player still fits
+    cy = 0;
+    z = Math.max(0.08, Math.min(z, (G - 20) / Math.max(1, G - top)));
+  }
+  const vw = W / z,
+    cx = WB.r - WB.l <= vw ? (WB.l + WB.r - vw) / 2 : Math.max(WB.l, Math.min(WB.r - vw, midX - vw / 2)),
+    k = snap ? 1 : 0.1;
+  CAM.z += (z - CAM.z) * k;
+  CAM.x += (cx - CAM.x) * k;
+  CAM.y += (cy - CAM.y) * k;
 }
 const HOUSE_MODE = {
   id: 'house',
   update() {},
   bg() {
     houseCamera(fr < 2);
-    drawHouse(HVIEW, CAM.x, CAM.y);
+    drawHouse(HVIEW, CAM.x, CAM.y, CAM.z);
   },
   hud() {
     if (fr < 240) {
