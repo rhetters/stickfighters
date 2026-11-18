@@ -1552,6 +1552,9 @@ body.padnav #ui select:focus {
   box-shadow: none;
   border-radius: 0;
 }
+.far .hcell {
+  border: none;
+}
 .hcell:hover,
 .hcell:focus-visible {
   background: rgba(255, 212, 0, 0.35);

@@ -12,8 +12,14 @@ const HS = {
   paint: false,
   last: '',
   ox: 0,
-  oy: 0
+  oy: 0,
+  zi: 0 // zoom level: index into HS_ZOOM
 };
+// Zoom levels for the editor: 1 = 20 x 7 squares, then 40 x 14 and 60 x 21 (every square in view is still a button)
+const HS_ZOOM = [1, 1 / 2, 1 / 3];
+const hsZ = () => HS_ZOOM[HS.zi],
+  hsCols = () => Math.round(HGRID.viewCols / hsZ()),
+  hsRows = () => Math.round(HGRID.viewRows / hsZ());
 const HS_TABS = [
   ['walls', 'WALLS'],
   ['solids', 'FLOORS & STAIRS'],
@@ -61,8 +67,8 @@ function closeHouse() {
 function houseLimits() {
   const e = houseExt(HOUSE);
   return {
-    x: Math.max(0, Math.min(HGRID.maxCols, e.cols + HGRID.grow) - HGRID.viewCols),
-    y: Math.max(0, Math.min(HGRID.maxRows, e.rows + HGRID.viewRows) - HGRID.viewRows) // a screen of sky above
+    x: Math.max(0, Math.min(HGRID.maxCols, e.cols + HGRID.grow) - hsCols()),
+    y: Math.max(0, Math.min(HGRID.maxRows, e.rows + hsRows()) - hsRows()) // a screen of sky above
   };
 }
 function housePan(dx, dy) {
@@ -74,9 +80,30 @@ function housePan(dx, dy) {
 function houseDraw() {
   const s = HGRID.cell;
   withCtx($('hs-cv').getContext('2d'), () => {
-    drawHouse(HOUSE, HS.ox * s, -HS.oy * s);
+    drawHouse(HOUSE, HS.ox * s, -HS.oy * s, hsZ());
+    if (HS.zi > 0) {
+      // zoomed out: a faint line around every square, so you can see where taps land
+      const z = hsZ(),
+        c0 = HS.ox,
+        r0 = HS.oy;
+      ctx.save();
+      camApply(c0 * s, -r0 * s, z);
+      ctx.strokeStyle = 'rgba(28,22,38,.13)';
+      ctx.lineWidth = 1 / z;
+      ctx.beginPath();
+      for (let c = c0; c <= c0 + hsCols(); c++) {
+        ctx.moveTo(c * s, G);
+        ctx.lineTo(c * s, G - (hsRows() + r0) * s);
+      }
+      for (let r = r0; r <= r0 + hsRows(); r++) {
+        ctx.moveTo(c0 * s, G - r * s);
+        ctx.lineTo((c0 + hsCols()) * s, G - r * s);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
     // the current fighter stands at the left of the land
-    if (HS.ox < 4 && HS.oy === 0) {
+    if (HS.ox < 4 && HS.oy === 0 && HS.zi === 0) {
       const L = lookOf(curFighter()),
         S = (STANCES.find(t => t.id === L.stance) || STANCES[0]).p,
         f = { look: L, face: 1, s: 1, slot: 0, vx: 0 },
@@ -93,18 +120,27 @@ function houseDraw() {
   $('hs-right').disabled = HS.ox >= L.x;
   $('hs-down').disabled = HS.oy <= 0;
   $('hs-up').disabled = HS.oy >= L.y;
+  $('hs-zout').disabled = HS.zi >= HS_ZOOM.length - 1;
+  $('hs-zin').disabled = HS.zi <= 0;
+}
+// Zoom the editor out or in, keeping the view on the land
+function houseZoom(d) {
+  HS.zi = Math.max(0, Math.min(HS_ZOOM.length - 1, HS.zi + d));
+  houseCells();
+  housePan(0, 0);
 }
 // One button per square in view, laid over the canvas; the view's bottom row sits on the floor line
 function houseCells() {
   const box = $('hs-cells'),
-    V = HGRID.viewRows,
-    s = HGRID.cell;
+    V = hsRows(),
+    s = HGRID.cell * hsZ();
   box.innerHTML = '';
   box.style.top = ((G - V * s) / H) * 100 + '%';
   box.style.height = ((V * s) / H) * 100 + '%';
-  box.style.gridTemplateColumns = 'repeat(' + HGRID.viewCols + ', 1fr)';
+  box.style.gridTemplateColumns = 'repeat(' + hsCols() + ', 1fr)';
+  box.classList.toggle('far', HS.zi > 0);
   for (let vr = 0; vr < V; vr++)
-    for (let vc = 0; vc < HGRID.viewCols; vc++) {
+    for (let vc = 0; vc < hsCols(); vc++) {
       const b = document.createElement('button');
       b.className = 'hcell';
       b.dataset.v = vc + ',' + (V - 1 - vr); // view column, view row counted up from the bottom
@@ -330,10 +366,13 @@ function houseBgPick(it) {
 }
 $('b-house').onclick = openHouse;
 $('b-houseback').onclick = closeHouse;
-$('hs-left').onclick = () => housePan(-5, 0);
-$('hs-right').onclick = () => housePan(5, 0);
-$('hs-up').onclick = () => housePan(0, 3);
-$('hs-down').onclick = () => housePan(0, -3);
+// the arrows move a quarter of the view each tap
+$('hs-left').onclick = () => housePan(-Math.ceil(hsCols() / 4), 0);
+$('hs-right').onclick = () => housePan(Math.ceil(hsCols() / 4), 0);
+$('hs-up').onclick = () => housePan(0, Math.ceil(hsRows() / 2));
+$('hs-down').onclick = () => housePan(0, -Math.ceil(hsRows() / 2));
+$('hs-zout').onclick = () => houseZoom(1);
+$('hs-zin').onclick = () => houseZoom(-1);
 $('b-hvisit').onclick = () => {
   ROSTER = [];
   startHouse({ ...normHouse(HOUSE), name: 'MY HOUSE' });

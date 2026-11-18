@@ -27,7 +27,7 @@ Each test opens `index.html` from disk in a headless browser, plays scripted inp
 | `m9lobby`, `m9vs`, `pm9test` | Players screen, Versus, co-op, teams, player grabs |
 | `menu2test`, `navtest` | Title menu with a controller, directional menu navigation |
 | `m10test` | Stars, store, saved fighters, save migration, pose wheel |
-| `m18test` | House builder: Customize menu, prices per square and per piece, full refunds when erasing, floors and stairs, the land growing and the view moving, save version 7 (upgraded from 5 and 6), and walking around: passing through stairs from the floor, landing on them, climbing onto a floor, dropping through it; visiting online |
+| `m18test` | House builder: Customize menu, prices per square and per piece, full refunds when erasing, floors and stairs, the land growing, the view moving and zooming, the camera zooming out to keep two far-apart players on screen, save version 7 (upgraded from 5 and 6), and walking around: passing through stairs from the floor, landing on them, climbing onto a floor, dropping through it; visiting online |
 | `spam` | Fast touch spamming on a phone-sized screen |
 | `nettest`, `nettest2`, `nettest3`, `netlag` | Online: rooms, joining, every mode, leaving, direct links and a blocked link, desync detection, 100 ms of simulated lag |
 

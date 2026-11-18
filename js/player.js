@@ -172,6 +172,7 @@ function tgt(e) {
 function init() {
   wave = 0;
   CAM.x = CAM.y = WB.l = WW.l = 0;
+  CAM.z = 1;
   WB.r = WW.r = W;
   MODE = ARCADE;
   terrainSet([]);

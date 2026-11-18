@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 17;
+const GAME_VERSION = 18;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -137,9 +137,15 @@ function withCtx(c2, fn) {
 }
 // World. CAM.x = world x of the screen's left edge. WB = walls for living fighters (the screen, or a gate such
 // as the fallen log). WW = the whole world's edges, used by ragdolls. In Arcade and Training all three are the screen.
-const CAM = { x: 0, y: 0 }, // y < 0 = looking up (a tall house; levels keep 0)
+const CAM = { x: 0, y: 0, z: 1 }, // y < 0 = looking up, z < 1 = zoomed out (the house; other modes keep 0, 0, 1)
   WB = { l: 0, r: W },
   WW = { l: 0, r: W };
+// World space as the camera sees it: (cx, cy) at zoom z, zooming about the floor line so the floor stays put at z 1
+function camApply(cx, cy, z) {
+  ctx.translate(0, G);
+  ctx.scale(z, z);
+  ctx.translate(-cx, -G - cy);
+}
 // Feel knobs (training room > Feel). Saved per device.
 const FEEL = { hitstop: 1, shake: 1, kb: 1, grav: 1, bounce: 1, body: 2.5 }; // body = seconds a settled body stays before the confetti
 let NB;

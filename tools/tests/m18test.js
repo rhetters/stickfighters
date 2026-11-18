@@ -29,12 +29,12 @@ ok(await ev("HOUSE.solids['3,4']==='floor'&&ECO.stars===390"),'FLOORS & STAIRS: 
 // the land grows as you build
 await ev("HS.ox=0;HS.oy=0;houseDraw()");const L0=await ev("houseLimits().x");await ev("$('hs-tabs').children[0].click();houseAct(30,0)");
 ok(await ev("houseLimits().x")>L0,'building further out makes the land bigger ('+L0+' -> '+await ev("houseLimits().x")+')');
-await ev("$('hs-right').click();$('hs-up').click()");ok(await ev("HS.ox===5&&HS.oy===3"),'the arrows move the view right and up');
+await ev("$('hs-right').click();$('hs-up').click()");ok(await ev("HS.ox===5&&HS.oy===4"),'the arrows move the view right and up');
 await ev("$('hs-tabs').children[2].click()");await card('Bed');await p.locator('.hcell').nth(6*20+0).tap();
-ok(await ev("HOUSE.items.some(i=>i.id==='hf-bed'&&i.x===5&&i.y===3)"),'placing while the view is moved uses the land position');
+ok(await ev("HOUSE.items.some(i=>i.id==='hf-bed'&&i.x===5&&i.y===4)"),'placing while the view is moved uses the land position');
 await ev("$('hs-tabs').children[4].click()");await card('Mint');await card('Mint');ok(await ev("HOUSE.bg==='hbg-mint'&&owns('hbg-mint')"),'a background is bought once and put up');
 const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))");ok(sv.saveVersion===7&&sv.house.bg==='hbg-mint'&&sv.house.solids['3,4']==='floor','saved as version 7 with walls, floors and items');
-await p.reload();await p.waitForTimeout(400);ok(await ev("HOUSE.bg==='hbg-mint'&&HOUSE.solids['3,4']==='floor'&&CHR.list[0].name==='RHETT'"),'the house survives a reload');
+await p.reload();await p.waitForFunction(()=>typeof openHouse==='function'&&typeof loop==='function');await p.waitForTimeout(400);ok(await ev("HOUSE.bg==='hbg-mint'&&HOUSE.solids['3,4']==='floor'&&CHR.list[0].name==='RHETT'"),'the house survives a reload '+await ev("JSON.stringify({bg:HOUSE.bg,s:HOUSE.solids,n:CHR.list[0]&&CHR.list[0].name,v:JSON.parse(localStorage.getItem('orangeArmy.v1')).house.bg})"));
 // a version 6 house (rows counted from the top) is turned over
 ok(await ev("JSON.stringify(normHouse({flip7:1,bg:'hbg-paper',cells:{'1,6':'wood','2,0':'roof'},items:[{id:'hf-shelf',x:4,y:4}]}))")==='{"bg":"hbg-paper","cells":{"1,0":"wood","2,6":"roof"},"solids":{},"items":[{"id":"hf-shelf","x":4,"y":0}]}','a version 6 house is turned the right way up');
 ok(await ev("JSON.stringify(normHouse({bg:'nope',cells:{'999,1':'wood','1,1':'lava','2,2':'brick'},solids:{'1,1':'trampoline','3,3':'stairR'},items:[{id:'hd-trophy',x:1,y:1},{id:'hf-shelf',x:500,y:-3}]}))")==='{"bg":"hbg-paper","cells":{"2,2":"brick"},"solids":{"3,3":"stairR"},"items":[{"id":"hf-shelf","x":238,"y":0}]}','bad squares, solids and locked items are dropped; positions kept on the land');
@@ -49,6 +49,22 @@ const r4=await run('dj',2);const r5=await run('',40);ok(r5.y===345&&r5.gy===345,
 await ev("PL[0].x=600");await run('',5);await run('j',2);await run('',14);await run('j',2);const r6=await run('',60);ok(r6.y===345-135,'jumping up through the floor from below (double jump) lands on top of it '+JSON.stringify(r6));
 await p.screenshot({path:S+'/shots/m18-visit.png'});
 await ev("for(const b of ACT)setA('kb',b,0,0);pause(true);$('b-quit').click()");ok(await p.isVisible('#s-house'),'quitting goes back to the house screen');
+// editor zoom
+await ev("HS.zi=0;HS.ox=0;HS.oy=0;titleOpenAll();$('b-house').click();$('hs-zout').click()");
+ok(await ev("$('hs-cells').children.length===40*14&&HS.zi===1"),'zoom out shows 40 x 14 squares');
+await ev("$('hs-zout').click()");ok(await ev("$('hs-cells').children.length===60*21&&$('hs-zout').disabled"),'zoom out again: 60 x 21, the farthest');
+await ev("$('hs-tabs').children[1].click()");await p.locator('.hcell').nth(20*60+30).tap();
+ok(await ev("HOUSE.solids['30,0']==='floor'"),'tapping while zoomed out builds on the right square');
+await p.screenshot({path:S+'/shots/m18-zoom.png'});
+await ev("$('hs-zin').click();$('hs-zin').click()");ok(await ev("$('hs-cells').children.length===20*7"),'zoom back in');
+// two players far apart: the camera zooms out to keep both on screen
+await ev(`ROSTER=[{slot:0,dev:'kb',col:'#ff7a00',d2:'#d85f00',name:'A'},{slot:1,dev:'kb2',col:'#3ec5ff',d2:'#1d86c4',name:'B'}];HOUSE.solids={...HOUSE.solids,'150,30':'floor'};startHouse({...normHouse(HOUSE)});PL[0].x=100;PL[1].x=150*45+20;PL[1].y=PL[1].gy=345-30*45;for(let i=0;i<120;i++)render()`);
+const cam=await ev("({z:CAM.z,x:CAM.x,y:CAM.y})");
+const fits=await ev("PL.every(p=>{const sx=(p.x-CAM.x)*CAM.z,sy=345+(p.y-345-CAM.y)*CAM.z;return sx>0&&sx<900&&sy>0&&sy<=420})");
+ok(cam.z<0.2&&fits,'players at both ends and up high are both on screen (zoom '+cam.z.toFixed(2)+')');
+await p.screenshot({path:S+'/shots/m18-far.png'});
+await ev("PL[1].x=PL[0].x+80;PL[1].y=PL[1].gy=345;for(let i=0;i<150;i++)render()");ok(await ev("CAM.z>0.95"),'together again: back to normal size');
+await ev("ROSTER=[]");
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged');
 // online: a guest visits the host's house
 const srv=spawn('node',[__dirname+'/sigserver.js','9316']);await new Promise(r=>setTimeout(r,400));
