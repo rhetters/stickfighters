@@ -90,11 +90,12 @@ function shade(hex, k) {
 }
 // A fighter with every field present and valid: unknown or unowned items are taken off, odd numbers clamped.
 // Older fighters: eq.trail became eq.surge, and eq.pose (one victory pose) became the pose wheel.
-function normFighter(c) {
+// any = accept items without checking ownership (fighters from other devices in online play)
+function normFighter(c, any) {
   const d = FIGHTER0,
     f = c && typeof c === 'object' ? c : {},
     fe = (f.eq && typeof f.eq === 'object' && f.eq) || {},
-    ok = (id, slot) => !!id && !!ITEM[id] && ITEM[id].slot === slot && owns(id),
+    ok = (id, slot) => !!id && !!ITEM[id] && ITEM[id].slot === slot && (any || owns(id)),
     eq = {};
   for (const s of EQ) {
     const id = s === 'surge' && !('surge' in fe) ? fe.trail : fe[s];

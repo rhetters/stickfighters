@@ -1428,3 +1428,102 @@ body.padnav #ui select:focus {
 .touch-on #press .tapalso {
   display: block;
 }
+/* Online screen (M11) */
+.onpane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+.onpane[hidden] {
+  display: none;
+}
+.onlabel {
+  margin: 8px 0 0;
+  font-weight: 800;
+}
+.oncode {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font:
+    900 24px Impact,
+    'Arial Black',
+    sans-serif;
+}
+.oncode b {
+  min-width: 1.1em;
+  text-align: center;
+}
+#on-w {
+  min-width: 4.6em;
+}
+.oncode button,
+.onmodes button {
+  font:
+    800 14px 'Trebuchet MS',
+    sans-serif;
+  border: 3px solid #1c1626;
+  border-radius: 10px;
+  background: #fff8ee;
+  color: #1c1626;
+  min-width: 38px;
+  min-height: 38px;
+  cursor: pointer;
+}
+.onmodes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.onmodes button {
+  padding: 4px 14px;
+}
+.onmodes button.on {
+  background: #ff7a00;
+  color: #fff;
+}
+.onmodes button:disabled:not(.on) {
+  opacity: 0.45;
+}
+.onroomcode {
+  margin: 0;
+  font-weight: 800;
+}
+.onroomcode b {
+  font:
+    900 30px Impact,
+    'Arial Black',
+    sans-serif;
+  letter-spacing: 2px;
+  color: #ff7a00;
+  margin-left: 8px;
+}
+#on-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 760px;
+}
+#on-msg {
+  font-weight: 800;
+  color: #c45200;
+  min-height: 1.2em;
+  margin: 2px 0;
+}
+#s-online {
+  justify-content: flex-start;
+  gap: 4px;
+  padding-top: 8px;
+}
+#s-online h2 {
+  margin: 0;
+}
+#s-online .btn {
+  min-height: 40px;
+  padding: 4px 26px;
+  margin: 2px 0;
+}

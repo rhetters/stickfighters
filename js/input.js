@@ -33,6 +33,8 @@ const SYM = { l: '←', r: '→', u: '↑', d: '↓', j: 'JUMP', p: 'P', k: 'K',
 // Player 1 like before. Devices with no player are ignored during a multiplayer game.
 let ROSTER = [];
 function devSlot(dev) {
+  // online (M11): every device here drives my own player
+  if (typeof NET !== 'undefined' && NET.match) return dev === 'net' ? -1 : NET.mySlot;
   if (!ROSTER.length) return 0;
   const r = ROSTER.find(r => r.dev === dev);
   return r ? r.slot : -1;

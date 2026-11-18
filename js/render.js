@@ -564,6 +564,7 @@ function hud() {
   ctx.fillStyle = INK;
   if (state !== 'train' && !MODE.pvp) ctx.fillText(String(score).padStart(7, '0'), W - 16, 34);
   if (state !== 'train' && MODE.drops) starHud();
+  if (NET.match) onlineHud();
   ctx.textAlign = 'center';
   ctx.font = '900 18px Impact,"Arial Black",sans-serif';
   if (MODE.hud && state !== 'train') MODE.hud();

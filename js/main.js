@@ -30,9 +30,17 @@ function show(id) {
   } else if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   $('wrap').classList.toggle('playing', !id && (state === 'play' || state === 'train'));
   $('wrap').classList.toggle('training', !id && state === 'train');
+  if (NET.match && id) onlineScreens(id);
+  else if (id === 's-pause' || id === 's-over' || id === 's-clear') onlineScreensReset();
 }
 function newSeed() {
   const s = String(SET.seed || '').trim();
+  // online (M11): everyone uses the seed the host chose
+  if (typeof NET !== 'undefined' && NET.match) {
+    curSeed = NET.seed >>> 0;
+    reseed(curSeed);
+    return;
+  }
   curSeed = s
     ? /^\d+$/.test(s)
       ? +s >>> 0
@@ -256,13 +264,7 @@ function titleOpenAll() {
 }
 $('b-solo').onclick = () => splitOpen('solo');
 $('b-mp').onclick = () => splitOpen('mp');
-$('b-online').onclick = () => show('s-online');
-$('b-onlineback').onclick = () => {
-  show('s-title');
-  titleView();
-  splitOpen('mp');
-  $('b-online').focus({ preventScroll: true });
-};
+$('b-online').onclick = () => openOnline();
 addEventListener('gamepadconnected', () => {
   if (pressMode()) titleReveal();
 });
@@ -296,7 +298,15 @@ $('b-set1').onclick = () => {
   show('s-settings');
 };
 $('b-resume').onclick = () => pause(false);
+// Online (M11): only the host restarts or ends a match, for everyone; a guest's MENU / QUIT leaves the room.
+const netLeaveToTitle = () => {
+  netLeave();
+  openTitle();
+};
+const netOr = (fn, cmd) => () =>
+  NET.match ? (NET.host ? netCmd(cmd) : cmd === 'room' && netLeaveToTitle()) : fn();
 $('b-restart').onclick = () => {
+  if (NET.match) return NET.host && netCmd('again');
   if (state === 'train') startTrain();
   else if (MODE === LEVEL) startLevel(LV.id);
   else if (MODE === VERSUS) startVersus();
@@ -307,14 +317,14 @@ $('b-set2').onclick = () => {
   back = 's-pause';
   show('s-settings');
 };
-$('b-quit').onclick = openTitle;
+$('b-quit').onclick = netOr(openTitle, 'room');
 $('b-back').onclick = () => show(back);
-$('b-again').onclick = () => (MODE === LEVEL ? startLevel(LV.id) : start());
-$('b-cont').onclick = continueLevel;
+$('b-again').onclick = netOr(() => (MODE === LEVEL ? startLevel(LV.id) : start()), 'again');
+$('b-cont').onclick = netOr(continueLevel, 'cont');
 $('b-level').onclick = () => startLevel('woods1');
-$('b-next').onclick = () => (MODE === VERSUS ? startVersus() : startLevel(LV.id));
-$('b-title2').onclick = openTitle;
-$('b-title').onclick = openTitle;
+$('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : startLevel(LV.id)), 'again');
+$('b-title2').onclick = netOr(openTitle, 'room');
+$('b-title').onclick = netOr(openTitle, 'room');
 $('pausebtn').onclick = () => pause(true);
 // Pose wheel on touch (M10 patch): hold POSE, aim with the stick, let go to strike the pose
 {
@@ -542,7 +552,14 @@ function loop(now) {
   last = now;
   pollPad();
   if (portraitMQ.matches && live()) pause(true);
-  if (!paused) {
+  if (NET.match) {
+    // online (M11): the match runs on everyone's buttons and never pauses; see net/session.js
+    acc += dt;
+    while (acc >= 16.67) {
+      acc -= 16.67;
+      netTick();
+    }
+  } else if (!paused) {
     acc += dt * (state === 'train' ? TR.ts : 1);
     while (acc >= 16.67) {
       acc -= 16.67;

@@ -155,7 +155,8 @@ const NO_INPUT = mkSlot();
 function use(p) {
   P = p;
   STM = p.stm;
-  const I = MODE.locked && MODE.locked(p) ? NO_INPUT : INP[p.slot];
+  // online (M11) the simulation reads the buttons that arrived for this frame (NETIN), not the devices
+  const I = MODE.locked && MODE.locked(p) ? NO_INPUT : NET.match ? NETIN[p.slot] : INP[p.slot];
   K = I.K;
   press = I.press;
   AIM = I.AIM;
