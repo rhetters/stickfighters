@@ -50,4 +50,6 @@ linked from rhetters.github.io). Read docs/VISION.md before designing anything n
 - End of each milestone: set its row in docs/ROADMAP.md to Done and move its plan to docs/archive/roadmap-history.md
   (append only); update ARCHITECTURE.md if the code's structure changed; README only if modes or controls changed.
 - Preview for Ron: `python3 tools/bundle.py . <out.html>` makes the single-file preview.
+- Ron's roadmap doc in Claude Docs holds only a copy of the milestone table (by his choice). When a row in
+  docs/ROADMAP.md's table changes, change the same row there; nothing else goes in that doc.
 - Explain changes to Ron in plain language; he may not review code.
