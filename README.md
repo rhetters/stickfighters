@@ -4,11 +4,11 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Play:** https://rhetters.github.io/stickfighters/
 
-**Status:** M0–M10 done: Wooded Trail, Arcade, local multiplayer (Versus and Co-op for up to 4 players), and ninja stars with the cosmetic store and character creation. Next: M11, network multiplayer (each kid on their own iPad over home Wi-Fi), then M12, XP and the skill tree. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
+**Status:** M0–M11 done: Wooded Trail, Arcade, local multiplayer (Versus and Co-op for up to 4 players), ninja stars with the cosmetic store and character creation, and online multiplayer (house to house, PC and iPad together). Next: M12, XP and the skill tree. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Modes
 
-The title says **PRESS START**: press any key, button or tap. **Solo** opens Campaign (the Wooded Trail) and Arcade; **Multiplayer** opens Local (up to 4 players on one screen) and Online (coming in M11); **Character** is where you make up to four fighters and spend ninja stars on their look.
+The title says **PRESS START**: press any key, button or tap. **Solo** opens Campaign (the Wooded Trail) and Arcade; **Multiplayer** opens Local (up to 4 players on one screen) and Online (host a room and share its code, or join one: up to 4 players on their own devices, PC, iPad and phone together); **Character** is where you make up to four fighters and spend ninja stars on their look.
 
 
 - **Play: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.

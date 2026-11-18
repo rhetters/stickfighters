@@ -2,6 +2,14 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M11 · Online multiplayer (internet, cross-play)
+- Title → Multiplayer → Online: HOST A GAME gives a room code; JOIN picks the code with arrows (works with a controller). Up to 4 players, one per device, any mix of PC, iPad and phone, house to house over the internet.
+- The room shows everyone's fighter (change yours with ◀ ▶); no two players share a color. The host picks Co-op Trail, Arcade or Versus and starts.
+- Every device runs the same game and only button presses travel; the input delay adapts to the measured lag. Game versions must match, the host's feel settings are used, and a fingerprint check stops the match if a game drifts.
+- A YOU marker shows your fighter at the start. The pause menu doesn't stop the match; only the host restarts or ends it. Guests leaving don't end the match; the host leaving sends everyone back.
+- Built to swap parts later: connection (WebRTC), room, lockstep (see ARCHITECTURE.md), for matchmaking or Steam.
+- Self-test fingerprints unchanged.
+
 ## M10 patch 2 (November 17, 2026)
 - Clothes sit at the right depth: the far hand, sleeve and leg go behind the body and dresses; ties and scarves go under the near arm. Ties look like ties.
 - Controller menus move the way you point (down from a fighter goes to the tabs below, right goes to the next fighter).
