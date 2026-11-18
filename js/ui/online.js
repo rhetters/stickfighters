@@ -3,12 +3,14 @@
 // ===== ONLINE SCREEN (M11) =====
 const ONC = { w: 0, a: 1, b: 0 }; // the room code being picked: word, first digit, second digit
 const ONLINE_WHY = {
-  NOROOM: 'No room with that code. Check the code with the host.',
+  NOROOM: 'No room with that code answered. Check the code, and that the host is still on the room screen.',
+  BLOCKED:
+    'Found the room, but the two devices couldn\u2019t connect to each other. One of the networks is blocking it; try again, or try another network.',
   FULL: 'That room is full (4 players).',
   PLAYING: 'That room is in the middle of a match. Try again when it ends.',
-  VERSION: 'Your game and the host’s are different versions. Reload the page on both devices.',
-  offline: 'Couldn’t reach the online service. Check the internet connection.',
-  taken: 'Couldn’t make a room right now. Try again.'
+  VERSION: 'Your game and the host\u2019s are different versions. Reload the page on both devices.',
+  offline: 'Couldn\u2019t reach any of the online services. Check the internet connection.',
+  taken: 'Couldn\u2019t make a room right now. Try again.'
 };
 function onlineMsg(t) {
   $('on-msg').textContent = t || '';
@@ -37,6 +39,7 @@ function renderOnline() {
   $('b-onlineback').textContent = NET.on ? 'LEAVE ROOM' : 'BACK';
   if (!NET.on) return;
   $('on-code').textContent = NET.code;
+  $('on-diag').textContent = NET.host ? 'Listening on: ' + rtcDiag() : '';
   const cards = $('on-cards');
   cards.innerHTML = '';
   for (let s = 0; s < MAX_ONLINE; s++) {
@@ -166,9 +169,10 @@ $('on-host').onclick = async () => {
     renderOnline();
     $('on-start').focus({ preventScroll: true });
   } catch (e) {
+    const d = rtcDiag();
     netReset();
     rtcClose();
-    onlineMsg(ONLINE_WHY[e] || ONLINE_WHY.offline);
+    onlineMsg((ONLINE_WHY[e] || ONLINE_WHY.offline) + (d ? ' (' + d + ')' : ''));
   }
 };
 $('on-join').onclick = async () => {
@@ -179,9 +183,10 @@ $('on-join').onclick = async () => {
     renderOnline();
     $('b-onlineback').focus({ preventScroll: true });
   } catch (e) {
+    const d = rtcDiag();
     rtcClose();
     netReset();
-    onlineMsg(ONLINE_WHY[e] || ONLINE_WHY.offline);
+    onlineMsg((ONLINE_WHY[e] || ONLINE_WHY.offline) + (d ? ' (' + d + ')' : ''));
   }
 };
 const onStep = (k, n, d) => () => {

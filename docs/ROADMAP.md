@@ -363,7 +363,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 **Done when:** Two devices in different houses finish Level 1 together over the internet, and a Versus match is playable.
 
-**Status: built** (November 17, 2026). Tested here with two to three browsers on one machine through a local copy of the signaling server: joining, wrong codes, full rooms, co-op, Arcade, Versus, restarts, leaving and a deliberately broken game being caught. Still needs the real test between two houses (and an iPad with a PC). Self-test fingerprints unchanged.
+**Status: built** (November 17, 2026). First real test: no device could join ("No room with that code"); fixed the same evening by sending room codes through several services at once (PeerJS plus public MQTT message boards), adding a free relay server and clearer messages. Waiting for the next real test. Tested here with two to three browsers on one machine through a local copy of the signaling server: joining, wrong codes, full rooms, co-op, Arcade, Versus, restarts, leaving and a deliberately broken game being caught. Still needs the real test between two houses (and an iPad with a PC). Self-test fingerprints unchanged.
 
 ### M12 · XP, levels, skill tree
 

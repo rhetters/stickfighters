@@ -2,6 +2,12 @@
 
 One short entry per milestone. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M11 fix: connecting between houses (November 17, 2026)
+- The first real test failed everywhere ("No room with that code"). Room codes now travel through several free services at once (the PeerJS server and three public MQTT message boards); whichever gets through first wins, so one being down or blocked no longer stops play.
+- A free relay (TURN) server is added for networks that won't connect devices directly.
+- Clearer messages: "Looking for room…", "Found the room. Connecting…", and different messages for "no room answered" and "found the room but the networks blocked the connection", plus which online services could be reached. The host's room screen shows which services it's listening on.
+- Version 13.
+
 ## M11 · Online multiplayer (internet, cross-play)
 - Title → Multiplayer → Online: HOST A GAME gives a room code; JOIN picks the code with arrows (works with a controller). Up to 4 players, one per device, any mix of PC, iPad and phone, house to house over the internet.
 - The room shows everyone's fighter (change yours with ◀ ▶); no two players share a color. The host picks Co-op Trail, Arcade or Versus and starts.

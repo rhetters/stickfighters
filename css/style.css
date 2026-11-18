@@ -1527,3 +1527,8 @@ body.padnav #ui select:focus {
   padding: 4px 26px;
   margin: 2px 0;
 }
+#on-diag {
+  margin: 0;
+  font-size: 11px;
+  color: #7a6e80;
+}
