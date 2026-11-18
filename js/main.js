@@ -273,7 +273,11 @@ addEventListener('gamepadconnected', () => {
 setInterval(() => {
   if (!pressMode() || !navigator.getGamepads) return;
   for (const g of navigator.getGamepads())
-    if (g && (g.buttons.some(b => b && b.pressed) || g.axes.some(v => Math.abs(v) > 0.6))) titleReveal();
+    if (g && (g.buttons.some(b => b && b.pressed) || g.axes.some(v => Math.abs(v) > 0.6))) {
+      // the button that opened the title is still down: the menu must not also take it as a press
+      padPrev[g.index] = g.buttons.map(b => !!(b && b.pressed));
+      titleReveal();
+    }
 }, 150);
 $('s-title').addEventListener('pointerdown', e => {
   if (pressMode()) {
