@@ -62,7 +62,7 @@ function tickAtk(f) {
     eat = k => eatIn(I, k);
   a.f++;
   f.tp = kf(d.k, Math.min(1, a.f / (d.kt || d.d)));
-  if (f.pl && a.b && !a.chained && !d.cost && !d.air && a.f <= Math.min(5, d.h[0]) && f.y >= G - 1) {
+  if (f.pl && a.b && !a.chained && !d.cost && !d.air && a.f <= Math.min(5, d.h[0]) && f.y >= f.gy - 1) {
     const o = a.b === 'p' ? 'k' : 'p';
     if (want(o) && Math.abs(press[o] - a.pf) <= 3) {
       eat(o);
@@ -71,7 +71,7 @@ function tickAtk(f) {
       return;
     }
   }
-  if (d.hop && a.f === 1 && f.y >= G - 1) {
+  if (d.hop && a.f === 1 && f.y >= f.gy - 1) {
     f.vy = d.hop;
     if (d.hopx) f.vx = f.face * d.hopx;
   }
@@ -106,7 +106,7 @@ function tickAtk(f) {
   }
   if (d.tatsu) {
     const m = (K.r ? 1 : 0) - (K.l ? 1 : 0),
-      hy = groundY(f.x) - 46;
+      hy = f.gy - 46;
     if (a.f <= 7) f.vy = -6.5;
     else if (a.f < d.d - 4) f.vy = (hy - f.y) * 0.25;
     f.vx = f.face * 3.4 + m * 1.6;
@@ -132,9 +132,9 @@ function tickAtk(f) {
   }
   if ((d.multi && a.f % (d.multi > 1 ? d.multi : 7) === 0) || (d.finalAt && a.f === d.finalAt)) a.hit.clear();
   if (d.quake && a.f === d.h[0]) {
-    ring(f.x, G, d.r);
-    dust(f.x - 60, G, 6);
-    dust(f.x + 60, G, 6);
+    ring(f.x, f.gy, d.r);
+    dust(f.x - 60, f.gy, 6);
+    dust(f.x + 60, f.gy, 6);
     shake = Math.max(shake, 8);
     camY += 4;
     sfx(55, 0.3, 'sine', 0.12);
@@ -188,21 +188,21 @@ function tickAtk(f) {
       }
     }
   }
-  if (d.dive && a.f > (d.diveAt || 0) + 3 && f.y >= G - 1) {
-    ring(f.x, G, d.area ? d.area : 60);
-    dust(f.x, G, d.area ? 16 : 8);
+  if (d.dive && a.f > (d.diveAt || 0) + 3 && f.y >= f.gy - 1) {
+    ring(f.x, f.gy, d.area ? d.area : 60);
+    dust(f.x, f.gy, d.area ? 16 : 8);
     shake = Math.max(shake, d.area ? 10 : 5);
     sfx(60, 0.2, 'sine', 0.12);
     if (d.area && !f.pl) {
       for (const q of PL) {
-        if (q.st === 'dead' || q.y < G - 24 || Math.abs(q.x - f.x) > d.area) continue;
+        if (q.st === 'dead' || q.y < q.gy - 24 || Math.abs(q.x - f.x) > d.area) continue;
         hurtP(q, { dmg: d.adm || 10, kb: 10, lift: -6 }, q.x >= f.x ? 1 : -1);
       }
       shake = Math.max(shake, 12);
     }
     if (d.area && f.pl && MODE.pvp)
       for (const q of foes(f)) {
-        if (q.inv > 0 || q.st === 'dead' || q.y < G - 24 || Math.abs(q.x - f.x) > d.area) continue;
+        if (q.inv > 0 || q.st === 'dead' || q.y < q.gy - 24 || Math.abs(q.x - f.x) > d.area) continue;
         pvpHit(q, { dmg: d.adm || 12, kb: 9, lift: -7, ef: 'kd' }, q.x >= f.x ? 1 : -1, f);
       }
     if (d.area && f.pl)
@@ -212,7 +212,7 @@ function tickAtk(f) {
           e.dying ||
           a.hit.has(e) ||
           e.st === 'down' ||
-          e.y < G - 60 ||
+          e.y < e.gy - 60 ||
           Math.abs(e.x - f.x) > d.area
         )
           continue;
@@ -227,7 +227,7 @@ function tickAtk(f) {
     endAtk(f);
     return;
   }
-  if (d.air && a.f > 2 && f.y >= G - 1) {
+  if (d.air && a.f > 2 && f.y >= f.gy - 1) {
     if (a.q) press[a.q] = fr;
     endAtk(f);
     return;
@@ -246,7 +246,7 @@ function tickAtk(f) {
     endAtk(f);
     return;
   }
-  if (a.q && (d.air || f.y >= G - 1) && a.f >= d.d * d.cx) {
+  if (a.q && (d.air || f.y >= f.gy - 1) && a.f >= d.d * d.cx) {
     const b = a.q;
     if (d.turn) f.face *= -1;
     const n = pick(f, b, true);
@@ -401,10 +401,10 @@ function throwE(f, e, dir) {
   const fc = f.face;
   if (dir === 'u') hurtE(e, { dmg: 6, kb: 1, lift: -13, ef: 'launch', w: 'M' }, fc, null, f);
   else if (dir === 'd') {
-    e.y = G - 4;
+    e.y = f.gy - 4;
     hurtE(e, { dmg: 10, kb: 1, lift: -8, ef: 'bounce', w: 'H' }, fc, null, f);
-    ring(e.x, G, 70);
-    dust(e.x, G, 12);
+    ring(e.x, f.gy, 70);
+    dust(e.x, f.gy, 12);
   } else {
     hurtE(e, { dmg: 8, kb: 12, lift: -5, ef: 'splat', w: 'H' }, fc, null, f);
     e.thrown = 1;
@@ -450,7 +450,7 @@ function hurtE(e, d, dr, src, by) {
   e.flash = 4;
   e.hs = WT[w].st;
   let ef = d.ef || 'stagger';
-  const air = e.y < G - 6 || e.st === 'fly' || e.st === 'splat';
+  const air = e.y < e.gy - 6 || e.st === 'fly' || e.st === 'splat';
   const ef0 = ef;
   if (e.hp <= 0) {
     e.dying = 1;
@@ -727,7 +727,7 @@ function bowl() {
           }
           a.vy = Math.min(a.vy, -5);
           a.vx *= 0.6;
-          dust(b.x, G, 4);
+          dust(b.x, b.gy, 4);
           sfx(90, 0.08, 'sine', 0.08);
         }
         continue;
@@ -810,14 +810,17 @@ function sep() {
     }
   }
 }
-// Ground height as a function of x: flat for now; platforms and stairs (roadmap, optional) would change only this.
+// The floor line under x (ragdolls still use only this; fighters stand on f.gy, see terrain.js).
 const groundY = x => G;
 function phys(f) {
   if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav;
+  const y0 = f.y;
   f.x += f.vx;
   f.y += f.vy;
   let imp = 0;
-  const gy = groundY(f.x);
+  if (TERRAIN.n) terrainStep(f, y0);
+  else f.gy = G;
+  const gy = f.gy;
   if (f.y >= gy) {
     if (f.vy > 0) imp = f.vy;
     f.y = gy;
@@ -827,7 +830,7 @@ function phys(f) {
   return imp;
 }
 function freePose(f) {
-  if (f.y < G - 4) return f.vy < -1 ? JUMP : FALL;
+  if (f.y < f.gy - 4) return f.vy < -1 ? JUMP : FALL;
   if (Math.abs(f.vx) > 0.9) {
     const ph = f.t * (f.pl ? 0.3 : 0.22),
       c = Math.cos(ph),

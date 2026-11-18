@@ -129,7 +129,7 @@ function withCtx(c2, fn) {
 }
 // World. CAM.x = world x of the screen's left edge. WB = walls for living fighters (the screen, or a gate such
 // as the fallen log). WW = the whole world's edges, used by ragdolls. In Arcade and Training all three are the screen.
-const CAM = { x: 0 },
+const CAM = { x: 0, y: 0 }, // y < 0 = looking up (a tall house; levels keep 0)
   WB = { l: 0, r: W },
   WW = { l: 0, r: W };
 // Feel knobs (training room > Feel). Saved per device.

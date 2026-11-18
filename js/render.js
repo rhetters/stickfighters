@@ -168,7 +168,7 @@ function drawF(f) {
   let a = 1;
   if (f.pl && f.inv > 0 && f.inv < 900 && f.st !== 'dead' && Math.floor(f.t / 3) % 2) a = 0.45;
   if (f.pl && f.phase > 0) a = Math.min(a, 0.55);
-  const lying = f.st === 'down' || (f.st === 'dead' && f.y >= G),
+  const lying = f.st === 'down' || (f.st === 'dead' && f.y >= f.gy),
     fl = f.flash > 0;
   if (f.trail && f.trail.length > 1) {
     const t = f.trail;
@@ -625,12 +625,12 @@ function render() {
   ctx.scale(1 + zoom * cm, 1 + zoom * cm);
   ctx.translate(-W / 2, -H / 2);
   bg();
-  ctx.translate(-CAM.x, 0);
+  ctx.translate(-CAM.x, -CAM.y);
   for (const f of [...PL, ...E]) {
-    const s = f.s * 16 * Math.max(0.4, 1 - (G - f.y) / 400);
+    const s = f.s * 16 * Math.max(0.4, 1 - (f.gy - f.y) / 400);
     ctx.fillStyle = 'rgba(0,0,0,.14)';
     ctx.beginPath();
-    ctx.ellipse(f.x, G + 6, s, 4, 0, 0, 7);
+    ctx.ellipse(f.x, f.gy + 6, s, 4, 0, 0, 7);
     ctx.fill();
   }
   for (const g of GH) {
@@ -668,7 +668,7 @@ function render() {
       ctx.stroke();
     }
   if (state === 'train' && TR.boxes) drawBoxes();
-  ctx.translate(CAM.x, 0);
+  ctx.translate(CAM.x, CAM.y);
   if (MODE.fg) MODE.fg();
   ctx.restore();
   if (state !== 'menu') hud();
