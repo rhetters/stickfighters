@@ -5,7 +5,8 @@
 //   j    jump        p k  punch / kick        s  Surge (hold)        x  ultimate
 //   e    pose wheel (hold, aim to pick a pose, let go to strike it; looks only)
 const ACT = ['l', 'r', 'u', 'd', 'j', 'p', 'k', 's', 'x', 'e'];
-// One input slot per player (M4 groundwork for M9 multiplayer). Devices feed slot 0 today; M9 maps a second device to slot 1.
+// One input slot per player: K = held, press = frame pressed, AIM / SRG = the direction and Surge held when P or K
+// was pressed. Devices reach a slot through devSlot(); the simulation reads it through inputOf(p) (player.js).
 const mkSlot = () => {
   const I = {
     K: {},
@@ -21,11 +22,6 @@ const INP = [mkSlot(), mkSlot(), mkSlot(), mkSlot()],
   SRC = INP[0].src,
   HIST = [];
 let fr = 0;
-// K / press / AIM / SRG point at the slot of the player being updated (see use()); AIM = direction held when P/K was pressed
-let K = INP[0].K,
-  press = INP[0].press,
-  AIM = INP[0].AIM,
-  SRG = INP[0].SRG;
 const SYM = { l: '←', r: '→', u: '↑', d: '↓', j: 'JUMP', p: 'P', k: 'K', s: 'SURGE', x: 'ULT', e: 'POSE' };
 // ===== PLAYERS AND DEVICES (M9) =====
 // ROSTER = the players in a multiplayer game: [{ slot, dev, col, d2, name }], where dev is 'touch', 'kb' (the main
@@ -97,8 +93,9 @@ function releaseAll() {
     b.classList.remove('on');
   });
 }
-const want = k => fr - (press[k] ?? -99) <= 12,
-  eat = k => (press[k] = -99); // 12-frame input buffer
+// 12-frame input buffer: a press counts for 12 frames until a move uses it up. I = an input slot (see inputOf).
+const wantIn = (I, k) => fr - (I.press[k] ?? -99) <= 12,
+  eatIn = (I, k) => (I.press[k] = -99);
 const live = () => (state === 'play' || state === 'train') && !paused;
 function unlockAudio() {
   try {

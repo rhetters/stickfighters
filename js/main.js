@@ -433,11 +433,7 @@ function update() {
     }
   }
   if (MODE.pre && MODE.pre()) return;
-  for (const p of PL) {
-    use(p);
-    updP();
-  }
-  use(PL[0]);
+  for (const p of PL) updP(p);
   director();
   for (const e of E) updE(e);
   bowl();

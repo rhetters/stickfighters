@@ -16,7 +16,7 @@ await tap(9);await W(150);ok(await ev("paused")&&await vis('s-pause'),'Start pau
 ok(await foc()==='b-resume','RESUME is highlighted');
 await tap(13);ok(await foc()==='b-restart','controller moves through the pause menu');
 await tap(12);await tap(0);await W(150);ok(await ev("!paused&&state==='play'"),'A on RESUME resumes the game');
-const x0=await ev("P.x");await ev("__pad.buttons[15].pressed=true");await W(500);await ev("__pad.buttons[15].pressed=false");ok(await ev("P.x")>x0+40,'after resuming, the controller moves Orange again');
+const x0=await ev("PL[0].x");await ev("__pad.buttons[15].pressed=true");await W(500);await ev("__pad.buttons[15].pressed=false");ok(await ev("PL[0].x")>x0+40,'after resuming, the controller moves Orange again');
 await tap(9);await W(100);await tap(9);await W(100);ok(await ev("!paused"),'Start again on the pause menu resumes');
 await tap(9);await W(100);await tap(1);await W(100);ok(await ev("!paused"),'B on the pause menu resumes');
 // settings via controller
@@ -39,8 +39,8 @@ ok(await ev("padBinds(__pad).p.includes(5)&&!padBinds(__pad).s.includes(5)"),'pr
 ok((await p.textContent('#bd-list')).includes('RB'),'buttons show Xbox names');
 // use them in game
 await p.click('#bd-back');await p.click('#b-back');await W(100);await ev("pause(false)");await W(100);
-await ev("releaseAll();E.forEach(e=>e.gone=1);E=[];LAST=null");await p.keyboard.press('f');await W(150);console.log(await ev("JSON.stringify({LAST,st:P.st,state,paused,f:KEYS.f,K:K,ui:$('ui').hidden})"));ok(await ev("P.st==='atk'&&P.att.b==='p'"),'F punches in the game');
-await W(700);await ev("__pad.buttons[5].pressed=true");await W(60);const rb=await ev("P.st==='atk'&&P.att.b==='p'");await ev("__pad.buttons[5].pressed=false");ok(rb,'RB punches in the game');
+await ev("releaseAll();E.forEach(e=>e.gone=1);E=[];LAST=null");await p.keyboard.press('f');await W(150);console.log(await ev("JSON.stringify({LAST,st:PL[0].st,state,paused,f:KEYS.f,K:inputOf(PL[0]).K,ui:$('ui').hidden})"));ok(await ev("PL[0].st==='atk'&&PL[0].att.b==='p'"),'F punches in the game');
+await W(700);await ev("__pad.buttons[5].pressed=true");await W(60);const rb=await ev("PL[0].st==='atk'&&PL[0].att.b==='p'");await ev("__pad.buttons[5].pressed=false");ok(rb,'RB punches in the game');
 // saved + migration
 await p.reload();await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await W(300);ok(await ev("KEYS.f==='p'&&padBinds(__pad).p.includes(5)&&JSON.parse(localStorage.getItem('orangeArmy.v1')).saveVersion>=3"),'bindings survive a reload (save version 3+)');
 await ev("pause(true)");await ev("show('s-binds');BD.dev='kb';renderBinds()");await p.click('#bd-reset');ok(await ev("KEYS.j==='p'&&KEYS.a==='l'"),'Reset to default restores the keys');

@@ -3,7 +3,8 @@
 const TR = { mortal: 0, inf: 0, boxes: 1, frames: 1, hist: 1, god: 1, passive: 1, ts: 1, freeze: 0, step: 0 };
 function spawnDummy(t) {
   if (state !== 'train' || E.filter(x => !x.gone && !x.dying).length >= 8) return;
-  const dir = P.x < (WB.l + WB.r) / 2 ? 1 : -1,
+  const P = PL[0],
+    dir = P.x < (WB.l + WB.r) / 2 ? 1 : -1,
     e = F(Math.max(WB.l + 60, Math.min(WB.r - 60, P.x + dir * (150 + rnd() * 60))), t, 0);
   if (!TR.mortal) e.hp = e.max = 9999;
   e.cd = 30;
@@ -60,7 +61,7 @@ function debugUI() {
   ctx.save();
   if (showF) {
     let t = 'Punch or kick to see frame data';
-    const a = P.att;
+    const a = PL[0].att;
     if (a) {
       const d = a.d,
         ph = a.f < d.h[0] ? 'startup' : a.f <= d.h[1] ? 'ACTIVE' : 'recovery';
@@ -123,7 +124,7 @@ function debugUI() {
     let hx = W - 282;
     const yk = tOn ? 110 : y;
     for (const a of ['l', 'u', 'd', 'r', 'j', 'p', 'k', 's', 'x']) {
-      const on = K[a];
+      const on = inputOf(PL[0]).K[a];
       ctx.fillStyle = on
         ? a === 's'
           ? '#ffd400'

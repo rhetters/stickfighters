@@ -310,7 +310,7 @@ function bg() {
   ctx.fillStyle = '#fbfaf4';
   ctx.fillRect(-30, -30, W + 60, H + 60);
   ctx.drawImage(gridC, 0, 0, W, H);
-  const ox = -(P.x - W / 2) * 0.05;
+  const ox = -(PL[0].x - W / 2) * 0.05;
   ctx.fillStyle = `hsl(${(wave * 47 + 20) % 360} 85% 82%)`;
   ctx.beginPath();
   ctx.arc(720 + ox, 95, 44, 0, 7);
@@ -434,7 +434,6 @@ function drawFX(x) {
 function hudPlayers() {
   PL.forEach((q, i) => {
     const y = 10 + i * 30;
-    q.hpT += (q.hp - q.hpT) * 0.1;
     ctx.fillStyle = q.col;
     ctx.strokeStyle = INK;
     ctx.lineWidth = 3;
@@ -490,7 +489,9 @@ function hud() {
   ctx.textAlign = 'left';
   if (PL.length > 1) hudPlayers();
   else {
-    P.hpT += (P.hp - P.hpT) * 0.1;
+    const P = PL[0],
+      STM = P.stm,
+      K = inputOf(P).K;
     ctx.fillStyle = INK;
     ctx.fillRect(14, 12, 264, 24);
     ctx.fillStyle = '#ff4fa3';
@@ -641,29 +642,16 @@ function render() {
   for (const e of E) drawF(e);
   drawPickups();
   for (const p of PL) {
-    use(p);
-    if (K.s && live() && P.st !== 'dead' && !STM.winded) {
+    // Surge glow while Surge is held (the sparkles that rise from it are made in updP)
+    if (inputOf(p).K.s && live() && p.st !== 'dead' && !p.stm.winded) {
       const pul = 0.45 + 0.2 * Math.sin(fr * 0.4),
-        sc = surgeCol(P.look, fr >> 2),
-        hs = P.s * (P.look ? P.look.ht : 1);
-      drawFig(P.x, P.y, P.face, P.pose, hs, sc, sc, P.pose[9], pul, 17);
-      surgeExtra(P);
-      if (fr % 4 === 0)
-        fxp({
-          k: 'd',
-          x: P.x + (Math.random() - 0.5) * 30,
-          y: P.y - Math.random() * 70,
-          vx: 0,
-          vy: -1.4,
-          r: 2 + Math.random() * 2,
-          l: 16,
-          m: 16,
-          c: surgeCol(P.look, fr)
-        });
+        sc = surgeCol(p.look, fr >> 2),
+        hs = p.s * (p.look ? p.look.ht : 1);
+      drawFig(p.x, p.y, p.face, p.pose, hs, sc, sc, p.pose[9], pul, 17);
+      surgeExtra(p);
     }
-    drawF(P);
+    drawF(p);
   }
-  use(PL[0]);
   for (const x of FX) drawFX(x);
   // co-op revive progress over a downed teammate
   for (const p of PL)

@@ -1,8 +1,6 @@
 // Orange vs. the Pink Army: Fighters, game state, Surge stamina, move picking, player creation and per-frame player update
 // ===== FIGHTERS & GAME STATE =====
 let PL = [],
-  STM,
-  P,
   E,
   FX,
   GH,
@@ -23,37 +21,38 @@ let PL = [],
   spawnT;
 const bn = t => (banner = { t: 70, m: 70, txt: t });
 const infS = () => state === 'train' && TR.inf;
-const canSurge = () => !STM.winded && (STM.v > 0 || infS());
-function wind() {
-  STM.v = 0;
-  STM.winded = Math.round(SURGE.winded * 60);
-  if (P && SET.surge === 'toggle') {
-    const I = INP[P.slot];
+// Surge stamina: every function takes the player (p.stm is that player's bar)
+const canSurge = p => !p.stm.winded && (p.stm.v > 0 || infS());
+function wind(p) {
+  p.stm.v = 0;
+  p.stm.winded = Math.round(SURGE.winded * 60);
+  if (SET.surge === 'toggle') {
+    const I = INP[p.slot];
     I.sl = false;
     I.K.s = 0;
   } // running dry switches toggled Surge off
-  if (P) {
-    txt(P.x, P.y - 110, 'WINDED!', '#e8a400', 22);
-    P.running = 0;
-  }
+  txt(p.x, p.y - 110, 'WINDED!', '#e8a400', 22);
+  p.running = 0;
   sfx(150, 0.45, 'triangle', 0.08, -90);
 }
-function deny() {
-  STM.flash = 24;
+function deny(p) {
+  p.stm.flash = 24;
   sfx(90, 0.12, 'square', 0.05);
 }
-function spend(c) {
+function spend(p, c) {
+  const STM = p.stm;
   if (infS()) return true;
   if (STM.winded || STM.v < c) {
-    deny();
+    deny(p);
     return false;
   }
   STM.v -= c;
   STM.last = fr;
-  if (STM.v <= 0) wind();
+  if (STM.v <= 0) wind(p);
   return true;
 }
-function stamTick() {
+function stamTick(p) {
+  const STM = p.stm;
   if (STM.flash > 0) STM.flash--;
   if (infS()) {
     STM.v = SURGE.max;
@@ -64,13 +63,14 @@ function stamTick() {
     if (--STM.winded === 0) STM.last = fr - SURGE.delay * 60;
     return;
   }
-  if (!P.running && fr - STM.last > SURGE.delay * 60) STM.v = Math.min(SURGE.max, STM.v + SURGE.regen / 60);
+  if (!p.running && fr - STM.last > SURGE.delay * 60) STM.v = Math.min(SURGE.max, STM.v + SURGE.regen / 60);
 }
 // Picks the move for a button from the route table (aim + Surge captured at the press), and keeps strings going.
 function pick(f, btn, chain, plain) {
-  const air = f.y < G - 4,
-    aim = AIM[btn] || 'n',
-    sg = !plain && (SRG[btn] || K.s) && canSurge();
+  const I = inputOf(f),
+    air = f.y < G - 4,
+    aim = I.AIM[btn] || 'n',
+    sg = !plain && (I.SRG[btn] || I.K.s) && canSurge(f);
   const grp = ROUTE[(sg ? 's' : '') + (air ? 'a' : 'g')],
     tbl = grp[aim] || grp.n,
     key = (sg ? 's' : '') + (air ? 'a' : 'g') + aim;
@@ -82,7 +82,7 @@ function pick(f, btn, chain, plain) {
     seq = btn;
   }
   const mv = A[name];
-  if (mv.cost && !spend(mv.cost)) return pick(f, btn, false, true);
+  if (mv.cost && !spend(f, mv.cost)) return pick(f, btn, false, true);
   f.ckey = key;
   f.seq = seq;
   return mv;
@@ -138,7 +138,7 @@ function F0(x, t, pl) {
     flip: 0
   };
 }
-// Players live in PL. P / STM / K... are bound to one player at a time by use(p); everything else reads them as before.
+// Players live in PL. Every function that needs a player takes it as a parameter (no hidden current player).
 function mkPlayer(x, slot, col, d2) {
   const p = F(x, 0, 1);
   p.slot = slot;
@@ -152,22 +152,9 @@ function mkPlayer(x, slot, col, d2) {
 }
 // A slot nobody presses: players whose control the mode has taken away (MODE.locked) read this instead.
 const NO_INPUT = mkSlot();
-function use(p) {
-  P = p;
-  STM = p.stm;
-  // online (M11) the simulation reads the buttons that arrived for this frame (NETIN), not the devices
-  const I = MODE.locked && MODE.locked(p) ? NO_INPUT : NET.match ? NETIN[p.slot] : INP[p.slot];
-  K = I.K;
-  press = I.press;
-  AIM = I.AIM;
-  SRG = I.SRG;
-}
-function addPlayer() {
-  if (PL.length > 1) return PL[1];
-  const p = mkPlayer(W / 2 - 90, 1, '#2fb5ff', '#1d86c4');
-  PL.push(p);
-  return p;
-} // M9 (multiplayer) calls this when a second player joins
+// The buttons a player's simulation reads this frame: online (M11) the ones that arrived over the network (NETIN),
+// otherwise the player's own input slot; an idle slot while the mode has taken control away (MODE.locked).
+const inputOf = p => (MODE.locked && MODE.locked(p) ? NO_INPUT : NET.match ? NETIN[p.slot] : INP[p.slot]);
 function tgt(e) {
   let b = null,
     bd = 1e9;
@@ -200,7 +187,6 @@ function init() {
   PK = [];
   RUN.stars = 0;
   RUN.items = [];
-  use(PL[0]);
   camX = camY = 0;
   E = [];
   FX = [];
@@ -213,7 +199,7 @@ function init() {
 // ===== PLAYER =====
 // Kneeling block pose. It trembles harder as the Surge bar empties, and flinches when a hit is blocked.
 function blockPose(f) {
-  const weak = 1 - STM.v / SURGE.max,
+  const weak = 1 - f.stm.v / SURGE.max,
     amp = 1 + weak * 7 + (f.blkT > 0 ? f.blkT * 0.8 : 0),
     j = Math.sin(f.t * 1.9) * amp,
     j2 = Math.cos(f.t * 2.3) * amp;
@@ -230,14 +216,33 @@ function blockPose(f) {
     0
   ];
 }
-function updP() {
-  const f = P;
+function updP(f) {
+  const STM = f.stm,
+    I = inputOf(f),
+    K = I.K,
+    press = I.press,
+    want = k => wantIn(I, k),
+    eat = k => eatIn(I, k);
   f.t++;
   if (f.inv > 0) f.inv--;
   if (f.flash > 0) f.flash--;
   if (f.dcd > 0) f.dcd--;
   if (f.phase > 0) f.phase--;
-  stamTick();
+  stamTick(f);
+  f.hpT += (f.hp - f.hpT) * 0.1; // the HUD's health bar trails behind a hit
+  // Surge sparkles rising off a player holding Surge (cosmetic: Math.random, and effects aren't part of the game state)
+  if (K.s && f.st !== 'dead' && !STM.winded && fr % 4 === 0)
+    fxp({
+      k: 'd',
+      x: f.x + (Math.random() - 0.5) * 30,
+      y: f.y - Math.random() * 70,
+      vx: 0,
+      vy: -1.4,
+      r: 2 + Math.random() * 2,
+      l: 16,
+      m: 16,
+      c: surgeCol(f.look, fr)
+    });
   if (f.sj > 0) {
     f.sj--;
     if (f.t % 2 === 0) ghost(f, '#ffd400');
@@ -396,14 +401,14 @@ function updP() {
     const g = f.y >= G - 1,
       m = (K.r ? 1 : 0) - (K.l ? 1 : 0);
     // Block: Down + Surge, standing still on the ground. Drains Surge slowly while held (see blockHit).
-    if (g && K.d && K.s && !m && !f.flip && canSurge()) {
+    if (g && K.d && K.s && !m && !f.flip && canSurge(f)) {
       f.blk = 1;
       f.vx *= 0.6;
       if (!infS()) {
         STM.v -= SURGE.blockDrain / 60;
         STM.last = fr;
         if (STM.v <= 0) {
-          wind();
+          wind(f);
           f.blk = 0;
         }
       }
@@ -413,7 +418,7 @@ function updP() {
       f.hop = 0;
     }
     // Surge run: hold Surge + a direction. Faster, drains the bar, passes through enemy bodies.
-    const run = K.s && m && canSurge();
+    const run = K.s && m && canSurge(f);
     f.running = run ? 1 : 0;
     const spd = STM.winded ? 2.4 : run ? SURGE.runSpeed : 4;
     if (m) {
@@ -425,7 +430,7 @@ function updP() {
       if (!infS()) {
         STM.v -= SURGE.runDrain / 60;
         STM.last = fr;
-        if (STM.v <= 0) wind();
+        if (STM.v <= 0) wind(f);
       }
       if (f.t % 3 === 0) ghost(f, '#ffd400');
       if (f.t % 2 === 0)
@@ -440,7 +445,7 @@ function updP() {
         });
       if (g && f.t % 6 === 0) dust(f.x, G, 1);
     }
-    if (want('j') && K.s && canSurge() && (g || !f.hop) && spend(g ? SURGE.jumpCost : SURGE.hopCost)) {
+    if (want('j') && K.s && canSurge(f) && (g || !f.hop) && spend(f, g ? SURGE.jumpCost : SURGE.hopCost)) {
       eat('j');
       if (g) {
         f.vy = -16.5;
@@ -483,7 +488,7 @@ function updP() {
     } else if (want('k')) {
       eat('k');
       go(pick(f, 'k', fr - f.last < 30), 'k');
-    } else if (want('d') && K.s && m && g && canSurge() && spend(SURGE.slideCost)) {
+    } else if (want('d') && K.s && m && g && canSurge(f) && spend(f, SURGE.slideCost)) {
       eat('d');
       f.st = 'slide';
       f.dt = 24;
