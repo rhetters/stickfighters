@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: zoom (November 17, 2026)
+- House builder: **−** and **+** zoom the view out and back in (20, 40 or 60 squares across). Every square is still tappable, and a faint grid shows where taps land.
+- Walking around with several players (on one screen or online): the camera zooms out to keep everyone in view, even players at opposite ends of the land and at the top of the tallest building, and zooms back in when they come together.
+- Self-test fingerprints unchanged (every other mode keeps the camera at normal size).
+- Version 18.
+
 ## M18 in progress: a bigger house with floors and stairs (November 17, 2026)
 - The land is now up to 240 squares wide and 60 tall, and grows as you build: towers, several houses, a little city. Arrow buttons move the view.
 - New **Floors & Stairs** tab: a floor is a line along the bottom of a square; stairs rise to the right or the left. When you walk around, you jump onto them, walk up and down the stairs, and press Down + Jump to drop through. Walking into stairs from the floor below passes through them, like most platformers. The camera follows you up.
