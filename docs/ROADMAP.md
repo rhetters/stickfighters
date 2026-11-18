@@ -39,6 +39,7 @@ Each milestone has an ID. Say “Start M3” or “change the scope of M3” and
 | M9 | Local multiplayer: co-op and versus | Done | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
 | M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
 | M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
+| M11.5 | Rollback for online play (proposed) | Planned | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | M12 | XP, levels, skill tree | Next | L | M3, M8, M10 | Level-ups, skill points, tree screen |
 | M13 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M10, M12 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
 | M14 | Boss level | Planned | L | M13 | Multi-phase boss fight |
@@ -356,7 +357,8 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 - **Host / Join.** One player hosts and gets a room code (a word and a number, like COMET-76); others pick the code with arrows (no typing, so controllers work) and join. Up to 4 players, one per device. The room shows everyone's fighter; each player changes theirs with ◀ ▶. The host picks Co-op Trail, Arcade or Versus and starts.
 - **Any device with any device.** It runs in the browser, so PC, iPad and phone mix freely.
 - **Three layers**, so matchmaking or Steam can replace one without the others: the *connection* (`net/rtc.js`: WebRTC data channels, found through the free public PeerJS signaling server, spoken to in plain JavaScript; STUN for home routers), the *room* (who's in, fighters, mode, version check; the host decides) and *lockstep* (every device runs the same simulation and only button presses travel, rule R2).
-- **Lockstep with the host as hub:** each device sends its buttons for frame f + D; the host bundles everyone's buttons per frame and sends them out; every device simulates a frame only once its bundle arrives. D (input delay) is set from the slowest player's measured lag at the start of each match (3–12 frames).
+- **Lockstep, direct (patched November 17):** each device sends its buttons for frame f + D straight to every other device (guests connect to each other; the host passes buttons along where two guests can't). D covers one trip between the slowest pair (2–10 frames; about 3 at 58 ping). The first version routed everything through the host and needed twice the delay.
+- **Next for lag: rollback (M11.5).** Play your own presses instantly, predict the others, and quietly replay a few frames when the real presses arrive; Versus should feel close to local.
 - **Same rules everywhere:** the host's seed and feel settings are used for the match; the game version must match to join; a fingerprint of the game state is compared every 2 seconds and the match stops if anyone drifts.
 - **Leaving:** if a guest leaves, the match goes on (their fighter stands still); if the host leaves, everyone returns to the online screen. The pause menu doesn't stop an online match; only the host can restart it or end it for everyone. After a match the host chooses Play again / Continue / Back to the room.
 - **Not yet:** a TURN relay for strict networks (some school, office or cellular networks block direct connections; add one to `NETCFG.ice` if a house can't connect); rollback for snappier Versus; more than one player per device online; public matchmaking with strangers (needs our own server and kid-safety decisions; see VISION.md).
@@ -364,6 +366,15 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 **Done when:** Two devices in different houses finish Level 1 together over the internet, and a Versus match is playable.
 
 **Status: built** (November 17, 2026). First real test: no device could join ("No room with that code"); fixed the same evening by sending room codes through several services at once (PeerJS plus public MQTT message boards), adding a free relay server and clearer messages. Waiting for the next real test. Tested here with two to three browsers on one machine through a local copy of the signaling server: joining, wrong codes, full rooms, co-op, Arcade, Versus, restarts, leaving and a deliberately broken game being caught. Still needs the real test between two houses (and an iPad with a PC). Self-test fingerprints unchanged.
+
+### M11.5 · Rollback for online play (proposed)
+
+- Proposed November 17 after the first real online test: Versus at 58 ping felt laggy. The direct-connection patch halved the delay; rollback removes most of the rest.
+- How: your own presses take effect at once (with a small built-in delay of 1–2 frames). Other players are predicted to keep pressing what they last pressed; when their real presses arrive and differ, the game rewinds to that frame and replays up to now within the same screen refresh.
+- Needs: saving and restoring the whole fight state every frame (fighters, enemies, ragdolls, the random seed, mode state), replays that don't repeat sounds and effects, and a limit on how far back it rewinds (about 8 frames).
+- Ordering: before or after M12 is Ron and Rhett's call.
+
+**Done when:** Versus between two houses at about 60 ping feels close to local, with no desyncs over a 10-minute match.
 
 ### M12 · XP, levels, skill tree
 
