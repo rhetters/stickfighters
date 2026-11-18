@@ -28,7 +28,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
-| M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
+| M18 | House builder and visiting | Next | L | M10, M11 | Build a house with stars, invite friends over |
 | Someday | Cloud saves, Steam | Maybe | — | — | Desktop app, Steam Workshop, server-backed stars |
 
 ## Upcoming milestones
@@ -105,6 +105,13 @@ A short prototype first: jump-through platforms, real stairs, and vertical camer
 - Levels are checked when loaded (sizes, known IDs only) and are never run as code (rule R3).
 
 **Done when:** Rhett builds a level on the iPad, plays it, and sees his chunks appear in generated runs.
+
+### M18 · House builder and visiting (in progress)
+
+- Built so far (versions 16 and 17): Customize → House; a side-view land up to 240 x 60 squares that grows as you build; walls, floors and stairs per square; furniture, decorations and backgrounds; Erase refunds everything; Walk Around with floors and stairs as terrain; visiting the host's house online. Details in CHANGELOG.md.
+- Reopened November 17: Ron and Rhett are trying it and adding to the list.
+
+**Done when:** Ron and Rhett say the house builder is finished.
 
 ### Someday · Cloud saves and Steam
 
