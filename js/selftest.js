@@ -60,7 +60,7 @@ function selfTest(n) {
     enemies: E.length,
     ticks: n + 1800
   };
-  // Level run (M8): walk the Wooded Trail with the same scripted fighting, mostly moving right
+  // Level run: walk the Wooded Trail with the same scripted fighting, mostly moving right
   reseed(20261117);
   fr = 0;
   init();

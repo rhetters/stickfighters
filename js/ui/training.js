@@ -1,5 +1,5 @@
 // Orange vs. the Pink Army: Training Room: dummies, hitbox/frame-data overlays, training hotkeys
-// ===== TRAINING ROOM (M0) =====
+// ===== TRAINING ROOM =====
 const TR = { mortal: 0, inf: 0, boxes: 1, frames: 1, hist: 1, god: 1, passive: 1, ts: 1, freeze: 0, step: 0 };
 function spawnDummy(t) {
   if (state !== 'train' || E.filter(x => !x.gone && !x.dying).length >= 8) return;

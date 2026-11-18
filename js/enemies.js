@@ -173,7 +173,7 @@ function updE(e) {
   smooth(e, tp, k);
   ragTick(e);
 }
-// ===== AI DIRECTOR (M7) =====
+// ===== AI DIRECTOR =====
 // Attack tokens: only a few enemies may swing at each player at once (the nearest ones). The rest hold a ring around you,
 // spread over both sides, waiting their turn. Bosses always have a token.
 function director() {
@@ -229,7 +229,7 @@ function aiThink(e, Q, T_) {
     dir = dist > want + 6 ? side : dist < want - 6 ? -side : 0;
   e.vx += (dir * spd * (dir === -side ? 0.6 : 1) - e.vx) * 0.2;
 }
-// ===== BOSS FRAMEWORK (M7): phases by health, health bar, scripted attack patterns =====
+// ===== BOSS FRAMEWORK: phases by health, health bar, scripted attack patterns =====
 const BOSSPH = {
   c: [
     { at: 1, cd: 1 },

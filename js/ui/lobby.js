@@ -1,6 +1,6 @@
-// Orange vs. the Pink Army: Players screen (M9). Up to 4 players join with a controller, the keyboard or touch,
+// Orange vs. the Pink Army: Players screen. Up to 4 players join with a controller, the keyboard or touch,
 // then pick Versus or Co-op. The chosen players become the ROSTER the game is built from.
-// ===== PLAYERS SCREEN (M9) =====
+// ===== PLAYERS SCREEN =====
 const PCOL = [
   ['#ff7a00', '#d85f00', 'ORANGE'],
   ['#2fb5ff', '#1d86c4', 'BLUE'],
@@ -10,7 +10,7 @@ const PCOL = [
 const GUESTCOL = ['col-orange', 'col-sky', 'col-green', 'col-purple'];
 let LOBBY = [],
   TEAMS = false;
-// ===== FIGHTER PICKS (M10) =====
+// ===== FIGHTER PICKS =====
 // Like Mario Kart: each player picks a saved fighter (or plays as a guest) and can change the colour and hat for
 // this session, with their own controller (left/right = fighter, top button = colour, left button = hat) or by
 // tapping their card. Saved fighters aren't changed. No two players share a colour.

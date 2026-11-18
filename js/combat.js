@@ -363,7 +363,7 @@ function pummel(f, e) {
 }
 // Throws: K while holding. Forward/neutral and back throw the enemy as a projectile into the crowd; Up launches; Down slams.
 function throwE(f, e, dir) {
-  // Versus (post-M9): throwing another player
+  // Versus: throwing another player
   if (e.pl) {
     e.held = null;
     e.st = 'free';
@@ -411,7 +411,7 @@ function throwE(f, e, dir) {
     e.ch = 0;
   }
 }
-// Hit weight (M4): every hit is Light, Medium or Heavy. Weight sets hit-stop, shake, camera kick, zoom and sound.
+// Hit weight: every hit is Light, Medium or Heavy. Weight sets hit-stop, shake, camera kick, zoom and sound.
 const WT = {
   L: { st: 3, sh: 2, kx: 2, ky: 0, z: 0 },
   M: { st: 5, sh: 4, kx: 4, ky: 1, z: 0.008 },
@@ -552,7 +552,7 @@ function hurtE(e, d, dr, src, by) {
     if (!queue.length && E.every(x => x.dying)) slow = 55;
   }
 }
-// Versus (M9): a player's attack on another player. Light hits stagger briefly so strings connect; launches and
+// Versus: a player's attack on another player. Light hits stagger briefly so strings connect; launches and
 // knockdowns send them flying with protection until they're back up (no juggles in versus yet). Long combos scale
 // down faster than against the army. Block (Down + Surge) works the same as against enemies.
 function pvpHit(q, d, dr, f) {
@@ -810,7 +810,7 @@ function sep() {
     }
   }
 }
-// Ground height as a function of x: flat today; M15 (platforms, stairs) changes only this.
+// Ground height as a function of x: flat for now; platforms and stairs (roadmap, optional) would change only this.
 const groundY = x => G;
 function phys(f) {
   if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav;

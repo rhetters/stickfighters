@@ -1,7 +1,7 @@
 // Orange vs. the Pink Army: Input: every device goes through setA() into a player input slot
-// ===== INPUT (M1) =====
+// ===== INPUT =====
 // Every device (keyboard, touch, gamepad) calls setA(); nothing else reads raw input.
-//   l r  move        u d  aim (the direction held when an attack is pressed picks the branch in M2)
+//   l r  move        u d  aim (the direction held when an attack is pressed picks the move)
 //   j    jump        p k  punch / kick        s  Surge (hold)        x  ultimate
 //   e    pose wheel (hold, aim to pick a pose, let go to strike it; looks only)
 const ACT = ['l', 'r', 'u', 'd', 'j', 'p', 'k', 's', 'x', 'e'];
@@ -23,13 +23,13 @@ const INP = [mkSlot(), mkSlot(), mkSlot(), mkSlot()],
   HIST = [];
 let fr = 0;
 const SYM = { l: '←', r: '→', u: '↑', d: '↓', j: 'JUMP', p: 'P', k: 'K', s: 'SURGE', x: 'ULT', e: 'POSE' };
-// ===== PLAYERS AND DEVICES (M9) =====
+// ===== PLAYERS AND DEVICES =====
 // ROSTER = the players in a multiplayer game: [{ slot, dev, col, d2, name }], where dev is 'touch', 'kb' (the main
 // keyboard keys), 'kb2' (arrows + number pad) or 'pad:N' (controller N). Empty = one player, and every device drives
 // Player 1 like before. Devices with no player are ignored during a multiplayer game.
 let ROSTER = [];
 function devSlot(dev) {
-  // online (M11): every device here drives my own player
+  // online: every device here drives my own player
   if (typeof NET !== 'undefined' && NET.match) return dev === 'net' ? -1 : NET.mySlot;
   if (!ROSTER.length) return 0;
   const r = ROSTER.find(r => r.dev === dev);
@@ -248,7 +248,7 @@ function stickEnd() {
   knob.style.transform = '';
   for (const a of ['l', 'r', 'u', 'd']) setA('tc', a, 0);
 }
-// Touch robustness (M6 fix): a touch can end before we lock onto it (fast spamming on iPad). The lock then throws, and the old code
+// Touch robustness: a touch can end before we lock onto it (fast spamming on iPad). The lock then throws, and the old code
 // had already claimed the stick for a finger that would never lift, so the stick ignored every later touch. Now: the lock can't
 // throw us out, a new finger always takes over a stick whose old finger is gone, and a watchdog frees anything left holding.
 const grab = (el, id) => {

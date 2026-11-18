@@ -1,5 +1,5 @@
 // Orange vs. the Pink Army: Training panels: move list, fighter info, feel sliders
-// ===== MOVE LIST (M2): every Combat Chart row, ticked off as you land it in training =====
+// ===== MOVE LIST: every Combat Chart row, ticked off as you land it in training =====
 const MOVELIST = [
   [
     'A. Ground (neutral or forward)',
@@ -121,7 +121,7 @@ function toggleMoves() {
   $('t-moves').classList.toggle('on', !el.hidden);
   renderMoves();
 }
-// ===== INFO PANEL (M7): every fighter's stats and how to beat it =====
+// ===== INFO PANEL: every fighter's stats and how to beat it =====
 const sizePx = s => Math.round(108 * s),
   spdS = v => Math.round(v * 60);
 function renderInfo() {
@@ -175,7 +175,7 @@ function toggleInfo() {
   }
   renderInfo();
 }
-// ===== FEEL PANEL (M4): tune impact while you play; saved on this device =====
+// ===== FEEL PANEL: tune impact while you play; saved on this device =====
 const FEELDEF = { ...FEEL },
   FEELUI = [
     ['hitstop', 'Hit-stop', 0.4, 1.6],
@@ -233,7 +233,7 @@ function toggleFeel() {
   if (!el.hidden) renderFeel();
 }
 
-// Settings copy of the Feel sliders (post-M9), so players can change them from the pause menu mid-match.
+// Settings copy of the Feel sliders, so players can change them from the pause menu mid-match.
 function renderSetFeel() {
   const el = $('o-feel');
   el.innerHTML = '<b>Feel (1.0 = default)</b>';

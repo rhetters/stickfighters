@@ -1,5 +1,5 @@
 // Orange vs. the Pink Army: Ragdolls, death poses and corpse cleanup
-// ===== RAGDOLL (M5) =====
+// ===== RAGDOLL =====
 // 13 points: 0 head, 1 neck, 2 shoulders, 3 mid-spine, 4 pelvis, 5/6 front elbow/hand, 7/8 back elbow/hand, 9/10 front knee/foot, 11/12 back knee/foot.
 // Verlet physics: each point keeps its last position; segments hold their length; a few min-distance links stop elbows/knees folding flat.
 // While alive the mid-spine is pinned to the gameplay body (so juggles, hitboxes and bowling are unchanged) and the limbs flail freely.
@@ -369,7 +369,7 @@ function ragTick(f) {
     }
     if (f.corpse || f.st === 'dead') {
       R.pin = 0;
-      corpseTick(f, !f.pl || f.left); // a player who left online dissolves like a defeated enemy (M11)
+      corpseTick(f, !f.pl || f.left); // a player who left online dissolves like a defeated enemy
       return;
     }
     // alive: pin the mid-spine to the gameplay body

@@ -1,5 +1,5 @@
 // Orange vs. the Pink Army: Game shell (screens, settings), screen fit, simulation step update(), main loop and boot. Loads last.
-// ===== GAME SHELL (M0): title, pause, settings, save =====
+// ===== GAME SHELL: title, pause, settings, save =====
 let paused = false,
   back = 's-title',
   curSeed = 0,
@@ -35,7 +35,7 @@ function show(id) {
 }
 function newSeed() {
   const s = String(SET.seed || '').trim();
-  // online (M11): everyone uses the seed the host chose
+  // online: everyone uses the seed the host chose
   if (typeof NET !== 'undefined' && NET.match) {
     curSeed = NET.seed >>> 0;
     reseed(curSeed);
@@ -217,7 +217,7 @@ function bindSettings() {
 }
 $('b-start').onclick = start;
 $('b-train').onclick = startTrain;
-// ===== TITLE MENU (post-M9) =====
+// ===== TITLE MENU =====
 // First visit: a flashing PRESS START; any key, tap or controller button opens the menu.
 // SOLO splits into CAMPAIGN | ARCADE and MULTIPLAYER into LOCAL | ONLINE, in place: the split row sits on top of
 // the button it replaces, so the title and the other buttons never move or resize. Back folds it up again.
@@ -258,6 +258,7 @@ function titleBack() {
 }
 const pressMode = () => !$('s-title').hidden && !$('ui').hidden && !TITLE.ready;
 // used by the automated tests: open everything at once
+// Opens the whole title menu at once (used by the tests in tools/tests to skip PRESS START)
 function titleOpenAll() {
   TITLE.ready = TITLE.keepOpen = true;
   titleView();
@@ -302,7 +303,7 @@ $('b-set1').onclick = () => {
   show('s-settings');
 };
 $('b-resume').onclick = () => pause(false);
-// Online (M11): only the host restarts or ends a match, for everyone; a guest's MENU / QUIT leaves the room.
+// Online: only the host restarts or ends a match, for everyone; a guest's MENU / QUIT leaves the room.
 const netLeaveToTitle = () => {
   netLeave();
   openTitle();
@@ -330,7 +331,7 @@ $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : startLevel(
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(openTitle, 'room');
 $('pausebtn').onclick = () => pause(true);
-// Pose wheel on touch (M10 patch): hold POSE, aim with the stick, let go to strike the pose
+// Pose wheel on touch: hold POSE, aim with the stick, let go to strike the pose
 {
   const pb = $('posebtn'),
     on = v => e => {
@@ -493,7 +494,7 @@ function update() {
   for (const g of GH) g.l--;
   GH = GH.filter(g => g.l > 0);
 }
-// ===== SCREEN FIT (M1): sharp canvas on retina, cached grid layer =====
+// ===== SCREEN FIT: sharp canvas on retina, cached grid layer =====
 function buildGrid() {
   gridC.width = cv.width;
   gridC.height = cv.height;
@@ -553,7 +554,7 @@ function loop(now) {
   pollPad();
   if (portraitMQ.matches && live()) pause(true);
   if (NET.match) {
-    // online (M11): the match runs on everyone's buttons and never pauses; see net/session.js
+    // online: the match runs on everyone's buttons and never pauses; see net/session.js
     acc += dt;
     while (acc >= 16.67) {
       acc -= 16.67;

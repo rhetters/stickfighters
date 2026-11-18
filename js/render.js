@@ -430,7 +430,7 @@ function drawFX(x) {
     ctx.globalAlpha = 1;
   }
 }
-// Multiplayer HUD (M9): one compact row per player, in their color: health, Surge, blue meter, and round wins in versus.
+// Multiplayer HUD: one compact row per player, in their color: health, Surge, blue meter, and round wins in versus.
 function hudPlayers() {
   PL.forEach((q, i) => {
     const y = 10 + i * 30;
@@ -634,7 +634,7 @@ function render() {
     ctx.fill();
   }
   for (const g of GH) {
-    // Surge afterimages take the owner's Surge style (M10 patch)
+    // Surge afterimages take the owner's Surge style
     const c = g.col === '#ffd400' && g.own && g.own.look ? surgeCol(g.own.look, g.l + fr) : g.col,
       gs = g.s * (g.own && g.own.look ? g.own.look.ht : 1);
     drawFig(g.x, g.y, g.face, g.pose, gs, c, c, g.pose[9], (g.l / 9) * 0.35, 7);

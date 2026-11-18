@@ -1,6 +1,6 @@
-// Orange vs. the Pink Army: Versus mode (M9). 2-4 players in a fixed arena, free-for-all, best of 3 rounds.
+// Orange vs. the Pink Army: Versus mode. 2-4 players in a fixed arena, free-for-all, best of 3 rounds.
 // Each round: countdown, 60 seconds, last one standing wins (or the most health when time runs out).
-// ===== VERSUS (M9) =====
+// ===== VERSUS =====
 let VS = null;
 function startVersus() {
   closePanels();

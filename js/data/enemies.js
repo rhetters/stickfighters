@@ -178,7 +178,7 @@ const T = {
     bnc: 0.25,
     poise: 40
   },
-  // M7. guard: blocks hits from the front with a shield (guard meter breaks it). flank: gets behind you. boss: phases, health bar, scripted attacks.
+  // guard: blocks hits from the front with a shield (guard meter breaks it). flank: gets behind you. boss: phases, health bar, scripted attacks.
   u: {
     hp: 34,
     s: 1.05,

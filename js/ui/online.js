@@ -1,6 +1,6 @@
-// Orange vs. the Pink Army: Online screen (M11): host or join a room, pick your fighter, start a match.
+// Orange vs. the Pink Army: Online screen: host or join a room, pick your fighter, start a match.
 // Works with touch, mouse and controllers (the room code is picked with arrows, no typing needed).
-// ===== ONLINE SCREEN (M11) =====
+// ===== ONLINE SCREEN =====
 const ONC = { w: 0, a: 1, b: 0 }; // the room code being picked: word, first digit, second digit
 const ONLINE_WHY = {
   NOROOM: 'No room with that code answered. Check the code, and that the host is still on the room screen.',

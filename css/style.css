@@ -427,15 +427,6 @@ canvas {
   cursor: pointer;
   padding: 0;
 }
-.tchint {
-  display: none;
-}
-.touch-on .tchint {
-  display: block;
-}
-.touch-on .kbhint {
-  display: none;
-}
 .touch-on #pausebtn {
   width: 44px;
   height: 44px;
@@ -829,7 +820,7 @@ body.padnav #ui select:focus {
   box-shadow: 0 0 0 7px #1c1626;
 }
 
-/* Players screen (M9) */
+/* Players screen */
 #lb-cards {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -909,7 +900,7 @@ body.padnav #ui select:focus {
   margin: 2px 0;
 }
 
-/* Title (post-M9): flashing PRESS START, then the menu */
+/* Title: flashing PRESS START, then the menu */
 #press {
   font:
     900 clamp(22px, 4vw, 38px) Impact,
@@ -1000,7 +991,7 @@ body.padnav #ui select:focus {
   min-width: 0;
 }
 
-/* Character & store (M10) */
+/* Character & store */
 .screen.wide {
   justify-content: flex-start;
   padding: 8px 12px 6px;
@@ -1047,8 +1038,7 @@ body.padnav #ui select:focus {
   background: #ff7a00;
   color: #fff;
 }
-.chstars,
-.lbstars {
+.chstars {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1265,10 +1255,6 @@ body.padnav #ui select:focus {
   gap: 6px;
   flex-wrap: wrap;
 }
-.chhelp {
-  color: #7a6e80;
-  max-width: none !important;
-}
 #ch-msg {
   min-height: 1.2em;
   margin: 0;
@@ -1285,7 +1271,7 @@ body.padnav #ui select:focus {
   font-weight: 800;
   color: #c45200;
 }
-/* Players screen fighter picks (M10) */
+/* Players screen fighter picks */
 .ppick {
   display: flex;
   align-items: center;
@@ -1345,7 +1331,7 @@ body.padnav #ui select:focus {
   flex-wrap: wrap;
   justify-content: center;
 }
-/* Back up / Restore (M10) */
+/* Back up / Restore */
 #bk-code {
   width: min(620px, 92%);
   height: 70px;
@@ -1384,7 +1370,7 @@ body.padnav #ui select:focus {
   background: #1c1626;
   border: 0;
 }
-/* Pose wheel touch button (M10 patch): hold it, aim with the stick, let go */
+/* Pose wheel touch button: hold it, aim with the stick, let go */
 #posebtn {
   position: absolute;
   z-index: 4;
@@ -1428,7 +1414,7 @@ body.padnav #ui select:focus {
 .touch-on #press .tapalso {
   display: block;
 }
-/* Online screen (M11) */
+/* Online screen */
 .onpane {
   display: flex;
   flex-direction: column;

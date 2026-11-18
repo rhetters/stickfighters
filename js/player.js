@@ -152,7 +152,7 @@ function mkPlayer(x, slot, col, d2) {
 }
 // A slot nobody presses: players whose control the mode has taken away (MODE.locked) read this instead.
 const NO_INPUT = mkSlot();
-// The buttons a player's simulation reads this frame: online (M11) the ones that arrived over the network (NETIN),
+// The buttons a player's simulation reads this frame: online the ones that arrived over the network (NETIN),
 // otherwise the player's own input slot; an idle slot while the mode has taken control away (MODE.locked).
 const inputOf = p => (MODE.locked && MODE.locked(p) ? NO_INPUT : NET.match ? NETIN[p.slot] : INP[p.slot]);
 function tgt(e) {
@@ -175,7 +175,7 @@ function init() {
   MODE = ARCADE;
   const R = ROSTER.length ? ROSTER : [{ slot: 0 }];
   PL = R.map((r, i) => {
-    // Looks (M10): a multiplayer player brings the look picked on the Players screen; one player uses the
+    // Looks: a multiplayer player brings the look picked on the Players screen; one player uses the
     // current saved fighter. Looks are drawing only.
     const L = r.look || (ROSTER.length ? null : lookOf(curFighter())),
       p = mkPlayer(W / 2 + (i - (R.length - 1) / 2) * 80, r.slot, L ? L.col : r.col, L ? L.d2 : r.d2);
@@ -364,7 +364,7 @@ function updP(f) {
   }
   f.blk = 0;
   if (f.blkT > 0) f.blkT--;
-  // Pose wheel (M10 patch; looks only): hold the pose button on the ground to stand still and aim (8 directions)
+  // Pose wheel (looks only): hold the pose button on the ground to stand still and aim (8 directions)
   // at a pose, let go to strike it. Moving, jumping, Surge or attacking ends the pose.
   // a direction still held from aiming the wheel doesn't count; only a new press of left or right does
   if (
