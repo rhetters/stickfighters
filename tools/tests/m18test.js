@@ -5,7 +5,8 @@ const {chromium,devices}=require('playwright');const {spawn}=require('child_proc
 (async()=>{const b=await chromium.launch();const errs=[];
 const c=await b.newContext(devices['iPad (gen 7) landscape']);
 // a version 5 save with a fighter and stars, from before houses existed
-await c.addInitScript(()=>{if(!localStorage.getItem('orangeArmy.v1'))localStorage.setItem('orangeArmy.v1',JSON.stringify({saveVersion:5,set:{},best:{score:5,wave:2,combo:3},prog:{},eco:{stars:500,got:500,own:[],seen:[]},chr:{cur:0,list:[{name:'RHETT',col:'col-orange'},null,null,null]}}))});
+// seeded once per tab (sessionStorage), so a reload never puts the old save back
+await c.addInitScript(()=>{if(!sessionStorage.getItem('seeded')&&!localStorage.getItem('orangeArmy.v1')&&sessionStorage.setItem('seeded','1')===undefined)localStorage.setItem('orangeArmy.v1',JSON.stringify({saveVersion:5,set:{},best:{score:5,wave:2,combo:3},prog:{},eco:{stars:500,got:500,own:[],seen:[]},chr:{cur:0,list:[{name:'RHETT',col:'col-orange'},null,null,null]}}))});
 const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(GAME);await p.waitForTimeout(400);
 const ev=x=>p.evaluate(x);
 ok(await ev("HOUSE.bg==='hbg-paper'&&ECO.stars===500&&CHR.list[0].name==='RHETT'"),'a version 5 save loads: stars and fighter kept, empty house');
@@ -34,7 +35,7 @@ await ev("$('hs-tabs').children[2].click()");await card('Bed');await p.locator('
 ok(await ev("HOUSE.items.some(i=>i.id==='hf-bed'&&i.x===5&&i.y===4)"),'placing while the view is moved uses the land position');
 await ev("$('hs-tabs').children[4].click()");await card('Mint');await card('Mint');ok(await ev("HOUSE.bg==='hbg-mint'&&owns('hbg-mint')"),'a background is bought once and put up');
 const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))");ok(sv.saveVersion===7&&sv.house.bg==='hbg-mint'&&sv.house.solids['3,4']==='floor','saved as version 7 with walls, floors and items');
-await p.reload();await p.waitForFunction(()=>typeof openHouse==='function'&&typeof loop==='function');await p.waitForTimeout(400);ok(await ev("HOUSE.bg==='hbg-mint'&&HOUSE.solids['3,4']==='floor'&&CHR.list[0].name==='RHETT'"),'the house survives a reload '+await ev("JSON.stringify({bg:HOUSE.bg,s:HOUSE.solids,n:CHR.list[0]&&CHR.list[0].name,v:JSON.parse(localStorage.getItem('orangeArmy.v1')).house.bg})"));
+await p.waitForTimeout(600);await p.reload();await p.waitForFunction(()=>typeof openHouse==='function'&&typeof loop==='function');await p.waitForTimeout(400);ok(await ev("HOUSE.bg==='hbg-mint'&&HOUSE.solids['3,4']==='floor'&&CHR.list[0].name==='RHETT'"),'the house survives a reload '+await ev("JSON.stringify({bg:HOUSE.bg,s:HOUSE.solids,raw:(localStorage.getItem('orangeArmy.v1')||'').slice(0,160)})"));
 // a version 6 house (rows counted from the top) is turned over
 ok(await ev("JSON.stringify(normHouse({flip7:1,bg:'hbg-paper',cells:{'1,6':'wood','2,0':'roof'},items:[{id:'hf-shelf',x:4,y:4}]}))")==='{"bg":"hbg-paper","cells":{"1,0":"wood","2,6":"roof"},"solids":{},"items":[{"id":"hf-shelf","x":4,"y":0}]}','a version 6 house is turned the right way up');
 ok(await ev("JSON.stringify(normHouse({bg:'nope',cells:{'999,1':'wood','1,1':'lava','2,2':'brick'},solids:{'1,1':'trampoline','3,3':'stairR'},items:[{id:'hd-trophy',x:1,y:1},{id:'hf-shelf',x:500,y:-3}]}))")==='{"bg":"hbg-paper","cells":{"2,2":"brick"},"solids":{"3,3":"stairR"},"items":[{"id":"hf-shelf","x":238,"y":0}]}','bad squares, solids and locked items are dropped; positions kept on the land');
