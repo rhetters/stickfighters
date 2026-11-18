@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Back up / Restore the save (M10)
+// Orange vs. the Pink Army: Back up / Restore the save
 // ===== BACKUP (VISION.md rule R6) =====
 // The backup is the whole save as text: "OVPA-" + base64 of its JSON. Restoring reads it as data only (JSON.parse,
 // never run), checks its shape, upgrades it with migrate(), keeps a copy of the old save, then reloads the game.

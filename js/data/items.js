@@ -1,5 +1,5 @@
 // Orange vs. the Pink Army: Cosmetics, colors, stances and star drops (plain data; VISION.md rules R3 and R8)
-// ===== ITEMS (M10) =====
+// ===== ITEMS =====
 // Store items are cosmetic only: nothing here changes how a fighter plays.
 // An item: { id (never rename it, saves keep it), sec (shelf section), name, price in ninja stars, c / c2 colors,
 //   k (drawing style), how }

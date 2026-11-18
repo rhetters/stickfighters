@@ -1,5 +1,5 @@
 // Orange vs. the Pink Army: Player move table, poses, route tree, move info
-// ===== MOVE TABLE & POSES (M0: data-driven; startup=h[0], active=h[1]-h[0]+1, recovery=d-h[1]) =====
+// ===== MOVE TABLE & POSES (data-driven; startup=h[0], active=h[1]-h[0]+1, recovery=d-h[1]) =====
 // poses: [lean, frontArm shoulder, elbow, backArm shoulder, elbow, frontLeg hip, knee, backLeg hip, knee, spin]
 const IDLE = [6, 35, 75, 20, 90, 18, 20, -18, 12, 0],
   HURT = [-20, -35, 40, 90, 50, 10, 35, -35, 25, 0],
@@ -193,7 +193,7 @@ const A = {
     ]
   }
 };
-// Route table: which move each input picks. M2 adds the up / down / Surge branches here, not in the player code.
+// Route table: which move each input picks (by aim and Surge). New branches go here, not in the player code.
 // ROUTE (Combat Chart): branch -> direction held at the press -> press sequence -> move.
 // g ground, a air, sg Surge ground, sa Surge air. n = neutral or forward, u = Up held, d = Down held.
 const ROUTE = {
@@ -225,7 +225,7 @@ const ROUTE = {
   },
   sa: { n: { p: 'rave', k: 'comet' } }
 };
-// ----- Surge (M3) -----
+// ----- Surge -----
 const GRDP = [-6, 80, 60, 20, 90, 22, 28, -24, 18, 0],
   SLIDE = [-38, 70, 40, 120, 30, 85, 5, 5, 110, 0],
   TIRED = [28, 15, 15, 5, 20, 15, 25, -15, 20, 0],
@@ -505,7 +505,7 @@ Object.assign(A, {
   }
 });
 // Holding Surge swaps each branch to its Surge version. Direction = what was held when the button was pressed.
-// ----- M2: directional moves (Combat Chart A-D) -----
+// ----- Directional moves (Combat Chart A-D) -----
 const HAY0 = [-15, -80, 60, 40, 90, 20, 25, -30, 15, 0],
   HAY = [30, 100, 10, -40, 60, 40, 35, -40, 10, 0],
   HAY2 = [38, 60, 20, -50, 60, 45, 40, -40, 10, 0],
@@ -981,7 +981,7 @@ Object.assign(A, {
   }
 });
 Object.assign(A.apunch, { air: 1, cx: 0.55, bot: 20 });
-// ----- M4: grab and throw (no hitbox of their own; the throw applies its effect directly) -----
+// ----- Grab and throw (no hitbox of their own; the throw applies its effect directly) -----
 const GRB = [10, 95, 15, 85, 15, 25, 20, -25, 15, 0],
   HLD = [-10, 150, 30, 150, 30, 20, 10, -15, 10, 0],
   NOHIT = [99, 99];
@@ -1109,7 +1109,7 @@ for (const n of [
   'tornado'
 ])
   A[n].limb = 'f';
-// Every Surge number lives here so the skill tree (M12) can change them.
+// Every Surge number lives here so the skill tree can change them.
 const SURGE = {
   max: 100,
   regen: 25,
@@ -1122,7 +1122,7 @@ const SURGE = {
   slideCost: 10,
   blockDrain: 8
 };
-// Chart name, effect shown in the readout, effect code used by the hit system, unlock tier (M12 gates tiers; everything is open until then).
+// Chart name, effect shown in the readout, effect code used by the hit system, unlock tier (the skill tree will gate tiers; everything is open until then).
 const INFO = {
   jab: ['Jab', 'Stagger', 'stagger', 'Start'],
   cross: ['Cross', 'Stagger', 'stagger', 'Start'],

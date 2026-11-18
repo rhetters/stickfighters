@@ -1,9 +1,9 @@
 // Orange vs. the Pink Army: Settings and save, seeded random, screen constants, feel knobs, sound
-// ===== SETTINGS & SAVE (M0) =====
+// ===== SETTINGS & SAVE =====
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 14;
+const GAME_VERSION = 15;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -21,17 +21,17 @@ let SET = { ...DEF },
   BEST = { score: 0, wave: 0, combo: 0 },
   PROG = {},
   LAST = null;
-// Ninja stars and owned cosmetics (M10). Change these only through economy.js (grantStars, spendStars, grantItem).
+// Ninja stars and owned cosmetics. Change these only through economy.js (grantStars, spendStars, grantItem).
 //   stars = wallet, got = stars ever earned, own = item ids owned, seen = item ids already shown as NEW
 const ECO = { stars: 0, got: 0, own: [], seen: [] };
-// Saved fighters (M10): four slots, cur = the one Player 1 uses. A slot is null until it's created.
+// Saved fighters: four slots, cur = the one Player 1 uses. A slot is null until it's created.
 const CHR = { cur: 0, list: [null, null, null, null] };
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
-//   v2 (M8): adds prog = { levelId: { done, score, time, combo } }
+//   v2: adds prog = { levelId: { done, score, time, combo } }
 //   v3: adds set.binds = custom keys and controller buttons (null = defaults)
-//   v4 (M10): adds eco = { stars, got, own, seen } and chr = { cur, list: [fighter|null] x3 }
-//   v5 (M10 patch): a fourth fighter slot; fighters gain ht and wheel (normFighter upgrades old fighters)
+//   v4: adds eco = { stars, got, own, seen } and chr = { cur, list: [fighter|null] x3 }
+//   v5: a fourth fighter slot; fighters gain ht and wheel (normFighter upgrades old fighters)
 const SAVE_VERSION = 5;
 function migrate(s) {
   if (!s.saveVersion) {
@@ -78,7 +78,7 @@ const save = () => {
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveData()));
   } catch (e) {}
 };
-// ===== SEEDED RANDOM (M0): same seed = same spawns, AI rolls and particle noise =====
+// ===== SEEDED RANDOM: same seed = same spawns, AI rolls and particle noise =====
 let SEED = 1;
 const reseed = s => {
   SEED = s >>> 0;
@@ -108,7 +108,7 @@ function withCtx(c2, fn) {
     ctx = keep;
   }
 }
-// World (M8). CAM.x = world x of the screen's left edge. WB = walls for living fighters (the screen, or a gate such
+// World. CAM.x = world x of the screen's left edge. WB = walls for living fighters (the screen, or a gate such
 // as the fallen log). WW = the whole world's edges, used by ragdolls. In Arcade and Training all three are the screen.
 const CAM = { x: 0 },
   WB = { l: 0, r: W },

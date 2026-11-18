@@ -21,7 +21,7 @@ function markDone(n) {
   }
 }
 function startAtk(f, def, btn) {
-  f.att = { d: def, f: 0, hit: new Set(), aim: btn ? AIM[btn] : 'n', b: btn, pf: fr };
+  f.att = { d: def, f: 0, hit: new Set(), aim: btn ? inputOf(f).AIM[btn] : 'n', b: btn, pf: fr };
   f.st = 'atk';
   f.tp = null;
   if (f.pl) {
@@ -52,8 +52,14 @@ function endAtk(f, q) {
   else if (f.inv > 100) f.inv = 45;
 } // grace after the Tornado Kick so a swing that started during it can't land
 function tickAtk(f) {
+  // enemies press nothing: their moves never read buttons, so they get the idle slot
   const a = f.att,
-    d = a.d;
+    d = a.d,
+    I = f.pl ? inputOf(f) : NO_INPUT,
+    K = I.K,
+    press = I.press,
+    want = k => wantIn(I, k),
+    eat = k => eatIn(I, k);
   a.f++;
   f.tp = kf(d.k, Math.min(1, a.f / (d.kt || d.d)));
   if (f.pl && a.b && !a.chained && !d.cost && !d.air && a.f <= Math.min(5, d.h[0]) && f.y >= G - 1) {
@@ -153,7 +159,7 @@ function tickAtk(f) {
         a.hit.add(e);
         const dr = d.omni ? (e.x >= f.x ? 1 : -1) : d.back ? -f.face : f.face;
         if (f.pl && blocks(e, f, d)) {
-          block(e, d, dr);
+          block(e, d, dr, f);
           continue;
         }
         if (f.pl && e.pl) pvpHit(e, d, dr, f);
@@ -213,7 +219,9 @@ function tickAtk(f) {
         hurtE(
           e,
           { dmg: d.adm || 12, kb: 9, lift: -7, st: 7, sh: 9, ef: 'kd', fold: d.n === 'meteor' },
-          e.x >= f.x ? 1 : -1
+          e.x >= f.x ? 1 : -1,
+          null,
+          f
         );
       }
     endAtk(f);
@@ -255,7 +263,7 @@ function blocks(e, f, d) {
   if (d.pierce || (d.top && d.top <= 60) || d.otg) return false;
   return (f.x - e.x) * e.face > 0;
 }
-function block(e, d, dr) {
+function block(e, d, dr, src) {
   const w = wtOf(d);
   e.gm -= Math.max(2, d.dmg) * (w === 'H' ? 2 : w === 'M' ? 1.3 : 1);
   e.st = 'block';
@@ -267,8 +275,8 @@ function block(e, d, dr) {
   stop = Math.max(stop, 2);
   sfx(700, 0.06, 'square', 0.04, -200);
   noise(0.04, 0.05, 3000);
-  P.combo++;
-  P.comboT = 100;
+  src.combo++;
+  src.comboT = 100;
   if (e.gm <= 0) {
     e.gm = 0;
     e.noShield = 240;
@@ -355,7 +363,7 @@ function pummel(f, e) {
 }
 // Throws: K while holding. Forward/neutral and back throw the enemy as a projectile into the crowd; Up launches; Down slams.
 function throwE(f, e, dir) {
-  // Versus (post-M9): throwing another player
+  // Versus: throwing another player
   if (e.pl) {
     e.held = null;
     e.st = 'free';
@@ -391,19 +399,19 @@ function throwE(f, e, dir) {
   startAtk(f, A[mv], 0);
   f.st = 'atk';
   const fc = f.face;
-  if (dir === 'u') hurtE(e, { dmg: 6, kb: 1, lift: -13, ef: 'launch', w: 'M' }, fc);
+  if (dir === 'u') hurtE(e, { dmg: 6, kb: 1, lift: -13, ef: 'launch', w: 'M' }, fc, null, f);
   else if (dir === 'd') {
     e.y = G - 4;
-    hurtE(e, { dmg: 10, kb: 1, lift: -8, ef: 'bounce', w: 'H' }, fc);
+    hurtE(e, { dmg: 10, kb: 1, lift: -8, ef: 'bounce', w: 'H' }, fc, null, f);
     ring(e.x, G, 70);
     dust(e.x, G, 12);
   } else {
-    hurtE(e, { dmg: 8, kb: 12, lift: -5, ef: 'splat', w: 'H' }, fc);
+    hurtE(e, { dmg: 8, kb: 12, lift: -5, ef: 'splat', w: 'H' }, fc, null, f);
     e.thrown = 1;
     e.ch = 0;
   }
 }
-// Hit weight (M4): every hit is Light, Medium or Heavy. Weight sets hit-stop, shake, camera kick, zoom and sound.
+// Hit weight: every hit is Light, Medium or Heavy. Weight sets hit-stop, shake, camera kick, zoom and sound.
 const WT = {
   L: { st: 3, sh: 2, kx: 2, ky: 0, z: 0 },
   M: { st: 5, sh: 4, kx: 4, ky: 1, z: 0.008 },
@@ -424,9 +432,11 @@ function impact(w, dr, x, y, kill) {
 // Hit effects (Combat Chart F): stagger, push, pop, launch, kd (knockdown), trip, splat, bounce.
 const JUGMAX = 7,
   EFVY = { pop: -5, launch: -10, kd: -4, trip: -4, splat: -3 };
-function hurtE(e, d, dr, src) {
+// src = the attacker whose momentum adds to the knockback (none for throws, flying bodies and shockwaves);
+// by = the player who gets the combo and meter (src when not given).
+function hurtE(e, d, dr, src, by) {
   if (e.dying) return;
-  const ap = src && src.pl ? src : P,
+  const ap = by || src,
     w = wtOf(d),
     dmg = Math.max(1, Math.round(d.dmg * (ap.combo < 4 ? 1 : Math.max(0.45, 1 - (ap.combo - 3) * 0.04)))); // long combos deal less per hit
   if (fr - (e.lh || -999) > 60) e.jug = 0;
@@ -533,7 +543,7 @@ function hurtE(e, d, dr, src) {
   ap.meter = Math.min(100, ap.meter + 4);
   maxc = Math.max(maxc, ap.combo);
   const cw = { 5: 'NICE!', 10: 'GREAT!', 20: 'AMAZING!', 35: 'UNSTOPPABLE!', 50: 'GODLIKE!' }[ap.combo];
-  if (cw) txt(P.x, P.y - 120, cw, '#ff7a00', 26);
+  if (cw) txt(ap.x, ap.y - 120, cw, '#ff7a00', 26);
   if (e.hp <= 0) {
     const sc = Math.round(e.T.sc * (1 + ap.combo * 0.1));
     score += sc;
@@ -542,7 +552,7 @@ function hurtE(e, d, dr, src) {
     if (!queue.length && E.every(x => x.dying)) slow = 55;
   }
 }
-// Versus (M9): a player's attack on another player. Light hits stagger briefly so strings connect; launches and
+// Versus: a player's attack on another player. Light hits stagger briefly so strings connect; launches and
 // knockdowns send them flying with protection until they're back up (no juggles in versus yet). Long combos scale
 // down faster than against the army. Block (Down + Surge) works the same as against enemies.
 function pvpHit(q, d, dr, f) {
@@ -610,7 +620,7 @@ function groundHit(e, d, dr, src) {
   spark(e.x, e.y - 18, 14, '#ffd400');
   sfxHit('L');
   stop = Math.max(stop, 2);
-  const ap = src && src.pl ? src : P;
+  const ap = src;
   ap.combo++;
   ap.comboT = 100;
   maxc = Math.max(maxc, ap.combo);
@@ -633,10 +643,7 @@ function blockHit(q, d, dr) {
   S.last = fr;
   if (S.v <= 0) {
     S.v = 0;
-    const k = P;
-    use(q);
-    wind();
-    use(k);
+    wind(q);
     q.blk = 0;
   }
 }
@@ -699,6 +706,8 @@ function hurtP(q, d, dr) {
 // Bodies as projectiles: a flying enemy knocks down whoever it hits. Each link in the chain hits 25% softer.
 // Momentum is shared by mass; a heavy target with poise stops the projectile cold. Falling bodies crush; downed bodies make a pile-up.
 function bowl() {
+  // whoever gets the combo and meter when a flying body hits another: Player 1 (it isn't tracked who sent it flying)
+  const cred = PL[0];
   for (const a of E) {
     if (a.st !== 'fly' || a.gone || a.corpse) continue;
     const sp = Math.abs(a.vx),
@@ -726,7 +735,7 @@ function bowl() {
       if (b.st === 'fly' || b.st === 'getup' || b.st === 'splat') continue;
       if (fall && Math.abs(dx) < 26 && dy > 20 && dy < 75) {
         a.bh.add(b);
-        hurtE(b, { dmg: 6, kb: 2, lift: -3, ef: 'kd', w: 'M' }, Math.sign(dx) || 1);
+        hurtE(b, { dmg: 6, kb: 2, lift: -3, ef: 'kd', w: 'M' }, Math.sign(dx) || 1, null, cred);
         b.ch = (a.ch || 0) + 1;
         a.vy = -4;
         txt(b.x, b.y - 100, 'CRUSH!', '#ff7a00', 20);
@@ -740,11 +749,17 @@ function bowl() {
           mb = b.T.m;
         const dmg = Math.max(2, Math.round((4 + sp * 0.7) * ma * (a.thrown ? 1.4 : 1) * Math.pow(0.75, ch)));
         if (blocks(b, a, { dmg, top: 84 })) {
-          block(b, { dmg: dmg * 1.5, w: 'H' }, dir);
+          block(b, { dmg: dmg * 1.5, w: 'H' }, dir, cred);
           a.vx *= -0.35;
           continue;
         }
-        hurtE(b, { dmg, kb: Math.min(12, sp * 0.8 * ma), lift: -5, ef: 'kd', w: dmg >= 10 ? 'H' : 'M' }, dir);
+        hurtE(
+          b,
+          { dmg, kb: Math.min(12, sp * 0.8 * ma), lift: -5, ef: 'kd', w: dmg >= 10 ? 'H' : 'M' },
+          dir,
+          null,
+          cred
+        );
         if (b.st === 'fly') {
           b.ch = ch + 1;
           b.thrown = 0;
@@ -795,7 +810,7 @@ function sep() {
     }
   }
 }
-// Ground height as a function of x: flat today; M15 (platforms, stairs) changes only this.
+// Ground height as a function of x: flat for now; platforms and stairs (roadmap, optional) would change only this.
 const groundY = x => G;
 function phys(f) {
   if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav;

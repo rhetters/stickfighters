@@ -1,6 +1,6 @@
 // Orange vs. the Pink Army: Scenery for levels: parallax layers, props, gate, foreground and ambient effects.
 // Everything here is drawing only. It never changes the game and uses Math.random() only for cosmetic effects.
-// ===== SCENERY (M8): the Wooded Trail in the hand-drawn paper style =====
+// ===== SCENERY: the Wooded Trail in the hand-drawn paper style =====
 // Stable pseudo-random value in [0, 1) for scenery index i, so hills and trees stay put as you walk.
 const hh = i => {
   let t = Math.imul((i | 0) ^ 0x9e3779b9, 0x85ebca6b);
@@ -150,8 +150,7 @@ function drawWoods() {
   for (const g of LV.gates) drawGate(g);
   ctx.restore();
 }
-const LEAF = '#cfe6c1',
-  BARK = '#6c5a4c';
+const BARK = '#6c5a4c';
 function blob(pts, fill, stroke, lw) {
   ctx.fillStyle = fill;
   for (const [x, y, r] of pts) {

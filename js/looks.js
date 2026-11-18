@@ -1,7 +1,7 @@
-// Orange vs. the Pink Army: Drawing a fighter's look (M10): hair, hats, headbands, scarves, ties, shirts, jackets,
+// Orange vs. the Pink Army: Drawing a fighter's look: hair, hats, headbands, scarves, ties, shirts, jackets,
 // gloves, pants, skirts, dresses, shoes, Surge styles, idle stances, poses and the pose wheel.
 // Drawing only: nothing here changes the game, and it never calls rnd().
-// ===== LOOKS (M10) =====
+// ===== LOOKS =====
 // J = joint positions from whichever drawer drew the body (standing figure, ragdoll or Tornado Kick):
 //   hd head centre, hr head radius, nk neck, sh shoulders, hp hips, ea/h front elbow/hand, eb/hb back elbow/hand,
 //   kf/f front knee/foot, kb/fb back knee/foot, face, s scale, lw drawn line width, col body colour.

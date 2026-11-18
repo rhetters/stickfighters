@@ -1,5 +1,5 @@
-// Orange vs. the Pink Army: Ninja star pickups and Captain gifts (M10)
-// ===== PICKUPS (M10) =====
+// Orange vs. the Pink Army: Ninja star pickups and Captain gifts
+// ===== PICKUPS =====
 // Defeated enemies drop ninja stars (STAR_DROP in data/items.js); Captains also drop a gift with a random cosmetic.
 // Pickups pop out, bounce, then fly to the nearest player. They never touch fighters, so the fight plays out the
 // same with or without them. Their rolls come from their own hash of the seed and frame (dropRoll), never from

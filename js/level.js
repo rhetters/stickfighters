@@ -1,6 +1,6 @@
 // Orange vs. the Pink Army: Level mode: a scrolling level built from chunk data (js/data/levels.js), with
 // encounters, a breakable gate, checkpoints, and a level-complete screen.
-// ===== LEVEL MODE (M8) =====
+// ===== LEVEL MODE =====
 // Run-time copy of the level being played; the data in LEVELS/CHUNKS is never changed.
 let LV = null;
 function buildLevel(id) {
@@ -222,7 +222,7 @@ function levelClear() {
   $('c-l3').textContent = 'Next: ' + LV.def.next;
   $('c-h1').textContent = 'LEVEL CLEAR!';
   $('b-next').textContent = 'PLAY AGAIN';
-  // a moment to see your victory pose (M10) before the results
+  // a moment to see your victory pose before the results
   bn('LEVEL CLEAR!');
   setTimeout(() => {
     if (state === 'clear' && MODE === LEVEL) show('s-clear');

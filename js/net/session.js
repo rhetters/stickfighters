@@ -1,10 +1,10 @@
-// Orange vs. the Pink Army: Online matches (M11): the room, and lockstep play over the connection in rtc.js
-// ===== ONLINE SESSION (M11) =====
+// Orange vs. the Pink Army: Online matches: the room, and lockstep play over the connection in rtc.js
+// ===== ONLINE SESSION =====
 // Three layers, so matchmaking or Steam can replace one without the others (see docs/ARCHITECTURE.md):
 //   connection  rtc.js: moves messages between devices
 //   room        who's in (up to 4), their fighters, the mode; the host decides and tells everyone
 //   lockstep    every device runs the same simulation (VISION.md rule R2) and only button presses travel.
-// Lockstep (direct, M11 patch): each device sends its buttons for frame f + D straight to every other device
+// Lockstep (direct): each device sends its buttons for frame f + D straight to every other device
 // (D = input delay, from the measured lag; one trip, not a round trip through the host). Guests connect to each
 // other too; where two guests can't, the host passes their buttons along. A device simulates frame f once it has
 // everyone's buttons for it. Every 2 seconds the guests send a fingerprint of the game state to the host, which
@@ -73,10 +73,6 @@ function applyMask(I, m) {
 // ===== ROOM =====
 const netSend = (id, m) => rtcSend(id, m);
 const netAll = m => NET.players.forEach(p => p.id !== 'host' && !p.left && rtcSend(p.id, m));
-const netMe = () => NET.players.find(p => p.slot === NET.mySlot);
-function myFighter() {
-  return curFighter();
-}
 // Fighters from other devices: checked for shape, but not for ownership (they own their own items)
 function netLook(p) {
   const f = normFighter(p.f, true);
@@ -131,7 +127,7 @@ async function netHost() {
     try {
       await rtcHost(code);
       Object.assign(NET, { on: true, host: true, code, mySlot: 0, mode: 'level' });
-      const f = myFighter();
+      const f = curFighter();
       NET.players = [{ slot: 0, id: 'host', name: f.name, f, rtt: 0 }];
       netColours();
       return code;
@@ -175,7 +171,7 @@ RTC.on.peer = id => {
   if (NET.host) return; // guests introduce themselves with 'hello'
   if (id === NET.hostId) {
     // connected to the host: say hello with my fighter and game version
-    netSend(id, { t: 'hello', v: GAME_VERSION, f: myFighter() });
+    netSend(id, { t: 'hello', v: GAME_VERSION, f: curFighter() });
     clearInterval(NET.pingT);
     NET.pingT = setInterval(
       () => netSend(NET.hostId, { t: 'ping', ts: performance.now(), rtt: NET.rtt || 0 }),

@@ -4,17 +4,17 @@ A stick-figure beat-'em-up: you're the orange fighter holding off waves of the p
 
 **Play:** https://rhetters.github.io/stickfighters/
 
-**Status:** M0–M11 done: Wooded Trail, Arcade, local multiplayer (Versus and Co-op for up to 4 players), ninja stars with the cosmetic store and character creation, and online multiplayer (house to house, PC and iPad together). Online button presses now go straight between devices (less lag). Next: M12, XP and the skill tree, or rollback (M11.5) for even less online lag. Full plan in [docs/ROADMAP.md](docs/ROADMAP.md).
+This page is the player's guide. What's built and what's next is in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Modes
 
-The title says **PRESS START**: press any key, button or tap. **Solo** opens Campaign (the Wooded Trail) and Arcade; **Multiplayer** opens Local (up to 4 players on one screen) and Online (host a room and share its code, or join one: up to 4 players on their own devices, PC, iPad and phone together); **Character** is where you make up to four fighters and spend ninja stars on their look.
+The title says **PRESS START**: press any key, button or tap.
 
-
-- **Play: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.
-- **Arcade: Endless Waves** is the original game: waves on one screen, with a Captain every fifth wave.
-- **Multiplayer: Versus & Co-op** opens the Players screen. Up to 4 players: controllers join by pressing any button (B leaves), or join with touch, the keyboard, or a second keyboard player (arrows + number pad; press 0 on the number pad). Then pick **Versus** (best of 3 rounds in The Clearing; free-for-all or teams, chosen with the Versus button, and tap TEAM on a card to switch sides; grab another player with punch + kick, mash to break free) or **Co-op** (Wooded Trail or Arcade; stand next to a downed teammate for 2 seconds to revive them).
-- **Character** holds four saved fighters. Change the name, height, head size, line thickness and stance, and dress them from the tabs: Colors, Head (hair, hats, headbands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge (the color of your Surge) and Poses (up to 4 on your pose wheel; the first is your victory pose). Each shelf is also the store: tap an item to try it on, tap again to buy it with ninja stars. Delete a fighter from the Body tab. Defeated enemies drop the stars, and Captains drop gifts. Everything is looks only and never changes how you fight. In multiplayer, each player picks a fighter on the Players screen and can change their color and hat.
+- **Solo → Campaign: Wooded Trail** walks you through a scrolling forest with 5 ambushes, a fallen log to smash, and a Captain at the end. Each fight you win is a checkpoint, so a KO lets you continue from there.
+- **Solo → Arcade** is the original game: waves on one screen, with a Captain every fifth wave.
+- **Multiplayer → Local** opens the Players screen. Up to 4 players: controllers join by pressing any button (B leaves), or join with touch, the keyboard, or a second keyboard player (arrows + number pad; press 0 on the number pad). Then pick **Versus** (best of 3 rounds in The Clearing; free-for-all or teams, chosen with the Versus button, and tap TEAM on a card to switch sides; grab another player with punch + kick, mash to break free) or **Co-op** (Wooded Trail or Arcade; stand next to a downed teammate for 2 seconds to revive them).
+- **Multiplayer → Online** plays house to house: one player hosts a room and shares its code (a word and a number); others pick the code with arrows and join. Up to 4 players, one per device, PC, iPad and phone together, in co-op, Arcade or Versus. Every device needs the same version of the game, so reload the page on all of them after an update.
+- **Character** holds four saved fighters. Change the name, height, head size, line thickness and stance, and dress them from the tabs: Colors, Head (hair, hats, headbands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge (the color of your Surge) and Poses (up to 8 on your pose wheel; the first is your victory pose). Each shelf is also the store: tap an item to try it on, tap again to buy it with ninja stars. Delete a fighter from the Body tab. Defeated enemies drop the stars, and Captains drop gifts. Everything is looks only and never changes how you fight. In multiplayer, each player picks a fighter on the Players screen and can change their color and hat.
 - **Back up your save** in Settings → Save: copy a code or save a file, and restore it on any device.
 - **Training Room** has dummies, hitboxes, frame data and the Feel / Moves / Info panels.
 
@@ -54,20 +54,18 @@ The **Training Room** (title screen) has spawnable dummies, hitbox and frame-dat
 
 Only a few enemies attack at once; the rest circle at a distance waiting their turn. Surge-phasing through one confuses it (?!) and then it chases faster.
 
-## Test checklist (iPad and a keyboard computer)
-
-- Title screen shows your best score; Settings keep their values after a reload.
-- Wooded Trail: the camera stops for each fight, GO → appears after each, the log blocks the way until smashed, Continue after a KO, and the level-clear screen at the arch.
-- Custom touch layouts still appear, and drag, resize, save and delete work.
-- Combos from each Move List section (A–G), Surge moves, Winded, grab and all four throws, Tornado Kick.
-- Block (Surge + down, standing still): kneels and shakes harder as Surge drains; hits from behind and hits after Surge runs out land. Hitting a downed enemy flops it around and it still gets up on time.
-- A Guard breaking, a Flanker leap, a Captain on wave 5 (enrages at about half health).
-- Ragdolls, death poses, confetti cleanup.
-- Training Room: spawn 1–6, hitboxes, frame data, speeds, freeze/step, Feel / Moves / Info.
-- Gamepad works; rotate-to-landscape prompt; the game pauses when you switch apps.
-- Multiplayer: 2+ controllers join on the Players screen, each controls its own fighter, Versus plays to a winner, co-op revive works. Try the TV with AirPlay and with an HDMI adapter.
-- For developers: `index.html?selftest` shows the fingerprint in docs/ARCHITECTURE.md.
-
 ## For developers
 
-Read [CLAUDE.md](CLAUDE.md) first. [docs/VISION.md](docs/VISION.md) has where the game is headed and the architecture rules, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) the file map, [docs/CHANGELOG.md](docs/CHANGELOG.md) the history. Each finished milestone has its own branch (`m5`, `m6`, `m7`, …) so any version can be played, compared or restored.
+Read [CLAUDE.md](CLAUDE.md) first. Each document has one job, so nothing has to be kept in sync in two places:
+
+| File | What it's for |
+|---|---|
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Status and plans: the only place that says what's done and what's next |
+| [docs/VISION.md](docs/VISION.md) | Where the game is headed and the architecture rules (why the code is built this way) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the code works: files, load order, each system |
+| [docs/COMBAT.md](docs/COMBAT.md) | The move design (combat chart) |
+| [docs/TESTING.md](docs/TESTING.md) | Automated tests and the iPad checklist |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | What changed in each release |
+| [docs/archive/](docs/archive/) | Frozen records (finished milestones' plans), never edited |
+
+Each finished milestone also has a branch (`m5`, `m6`, …, `m11`) so any version can be played, compared or restored.

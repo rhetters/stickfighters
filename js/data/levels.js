@@ -1,5 +1,5 @@
 // Orange vs. the Pink Army: Level data (plain JSON-compatible objects; never code, VISION.md rule R3)
-// ===== LEVELS (M8) =====
+// ===== LEVELS =====
 // A level is an ordered list of chunks. A chunk is one stretch of trail:
 //   w      width in pixels (the screen is 900 wide)
 //   dusk   0 = morning light, 1 = dusk; the sky blends between chunks as you walk
@@ -9,7 +9,7 @@
 //   enc    an encounter: the camera stops so that x = at is the middle of the screen, and the list of enemies
 //          drops in from the treetops, at most `max` fighting at once. lvl = toughness (same scale as Arcade waves).
 //   gate   an obstacle that blocks the trail until broken: { k: 'log', x, hp }
-// The M17 level creator will save chunks in this same format, and M13's generator will pick chunks from pools.
+// The planned level creator saves chunks in this same format, and procedural runs will pick chunks from pools.
 const CHUNKS = {
   trailhead: {
     w: 1100,
@@ -86,7 +86,7 @@ const CHUNKS = {
     ]
   }
 };
-// Versus arena (M9): one screen, no fights scripted.
+// Versus arena: one screen, no fights scripted.
 CHUNKS.arena = {
   w: 900,
   dusk: 0.35,
@@ -103,7 +103,7 @@ const LEVELS = {
     name: 'WOODED TRAIL',
     num: 1,
     theme: 'woods',
-    next: 'Sewer Entrance (coming in M13)',
+    next: 'Sewer Entrance (coming soon)',
     chunks: ['trailhead', 'birches', 'fallenlog', 'clearing', 'grove', 'trailend']
   },
   arena: { name: 'THE CLEARING', num: 0, theme: 'woods', next: '', chunks: ['arena'] }

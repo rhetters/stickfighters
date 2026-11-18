@@ -1,5 +1,5 @@
-// Orange vs. the Pink Army: Online connection layer (M11): WebRTC data channels between browsers
-// ===== CONNECTION (M11) =====
+// Orange vs. the Pink Army: Online connection layer: WebRTC data channels between browsers
+// ===== CONNECTION =====
 // This file only moves messages between devices; it knows nothing about the game. The match code (session.js)
 // talks to it through four calls and a few callbacks, so a different connection (Steam networking, our own
 // server) can replace this file later without touching the game:
@@ -10,7 +10,7 @@
 //
 // How devices find each other ("signaling"): the first hello between two devices goes through free public
 // servers. Several kinds are used at once and whichever gets through first wins, so one being down or blocked
-// doesn't stop play (M11 fix, after the first real test failed):
+// doesn't stop play (after the first real test failed):
 //   PeerJS cloud server   a host registers as "orangearmy-<code>", a joiner sends it an offer
 //   MQTT brokers          public message boards; a host listens on "orangearmy/v1/orangearmy-<code>"
 // Both are spoken to in plain JavaScript (no libraries). After the hello the devices talk directly (peer to
@@ -390,7 +390,7 @@ async function rtcJoin(code) {
   RTC.joinT = setTimeout(() => !P.answered && RTC.on.err('NOROOM'), 14000);
   return host;
 }
-// Connect directly to another device in the same room (guests connecting to each other, M11 patch)
+// Connect directly to another device in the same room (guests connecting to each other)
 async function rtcConnect(id) {
   if (RTC.peers[id]) return;
   const P = rtcPeer(id);

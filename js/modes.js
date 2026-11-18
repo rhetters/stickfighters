@@ -1,6 +1,6 @@
 // Orange vs. the Pink Army: Game modes. The combat engine knows nothing about waves, levels or score rules;
 // a mode sets up the world and runs the rules on top of it (VISION.md rule R1).
-// ===== MODES (M8) =====
+// ===== MODES =====
 // A mode is { id, update() once per simulation step while someone is alive, hud?(), fg?() foreground drawing }.
 // Arcade: endless waves on one screen (the original game).
 const ARCADE = {
@@ -28,9 +28,9 @@ const ARCADE = {
   }
 };
 ARCADE.revive = 1;
-ARCADE.drops = 1; // enemies drop ninja stars (M10)
+ARCADE.drops = 1; // enemies drop ninja stars
 let MODE = ARCADE;
-// ===== CO-OP RULES (M9) =====
+// ===== CO-OP RULES =====
 // Enemies get 35% more health per extra player, and each fight gets about 30% more grunts per extra player.
 const coopScale = () => (MODE.pvp || PL.length < 2 ? 1 : 1 + 0.35 * (PL.length - 1));
 function coopExtra(q) {
