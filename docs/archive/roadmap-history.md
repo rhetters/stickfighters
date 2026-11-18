@@ -205,7 +205,7 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 
 ### M8 · Level framework, modes, and Level 1: Wooded Trail (vertical slice)
 
-**Goal:** Turn waves into levels, prove the whole loop on one polished level, and lay the groundwork the vision needs (see [VISION.md](VISION.md), rules R1, R3 and R9).
+**Goal:** Turn waves into levels, prove the whole loop on one polished level, and lay the groundwork the vision needs (see [VISION.md](../VISION.md), rules R1, R3 and R9).
 
 - **Modes:** a small mode interface (set up the world, run the rules, decide when it's over, show results). The current wave game moves into an **Arcade** mode; Training becomes a mode too.
 - **Camera and world bounds:** the world is wider than the screen. Physics, spawns, drawing and ragdoll wall checks use the world's edges instead of the screen's.
