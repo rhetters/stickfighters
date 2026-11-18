@@ -2,6 +2,9 @@
 // ===== SELF-TEST: open the game with ?selftest to check the simulation is deterministic =====
 // Runs a fixed seed with scripted inputs and no drawing, then prints a fingerprint (hash) of the game state.
 // The hash must be identical before and after any refactor. Cosmetic effects (FX) are not part of the hash.
+// The fingerprints the game should give. A refactor must not change them; a gameplay change will, and then the new
+// values go here (and in the CHANGELOG entry for that change).
+const SELFTEST_EXPECT = { arcade: 'c87c9470', level: '21292ab5' };
 let SELFTESTING = false;
 function selfTest(n) {
   SELFTESTING = true;

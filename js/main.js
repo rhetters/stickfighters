@@ -597,7 +597,8 @@ if (/[?&]selftest/.test(location.search)) {
     R.hashL +
     '  (' +
     R.level +
-    ')';
+    ')  ' +
+    (R.hash === SELFTEST_EXPECT.arcade && R.hashL === SELFTEST_EXPECT.level ? 'MATCH' : 'CHANGED');
   d.style.cssText =
     'position:fixed;left:8px;top:8px;z-index:99;background:#1c1626;color:#ffd400;padding:8px 12px;font:14px monospace;border-radius:6px';
   document.body.appendChild(d);

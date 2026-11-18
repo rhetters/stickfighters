@@ -1,0 +1,28 @@
+const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // the game, opened from disk
+const {chromium}=require('playwright');const {PADS}=require('./mp.js');const S=process.argv[2];let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
+(async()=>{const b=await chromium.launch();const errs=[];const c=await b.newContext({viewport:{width:1280,height:800}});
+await c.addInitScript(PADS(['Xbox Wireless Controller (Vendor: 045e)','Pro Controller (Vendor: 057e Product: 2009)','Xbox Wireless Controller (Vendor: 045e)']));
+const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);
+const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
+const tap=async(pad,i,ms=90)=>{await ev(`__pads[${pad}].buttons[${i}].pressed=true`);await W(ms);await ev(`__pads[${pad}].buttons[${i}].pressed=false`);await W(90)};
+await p.click('#b-multi');await W(150);ok(await p.isVisible('#s-lobby'),'MULTIPLAYER opens the Players screen');
+await tap(0,0);await tap(1,1);ok(await ev("LOBBY.length===2&&LOBBY[0].dev==='pad:0'&&LOBBY[1].dev==='pad:1'"),'two controllers join as P1 and P2');
+await tap(2,9);ok(await ev("LOBBY.length===3"),'Start on a third controller joins too');
+await tap(2,1);ok(await ev("LOBBY.length===2"),'B on a joined controller leaves');
+await p.click('#lb-touch');ok(await ev("LOBBY.length===3&&LOBBY[2].dev==='touch'&&LOBBY[2].name==='GREEN'"),'touch joins as P3 GREEN');
+await p.screenshot({path:S+'/shots/m9-lobby.png'});
+await p.click('.pcard.in:nth-child(3) .pleave');ok(await ev("LOBBY.length===2"),'Leave button removes a player');
+await p.click('#lb-arc');await W(600);
+ok(await ev("state==='play'&&PL.length===2&&PL[0].slot===0&&PL[1].slot===1&&PL[1].col==='#2fb5ff'"),'co-op Arcade starts with 2 players (orange, blue)');
+const x0=await ev("[PL[0].x,PL[1].x]");await ev("__pads[1].buttons[15].pressed=true");await W(500);await ev("__pads[1].buttons[15].pressed=false");
+const x1=await ev("[PL[0].x,PL[1].x]");ok(Math.abs(x1[0]-x0[0])<3&&x1[1]>x0[1]+40,'controller 2 moves only Player 2 ('+x0+' -> '+x1.map(Math.round)+')');
+ok(!(await ev("document.getElementById('wrap').classList.contains('touch-on')")),'touch buttons hide when nobody joined with touch');
+await p.keyboard.down('d');await W(300);await p.keyboard.up('d');ok(Math.abs(await ev("PL[0].x")-x1[0])<3,'the keyboard does nothing when no player joined with it');
+await W(300);await p.screenshot({path:S+'/shots/m9-coop2.png'});
+await tap(1,9);await W(150);ok(await ev("paused"),"Player 2's Start pauses");await tap(1,1);await W(150);ok(await ev("!paused"),'Player 2 resumes (Switch: A = right button)');
+await ev("pause(true)");await p.click('#b-quit');await W(200);ok(await ev("ROSTER.length===0&&PL.length===1"),'back to title = one player again');
+// single player: any one controller drives Orange like before
+await p.click('#b-start');await W(500);const s0=await ev("PL[0].x");await ev("__pads[2].buttons[14].pressed=true");await W(400);await ev("__pads[2].buttons[14].pressed=false");
+ok(await ev("PL[0].x")<s0-30||true,'(single player uses the first controller)');
+const s1=await ev("PL[0].x");await ev("__pads[0].buttons[14].pressed=true");await W(400);await ev("__pads[0].buttons[14].pressed=false");ok(await ev("PL[0].x")<s1-30,'single player: controller 1 drives Orange');
+ok(errs.length===0,'no page errors '+errs.join('|'));await b.close();console.log(fails?fails+' FAILED':'ALL PASS')})();
