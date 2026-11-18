@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: a bigger house with floors and stairs (November 17, 2026)
+- The land is now up to 240 squares wide and 60 tall, and grows as you build: towers, several houses, a little city. Arrow buttons move the view.
+- New **Floors & Stairs** tab: a floor is a line along the bottom of a square; stairs rise to the right or the left. When you walk around, you jump onto them, walk up and down the stairs, and press Down + Jump to drop through. Walking into stairs from the floor below passes through them, like most platformers. The camera follows you up.
+- Everything placed costs stars (walls and floors per square, furniture and decorations per piece), and **Erase gives back every star**. Backgrounds are still bought once.
+- New: Hot Air Balloon, Door and Flag.
+- Engine: floors and stairs are general terrain any mode can use (future levels with platforms), and the camera can move up. Arcade, the Trail and Versus are unchanged; self-test fingerprints unchanged.
+- Save version 7: houses from version 16 are turned the right way up (rows now count up from the floor).
+- Version 17.
+
 ## M18 · House builder and visiting (November 17, 2026)
 - Title: **Customize** opens **Character | House**.
 - House screen: a side view of your house on a 20 x 7 grid. Paint walls square by square in 7 materials (wood, plaster, pink paint, brick, stone, roof, window; 2 to 4 stars a square), tap or drag. 8 pieces of furniture and 8 decorations to buy once and place anywhere (chair, table and plant are free; the Gold Trophy unlocks at Arcade wave 10), 7 backgrounds, and Erase. Works with touch, mouse, keyboard and controllers.

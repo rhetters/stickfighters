@@ -578,6 +578,9 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 checkUnlocks(); // older saves get what they already earned
+// the house as saved, checked (and turned over if it was saved before version 7)
+Object.assign(HOUSE, normHouse(HOUSE));
+delete HOUSE.flip7;
 init();
 applySet();
 resize();

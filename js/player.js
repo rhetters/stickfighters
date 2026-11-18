@@ -68,7 +68,7 @@ function stamTick(p) {
 // Picks the move for a button from the route table (aim + Surge captured at the press), and keeps strings going.
 function pick(f, btn, chain, plain) {
   const I = inputOf(f),
-    air = f.y < G - 4,
+    air = f.y < f.gy - 4,
     aim = I.AIM[btn] || 'n',
     sg = !plain && (I.SRG[btn] || I.K.s) && canSurge(f);
   const grp = ROUTE[(sg ? 's' : '') + (air ? 'a' : 'g')],
@@ -98,6 +98,7 @@ function F0(x, t, pl) {
   return {
     x,
     y: G,
+    gy: G, // the height this fighter stands on (G, or a floor or stair; terrain.js)
     vx: 0,
     vy: 0,
     face: pl ? 1 : -1,
@@ -170,9 +171,10 @@ function tgt(e) {
 }
 function init() {
   wave = 0;
-  CAM.x = WB.l = WW.l = 0;
+  CAM.x = CAM.y = WB.l = WW.l = 0;
   WB.r = WW.r = W;
   MODE = ARCADE;
+  terrainSet([]);
   const R = ROSTER.length ? ROSTER : [{ slot: 0 }];
   PL = R.map((r, i) => {
     // Looks: a multiplayer player brings the look picked on the Players screen; one player uses the
@@ -252,7 +254,7 @@ function updP(f) {
     k = 0.3;
   if (f.st === 'dead') {
     f.deadT = (f.deadT || 0) + 1;
-    if (f.y < G - 2) {
+    if (f.y < f.gy - 2) {
       f.sp += f.vx >= 0 ? 18 : -18;
       f.pose[9] = f.sp;
       tp = FLY;
@@ -348,7 +350,7 @@ function updP(f) {
     f.vx *= 0.955;
     f.phase = 2;
     if (f.t % 2 === 0) ghost(f, '#ffd400');
-    if (f.t % 3 === 0) dust(f.x, G, 1);
+    if (f.t % 3 === 0) dust(f.x, f.gy, 1);
     const b = want('p') ? 'p' : want('k') ? 'k' : 0;
     if (b) {
       eat(b);
@@ -358,7 +360,7 @@ function updP(f) {
     tickAtk(f);
     if (f.tp) tp = f.tp;
     k = 0.6;
-    f.vx *= f.y >= G ? 0.9 : 0.97;
+    f.vx *= f.y >= f.gy ? 0.9 : 0.97;
     if (f.t % 2 === 0 && f.att && (f.att.d.cost || f.att.d.dmg >= 9 || f.att.d.dive))
       ghost(f, f.att.d.cost ? '#ffd400' : 0);
   }
@@ -379,7 +381,7 @@ function updP(f) {
       K.x)
   )
     f.emote = null;
-  if (f.st === 'free' && K.e && f.y >= G - 1) {
+  if (f.st === 'free' && K.e && f.y >= f.gy - 1) {
     // d = the aimed direction in eighths of a turn, clockwise from up (0 = up, 2 = right, 4 = down, 6 = left)
     f.wheel = f.wheel || { d: 0 };
     const ax = (K.r ? 1 : 0) - (K.l ? 1 : 0),
@@ -398,7 +400,7 @@ function updP(f) {
     f.wheel = null;
   }
   if (f.st === 'free') {
-    const g = f.y >= G - 1,
+    const g = f.y >= f.gy - 1,
       m = (K.r ? 1 : 0) - (K.l ? 1 : 0);
     // Block: Down + Surge, standing still on the ground. Drains Surge slowly while held (see blockHit).
     if (g && K.d && K.s && !m && !f.flip && canSurge(f)) {
@@ -443,17 +445,27 @@ function updP(f) {
           l: 9,
           m: 9
         });
-      if (g && f.t % 6 === 0) dust(f.x, G, 1);
+      if (g && f.t % 6 === 0) dust(f.x, f.gy, 1);
     }
-    if (want('j') && K.s && canSurge(f) && (g || !f.hop) && spend(f, g ? SURGE.jumpCost : SURGE.hopCost)) {
+    // Down + Jump on a floor or stairs drops through it (terrain.js)
+    if (want('j') && K.d && !K.s && g && f.gy < G) {
+      eat('j');
+      terrainDrop(f);
+    } else if (
+      want('j') &&
+      K.s &&
+      canSurge(f) &&
+      (g || !f.hop) &&
+      spend(f, g ? SURGE.jumpCost : SURGE.hopCost)
+    ) {
       eat('j');
       if (g) {
         f.vy = -16.5;
         if (m) f.vx = m * Math.max(Math.abs(f.vx), 6);
         f.jumps = 1;
         f.sj = 26;
-        ring(f.x, G, 40);
-        dust(f.x, G, 8);
+        ring(f.x, f.gy, 40);
+        dust(f.x, f.gy, 8);
         sfx(380, 0.2, 'sawtooth', 0.05, 500);
       } else {
         f.hop = 1;
@@ -495,7 +507,7 @@ function updP(f) {
       f.face = m;
       f.vx = m * 11;
       f.running = 0;
-      dust(f.x, G, 6);
+      dust(f.x, f.gy, 6);
       sfx(300, 0.2, 'sawtooth', 0.04, -200);
     } else if (want('x') && f.meter >= 100) {
       eat('x');
@@ -524,11 +536,11 @@ function updP(f) {
     }
   }
   const imp = phys(f);
-  if (imp > 6) dust(f.x, G, 4);
+  if (imp > 6) dust(f.x, f.gy, 4);
   if (f.st === 'fly' && imp > 0) {
     f.st = 'down';
     f.dt = 30;
-    dust(f.x, G, 6);
+    dust(f.x, f.gy, 6);
     shake = Math.max(shake, 4);
   }
   smooth(f, tp, k);

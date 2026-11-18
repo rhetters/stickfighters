@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 16;
+const GAME_VERSION = 17;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -27,7 +27,7 @@ const ECO = { stars: 0, got: 0, own: [], seen: [] };
 // Saved fighters: four slots, cur = the one Player 1 uses. A slot is null until it's created.
 const CHR = { cur: 0, list: [null, null, null, null] };
 // The house (see data/house.js for its shape). Checked with normHouse() before it's used.
-const HOUSE = { bg: 'hbg-paper', cells: {}, items: [] };
+const HOUSE = { bg: 'hbg-paper', cells: {}, solids: {}, items: [] };
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
 //   v2: adds prog = { levelId: { done, score, time, combo } }
@@ -35,7 +35,9 @@ const HOUSE = { bg: 'hbg-paper', cells: {}, items: [] };
 //   v4: adds eco = { stars, got, own, seen } and chr = { cur, list: [fighter|null] x3 }
 //   v5: a fourth fighter slot; fighters gain ht and wheel (normFighter upgrades old fighters)
 //   v6: adds house = { bg, cells, items }
-const SAVE_VERSION = 6;
+//   v7: the house grows: rows count up from the floor (v6 counted 7 rows down from the top) and squares can hold
+//       solids; normHouse() turns the rows over for a house marked flip7
+const SAVE_VERSION = 7;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -58,6 +60,10 @@ function migrate(s) {
     s.house = s.house || { bg: 'hbg-paper', cells: {}, items: [] };
     s.saveVersion = 6;
   }
+  if (s.saveVersion === 6) {
+    if (s.house) s.house.flip7 = 1;
+    s.saveVersion = 7;
+  }
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).
@@ -78,6 +84,8 @@ function loadSave(s) {
   HOUSE.bg = typeof h.bg === 'string' ? h.bg : 'hbg-paper';
   HOUSE.cells = h.cells && typeof h.cells === 'object' && !Array.isArray(h.cells) ? h.cells : {};
   HOUSE.items = Array.isArray(h.items) ? h.items : [];
+  HOUSE.solids = h.solids && typeof h.solids === 'object' && !Array.isArray(h.solids) ? h.solids : {};
+  if (h.flip7) HOUSE.flip7 = 1;
 }
 try {
   loadSave(migrate(JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')));
@@ -129,7 +137,7 @@ function withCtx(c2, fn) {
 }
 // World. CAM.x = world x of the screen's left edge. WB = walls for living fighters (the screen, or a gate such
 // as the fallen log). WW = the whole world's edges, used by ragdolls. In Arcade and Training all three are the screen.
-const CAM = { x: 0 },
+const CAM = { x: 0, y: 0 }, // y < 0 = looking up (a tall house; levels keep 0)
   WB = { l: 0, r: W },
   WW = { l: 0, r: W };
 // Feel knobs (training room > Feel). Saved per device.

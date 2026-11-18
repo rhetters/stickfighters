@@ -1,8 +1,9 @@
 // Orange vs. the Pink Army: Drawing a house, and House mode (walking around a house, alone or with visitors online)
-// Drawing only: nothing here calls rnd() or changes the game.
+// Drawing never calls rnd() or changes the game; the house's floors and stairs become terrain (terrain.js).
 // ===== HOUSE DRAWING =====
+// Square (c, r): c counts from the left edge of the land, r up from the floor (row 0 sits on the floor line G).
 const HX = c => c * HGRID.cell,
-  HY = r => HGRID.top + r * HGRID.cell;
+  HY = r => G - (r + 1) * HGRID.cell; // top edge of row r
 function houseBg(it) {
   const k = it ? it.k : 'paper';
   ctx.fillStyle = it ? it.c : '#fbfaf4';
@@ -268,49 +269,203 @@ function houseThing(it, x, y, w, h) {
     ctx.lineTo(fx - 12, y + h * 0.48);
     ctx.lineTo(fx - 12, y + h * 0.62);
     ctx.fill();
+  } else if (k === 'door') {
+    houseBox(x + w * 0.12, y + 3, w * 0.76, h - 3, c, 6);
+    ctx.fillStyle = '#ffd400';
+    ctx.beginPath();
+    ctx.arc(x + w * 0.72, y + h * 0.55, 3.5, 0, 7);
+    ctx.fill();
+    ctx.strokeStyle = c2;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x + w * 0.22, y + h * 0.1, w * 0.56, h * 0.3);
+  } else if (k === 'flag') {
+    houseBox(x + w * 0.2, y + 2, w * 0.07, h - 2, '#555');
+    const wv = Math.sin(fr * 0.1) * 3;
+    ctx.fillStyle = c;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.27, y + 4);
+    ctx.quadraticCurveTo(x + w * 0.55, y + 4 + wv, x + w * 0.92, y + 10);
+    ctx.lineTo(x + w * 0.92, y + h * 0.3);
+    ctx.quadraticCurveTo(x + w * 0.55, y + h * 0.3 - wv, x + w * 0.27, y + h * 0.36);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else if (k === 'balloon') {
+    const bob = Math.sin(fr * 0.03) * 4,
+      cx = x + w / 2,
+      r = w * 0.42,
+      cy = y + r + 2 + bob;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx - r * 0.55, cy + r * 0.75);
+    ctx.lineTo(cx - w * 0.14, b - h * 0.16 + bob);
+    ctx.moveTo(cx + r * 0.55, cy + r * 0.75);
+    ctx.lineTo(cx + w * 0.14, b - h * 0.16 + bob);
+    ctx.stroke();
+    ctx.lineWidth = 3;
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.moveTo(cx - r * 0.5, cy + r * 0.85);
+    ctx.bezierCurveTo(cx - r * 1.3, cy + r * 0.2, cx - r * 1.1, cy - r * 1.1, cx, cy - r);
+    ctx.bezierCurveTo(cx + r * 1.1, cy - r * 1.1, cx + r * 1.3, cy + r * 0.2, cx + r * 0.5, cy + r * 0.85);
+    ctx.closePath();
+    ctx.fill();
+    ctx.save();
+    ctx.clip();
+    ctx.fillStyle = c2;
+    for (const dx of [-0.55, 0.15]) ctx.fillRect(cx + dx * r, cy - r * 1.2, r * 0.4, r * 2.2);
+    ctx.restore();
+    ctx.stroke();
+    houseBox(cx - w * 0.16, b - h * 0.16 + bob, w * 0.32, h * 0.15, '#a96e3a');
   } else if (k === 'trophy') {
     houseBox(x + w * 0.3, b - h * 0.15, w * 0.4, h * 0.13, '#8a5a33');
     houseBox(x + w * 0.45, b - h * 0.35, w * 0.1, h * 0.2, c);
     houseBox(x + w * 0.25, y + h * 0.12, w * 0.5, h * 0.4, c, 10);
   }
 }
-// A whole house, drawn on the game canvas in world space (the house is one screen wide)
-function drawHouse(h) {
-  houseBg(ITEM[h.bg]);
-  const s = HGRID.cell;
-  for (const k in h.cells) {
-    const [c, r] = k.split(',').map(Number);
-    houseTile(HTILE[h.cells[k]], HX(c), HY(r), s);
+// Floors and stairs: what fighters stand on
+function houseSolid(id, x, y, s) {
+  ctx.strokeStyle = INK;
+  ctx.lineJoin = 'round';
+  if (id === 'floor') {
+    ctx.fillStyle = '#c98a4f';
+    ctx.fillRect(x, y + s - 7, s, 5);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x, y + s - 1);
+    ctx.lineTo(x + s, y + s - 1);
+    ctx.stroke();
+    return;
   }
+  const d = s / 3,
+    b = y + s,
+    pts =
+      id === 'stairR'
+        ? [
+            [x, b],
+            [x, b - d],
+            [x + d, b - d],
+            [x + d, b - 2 * d],
+            [x + 2 * d, b - 2 * d],
+            [x + 2 * d, b - s],
+            [x + s, b - s],
+            [x + s, b]
+          ]
+        : [
+            [x + s, b],
+            [x + s, b - d],
+            [x + 2 * d, b - d],
+            [x + 2 * d, b - 2 * d],
+            [x + d, b - 2 * d],
+            [x + d, b - s],
+            [x, b - s],
+            [x, b]
+          ];
+  ctx.fillStyle = '#d39a5e';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+}
+// The squares of a house as lists (keys parsed into numbers), remade whenever its cells or solids object changes
+// (every save makes new ones)
+const HCACHE = new WeakMap();
+function houseLists(h) {
+  let L = HCACHE.get(h.cells);
+  if (!L || L.solidsOf !== h.solids) {
+    const parse = o => Object.entries(o || {}).map(([k, v]) => [...k.split(',').map(Number), v]);
+    L = { tiles: parse(h.cells), solids: parse(h.solids), solidsOf: h.solids };
+    HCACHE.set(h.cells, L);
+  }
+  return L;
+}
+// How much land a house uses (squares), so the walkable world and the editor grow as you build
+function houseExt(h) {
+  let cols = 0,
+    rows = 0;
+  const L = houseLists(h);
+  for (const [c, r] of [...L.tiles, ...L.solids]) {
+    cols = Math.max(cols, c + 1);
+    rows = Math.max(rows, r + 1);
+  }
+  for (const it of h.items) {
+    const d = ITEM[it.id];
+    cols = Math.max(cols, it.x + d.w);
+    rows = Math.max(rows, it.y + d.h);
+  }
+  return { cols, rows };
+}
+// The house's floors and stairs as terrain surfaces (terrain.js)
+function houseTerrain(h) {
+  const s = HGRID.cell;
+  return houseLists(h).solids.map(([c, r, id]) => {
+    const x1 = c * s,
+      lo = G - r * s,
+      hi = lo - s;
+    return id === 'floor'
+      ? { x1, x2: x1 + s, y1: lo, y2: lo }
+      : id === 'stairR'
+        ? { x1, x2: x1 + s, y1: lo, y2: hi }
+        : { x1, x2: x1 + s, y1: hi, y2: lo };
+  });
+}
+// A whole house: the background fills the screen, the rest is drawn in world space seen from (cx, cy)
+function drawHouse(h, cx, cy) {
+  houseBg(ITEM[h.bg]);
+  const s = HGRID.cell,
+    L = houseLists(h),
+    c0 = Math.floor(cx / s) - 1,
+    c1 = Math.ceil((cx + W) / s) + 1,
+    seen = (c, r, w, hh) => c + w >= c0 && c <= c1 && HY(r + hh - 1) - cy < H && HY(r) + s - cy > 0;
+  ctx.save();
+  ctx.translate(-cx, -cy);
+  for (const [c, r, t] of L.tiles) if (seen(c, r, 1, 1)) houseTile(HTILE[t], HX(c), HY(r), s);
   // floor
   ctx.fillStyle = '#d9b98f';
-  ctx.fillRect(-30, G, W + 60, H - G + 30);
+  ctx.fillRect(cx - 30, G, W + 60, H + 30);
   ctx.strokeStyle = '#b8956a';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  for (let x = 0; x < W; x += 90) {
+  for (let x = Math.floor(cx / 90) * 90; x < cx + W + 90; x += 90) {
     ctx.moveTo(x, G + 4);
-    ctx.lineTo(x, H);
+    ctx.lineTo(x, G + H);
   }
-  ctx.moveTo(0, G + 38);
-  ctx.lineTo(W, G + 38);
+  ctx.moveTo(cx - 30, G + 38);
+  ctx.lineTo(cx + W + 30, G + 38);
   ctx.stroke();
   ctx.fillStyle = INK;
-  ctx.fillRect(-30, G, W + 60, 3);
+  ctx.fillRect(cx - 30, G, W + 60, 3);
   for (const it of h.items) {
     const d = ITEM[it.id];
-    if (d) houseThing(d, HX(it.x), HY(it.y), d.w * s, d.h * s);
+    if (d && seen(it.x, it.y, d.w, d.h)) houseThing(d, HX(it.x), HY(it.y + d.h - 1), d.w * s, d.h * s);
   }
+  for (const [c, r, id] of L.solids) if (seen(c, r, 1, 1)) houseSolid(id, HX(c), HY(r), s);
+  ctx.restore();
 }
 // ===== HOUSE MODE =====
-// Walk around a house: no enemies, no stars, nobody gets hurt. The house is decoration only, so it never changes
-// the simulation (fighters walk on the floor line as everywhere else).
+// Walk around a house: no enemies, no stars, nobody gets hurt. Floors and stairs are terrain, so you can climb the
+// house; everything else is decoration. The camera follows your own fighter (drawing only: in House mode nothing
+// in the simulation reads CAM).
 let HVIEW = null; // the house being visited
+function houseCamera(snap) {
+  const me = (NET.match && PL.find(p => p.slot === NET.mySlot)) || PL[0],
+    tx = Math.max(WB.l, Math.min(WB.r - W, me.x - W / 2)),
+    ty = Math.min(0, me.y - 300),
+    k = snap ? 1 : 0.12;
+  CAM.x += (tx - CAM.x) * k;
+  CAM.y += (ty - CAM.y) * k;
+}
 const HOUSE_MODE = {
   id: 'house',
   update() {},
   bg() {
-    drawHouse(HVIEW);
+    houseCamera(fr < 2);
+    drawHouse(HVIEW, CAM.x, CAM.y);
   },
   hud() {
     if (fr < 240) {
@@ -318,6 +473,8 @@ const HOUSE_MODE = {
       ctx.font = '900 18px "Trebuchet MS",sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(HVIEW.name || 'MY HOUSE', W / 2, 26);
+      ctx.font = '700 13px "Trebuchet MS",sans-serif';
+      ctx.fillText('Jump onto floors and stairs · Down + Jump drops through', W / 2, 104);
     }
   }
 };
@@ -328,6 +485,8 @@ function startHouse(h) {
   HVIEW = h;
   MODE = HOUSE_MODE;
   state = 'play';
+  WB.r = WW.r = Math.max(W, (houseExt(h).cols + 3) * HGRID.cell);
+  terrainSet(houseTerrain(h));
   PL.forEach((p, i) => {
     p.x = 160 + i * 90;
     p.face = 1;

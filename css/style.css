@@ -1558,6 +1558,30 @@ body.padnav #ui select:focus {
   outline: 2px solid #ff7a00;
   outline-offset: -2px;
 }
+.hsrow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.hsnav {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.hsnav button {
+  min-width: 34px;
+  min-height: 30px;
+  padding: 0 6px;
+}
+.hsnav small {
+  font-weight: 800;
+  font-size: 11px;
+  min-width: 92px;
+  text-align: center;
+}
 #hs-tabs,
 #hs-pal,
 .hsbtns {

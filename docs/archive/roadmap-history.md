@@ -363,3 +363,5 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 **Done when:** You can build and decorate a house with stars, and a sibling can visit it from their iPad.
 
 **Status: done** (November 17, 2026, version 16). Built as a side-view house on a 20 x 7 grid with walls paid per square, store furniture, decorations and backgrounds, a Walk Around mode, and visiting the host's house online. The Character button became Customize (Character | House).
+
+Reopened the same evening (version 17 work): the house builder is still in progress; see ROADMAP.md.

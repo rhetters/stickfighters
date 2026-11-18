@@ -130,9 +130,9 @@ function updE(e) {
     if (!(d && d.lv && e.att.f >= d.h[0] && e.att.f <= d.h[1])) e.vx *= 0.85;
   } else {
     const Q = tgt(e); // nearest standing player
-    if (e.y >= G - 3 && Q && !(state === 'train' && TR.passive)) {
+    if (e.y >= e.gy - 3 && Q && !(state === 'train' && TR.passive)) {
       aiThink(e, Q, T_);
-    } else if (e.y >= G - 3) e.vx *= 0.7;
+    } else if (e.y >= e.gy - 3) e.vx *= 0.7;
     tp = freePose(e);
   }
   const imp = e.corpse ? 0 : phys(e);
@@ -140,10 +140,10 @@ function updE(e) {
     if (e.gb) {
       e.gb = 0;
       e.vy = -7;
-      e.y = G - 1;
+      e.y = e.gy - 1;
       e.vx *= 0.6;
-      ring(e.x, G, 44);
-      dust(e.x, G, 8);
+      ring(e.x, e.gy, 44);
+      dust(e.x, e.gy, 8);
       shake = Math.max(shake, 5);
       sfx(65, 0.15, 'sine', 0.12);
     } else if (e.pop && !e.dying) {
@@ -152,13 +152,13 @@ function updE(e) {
       e.stun = 10;
       e.sp = 0;
       e.pose[9] = 0;
-      dust(e.x, G, 3);
+      dust(e.x, e.gy, 3);
     } else if (imp > 5) {
       e.vy = -imp * T_.bnc * FEEL.bounce;
-      e.y = G - 1;
+      e.y = e.gy - 1;
       e.vx *= 0.7;
       e.spv *= 0.6;
-      dust(e.x, G, 5);
+      dust(e.x, e.gy, 5);
       shake = Math.max(shake, 3);
       sfx(70, 0.12, 'sine', 0.1);
     } else {
@@ -167,7 +167,7 @@ function updE(e) {
       e.otgU = 0;
     }
   } else if (e.st === 'free' && imp > 6) {
-    dust(e.x, G, 5);
+    dust(e.x, e.gy, 5);
     shake = Math.max(shake, 2);
   }
   smooth(e, tp, k);
@@ -209,7 +209,7 @@ function aiThink(e, Q, T_) {
     // get behind the target: aim for the spot at its back; if it's facing us up close, leap over it
     const behind = (e.x - Q.x) * Q.face < 0,
       goal = Q.x - Q.face * 58;
-    if (!behind && Math.abs(Q.x - e.x) < 120 && e.y >= G - 3 && !(e.hopT > 0)) {
+    if (!behind && Math.abs(Q.x - e.x) < 120 && e.y >= e.gy - 3 && !(e.hopT > 0)) {
       e.vy = -12.5;
       e.vx = side * 7.5;
       e.hopT = 80;
@@ -217,7 +217,7 @@ function aiThink(e, Q, T_) {
     }
     if (e.hopT > 0) e.hopT--;
     if (behind && inRange && e.cd <= 0 && e.tok) return startAtk(e, EA[T_.atk]);
-    if (e.y >= G - 3) e.vx += (Math.sign(goal - e.x) * (Math.abs(goal - e.x) > 8 ? spd : 0) - e.vx) * 0.2;
+    if (e.y >= e.gy - 3) e.vx += (Math.sign(goal - e.x) * (Math.abs(goal - e.x) > 8 ? spd : 0) - e.vx) * 0.2;
     return;
   }
   if (inRange && e.cd <= 0 && e.tok) return startAtk(e, EA[T_.atk]);

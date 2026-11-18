@@ -15,7 +15,7 @@ The title says **PRESS START**: press any key, button or tap.
 - **Multiplayer → Local** opens the Players screen. Up to 4 players: controllers join by pressing any button (B leaves), or join with touch, the keyboard, or a second keyboard player (arrows + number pad; press 0 on the number pad). Then pick **Versus** (best of 3 rounds in The Clearing; free-for-all or teams, chosen with the Versus button, and tap TEAM on a card to switch sides; grab another player with punch + kick, mash to break free) or **Co-op** (Wooded Trail or Arcade; stand next to a downed teammate for 2 seconds to revive them).
 - **Multiplayer → Online** plays house to house: one player hosts a room and shares its code (a word and a number); others pick the code with arrows and join. Up to 4 players, one per device, PC, iPad and phone together, in co-op, Arcade, Versus or the host's house. Every device needs the same version of the game, so reload the page on all of them after an update.
 - **Customize → Character** holds four saved fighters. Change the name, height, head size, line thickness and stance, and dress them from the tabs: Colors, Head (hair, hats, headbands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge (the color of your Surge) and Poses (up to 8 on your pose wheel; the first is your victory pose). Each shelf is also the store: tap an item to try it on, tap again to buy it with ninja stars. Delete a fighter from the Body tab. Defeated enemies drop the stars, and Captains drop gifts. Everything is looks only and never changes how you fight. In multiplayer, each player picks a fighter on the Players screen and can change their color and hat.
-- **Customize → House** builds your house: paint walls square by square (each square costs a few ninja stars), buy furniture, decorations and backgrounds and place them anywhere on the grid, or erase. **WALK AROUND** lets your fighter explore it, and online the host can pick **HOST'S HOUSE** so everyone visits.
+- **Customize → House** builds your house, as big as you like (even a little city): walls, floors and stairs square by square, furniture and decorations piece by piece (each costs a few ninja stars), and a background. The arrows move around your land, which grows as you build. Erase gives back every star. **WALK AROUND** lets your fighter explore it: jump onto floors and stairs, walk up the stairs, and press **Down + Jump** to drop through a floor. Online, the host can pick **HOST'S HOUSE** so everyone visits.
 - **Back up your save** in Settings → Save: copy a code or save a file, and restore it on any device.
 - **Training Room** has dummies, hitboxes, frame data and the Feel / Moves / Info panels.
 
@@ -25,7 +25,7 @@ The title says **PRESS START**: press any key, button or tap.
 | --- | --- | --- | --- |
 | Move | A / D or ← / → | Stick left/right | Left stick / d-pad |
 | Aim up / down (picks the move) | W / S or ↑ / ↓ | Stick up/down | Left stick / d-pad |
-| Jump (twice for a flip) | Space | JUMP | A |
+| Jump (twice for a flip; Down + Jump drops through a floor) | Space | JUMP | A |
 | Punch / Kick | J / K | PUNCH / KICK | X / B |
 | Surge (hold, or tap on/off: Settings → Surge button): run through enemies, super jump, Surge moves | Shift | SURGE | Bumpers / triggers |
 | Block (hits from the front cost Surge instead of health; drops when Surge runs out) | Shift + S, standing still | SURGE + stick down | Bumper + d-pad down |

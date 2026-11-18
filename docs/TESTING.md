@@ -27,7 +27,7 @@ Each test opens `index.html` from disk in a headless browser, plays scripted inp
 | `m9lobby`, `m9vs`, `pm9test` | Players screen, Versus, co-op, teams, player grabs |
 | `menu2test`, `navtest` | Title menu with a controller, directional menu navigation |
 | `m10test` | Stars, store, saved fighters, save migration, pose wheel |
-| `m18test` | House builder: Customize menu, walls and their cost, buying and placing, erase, backgrounds, save version 6 and its upgrade, walking around, visiting online |
+| `m18test` | House builder: Customize menu, prices per square and per piece, full refunds when erasing, floors and stairs, the land growing and the view moving, save version 7 (upgraded from 5 and 6), and walking around: passing through stairs from the floor, landing on them, climbing onto a floor, dropping through it; visiting online |
 | `spam` | Fast touch spamming on a phone-sized screen |
 | `nettest`, `nettest2`, `nettest3`, `netlag` | Online: rooms, joining, every mode, leaving, direct links and a blocked link, desync detection, 100 ms of simulated lag |
 
@@ -49,7 +49,7 @@ To add a test: copy a similar one, keep the `ok(condition, 'what it means')` lin
 - A Guard breaking, a Flanker leap, a Captain on wave 5 (enrages at about half health).
 - Ragdolls, death poses, confetti cleanup.
 - Character: try on and buy an item, the pose wheel in a fight (hold POSE, aim, let go), stars dropping and flying to you.
-- House: drag walls with a finger, buy and place furniture, WALK AROUND, and visit a host's house online.
+- House: drag walls with a finger, build a tall tower with floors and stairs, climb it in WALK AROUND, erase (stars come back), and visit a host's house online.
 - Training Room: spawn 1–6, hitboxes, frame data, speeds, freeze/step, Feel / Moves / Info.
 - Gamepad works; rotate-to-landscape prompt; the game pauses when you switch apps.
 - Multiplayer: 2+ controllers join on the Players screen, each controls its own fighter, Versus plays to a winner, co-op revive works. Try the TV with AirPlay and with an HDMI adapter.
