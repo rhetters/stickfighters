@@ -138,12 +138,20 @@ async function netHost() {
 }
 async function netJoin(code) {
   netReset();
-  const host = await rtcJoin(code);
-  Object.assign(NET, { on: true, host: false, code, hostId: host });
-  return new Promise((ok, bad) => {
+  Object.assign(NET, { on: true, host: false, code });
+  // the promise settles when the host welcomes us, or the connection layer reports NOROOM / BLOCKED
+  const wait = new Promise((ok, bad) => {
     NET.joinWait = { ok, bad };
-    NET.joinT = setTimeout(() => bad('NOROOM'), 15000);
+    NET.joinT = setTimeout(() => bad('BLOCKED'), 45000);
   });
+  try {
+    NET.hostId = await rtcJoin(code);
+  } catch (e) {
+    clearTimeout(NET.joinT);
+    NET.joinWait = null;
+    throw e;
+  }
+  return wait;
 }
 function netLeave() {
   if (NET.host) netAll({ t: 'end' });
@@ -182,13 +190,14 @@ RTC.on.gone = id => {
   netFlush();
 };
 RTC.on.err = e => {
-  if (NET.joinWait && e === 'NOROOM') {
+  if (NET.joinWait && (e === 'NOROOM' || e === 'BLOCKED')) {
     clearTimeout(NET.joinT);
-    NET.joinWait.bad('NOROOM');
+    NET.joinWait.bad(e);
     NET.joinWait = null;
-  } else if (typeof onlineMsg === 'function')
-    onlineMsg(e === 'CONNECT' ? 'Couldn’t connect. Try again.' : '');
+  } else if (typeof onlineMsg === 'function' && e === 'CONNECT')
+    onlineMsg('Couldn\u2019t connect. Try again.');
 };
+RTC.on.stage = t => NET.joinWait && typeof onlineMsg === 'function' && onlineMsg(t);
 RTC.on.msg = (id, m) => {
   if (!NET.on) return;
   if (NET.host) netHostMsg(id, m);
