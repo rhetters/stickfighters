@@ -15,6 +15,7 @@ Each test opens `index.html` from disk in a headless browser, plays scripted inp
 
 | Test | What it checks |
 |---|---|
+| `names` | No two game files define the same top-level name (they share one global scope) |
 | `selftest` | Determinism: `index.html?selftest` twice, both must say MATCH (the expected fingerprints are `SELFTEST_EXPECT` in `js/selftest.js`) |
 | `m4test` | Hit weight, poise, grab and throws, bowling, a second player |
 | `m5test` | Ragdolls, death poses, confetti cleanup |
@@ -26,6 +27,7 @@ Each test opens `index.html` from disk in a headless browser, plays scripted inp
 | `m9lobby`, `m9vs`, `pm9test` | Players screen, Versus, co-op, teams, player grabs |
 | `menu2test`, `navtest` | Title menu with a controller, directional menu navigation |
 | `m10test` | Stars, store, saved fighters, save migration, pose wheel |
+| `m18test` | House builder: Customize menu, walls and their cost, buying and placing, erase, backgrounds, save version 6 and its upgrade, walking around, visiting online |
 | `spam` | Fast touch spamming on a phone-sized screen |
 | `nettest`, `nettest2`, `nettest3`, `netlag` | Online: rooms, joining, every mode, leaving, direct links and a blocked link, desync detection, 100 ms of simulated lag |
 
@@ -47,6 +49,7 @@ To add a test: copy a similar one, keep the `ok(condition, 'what it means')` lin
 - A Guard breaking, a Flanker leap, a Captain on wave 5 (enrages at about half health).
 - Ragdolls, death poses, confetti cleanup.
 - Character: try on and buy an item, the pose wheel in a fight (hold POSE, aim, let go), stars dropping and flying to you.
+- House: drag walls with a finger, buy and place furniture, WALK AROUND, and visit a host's house online.
 - Training Room: spawn 1–6, hitboxes, frame data, speeds, freeze/step, Feel / Moves / Info.
 - Gamepad works; rotate-to-landscape prompt; the game pauses when you switch apps.
 - Multiplayer: 2+ controllers join on the Players screen, each controls its own fighter, Versus plays to a winner, co-op revive works. Try the TV with AirPlay and with an HDMI adapter.

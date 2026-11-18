@@ -351,3 +351,15 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 4. **Grab and throw.** Decided: yes, built in M4. Punch + Kick together grabs, and a throw sends the enemy into others.
 5. **Level style.** Decided in M8: side-scrolling levels with "GO →" prompts (Versus uses a single-screen arena).
 6. **Defense for versus.** Decided (combat patch, November 16): hold **Down + Surge** while standing still to block. Hits from the front cost Surge instead of health with no stun or dizziness; the kneeling pose trembles more as Surge drains; when Surge runs out you're Winded and hits land. Hits from behind always land.
+
+## Finished after the archive was started
+
+### M18 · House builder and visiting
+
+- A "House" section of the store opens your fighter on an open 2D grid. Drag across squares to build walls, charged in stars per square; buy backgrounds, furniture and decorations.
+- A house is data (background, grid, tiles, items), saved with the profile.
+- Invite friends into your house while you're in it: an online room like the ones from M11, where guests can look around and only the host edits.
+
+**Done when:** You can build and decorate a house with stars, and a sibling can visit it from their iPad.
+
+**Status: done** (November 17, 2026, version 16). Built as a side-view house on a 20 x 7 grid with walls paid per square, store furniture, decorations and backgrounds, a Walk Around mode, and visiting the host's house online. The Character button became Customize (Character | House).

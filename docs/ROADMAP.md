@@ -28,7 +28,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
-| M18 | House builder and visiting | Planned | L | M10, M11 | Build a house with stars, invite friends over |
+| M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
 | Someday | Cloud saves, Steam | Maybe | — | — | Desktop app, Steam Workshop, server-backed stars |
 
 ## Upcoming milestones
@@ -105,14 +105,6 @@ A short prototype first: jump-through platforms, real stairs, and vertical camer
 - Levels are checked when loaded (sizes, known IDs only) and are never run as code (rule R3).
 
 **Done when:** Rhett builds a level on the iPad, plays it, and sees his chunks appear in generated runs.
-
-### M18 · House builder and visiting
-
-- A "House" section of the store opens your fighter on an open 2D grid. Drag across squares to build walls, charged in stars per square; buy backgrounds, furniture and decorations.
-- A house is data (background, grid, tiles, items), saved with the profile.
-- Invite friends into your house while you're in it: an online room like the ones from M11, where guests can look around and only the host edits.
-
-**Done when:** You can build and decorate a house with stars, and a sibling can visit it from their iPad.
 
 ### Someday · Cloud saves and Steam
 
