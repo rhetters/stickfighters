@@ -15,6 +15,15 @@ const unit = v => {
   return [v[0] / d, v[1] / d];
 };
 const lerp2 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+// The radius hats, hair and bands are sized and placed by. They snap to the head's visible outer edge (its radius
+// plus half its outline), scaled so a normal head and line width give exactly the plain radius: with a bigger or
+// smaller head, or a thicker or thinner line, every head item still sits on the head the same way.
+function itemR(J) {
+  if (!J.hw || !J.hs) return J.hr;
+  const s = J.hs,
+    ref = 9 * s;
+  return ((J.hr + J.hw / 2) * ref) / (ref + 3.5 * Math.pow(s, 0.7));
+}
 // Draws in a frame fixed to the head: origin = point, x = the way you face, y = down along the neck.
 function headFrame(J, at, fn) {
   frameAt(at, unit(sub(J.hd, J.nk)), J.face, fn);
@@ -873,7 +882,7 @@ function drawLook(f, J, a, ph) {
     return;
   }
   const s = J.s,
-    r = J.hr,
+    r = itemR(J),
     w = 2.2 * Math.pow(s, 0.7),
     wv = Math.sin(fr * 0.22 + (f.slot || 0)) * 0.35,
     body = J.sh && J.hp,

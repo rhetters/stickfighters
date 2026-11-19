@@ -131,8 +131,8 @@ canvas {
     900 clamp(16px, 3vw, 22px) Impact,
     'Arial Black',
     sans-serif;
-  background: #ff7a00;
-  color: #fff;
+  background: #fff8ee;
+  color: #1c1626;
   border: 4px solid #1c1626;
   border-radius: 12px;
   padding: 8px 26px;
@@ -142,19 +142,31 @@ canvas {
   min-width: min(260px, 70%);
   min-height: 44px;
 }
-.btn.alt {
-  background: #fff8ee;
-  color: #1c1626;
-}
+/* Buttons turn orange only while highlighted: pressed, under a mouse, or picked with a controller or keyboard
+   (body.padnav). Nothing is lit up on its own, so on a touch screen nothing looks chosen until you tap it. */
 .btn:active {
   transform: translateY(4px);
   box-shadow: 0 1px 0 #1c1626;
 }
-.btn:focus-visible,
-.tb:focus-visible,
-#pausebtn:focus-visible {
+.btn:active,
+body.padnav .btn:focus {
+  background: #ff7a00;
+  color: #fff;
+}
+@media (hover: hover) {
+  .btn:hover:not(:disabled) {
+    background: #ff7a00;
+    color: #fff;
+  }
+}
+body.padnav .btn:focus-visible,
+body.padnav .tb:focus-visible,
+body.padnav #pausebtn:focus-visible {
   outline: 3px solid #ff4fa3;
   outline-offset: 3px;
+}
+body:not(.padnav) :focus {
+  outline: none;
 }
 .set {
   display: grid;
@@ -1520,9 +1532,11 @@ body.padnav #ui select:focus {
 }
 /* House screen: the house fills the frame; everything else sits on top of it. The floor line is at 270 of 420
    (64.3%), and the tabs and pieces sit on the floor below it. */
+#s-house:not([hidden]) {
+  display: block;
+}
 #s-house {
   padding: 0;
-  display: block;
   overflow: hidden;
   touch-action: none;
 }

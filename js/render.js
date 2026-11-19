@@ -119,6 +119,8 @@ function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, lay) {
     out.sh = R(sho);
     out.nk = R(neck);
     out.hr = hr;
+    out.hw = (lw || 7) * Math.pow(s, 0.7); // the head outline's width
+    out.hs = s;
     out.ea = R(eA);
     out.eb = R(eB);
     out.hp = R([x, hy]);

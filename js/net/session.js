@@ -15,8 +15,9 @@ const NET = {
   host: false,
   code: '',
   mySlot: 0,
-  players: [], // [{ slot, id, name, f (fighter), cid (colour id), rtt, left }]
+  players: [], // [{ slot, id, name, f (fighter), cid (colour id), team (0 or 1), rtt, left }]
   mode: 'level',
+  teams: false, // Versus in two teams instead of free-for-all
   match: false, // a match is running
   epoch: 0, // which match (messages from an older match are ignored)
   seed: 0,
@@ -94,16 +95,33 @@ function netRoomMsg() {
     t: 'room',
     code: NET.code,
     mode: NET.mode,
+    teams: NET.teams,
     players: NET.players.map(p => ({
       slot: p.slot,
       id: p.id,
       name: p.name,
       f: p.f,
       cid: p.cid,
+      team: p.team,
       rtt: p.rtt,
       left: p.left
     }))
   };
+}
+// Versus can start with 2 or more players, and in teams only when both teams have someone
+function netVsReady() {
+  const live = NET.players.filter(p => !p.left),
+    t1 = live.filter(p => p.team).length;
+  return live.length >= 2 && (!NET.teams || (t1 > 0 && t1 < live.length));
+}
+// Change a player's team: the host for anyone, a guest only for themselves (asks the host)
+function netSetTeam(slot) {
+  const p = NET.players.find(q => q.slot === slot);
+  if (!p || NET.match) return;
+  if (NET.host) {
+    p.team = p.team ? 0 : 1;
+    netRoomChanged();
+  } else if (slot === NET.mySlot) netSend(NET.hostId, { t: 'team', team: p.team ? 0 : 1 });
 }
 function netRoomChanged() {
   netColours();
@@ -111,7 +129,15 @@ function netRoomChanged() {
   if (typeof renderOnline === 'function') renderOnline();
 }
 function netReset() {
-  Object.assign(NET, { on: false, host: false, code: '', players: [], match: false, mySlot: 0 });
+  Object.assign(NET, {
+    on: false,
+    host: false,
+    code: '',
+    players: [],
+    match: false,
+    mySlot: 0,
+    teams: false
+  });
   NET.tab.clear();
   NET.hashes.clear();
   NET.links.clear();
@@ -128,7 +154,7 @@ async function netHost() {
       await rtcHost(code);
       Object.assign(NET, { on: true, host: true, code, mySlot: 0, mode: 'level' });
       const f = curFighter();
-      NET.players = [{ slot: 0, id: 'host', name: f.name, f, rtt: 0 }];
+      NET.players = [{ slot: 0, id: 'host', name: f.name, f, team: 0, rtt: 0 }];
       netColours();
       return code;
     } catch (e) {
@@ -253,7 +279,7 @@ function netHostMsg(id, m) {
     while (live.some(q => q.slot === slot)) slot++;
     const f = normFighter(m.f, true);
     NET.players = NET.players.filter(q => q.slot !== slot);
-    NET.players.push({ slot, id, name: f.name, f, rtt: 0, links: [] });
+    NET.players.push({ slot, id, name: f.name, f, team: slot % 2, rtt: 0, links: [] });
     NET.players.sort((a, b) => a.slot - b.slot);
     netSend(id, { t: 'welcome', slot });
     sfx(700, 0.12, 'square', 0.04, 300);
@@ -262,6 +288,9 @@ function netHostMsg(id, m) {
   else if (m.t === 'fighter' && !NET.match) {
     p.f = normFighter(m.f, true);
     p.name = p.f.name;
+    netRoomChanged();
+  } else if (m.t === 'team' && !NET.match) {
+    p.team = m.team ? 1 : 0;
     netRoomChanged();
   } else if (m.t === 'ping') {
     netSend(id, { t: 'pong', ts: m.ts });
@@ -300,6 +329,7 @@ function netClientMsg(m) {
   } else if (m.t === 'room') {
     NET.players = m.players;
     NET.mode = m.mode;
+    NET.teams = !!m.teams;
     netMesh();
     if (typeof renderOnline === 'function') renderOnline();
   } else if (m.t === 'pong') NET.rtt = performance.now() - m.ts;
@@ -329,7 +359,7 @@ function netLost(why) {
 function netStart() {
   if (!NET.host || NET.match) return;
   const live = NET.players.filter(p => !p.left);
-  if (NET.mode === 'vs' && live.length < 2) return false;
+  if (NET.mode === 'vs' && !netVsReady()) return false;
   const r = live.map(p => p.rtt || 0).sort((a, b) => b - a),
     oneWay = ((r[0] || 0) + (r[1] || 0)) / 2,
     D = Math.max(2, Math.min(10, Math.ceil(oneWay / 16.67) + 1)),
@@ -340,7 +370,8 @@ function netStart() {
       mode: NET.mode,
       D,
       feel: { ...FEEL },
-      players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid })),
+      players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid, team: p.team })),
+      teams: NET.mode === 'vs' && NET.teams,
       // House mode visits the host's house (decoration only, so it can't affect the simulation)
       house: NET.mode === 'house' ? normHouse(HOUSE) : undefined
     };
@@ -370,7 +401,15 @@ function netStartLocal(m) {
   netFresh(m.e);
   ROSTER = m.players.map(p => {
     const L = netLook(p);
-    return { slot: p.slot, dev: 'net', col: L.col, d2: L.d2, name: L.name, look: L };
+    return {
+      slot: p.slot,
+      dev: 'net',
+      col: L.col,
+      d2: L.d2,
+      name: L.name,
+      look: L,
+      team: m.teams ? p.team : undefined
+    };
   });
   releaseAll();
   applyTouchVis();
