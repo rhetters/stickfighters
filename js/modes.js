@@ -43,7 +43,7 @@ function reviveTick() {
   if (PL.length < 2) return;
   for (const q of PL) {
     if (q.st !== 'dead' || q.left || (q.deadT || 0) < 40) continue;
-    const near = PL.some(p => p !== q && p.st !== 'dead' && Math.abs(p.x - q.x) < 70 && p.y >= G - 4);
+    const near = PL.some(p => p !== q && p.st !== 'dead' && Math.abs(p.x - q.x) < 70 && p.y >= p.gy - 4);
     q.rv = near ? (q.rv || 0) + 1 : Math.max(0, (q.rv || 0) - 2);
     if (q.rv >= 120) {
       Object.assign(q, {

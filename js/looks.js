@@ -1073,7 +1073,7 @@ function lookPose(f) {
   LOOKK.set(f, k);
   const idle =
       f.st === 'free' &&
-      f.y >= G - 1 &&
+      f.y >= f.gy - 1 &&
       Math.abs(f.vx) < 0.9 &&
       !f.blk &&
       !f.running &&
