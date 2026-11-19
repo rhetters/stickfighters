@@ -61,8 +61,17 @@ function renderOnline() {
       (me ? '<button class="pprev" aria-label="Previous fighter">&#9664;</button>' : '') +
       '<canvas class="pcv" width="120" height="144"></canvas>' +
       (me ? '<button class="pnext" aria-label="Next fighter">&#9654;</button>' : '') +
-      '</div><small></small>';
+      '</div>' +
+      (NET.mode === 'vs' && NET.teams
+        ? '<button class="pteam">TEAM ' + ((p.team || 0) + 1) + '</button>'
+        : '') +
+      '<small></small>';
     c.querySelector('.pname').textContent = L.name;
+    const tb = c.querySelector('.pteam');
+    if (tb) {
+      tb.disabled = !(NET.host || me);
+      tb.onclick = () => netSetTeam(s);
+    }
     c.querySelector('small').textContent =
       (p.id === 'host' ? 'HOST' : 'GUEST') +
       (me ? ' · YOU' : '') +
@@ -79,8 +88,11 @@ function renderOnline() {
     b.classList.toggle('on', b.dataset.mode === NET.mode);
     b.disabled = !NET.host;
   }
+  $('on-teams').hidden = NET.mode !== 'vs';
+  $('on-teams').disabled = !NET.host;
+  $('on-teams').textContent = NET.teams ? 'VERSUS: TEAMS' : 'VERSUS: FREE-FOR-ALL';
   $('on-start').hidden = !NET.host;
-  $('on-start').disabled = NET.mode === 'vs' && live < 2;
+  $('on-start').disabled = NET.mode === 'vs' && !netVsReady();
   $('on-wait').textContent = NET.host
     ? live < 2
       ? 'Tell your friends the room code. Co-op and Arcade also work alone; Versus needs 2 players.'
@@ -206,8 +218,14 @@ for (const b of $('on-modes').querySelectorAll('button'))
     NET.mode = b.dataset.mode;
     netRoomChanged();
   };
+$('on-teams').onclick = () => {
+  if (!NET.host) return;
+  NET.teams = !NET.teams;
+  netRoomChanged();
+};
 $('on-start').onclick = () => {
-  if (!netStart()) onlineMsg('Versus needs at least 2 players.');
+  if (!netStart())
+    onlineMsg(NET.teams ? 'Each team needs at least one player.' : 'Versus needs at least 2 players.');
 };
 $('b-onlineback').onclick = () => {
   if (NET.on) {

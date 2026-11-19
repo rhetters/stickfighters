@@ -322,64 +322,85 @@ function houseThing(it, x, y, w, h) {
     houseBox(cx - w * 0.16, b - h * 0.16 + bob, w * 0.32, h * 0.15, '#a96e3a');
   } else if (k === 'trophy') {
     houseBox(x + w * 0.3, b - h * 0.15, w * 0.4, h * 0.13, '#8a5a33');
-    houseBox(x + w * 0.45, b - h * 0.35, w * 0.1, h * 0.2, c);
+    houseBox(x + w * 0.45, y + h * 0.48, w * 0.1, h * 0.4, c);
     houseBox(x + w * 0.25, y + h * 0.12, w * 0.5, h * 0.4, c, 10);
   }
 }
-// Floors and stairs: what fighters stand on
-function houseSolid(id, x, y, s) {
-  ctx.strokeStyle = INK;
-  ctx.lineJoin = 'round';
-  if (id === 'floor') {
-    ctx.fillStyle = '#c98a4f';
-    ctx.fillRect(x, y + s - 7, s, 5);
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(x, y + s - 1);
-    ctx.lineTo(x + s, y + s - 1);
-    ctx.stroke();
-    return;
-  }
+// Barriers are black lines. Stairs: the outline of their steps (or a spiral), rising to the right (R) or left (L).
+// The step outline as points, from the bottom corner up to the top corner, for a square at (x, y) of size s
+function stairPts(id, x, y, s) {
   const d = s / 3,
     b = y + s,
-    pts =
-      id === 'stairR'
-        ? [
-            [x, b],
-            [x, b - d],
-            [x + d, b - d],
-            [x + d, b - 2 * d],
-            [x + 2 * d, b - 2 * d],
-            [x + 2 * d, b - s],
-            [x + s, b - s],
-            [x + s, b]
-          ]
-        : [
-            [x + s, b],
-            [x + s, b - d],
-            [x + 2 * d, b - d],
-            [x + 2 * d, b - 2 * d],
-            [x + d, b - 2 * d],
-            [x + d, b - s],
-            [x, b - s],
-            [x, b]
-          ];
-  ctx.fillStyle = '#d39a5e';
-  ctx.lineWidth = 2.5;
+    up = [
+      [0, 0],
+      [0, d],
+      [d, d],
+      [d, 2 * d],
+      [2 * d, 2 * d],
+      [2 * d, s],
+      [s, s]
+    ];
+  return up.map(([u, v]) => [id.endsWith('R') ? x + u : x + s - u, b - v]);
+}
+function houseSolid(id, x, y, s) {
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.lineCap = ctx.lineJoin = 'round';
   ctx.beginPath();
-  pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
-  ctx.closePath();
-  ctx.fill();
+  if (id === 'floor') {
+    ctx.moveTo(x, y + s);
+    ctx.lineTo(x + s, y + s);
+  } else if (id === 'side') {
+    ctx.moveTo(x + s, y);
+    ctx.lineTo(x + s, y + s);
+  } else if (id.startsWith('stair'))
+    stairPts(id, x, y, s).forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+  else {
+    // spiral: rounded steps curling up the square, with the centre post they turn around
+    const R = id.endsWith('R'),
+      X = u => (R ? x + u : x + s - u),
+      b = y + s,
+      d = s / 3;
+    ctx.moveTo(X(0), b);
+    for (let i = 0; i < 3; i++) {
+      ctx.lineTo(X(i * d), b - (i + 1) * d + d * 0.35);
+      ctx.quadraticCurveTo(X(i * d), b - (i + 1) * d, X(i * d + d * 0.45), b - (i + 1) * d);
+      ctx.lineTo(X((i + 1) * d), b - (i + 1) * d);
+    }
+    ctx.stroke();
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(X(s * 0.15), b);
+    ctx.lineTo(X(s), b - s * 0.85);
+  }
   ctx.stroke();
 }
-// The squares of a house as lists (keys parsed into numbers), remade whenever its cells or solids object changes
-// (every save makes new ones)
+// A material painted inside stairs: fills the area under the steps
+function houseFill(t, sid, x, y, s) {
+  ctx.save();
+  ctx.beginPath();
+  const pts = stairPts(sid.startsWith('spiral') ? (sid.endsWith('R') ? 'stairR' : 'stairL') : sid, x, y, s);
+  pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+  ctx.lineTo(sid.endsWith('R') ? x + s : x, y + s);
+  ctx.closePath();
+  ctx.clip();
+  houseTile(t, x, y, s);
+  ctx.restore();
+}
+// The squares of a house as lists (keys parsed into numbers), remade whenever one of its layers changes
+// (every save makes new layer objects)
 const HCACHE = new WeakMap();
 function houseLists(h) {
   let L = HCACHE.get(h.cells);
-  if (!L || L.solidsOf !== h.solids) {
+  if (!L || L.of[0] !== h.solids || L.of[1] !== h.fills || L.of[2] !== h.sides) {
     const parse = o => Object.entries(o || {}).map(([k, v]) => [...k.split(',').map(Number), v]);
-    L = { tiles: parse(h.cells), solids: parse(h.solids), solidsOf: h.solids };
+    L = {
+      tiles: parse(h.cells),
+      solids: parse(h.solids),
+      fills: parse(h.fills),
+      sides: parse(h.sides),
+      of: [h.solids, h.fills, h.sides]
+    };
     HCACHE.set(h.cells, L);
   }
   return L;
@@ -389,7 +410,7 @@ function houseExt(h) {
   let cols = 0,
     rows = 0;
   const L = houseLists(h);
-  for (const [c, r] of [...L.tiles, ...L.solids]) {
+  for (const [c, r] of [...L.tiles, ...L.solids, ...L.sides]) {
     cols = Math.max(cols, c + 1);
     rows = Math.max(rows, r + 1);
   }
@@ -400,19 +421,23 @@ function houseExt(h) {
   }
   return { cols, rows };
 }
-// The house's floors and stairs as terrain surfaces (terrain.js)
+// The house's barriers as terrain: floors and stairs are surfaces, side walls are walls (terrain.js)
 function houseTerrain(h) {
-  const s = HGRID.cell;
-  return houseLists(h).solids.map(([c, r, id]) => {
-    const x1 = c * s,
-      lo = G - r * s,
-      hi = lo - s;
-    return id === 'floor'
-      ? { x1, x2: x1 + s, y1: lo, y2: lo }
-      : id === 'stairR'
-        ? { x1, x2: x1 + s, y1: lo, y2: hi }
-        : { x1, x2: x1 + s, y1: hi, y2: lo };
-  });
+  const s = HGRID.cell,
+    L = houseLists(h);
+  return {
+    surfaces: L.solids.map(([c, r, id]) => {
+      const x1 = c * s,
+        lo = G - r * s,
+        hi = lo - s;
+      return id === 'floor'
+        ? { x1, x2: x1 + s, y1: lo, y2: lo }
+        : id.endsWith('R')
+          ? { x1, x2: x1 + s, y1: lo, y2: hi }
+          : { x1, x2: x1 + s, y1: hi, y2: lo };
+    }),
+    walls: L.sides.map(([c, r]) => ({ x: (c + 1) * s, y1: G - (r + 1) * s, y2: G - r * s }))
+  };
 }
 // A whole house: the background fills the screen, the rest is drawn in world space seen from (cx, cy)
 function drawHouse(h, cx, cy, z = 1) {
@@ -447,7 +472,11 @@ function drawHouse(h, cx, cy, z = 1) {
     const d = ITEM[it.id];
     if (d && seen(it.x, it.y, d.w, d.h)) houseThing(d, HX(it.x), HY(it.y + d.h - 1), d.w * s, d.h * s);
   }
+  const sol = h.solids || {};
+  for (const [c, r, t] of L.fills)
+    if (seen(c, r, 1, 1) && sol[c + ',' + r]) houseFill(HTILE[t], sol[c + ',' + r], HX(c), HY(r), s);
   for (const [c, r, id] of L.solids) if (seen(c, r, 1, 1)) houseSolid(id, HX(c), HY(r), s);
+  for (const [c, r] of L.sides) if (seen(c, r, 1, 1)) houseSolid('side', HX(c), HY(r), s);
   ctx.restore();
 }
 // ===== HOUSE MODE =====
@@ -507,7 +536,8 @@ function startHouse(h) {
   MODE = HOUSE_MODE;
   state = 'play';
   WB.r = WW.r = Math.max(W, (houseExt(h).cols + 3) * HGRID.cell);
-  terrainSet(houseTerrain(h));
+  const T = houseTerrain(h);
+  terrainSet(T.surfaces, T.walls);
   PL.forEach((p, i) => {
     p.x = 160 + i * 90;
     p.face = 1;

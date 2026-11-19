@@ -232,6 +232,7 @@ function updP(f) {
   if (f.dcd > 0) f.dcd--;
   if (f.phase > 0) f.phase--;
   stamTick(f);
+  f.climb = !!K.u; // holding Up steps onto stairs (terrain.js)
   f.hpT += (f.hp - f.hpT) * 0.1; // the HUD's health bar trails behind a hit
   // Surge sparkles rising off a player holding Surge (cosmetic: Math.random, and effects aren't part of the game state)
   if (K.s && f.st !== 'dead' && !STM.winded && fr % 4 === 0)

@@ -2,6 +2,17 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: barriers, a bigger building view, and fixes (November 19, 2026)
+- House: **Floors & Stairs** is now **Barriers**, all drawn as black lines: a floor along a square's bottom edge, a **side wall** along its right edge (nobody walks or flies through it), stairs (just the steps) and **spiral stairs**. Walking into stairs from the floor passes through them; **hold Up** to step onto them and walk up.
+- Layering: a wall painted on stairs fills only inside the steps (wood wall, then stairs, then stone = stone stairs in front of a wood wall). Erase goes front to back: the stone, then the stairs, then the wood.
+- House builder fills the whole frame: help text top-left; stars, Walk Around and Done top-right; a D-pad bottom-left; zoom bottom-right; the tabs and pieces on the floor below the building area.
+- Fixed: poses didn't show when standing on a floor or stairs. Fixed: the gold trophy had a gap.
+- Online Versus now has **teams**: the host switches between free-for-all and teams, and each player taps their card to pick a team.
+- Hats, hair and headbands now fit any head size and line thickness: they snap to the head's outer edge.
+- Menus: no button is orange until it's highlighted (pressed, under the mouse, or picked with a controller or keyboard), so nothing looks chosen on an iPad until you tap it.
+- Save version 8 (fills and side walls in the house). Self-test fingerprints unchanged.
+- Version 19.
+
 ## M18 in progress: zoom (November 17, 2026)
 - House builder: **−** and **+** zoom the view out and back in (20, 40 or 60 squares across). Every square is still tappable, and a faint grid shows where taps land.
 - Walking around with several players (on one screen or online): the camera zooms out to keep everyone in view, even players at opposite ends of the land and at the top of the tallest building, and zooms back in when they come together.

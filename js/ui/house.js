@@ -1,7 +1,8 @@
-// Orange vs. the Pink Army: House screen: build walls, floors and stairs square by square, place furniture and
-// decorations, pick a background. Everything placed costs stars and erasing gives them all back. The view shows
-// 20 x 7 squares of a much bigger land and moves with the arrow buttons; the land grows as you build.
-// Works with touch (tap or drag to paint), mouse, keyboard and controllers (every square in view is a button).
+// Orange vs. the Pink Army: House screen: build walls and barriers (floors, side walls, stairs) square by square,
+// place furniture and decorations, pick a background. Everything placed costs stars and erasing gives them all back.
+// The house fills the whole frame; the buttons sit on top of it, and the tabs and pieces live on the floor below the
+// building area. The land is much bigger than the view: the D-pad moves around it, - and + zoom, and it grows as you
+// build. Works with touch (tap or drag to paint), mouse, keyboard and controllers (every square in view is a button).
 // ===== HOUSE SCREEN =====
 const HS = {
   tab: 'walls',
@@ -15,26 +16,28 @@ const HS = {
   oy: 0,
   zi: 0 // zoom level: index into HS_ZOOM
 };
-// Zoom levels for the editor: 1 = 20 x 7 squares, then 40 x 14 and 60 x 21 (every square in view is still a button)
+const HS_FLOOR = 270; // where the floor line sits in the editor (lower than in play, to leave room for the pieces)
+// Zoom levels for the editor: 1 = 20 x 6 squares, then 40 x 12 and 60 x 18 (every square in view is still a button)
 const HS_ZOOM = [1, 1 / 2, 1 / 3];
 const hsZ = () => HS_ZOOM[HS.zi],
   hsCols = () => Math.round(HGRID.viewCols / hsZ()),
-  hsRows = () => Math.round(HGRID.viewRows / hsZ());
+  hsRows = () => Math.round(HS_FLOOR / HGRID.cell / hsZ());
 const HS_TABS = [
   ['walls', 'WALLS'],
-  ['solids', 'FLOORS & STAIRS'],
+  ['solids', 'BARRIERS'],
   ['hfurn', 'FURNITURE'],
   ['hdecor', 'DECORATIONS'],
   ['hbg', 'BACKGROUND'],
   ['erase', 'ERASE']
 ];
 const HS_HELP = {
-  walls: 'Pick a material, then tap or drag. Walls are scenery behind you.',
-  solids: 'Floors and stairs hold you up: jump onto them, walk up stairs, Down + Jump to drop through.',
+  walls: 'Pick a material, then tap or drag. On stairs it fills just the steps.',
+  solids:
+    'Barriers hold you up or stop you: jump onto floors, hold Up to walk up stairs, Down + Jump drops through.',
   hfurn: 'Pick one, then tap where its bottom-left corner goes.',
   hdecor: 'Pick one, then tap where its bottom-left corner goes.',
   hbg: 'Tap a background to use it.',
-  erase: 'Tap or drag to remove things. You get all their stars back.'
+  erase: 'Tap or drag to remove things, front first. You get all their stars back.'
 };
 function houseMsg(t) {
   $('hs-msg').textContent = t || '';
@@ -77,45 +80,43 @@ function housePan(dx, dy) {
   HS.oy = Math.max(0, Math.min(L.y, HS.oy + dy));
   houseDraw();
 }
+// The camera for the editor: square (ox, oy) at the bottom-left, with the floor line raised to HS_FLOOR
+const hsCam = () => [HS.ox * HGRID.cell, -HS.oy * HGRID.cell + (G - HS_FLOOR) / hsZ(), hsZ()];
 function houseDraw() {
-  const s = HGRID.cell;
+  const s = HGRID.cell,
+    [cx, cy, z] = hsCam();
   withCtx($('hs-cv').getContext('2d'), () => {
-    drawHouse(HOUSE, HS.ox * s, -HS.oy * s, hsZ());
-    if (HS.zi > 0) {
-      // zoomed out: a faint line around every square, so you can see where taps land
-      const z = hsZ(),
-        c0 = HS.ox,
-        r0 = HS.oy;
-      ctx.save();
-      camApply(c0 * s, -r0 * s, z);
-      ctx.strokeStyle = 'rgba(28,22,38,.13)';
-      ctx.lineWidth = 1 / z;
-      ctx.beginPath();
-      for (let c = c0; c <= c0 + hsCols(); c++) {
-        ctx.moveTo(c * s, G);
-        ctx.lineTo(c * s, G - (hsRows() + r0) * s);
-      }
-      for (let r = r0; r <= r0 + hsRows(); r++) {
-        ctx.moveTo(c0 * s, G - r * s);
-        ctx.lineTo((c0 + hsCols()) * s, G - r * s);
-      }
-      ctx.stroke();
-      ctx.restore();
+    drawHouse(HOUSE, cx, cy, z);
+    ctx.save();
+    camApply(cx, cy, z);
+    // a faint line around every square in view, so you can see where taps land
+    const c0 = HS.ox,
+      r0 = HS.oy;
+    ctx.strokeStyle = 'rgba(28,22,38,.12)';
+    ctx.lineWidth = 1 / z;
+    ctx.beginPath();
+    for (let c = c0; c <= c0 + hsCols(); c++) {
+      ctx.moveTo(c * s, G - r0 * s);
+      ctx.lineTo(c * s, G - (hsRows() + r0) * s);
     }
+    for (let r = r0; r <= r0 + hsRows(); r++) {
+      ctx.moveTo(c0 * s, G - r * s);
+      ctx.lineTo((c0 + hsCols()) * s, G - r * s);
+    }
+    ctx.stroke();
     // the current fighter stands at the left of the land
-    if (HS.ox < 4 && HS.oy === 0 && HS.zi === 0) {
+    if (HS.ox < 4 && HS.oy === 0) {
       const L = lookOf(curFighter()),
         S = (STANCES.find(t => t.id === L.stance) || STANCES[0]).p,
         f = { look: L, face: 1, s: 1, slot: 0, vx: 0 },
-        o = {},
-        x = 110 - HS.ox * s;
-      drawFig(x, G, 1, S, L.ht, L.col, L.d2, 0, 1, L.lw, o, L.head, lookLayers(f, { face: 1, s: L.ht }, 1));
+        o = {};
+      drawFig(110, G, 1, S, L.ht, L.col, L.d2, 0, 1, L.lw, o, L.head, lookLayers(f, { face: 1, s: L.ht }, 1));
       drawLook(f, { ...o, face: 1, s: L.ht }, 1, 'front');
     }
+    ctx.restore();
   });
   $('hs-stars').textContent = ECO.stars;
   const L = houseLimits();
-  $('hs-pos').textContent = 'Square ' + (HS.ox + 1) + ' · floor ' + (HS.oy + 1);
   $('hs-left').disabled = HS.ox <= 0;
   $('hs-right').disabled = HS.ox >= L.x;
   $('hs-down').disabled = HS.oy <= 0;
@@ -129,16 +130,14 @@ function houseZoom(d) {
   houseCells();
   housePan(0, 0);
 }
-// One button per square in view, laid over the canvas; the view's bottom row sits on the floor line
+// One button per square in view, laid over the canvas above the floor line
 function houseCells() {
   const box = $('hs-cells'),
-    V = hsRows(),
-    s = HGRID.cell * hsZ();
+    V = hsRows();
   box.innerHTML = '';
-  box.style.top = ((G - V * s) / H) * 100 + '%';
-  box.style.height = ((V * s) / H) * 100 + '%';
+  box.style.height = (HS_FLOOR / H) * 100 + '%';
   box.style.gridTemplateColumns = 'repeat(' + hsCols() + ', 1fr)';
-  box.classList.toggle('far', HS.zi > 0);
+  box.style.gridTemplateRows = 'repeat(' + V + ', 1fr)';
   for (let vr = 0; vr < V; vr++)
     for (let vc = 0; vc < hsCols(); vc++) {
       const b = document.createElement('button');
@@ -177,7 +176,7 @@ $('hs-cells').addEventListener('pointermove', e => {
 });
 addEventListener('pointerup', () => (HS.paint = false));
 addEventListener('pointercancel', () => (HS.paint = false));
-// Paint one square of a layer (cells = walls, solids = floors and stairs): pay for the new piece, refund the old one
+// Paint one square of a layer (cells, fills, solids or sides): pay for the new piece, refund the one it replaces
 function housePaint(layer, list, k, id) {
   const old = HOUSE[layer][k];
   if (old === id) return false;
@@ -194,18 +193,34 @@ function housePaint(layer, list, k, id) {
 function houseAct(c, r) {
   const k = c + ',' + r;
   let done = false;
-  if (HS.tab === 'walls') done = housePaint('cells', HTILE, k, HS.tile);
-  else if (HS.tab === 'solids') done = housePaint('solids', HSOLID, k, HS.solid);
-  else if (HS.tab === 'erase') {
-    const i = houseItemAt(c, r);
+  if (HS.tab === 'walls')
+    // on stairs a material fills just the steps; anywhere else it fills the whole square behind
+    done = isStair(HOUSE.solids[k])
+      ? housePaint('fills', HTILE, k, HS.tile)
+      : housePaint('cells', HTILE, k, HS.tile);
+  else if (HS.tab === 'solids') {
+    const t = HSOLID[HS.solid];
+    done = housePaint(t.layer, HSOLID, k, t.id);
+    // stairs replaced by a floor: their fill has nothing to fill any more
+    if (done && HOUSE.fills[k] && !isStair(HOUSE.solids[k])) {
+      refundStars(HTILE[HOUSE.fills[k]].price, 'house');
+      HOUSE.fills = { ...HOUSE.fills };
+      delete HOUSE.fills[k];
+    }
+  } else if (HS.tab === 'erase') {
+    // front to back: a thing, the stairs' fill, a side wall, the floor or stairs, the wall behind
+    const i = houseItemAt(c, r),
+      take = (layer, list) => {
+        refundStars(list[HOUSE[layer][k]].price, 'house');
+        HOUSE[layer] = { ...HOUSE[layer] };
+        delete HOUSE[layer][k];
+      };
     if (i >= 0) refundStars(ITEM[HOUSE.items.splice(i, 1)[0].id].price || 0, 'house');
-    else if (HOUSE.solids[k]) {
-      refundStars(HSOLID[HOUSE.solids[k]].price, 'house');
-      delete HOUSE.solids[k];
-    } else if (HOUSE.cells[k]) {
-      refundStars(HTILE[HOUSE.cells[k]].price, 'house');
-      delete HOUSE.cells[k];
-    } else return;
+    else if (HOUSE.fills[k]) take('fills', HTILE);
+    else if (HOUSE.sides[k]) take('sides', HSOLID);
+    else if (HOUSE.solids[k]) take('solids', HSOLID);
+    else if (HOUSE.cells[k]) take('cells', HTILE);
+    else return;
     sfx(200, 0.05, 'triangle', 0.03, -100);
     done = true;
   } else if (HS.tab === 'hfurn' || HS.tab === 'hdecor') {
@@ -366,7 +381,7 @@ function houseBgPick(it) {
 }
 $('b-house').onclick = openHouse;
 $('b-houseback').onclick = closeHouse;
-// the arrows move a quarter of the view each tap
+// the D-pad moves a quarter of the view across, or half of it up and down, each tap
 $('hs-left').onclick = () => housePan(-Math.ceil(hsCols() / 4), 0);
 $('hs-right').onclick = () => housePan(Math.ceil(hsCols() / 4), 0);
 $('hs-up').onclick = () => housePan(0, Math.ceil(hsRows() / 2));

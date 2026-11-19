@@ -429,6 +429,9 @@ function navItems() {
       getComputedStyle(e).visibility !== 'hidden'
   );
 }
+// Touching or clicking switches the highlight off; Tab or a controller switches it on (see navMove / navPress)
+addEventListener('pointerdown', () => document.body.classList.remove('padnav'), true);
+addEventListener('keydown', e => e.key === 'Tab' && document.body.classList.add('padnav'), true);
 function navMove(dir) {
   document.body.classList.add('padnav');
   const L = navItems();
