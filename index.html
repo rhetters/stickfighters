@@ -91,11 +91,14 @@
   </div>
   <button class="btn" id="b-charback">DONE</button>
  </div>
- <div class="screen wide" id="s-house" hidden>
-  <div class="chtop"><h2>HOUSE</h2><p id="hs-msg" aria-live="polite"></p><div class="chstars"><span class="shk"></span><b id="hs-stars">0</b></div><div class="hsbtns"><button class="btn alt" id="b-hvisit">WALK AROUND</button><button class="btn" id="b-houseback">DONE</button></div></div>
-  <div id="hs-view"><canvas id="hs-cv" width="900" height="420" aria-label="Your house"></canvas><div id="hs-cells"></div></div>
-  <div class="hsrow"><div class="hsnav"><button id="hs-left" aria-label="Look left">&#9664;</button><button id="hs-down" aria-label="Look down">&#9660;</button><small id="hs-pos"></small><button id="hs-up" aria-label="Look up">&#9650;</button><button id="hs-right" aria-label="Look right">&#9654;</button><button id="hs-zout" aria-label="Zoom out">&minus;</button><button id="hs-zin" aria-label="Zoom in">+</button></div><div id="hs-tabs"></div></div>
-  <div id="hs-pal"></div>
+ <div class="screen" id="s-house" hidden>
+  <canvas id="hs-cv" width="900" height="420" aria-label="Your house"></canvas>
+  <div id="hs-cells"></div>
+  <p id="hs-msg" aria-live="polite"></p>
+  <div class="hstop"><div class="chstars"><span class="shk"></span><b id="hs-stars">0</b></div><button class="btn alt" id="b-hvisit">WALK AROUND</button><button class="btn" id="b-houseback">DONE</button></div>
+  <div class="hsdpad"><button id="hs-up" aria-label="Look up">&#9650;</button><button id="hs-left" aria-label="Look left">&#9664;</button><button id="hs-right" aria-label="Look right">&#9654;</button><button id="hs-down" aria-label="Look down">&#9660;</button></div>
+  <div class="hsfloor"><div id="hs-tabs"></div><div id="hs-pal"></div></div>
+  <div class="hszoom"><button id="hs-zout" aria-label="Zoom out">&minus;</button><button id="hs-zin" aria-label="Zoom in">+</button></div>
  </div>
  <div class="screen" id="s-lobby" hidden>
   <h2>PLAYERS</h2>

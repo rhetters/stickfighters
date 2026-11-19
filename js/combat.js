@@ -814,11 +814,12 @@ function sep() {
 const groundY = x => G;
 function phys(f) {
   if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav;
-  const y0 = f.y;
+  const x0 = f.x,
+    y0 = f.y;
   f.x += f.vx;
   f.y += f.vy;
   let imp = 0;
-  if (TERRAIN.n) terrainStep(f, y0);
+  if (TERRAIN.n) terrainStep(f, x0, y0);
   else f.gy = G;
   const gy = f.gy;
   if (f.y >= gy) {

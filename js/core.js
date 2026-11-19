@@ -27,7 +27,7 @@ const ECO = { stars: 0, got: 0, own: [], seen: [] };
 // Saved fighters: four slots, cur = the one Player 1 uses. A slot is null until it's created.
 const CHR = { cur: 0, list: [null, null, null, null] };
 // The house (see data/house.js for its shape). Checked with normHouse() before it's used.
-const HOUSE = { bg: 'hbg-paper', cells: {}, solids: {}, items: [] };
+const HOUSE = { bg: 'hbg-paper', cells: {}, solids: {}, fills: {}, sides: {}, items: [] };
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
 //   v2: adds prog = { levelId: { done, score, time, combo } }
@@ -37,7 +37,8 @@ const HOUSE = { bg: 'hbg-paper', cells: {}, solids: {}, items: [] };
 //   v6: adds house = { bg, cells, items }
 //   v7: the house grows: rows count up from the floor (v6 counted 7 rows down from the top) and squares can hold
 //       solids; normHouse() turns the rows over for a house marked flip7
-const SAVE_VERSION = 7;
+//   v8: barriers: house.fills (material inside stairs) and house.sides (side walls)
+const SAVE_VERSION = 8;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -64,6 +65,10 @@ function migrate(s) {
     if (s.house) s.house.flip7 = 1;
     s.saveVersion = 7;
   }
+  if (s.saveVersion === 7) {
+    if (s.house) Object.assign(s.house, { fills: s.house.fills || {}, sides: s.house.sides || {} });
+    s.saveVersion = 8;
+  }
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).
@@ -84,7 +89,10 @@ function loadSave(s) {
   HOUSE.bg = typeof h.bg === 'string' ? h.bg : 'hbg-paper';
   HOUSE.cells = h.cells && typeof h.cells === 'object' && !Array.isArray(h.cells) ? h.cells : {};
   HOUSE.items = Array.isArray(h.items) ? h.items : [];
-  HOUSE.solids = h.solids && typeof h.solids === 'object' && !Array.isArray(h.solids) ? h.solids : {};
+  const map = o => (o && typeof o === 'object' && !Array.isArray(o) ? o : {});
+  HOUSE.solids = map(h.solids);
+  HOUSE.fills = map(h.fills);
+  HOUSE.sides = map(h.sides);
   if (h.flip7) HOUSE.flip7 = 1;
 }
 try {

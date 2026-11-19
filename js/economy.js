@@ -127,7 +127,7 @@ function normFighter(c, any) {
 function normHouse(h, any) {
   const src = h && typeof h === 'object' ? h : {},
     flip = !!src.flip7,
-    out = { bg: 'hbg-paper', cells: {}, solids: {}, items: [] },
+    out = { bg: 'hbg-paper', cells: {}, solids: {}, fills: {}, sides: {}, items: [] },
     inLand = (c, r) => c >= 0 && r >= 0 && c < HGRID.maxCols && r < HGRID.maxRows,
     squares = (o, ok, dst) => {
       const o0 = o && typeof o === 'object' ? o : {};
@@ -141,7 +141,13 @@ function normHouse(h, any) {
     };
   if (ITEM[src.bg] && ITEM[src.bg].sec === 'hbg' && (any || owns(src.bg))) out.bg = src.bg;
   squares(src.cells, HTILE, out.cells);
-  squares(src.solids, HSOLID, out.solids);
+  const solidOk = Object.fromEntries(HSOLIDS.filter(t => t.layer === 'solids').map(t => [t.id, t])),
+    sideOk = { side: HSOLID.side };
+  squares(src.solids, solidOk, out.solids);
+  squares(src.sides, sideOk, out.sides);
+  squares(src.fills, HTILE, out.fills);
+  // a fill only makes sense inside stairs
+  for (const k in out.fills) if (!isStair(out.solids[k])) delete out.fills[k];
   for (const it of Array.isArray(src.items) ? src.items.slice(0, HOUSE_MAX_ITEMS) : []) {
     const d = it && ITEM[it.id];
     if (!d || (d.sec !== 'hfurn' && d.sec !== 'hdecor') || !(any || d.price || owns(d.id))) continue;
