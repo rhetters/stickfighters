@@ -314,7 +314,6 @@ function titleBack() {
   return false;
 }
 const pressMode = () => !$('s-title').hidden && !$('ui').hidden && !TITLE.ready;
-// used by the automated tests: open everything at once
 // Opens the whole title menu at once (used by the tests in tools/tests to skip PRESS START)
 function titleOpenAll() {
   TITLE.ready = TITLE.keepOpen = true;

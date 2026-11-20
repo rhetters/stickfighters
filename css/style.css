@@ -1332,7 +1332,8 @@ body.padnav #ui select:focus {
   font-size: 18px;
   padding: 0 8px;
 }
-#ch-stance {
+#ch-stance,
+#ch-htype {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -1854,4 +1855,21 @@ body.padnav #ui select:focus {
   100% {
     transform: translateX(-50%) scale(1);
   }
+}
+/* Multiplayer screens (Players and Online): Rhett's campaign / versus drawing behind a light paper wash */
+#s-lobby,
+#s-online {
+  background:
+    linear-gradient(rgba(251, 250, 244, 0.5), rgba(251, 250, 244, 0.5)),
+    #fbfaf4 url(../img/multiplayer.jpg) center 30% / cover no-repeat;
+}
+#s-lobby .pcard,
+#s-online .pcard {
+  background-color: rgba(251, 250, 244, 0.88);
+}
+#s-lobby p:not(:empty),
+#s-online p:not(:empty) {
+  background: rgba(251, 250, 244, 0.85);
+  border-radius: 8px;
+  padding: 1px 8px;
 }

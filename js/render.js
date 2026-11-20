@@ -79,11 +79,21 @@ function stars(x, y) {
   ctx.restore();
 }
 // ===== RENDER =====
-// hk = head size (1 = normal; character creation can change it). out (optional) receives the joint positions.
+// A fighter's head: a ring (donut) or, when full, filled with the line colour.
+function figHead(x, y, r, full) {
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, 7);
+  if (full) {
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fill();
+  }
+  ctx.stroke();
+}
+// hk = head size (1 = normal; character creation can change it). hf = a full (filled) head instead of a ring. out (optional) receives the joint positions.
 // lay (optional) = functions called with out between the body's layers so clothes sit at the right depth:
 //   under (behind everything: capes), back (after the far arm and leg), mid (after the torso and head),
 //   legs (after the near leg); whatever the caller draws afterwards lands on top of the near arm.
-function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, lay) {
+function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, lay, hf) {
   const th = 15 * s,
     sh = 15 * s,
     ua = 13 * s,
@@ -157,9 +167,7 @@ function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, lay) {
   hook('back');
   layer(() => {
     L(col, [[x, hy], neck]);
-    ctx.beginPath();
-    ctx.arc(head[0], head[1], hr, 0, 7);
-    ctx.stroke();
+    figHead(head[0], head[1], hr, hf);
   });
   hook('mid');
   layer(() => L(col, [[x, hy], kF, fF]));
@@ -223,7 +231,8 @@ function drawF(f) {
       L ? L.lw : 7,
       o,
       L ? L.head : 1,
-      L ? lookLayers(f, { face: f.face, s: ds }, fa) : null
+      L ? lookLayers(f, { face: f.face, s: ds }, fa) : null,
+      L && L.hfull
     );
     if (L) drawLook(f, { ...o, face: f.face, s: ds }, fa, 'front');
     ctx.restore();

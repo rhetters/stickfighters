@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>StickFighters</title>
-<link rel="stylesheet" href="css/style.css?v=24">
+<link rel="stylesheet" href="css/style.css?v=25">
 </head>
 <body>
 <div id="wrap">
@@ -80,6 +80,7 @@
     <div id="ch-body">
      <div class="chrow"><span>Height</span><button id="ch-ht-" aria-label="Shorter">&minus;</button><b id="ch-ht"></b><button id="ch-ht+" aria-label="Taller">+</button></div>
      <div class="chrow"><span>Head size</span><button id="ch-head-" aria-label="Smaller head">&minus;</button><b id="ch-head"></b><button id="ch-head+" aria-label="Bigger head">+</button></div>
+     <div class="chrow"><span>Head</span><div id="ch-htype"></div></div>
      <div class="chrow"><span>Line thickness</span><button id="ch-lw-" aria-label="Thinner lines">&minus;</button><b id="ch-lw"></b><button id="ch-lw+" aria-label="Thicker lines">+</button></div>
      <div class="chrow"><span>Stance</span><div id="ch-stance"></div></div>
      <div class="chrow"><span></span><button id="ch-del" class="chdel">DELETE THIS FIGHTER</button></div>
@@ -172,40 +173,40 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=24" defer></script>
-<script src="js/input.js?v=24" defer></script>
-<script src="js/data/moves.js?v=24" defer></script>
-<script src="js/data/enemies.js?v=24" defer></script>
-<script src="js/data/levels.js?v=24" defer></script>
-<script src="js/data/items.js?v=24" defer></script>
-<script src="js/data/house.js?v=24" defer></script>
-<script src="js/economy.js?v=24" defer></script>
-<script src="js/player.js?v=24" defer></script>
-<script src="js/effects.js?v=24" defer></script>
-<script src="js/combat.js?v=24" defer></script>
-<script src="js/terrain.js?v=24" defer></script>
-<script src="js/enemies.js?v=24" defer></script>
-<script src="js/modes.js?v=24" defer></script>
-<script src="js/level.js?v=24" defer></script>
-<script src="js/versus.js?v=24" defer></script>
-<script src="js/pickups.js?v=24" defer></script>
-<script src="js/net/rtc.js?v=24" defer></script>
-<script src="js/net/session.js?v=24" defer></script>
-<script src="js/ragdoll.js?v=24" defer></script>
-<script src="js/scenery.js?v=24" defer></script>
-<script src="js/looks.js?v=24" defer></script>
-<script src="js/house.js?v=24" defer></script>
-<script src="js/render.js?v=24" defer></script>
-<script src="js/ui/panels.js?v=24" defer></script>
-<script src="js/ui/training.js?v=24" defer></script>
-<script src="js/ui/touch-layout.js?v=24" defer></script>
-<script src="js/ui/lobby.js?v=24" defer></script>
-<script src="js/ui/online.js?v=24" defer></script>
-<script src="js/ui/bindings.js?v=24" defer></script>
-<script src="js/ui/character.js?v=24" defer></script>
-<script src="js/ui/house.js?v=24" defer></script>
-<script src="js/ui/backup.js?v=24" defer></script>
-<script src="js/selftest.js?v=24" defer></script>
-<script src="js/main.js?v=24" defer></script>
+<script src="js/core.js?v=25" defer></script>
+<script src="js/input.js?v=25" defer></script>
+<script src="js/data/moves.js?v=25" defer></script>
+<script src="js/data/enemies.js?v=25" defer></script>
+<script src="js/data/levels.js?v=25" defer></script>
+<script src="js/data/items.js?v=25" defer></script>
+<script src="js/data/house.js?v=25" defer></script>
+<script src="js/economy.js?v=25" defer></script>
+<script src="js/player.js?v=25" defer></script>
+<script src="js/effects.js?v=25" defer></script>
+<script src="js/combat.js?v=25" defer></script>
+<script src="js/terrain.js?v=25" defer></script>
+<script src="js/enemies.js?v=25" defer></script>
+<script src="js/modes.js?v=25" defer></script>
+<script src="js/level.js?v=25" defer></script>
+<script src="js/versus.js?v=25" defer></script>
+<script src="js/pickups.js?v=25" defer></script>
+<script src="js/net/rtc.js?v=25" defer></script>
+<script src="js/net/session.js?v=25" defer></script>
+<script src="js/ragdoll.js?v=25" defer></script>
+<script src="js/scenery.js?v=25" defer></script>
+<script src="js/looks.js?v=25" defer></script>
+<script src="js/house.js?v=25" defer></script>
+<script src="js/render.js?v=25" defer></script>
+<script src="js/ui/panels.js?v=25" defer></script>
+<script src="js/ui/training.js?v=25" defer></script>
+<script src="js/ui/touch-layout.js?v=25" defer></script>
+<script src="js/ui/lobby.js?v=25" defer></script>
+<script src="js/ui/online.js?v=25" defer></script>
+<script src="js/ui/bindings.js?v=25" defer></script>
+<script src="js/ui/character.js?v=25" defer></script>
+<script src="js/ui/house.js?v=25" defer></script>
+<script src="js/ui/backup.js?v=25" defer></script>
+<script src="js/selftest.js?v=25" defer></script>
+<script src="js/main.js?v=25" defer></script>
 </body>
 </html>

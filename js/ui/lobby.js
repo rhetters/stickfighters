@@ -84,7 +84,8 @@ function lbDraw(cv2, r) {
       L.lw,
       o,
       L.head,
-      lookLayers(f, { face: 1, s: 0.72 * L.ht }, 1)
+      lookLayers(f, { face: 1, s: 0.72 * L.ht }, 1),
+      L.hfull
     );
     drawLook(f, { ...o, face: 1, s: 0.72 * L.ht }, 1, 'front');
   });

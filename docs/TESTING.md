@@ -25,9 +25,9 @@ Each test opens `index.html` from disk in a headless browser, plays scripted inp
 | `cptest` | Blocking and Winded |
 | `bindtest` | Settings → Buttons for keys and controllers |
 | `m9lobby`, `m9vs`, `pm9test` | Players screen, Versus, co-op, teams, player grabs |
-| `menu2test`, `navtest` | Title menu with a controller (and its orange poof), the title art, Settings scrolling from its top, Esc backing out of Settings, directional menu navigation |
+| `menu2test`, `navtest` | Title menu with a controller (and its orange poof), the title art, Settings scrolling from its top, Esc backing out of Settings, the multiplayer drawing, directional menu navigation |
 | `m10test` | Stars, store, saved fighters, save migration, pose wheel |
-| `m18test` | Menu highlight (nothing lit until navigated), house builder: Customize menu, prices and full refunds, barriers and layering (fills inside stairs, erase front to back, floor and side wall in one square), the full-frame editor, the land growing, moving and zooming, save version 8 (upgraded from 5, 6 and 7), walking around (Esc returns to the builder, passing through stairs, Up to climb, staying on your level, Up / Down taking stairs going that way (including where two staircases meet), floors and stairs sharing a square, gloves and shoes following line width, ladders and spiral stairs, landing, dropping through, poses on an upper floor, side walls stop you), the camera keeping far-apart players on screen; online: visiting the host's house, Versus teams, the room fitting without a scroll bar |
+| `m18test` | Menu highlight (nothing lit until navigated), house builder: Customize menu, prices and full refunds, barriers and layering (fills inside stairs, erase front to back, floor and side wall in one square), the full-frame editor, the land growing, moving and zooming, saving at the current version (upgraded from 5), walking around (Esc returns to the builder, passing through stairs, Up to climb, staying on your level, Up / Down taking stairs going that way (including where two staircases meet), floors and stairs sharing a square, gloves and shoes following line width, ladders and spiral stairs, landing, dropping through, poses on an upper floor, side walls stop you), the camera keeping far-apart players on screen, head types (save version 11, full heads filled); online: visiting the host's house, Versus teams, the room fitting without a scroll bar |
 | `spam` | Fast touch spamming on a phone-sized screen |
 | `nettest`, `nettest2`, `nettest3`, `netlag` | Online: rooms, joining, every mode, leaving, direct links and a blocked link, desync detection, 100 ms of simulated lag |
 
@@ -48,7 +48,7 @@ To add a test: copy a similar one, keep the `ok(condition, 'what it means')` lin
 - Block (Surge + down, standing still): kneels and shakes harder as Surge drains; hits from behind and hits after Surge runs out land. Hitting a downed enemy flops it around and it still gets up on time.
 - A Guard breaking, a Flanker leap, a Captain on wave 5 (enrages at about half health).
 - Ragdolls, death poses, confetti cleanup.
-- Character: try on and buy an item, the pose wheel in a fight (hold POSE, aim, let go), stars dropping and flying to you.
+- Character: switch the head between Donut and Full, try on and buy an item, the pose wheel in a fight (hold POSE, aim, let go), stars dropping and flying to you.
 - House: drag walls with a finger, build a tall tower with floors and stairs, climb it in WALK AROUND, erase (stars come back), and visit a host's house online.
 - Training Room: spawn 1–6, hitboxes, frame data, speeds, freeze/step, Feel / Moves / Info.
 - Gamepad works; rotate-to-landscape prompt; the game pauses when you switch apps.
