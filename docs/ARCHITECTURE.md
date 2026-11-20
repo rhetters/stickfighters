@@ -46,6 +46,8 @@ How the code fits together: files, the simulation, and how each system works. Up
 
 Nothing runs game code at load except data setup; boot (`checkUnlocks(); init(); applySet(); resize(); bindSettings(); syncTrain(); openTitle(); requestAnimationFrame(loop)`) is the last thing in `main.js`.
 
+Pictures live in `img/` and are used from the stylesheet (`img/title.jpg` is the title screen art; `tools/bundle.py` inlines them for the preview).
+
 Outside the game: `tools/tests/` (browser tests, run with `node tools/tests/run.js`) and `tools/bundle.py` (the single-file preview). Nothing in `tools/` is loaded by `index.html`.
 
 **Cache-busting:** every asset tag carries `?v=N`. Bump N on every release so iPads never mix old and new files.
@@ -119,6 +121,10 @@ Gloves and shoes scale with `limbK(J)` (the fighter's line width against the def
 House mode turns floors and stairs into surfaces, sides into walls and climbs into climbs (`houseTerrain`), draws from cached lists (`houseLists`, remade when a layer object changes) culled to the view, and frames every player at draw time (`houseCamera`: zooms out as far as 8%; nothing in House mode's simulation reads `CAM`). Online, `start` carries the host's house (`m.house`), so every device builds the same terrain.
 
 Editor (ui/house.js): the canvas fills the screen; the floor line is raised to `HS_FLOOR` (270 of 420) so the tabs and pieces sit on the floor (`.hsfloor`), with the message, stars and buttons, D-pad and zoom laid over the scene. `hsCam()` gives the editor's camera; three zoom levels (`HS_ZOOM`: 20, 40 or 60 squares across); every square in view is a button (`houseCells`).
+
+## Screen layout
+
+`.screen` stacks its contents in a column. Centered screens are centered by two growing spacers (`::before` / `::after`) rather than `justify-content: center`, so a screen taller than the frame (Settings) scrolls from its top instead of cutting it off. Screens that start at the top hide the spacers. The title screen uses them for its art instead: a blurred copy fills the frame's sides and the whole picture sits in the middle; with container queries, the menu is sized in `cqh` (percent of the frame's height) so it stays in the gap between the fighters on any screen.
 
 ## Menu highlight
 

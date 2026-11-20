@@ -96,11 +96,30 @@ canvas {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
   padding: 12px;
   gap: 4px;
   overflow: auto;
+}
+/* Centered screens that grow taller than the frame scroll from their top: two growing spacers do the centering
+   (justify-content: center would push the top out of reach) */
+.screen::before,
+.screen::after {
+  content: '';
+  flex: 1 0 0;
+}
+#s-online::before,
+#s-online::after,
+#s-lobby::before,
+#s-lobby::after,
+#s-binds::before,
+#s-binds::after,
+#s-house::before,
+#s-house::after,
+.screen.wide::before,
+.screen.wide::after {
+  display: none;
 }
 .screen h1 {
   margin: 0 0 2px;
@@ -977,7 +996,70 @@ body.padnav #ui select:focus {
 /* Title menu (menu v2): the title stays put, and a split row covers the button it replaces */
 #s-title {
   justify-content: flex-start;
-  padding-top: clamp(6px, 5vh, 56px);
+  /* the title art: the name is part of the picture, and the menu sits in the space between the fighters */
+  background: #141020;
+  isolation: isolate;
+  overflow: hidden;
+  padding-top: 12.5%;
+}
+/* the whole picture, with a blurred, darker copy filling the frame's wider sides */
+#s-title::before,
+#s-title::after {
+  display: block;
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url(../img/title.jpg) center / contain no-repeat;
+}
+#s-title::before {
+  background-size: cover;
+  filter: blur(12px) brightness(0.55);
+  transform: scale(1.08);
+}
+#s-title h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+#s-title #press {
+  color: #fff;
+  -webkit-text-stroke: 1.5px #1c1626;
+  text-shadow: 0 3px 0 #1c1626;
+  margin-top: 6%;
+}
+#s-title #press .tapalso {
+  -webkit-text-stroke: 0;
+  text-shadow: 0 1px 3px #000;
+}
+#s-title .btn {
+  box-shadow: 0 3px 0 #1c1626;
+}
+/* Sized to the frame (not the window) so the menu stays in the space between the fighters on any screen */
+@supports (container-type: size) {
+  #s-title {
+    container-type: size;
+    padding-top: 0;
+  }
+  #s-title #press {
+    margin-top: 52cqh;
+    font-size: 7cqh;
+  }
+  #s-title #tmenu {
+    margin-top: 30.5cqh;
+    gap: 1.2cqh;
+  }
+  #s-title .btn {
+    font-size: 4.6cqh;
+    padding: 1.5cqh 3cqh;
+    margin: 0;
+    min-height: min(44px, 11cqh); /* phones: still a big target, but the menu fits under the name */
+  }
+  #s-title .split {
+    gap: 1.6cqh;
+  }
 }
 #tmenu .btn {
   margin: 2px 0;
