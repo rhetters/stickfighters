@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: ladders, climbing and a few fixes (November 19, 2026)
+- **Ladders** (new) and **spiral stairs** (now straight up and down) are climbed: hold Up to climb, Down to go down, let go to hang on; Jump or walk sideways to get off, or walk off the top onto a floor.
+- **Stairs:** Up always walks up them and Down always walks down, whichever way you face. Down at the top of a staircase walks down it.
+- Hats, hair and headbands now cover the head's outline: they reach its outer edge at any head size and line thickness.
+- Fixed (online): a match could freeze at the start ("Waiting for the connection…") when another player's first button presses arrived before this device got the host's start message, most likely with 3 or 4 players. Early presses are now kept and used.
+- Save version 9: ladders and spiral stairs are kept in their own layer; old spiral stairs move there.
+- Self-test fingerprints unchanged.
+- Version 20.
+
 ## M18 in progress: barriers, a bigger building view, and fixes (November 19, 2026)
 - House: **Floors & Stairs** is now **Barriers**, all drawn as black lines: a floor along a square's bottom edge, a **side wall** along its right edge (nobody walks or flies through it), stairs (just the steps) and **spiral stairs**. Walking into stairs from the floor passes through them; **hold Up** to step onto them and walk up.
 - Layering: a wall painted on stairs fills only inside the steps (wood wall, then stairs, then stone = stone stairs in front of a wood wall). Erase goes front to back: the stone, then the stairs, then the wood.
