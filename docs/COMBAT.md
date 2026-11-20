@@ -10,7 +10,7 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 - A comma means the next press within the chain window (about 30 frames after the previous move). A new press can cancel in about halfway through a move.
 - Changing direction mid-string starts that direction’s first move.
 - **Effects:** Stagger (short flinch), Pop (small lift), Launch (airborne, juggle), Knockdown, Trip, Splat (bounces off a wall for extra damage), Bounce (ground bounce), Pushback.
-- **Unlock:** Start means available at the beginning. Other values are tree branches (FST fists, LEG legs) and tiers.
+- **Unlock:** Start means every fighter has it. Otherwise it's the skill-tree node that unlocks it (branch: node; nodes above row 1 need points lower in that branch first). The tree itself is in `js/data/skills.js` and the M12 plan in ROADMAP.md.
 
 ## A. Ground: Neutral and Forward
 
@@ -18,14 +18,14 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 |---|---|---|---|---|
 | N+P | Jab | Lead arm snaps out, small step in, slight lean | Stagger | Start |
 | N+P, P | Cross | Rear arm punch with hip twist, lunge forward | Stagger | Start |
-| N+P, P, P | Haymaker | Arm winds back, crouch, big swing, body rotates, ends off-balance | Knockdown, Splat | FST-1 |
+| N+P, P, P | Haymaker | Arm winds back, crouch, big swing, body rotates, ends off-balance | Knockdown, Splat | Fists: Haymaker |
 | N+K | Front Kick | Knee lifts, leg thrusts forward, lean back | Pushback | Start |
 | N+K, K | High Kick | Opposite leg, higher arc | Stagger, Pop | Start |
 | N+K, K, K | Flip Kick | Backflip with leg arc | Launch | Start |
-| N+P, K | Knee Strike | Hop in, rising knee, hands pull down | Pop | FST-2 |
-| N+P, P, K | Spin Back-Kick | 180° spin, rear leg thrust | Knockdown | LEG-2 |
-| N+K, P | Palm Thrust | Step through the kick into an open-palm push | Pushback, Splat | LEG-1 |
-| N+K, K, P | Elbow Smash | Close step, elbow drives forward and down | Knockdown | FST-2 |
+| N+P, K | Knee Strike | Hop in, rising knee, hands pull down | Pop | Fists: Knee and Elbow (row 2) |
+| N+P, P, K | Spin Back-Kick | 180° spin, rear leg thrust | Knockdown | Legs: Spin Back-Kick (row 2) |
+| N+K, P | Palm Thrust | Step through the kick into an open-palm push | Pushback, Splat | Legs: Palm Thrust |
+| N+K, K, P | Elbow Smash | Close step, elbow drives forward and down | Knockdown | Fists: Knee and Elbow (row 2) |
 
 ## B. Ground: Up held
 
@@ -35,19 +35,19 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 | U+P, P | High Cross | Opposite arm, same angle, shoulder rotates | Pop | Start |
 | U+P, P, P | Rising Uppercut | Crouch, leap, full uppercut | Launch | Start |
 | U+K | Sky Kick | Diagonal high kick with a small hop | Pop, anti-air | Start |
-| U+K, K | Twin Sky Kick | Alternate leg, second hop | Pop | LEG-1 |
-| U+K, K, K | Somersault Kick | Backflip, leg sweeps upward, brief invulnerability | Launch (higher) | LEG-2 |
+| U+K, K | Twin Sky Kick | Alternate leg, second hop | Pop | Legs: Twin Kicks |
+| U+K, K, K | Somersault Kick | Backflip, leg sweeps upward, brief invulnerability | Launch (higher) | Legs: Flips (row 2) |
 
 ## C. Ground: Down held
 
 | Input | Move | Animation output | Effect | Unlock |
 |---|---|---|---|---|
 | D+P | Gut Punch | Crouch, low punch to the midsection | Stagger (low hit) | Start |
-| D+P, P | Double Low Hook | Alternate arm, hook rises from crouch | Stagger | FST-1 |
-| D+P, P, P | Ground Pound | Drop to one knee, overhand smash into floor, shock ring | Bounce, small area hit | FST-3 |
+| D+P, P | Double Low Hook | Alternate arm, hook rises from crouch | Stagger | Fists: Low Hooks |
+| D+P, P, P | Ground Pound | Drop to one knee, overhand smash into floor, shock ring | Bounce, small area hit | Fists: Ground Pound (row 3) |
 | D+K | Leg Sweep | Crouch, spin with leg extended low | Trip | Start |
-| D+K, K | Reverse Sweep | Spin the other way | Trip again | LEG-1 |
-| D+K, K, K | Axe Kick | Stand, leg rises overhead, heel drops | Bounce | LEG-3 |
+| D+K, K | Reverse Sweep | Spin the other way | Trip again | Legs: Twin Kicks |
+| D+K, K, K | Axe Kick | Stand, leg rises overhead, heel drops | Bounce | Legs: Axe Kick (row 3) |
 
 ## D. Air
 
@@ -55,12 +55,12 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 |---|---|---|---|---|
 | J, then P | Air Jab | Tuck, quick lead jab | Stagger | Start |
 | J, then P, P | Air Cross | Opposite arm | Stagger | Start |
-| J, then P, P, P | Air Flurry | Three rapid jabs, fall slows slightly | Stagger | FST-2 |
+| J, then P, P, P | Air Flurry | Three rapid jabs, fall slows slightly | Stagger | Fists: Air Fists (row 2) |
 | J, then K | Flying Kick | Leg fully extended, body horizontal | Pushback | Start |
-| J, then K, K | Scissor Kick | Both legs snap in sequence | Stagger | LEG-1 |
+| J, then K, K | Scissor Kick | Both legs snap in sequence | Stagger | Legs: Scissor Kick |
 | J, then D+K | Dive Kick | Diagonal dive, shock ring on landing | Knockdown | Start |
-| J, then D+P | Spike Fist | Both fists overhead, slam downward | Bounce | FST-2 |
-| J, then U+K | Rising Scissor | Upward diagonal kick, good for juggles | Pop | LEG-2 |
+| J, then D+P | Spike Fist | Both fists overhead, slam downward | Bounce | Fists: Air Fists (row 2) |
+| J, then U+K | Rising Scissor | Upward diagonal kick, good for juggles | Pop | Legs: Flips (row 2) |
 
 ## E. Surge (hold S; costs yellow stamina)
 
@@ -83,6 +83,8 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 | S+J, then P | Air Rave | Four hovering aerial hits | Spike | 25 |
 | S+J, then K | Comet Kick | Surge dive, longer reach | Splat, Knockdown | 25 |
 | S+Down (standing still) | Block | Kneel with arms up; trembles harder as Surge drains | Hits from the front cost Surge (2× the hit's damage) instead of health, no stun; holding drains 8/s; when Surge runs out you're Winded and hits land | 8/s + per hit |
+
+**Surge move unlocks:** Flash Strike and Rush Kick are Start. Surge: Low Surge opens Quake Fist and Phase Sweep, Surge Strings opens Barrage and Whirlwind, Rising Surge (row 2) opens Phoenix Fist and Sky Cutter, Air Surge (row 2) opens Air Rave and Comet Kick, Big Finishers (row 3) opens Shockwave Palm and Meteor Kick. A locked Surge move falls back to Flash Strike or Rush Kick (or the plain move in the air). Up Throw and Slam need Body: More Throws; without it they're a Forward Throw.
 
 **Stamina starting values:** max 100, regen 25 per second after a 0.6 second delay, empty bar means a 1.5 second Winded state. All tunable.
 
@@ -109,3 +111,13 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 | then ↓ + K | Slam | Lift overhead, drop to one knee, slam | Bounce, shock ring |
 | hold too long (1.7 s) | Escape | The enemy breaks free | None |
 
+## H. Ultimates (ULT, when the blue meter is full)
+
+Each fighter picks one branch it has a point in; the step comes from its level (5, 15, 30). Every ultimate starts with a burst in the branch's colour, a short slow-motion moment and its name on screen, and the fighter can't be hurt while it plays.
+
+| Branch | Level 5 | Level 15 | Level 30 |
+|---|---|---|---|
+| Fists | Flurry: fast alternating punches, the last one launches | Hundred Fists: longer, walking forward, the last one launches | Comet Fist: leap, crash down fist-first, big shockwave |
+| Legs | Spin Kick: one low spin, hits both sides | Twisting Kick: rising spin moving forward, last spin launches | Tornado Kick: high spinning kick across the screen |
+| Surge | Surge Dash: phase dash through everyone, lightning | Lightning Rush: three dashes back and forth | Thunder Step: five dashes, then a thunderclap that launches everyone near |
+| Body | Shoulder Charge: armored charge that bowls through | Quake Stomp: jump and stomp, area knockdown | Earthshaker: three stomps, each shockwave bigger, the last launches |

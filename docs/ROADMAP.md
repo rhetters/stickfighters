@@ -27,33 +27,25 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
-| M18 | House builder and visiting | Next | L | M10, M11 | Build a house with stars, invite friends over |
+| M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
 ## Upcoming milestones
 
-### M12 · XP, levels, skill tree
+### M12 · XP, levels, skill tree (in progress)
 
-**Goal:** A reason to keep fighting. Ninja stars already exist, so respecs can cost stars from day one. Online play means skills and stats must be shared at the start of a match, the way looks are. Decide the unlock approach first (Open decisions, item 2).
+**Goal:** a reason to keep fighting. Each saved fighter earns XP, levels up to 30 and spends skill points in a tree. Decided by Ron and Rhett (November 19): moves beyond the basics are locked and earned back; respecs are free, one point at a time or all at once; each fighting branch has its own ultimate in three steps; in Versus your moves and ultimate count but stats are even; balance favors small boosts that add up over many levels, not sudden spikes; everything stays in the game's style.
 
-- XP from kills (by enemy type), combo bonuses, variety bonuses (using many different moves), no-damage bonuses, and level clears.
-- Level curve: XP needed per level = 100 × level^1.4, cap 30 for v1. One skill point per level, plus a bonus point every fifth level.
-- Skill tree screen that works by touch and controller, with tooltips and a button to preview a move’s animation. Respec costs ninja stars.
-- Starting style in character creation: Brawler, Kicker or Sprinter, which sets your first skill point.
-- Stats system: HP, damage, Surge max, regen, and costs, all editable by skills. Progress lives in the save (with a save version, rule R6).
+- **XP and levels** (per saved fighter): every player in the fight earns XP for each enemy beaten (by type, Captain most), plus a bonus for clearing a level or an Arcade wave and a small Versus reward. XP is banked when a run ends. XP for the next level = 40 × level^1.5. One skill point per level from level 2, plus a bonus point at 5, 10, 15, 20, 25 and 30 (35 points at level 30; the tree holds about 65, so builds differ).
+- **Tree:** five branches (Fists, Legs, Surge, Body, Fortune), four rows each. A row opens after 0 / 3 / 6 / 10 points in that branch's lower rows. Nodes either unlock moves (the old FST and LEG tiers, the Surge moves, Up Throw and Slam) or give small stat boosts with up to 3 ranks (+3% punch or kick damage, +3% kick reach, +6 Surge, faster Surge refill, cheaper Surge moves, 3% less damage taken, faster get-up, stronger throws, more XP or stars). Capstones: punches or kicks fill the ultimate meter faster, shorter Winded, Second Wind (get back up once per run), Lucky Streak.
+- **Respec:** tap a node to add or take back a point (taking back is refused only if a higher row would lose its requirement); RESET returns every point. Free.
+- **Ultimates** (ULT button, blue meter): pick one branch you have a point in. Step 1 at level 5, step 2 at 15, step 3 at 30. Fists: Flurry → Hundred Fists → Comet Fist. Legs: Spin Kick → Twisting Kick → Tornado Kick. Surge: Surge Dash → Lightning Rush → Thunder Step. Body: Shoulder Charge → Quake Stomp → Earthshaker. Fortune has none.
+- **Basics everyone has:** Jab, Cross, Front Kick, High Kick, Flip Kick, Sky Jab, High Cross, Rising Uppercut, Sky Kick, Gut Punch, Leg Sweep, Air Jab, Air Cross, Flying Kick, Dive Kick, Flash Strike, Rush Kick, grab, pummel and the forward and back throws.
+- **Testing:** a temporary TEST row on the skills screen adds levels; it lives in one file so it can be removed cleanly.
+- Online, a fighter's tree travels with its looks, so every device plays the same build. The self-test plays with everything unlocked and no boosts, so its fingerprints don't change.
 
-**Draft skill tree (five branches):**
-
-| Branch | Tier 1 | Tier 2 | Tier 3 | Capstone |
-|---|---|---|---|---|
-| Fists | Hard Knuckles (+punch damage) | Low Hooks, Spike Fist | Ground Pound, Surge Barrage | Hundred Fists (Surge string) |
-| Legs | Twin Sky Kick, Reverse Sweep | Somersault Kick, Scissor Kick | Axe Kick, Meteor Kick | Comet Barrage |
-| Surge | Bigger bar, faster regen | Cheaper strings | Longer phase, air Surge hop | Endless Surge (brief unlimited Surge) |
-| Body | More HP | Faster get-up, less stagger | Armor on heavy moves | Second Wind (one revive per level) |
-| Fortune | Star magnet | Bonus XP | Treasure sense (hidden chests sparkle) | Lucky Streak (combo-based star bonus) |
-
-**Done when:** Level-ups give points, spending them changes your moves and stats visibly, and everything saves.
+**Done when:** level-ups give points, spending them changes your moves and stats visibly, each branch's ultimate works at all three steps, and everything saves.
 
 ### M13 · Levels 2–5, themes and procedural runs
 
@@ -97,13 +89,6 @@ A short prototype first: jump-through platforms, real stairs, and vertical camer
 
 **Done when:** Rhett builds a level on the iPad, plays it, and sees his chunks appear in generated runs.
 
-### M18 · House builder and visiting (in progress)
-
-- Built so far (versions 16 and 17): Customize → House; a side-view land up to 240 x 60 squares that grows as you build; walls, floors and stairs per square; furniture, decorations and backgrounds; Erase refunds everything; Walk Around with floors and stairs as terrain; visiting the host's house online. Details in CHANGELOG.md.
-- Reopened November 17: Ron and Rhett are trying it and adding to the list.
-
-**Done when:** Ron and Rhett say the house builder is finished.
-
 ### M11.5 · Rollback for online play (suggested before Steam)
 
 - Why: Versus at 58 ping felt laggy in the first real test. The direct-connection patch halved the delay; rollback removes most of the rest.
@@ -120,11 +105,9 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 ## Open decisions
 
 1. **Back moves.** Add Back+P Backfist and Back+K Back Kick, which hit behind you? Not in the combat chart yet.
-2. **Unlock approach (decide before M12).** Today every move is unlocked, and each carries its tier (FST-1, LEG-2 and so on) so the skill tree can lock them. Start with the base strings and unlock the rest, or start with everything and unlock upgrades?
-3. **Ultimate name.** The Tornado Kick keeps its own blue meter, separate from Surge. Rename it Typhoon?
 
 Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocking) are in the archive.
 
 ## Suggested next step
 
-For M12, settle the unlock approach first (Open decisions, item 2).
+Finish M12, then M13 (Levels 2–5).

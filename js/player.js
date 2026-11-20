@@ -25,7 +25,7 @@ const infS = () => state === 'train' && TR.inf;
 const canSurge = p => !p.stm.winded && (p.stm.v > 0 || infS());
 function wind(p) {
   p.stm.v = 0;
-  p.stm.winded = Math.round(SURGE.winded * 60);
+  p.stm.winded = Math.round(SURGE.winded * 60 * (1 - modOf(p, 'wind')));
   if (SET.surge === 'toggle') {
     const I = INP[p.slot];
     I.sl = false;
@@ -55,7 +55,7 @@ function stamTick(p) {
   const STM = p.stm;
   if (STM.flash > 0) STM.flash--;
   if (infS()) {
-    STM.v = SURGE.max;
+    STM.v = p.smax;
     STM.winded = 0;
     return;
   }
@@ -63,7 +63,8 @@ function stamTick(p) {
     if (--STM.winded === 0) STM.last = fr - SURGE.delay * 60;
     return;
   }
-  if (!p.running && fr - STM.last > SURGE.delay * 60) STM.v = Math.min(SURGE.max, STM.v + SURGE.regen / 60);
+  if (!p.running && fr - STM.last > SURGE.delay * 60)
+    STM.v = Math.min(p.smax, STM.v + (SURGE.regen * (1 + modOf(p, 'sreg'))) / 60);
 }
 // Picks the move for a button from the route table (aim + Surge captured at the press), and keeps strings going.
 function pick(f, btn, chain, plain) {
@@ -74,15 +75,18 @@ function pick(f, btn, chain, plain) {
   const grp = ROUTE[(sg ? 's' : '') + (air ? 'a' : 'g')],
     tbl = grp[aim] || grp.n,
     key = (sg ? 's' : '') + (air ? 'a' : 'g') + aim;
+  // a move the fighter's skill tree hasn't unlocked yet is skipped: the string starts over, then the plain version
+  const open = n => n && !(f.bd && f.bd.locked.has(n));
   let seq = (chain && f.ckey === key ? f.seq : '') + btn;
-  if (!tbl[seq]) seq = btn;
+  if (!open(tbl[seq])) seq = btn;
   let name = tbl[seq];
-  if (!name) {
+  if (!open(name)) {
     name = grp.n[btn];
     seq = btn;
   }
+  if (!open(name) && !plain) return pick(f, btn, false, true);
   const mv = A[name];
-  if (mv.cost && !spend(f, mv.cost)) return pick(f, btn, false, true);
+  if (mv.cost && !spend(f, mv.cost * (1 - modOf(f, 'scost')))) return pick(f, btn, false, true);
   f.ckey = key;
   f.seq = seq;
   return mv;
@@ -144,6 +148,7 @@ function mkPlayer(x, slot, col, d2) {
   const p = F(x, 0, 1);
   p.slot = slot;
   p.stm = { v: SURGE.max, last: -999, winded: 0, flash: 0 };
+  p.smax = SURGE.max;
   Object.assign(p, { combo: 0, comboT: 0, meter: 0, hpT: 100 });
   if (col) {
     p.col = col;
@@ -185,11 +190,16 @@ function init() {
     p.look = L;
     p.name = r.name || (L && L.name) || 'ORANGE';
     p.team = r.team;
+    // Progress: the tree this player fights with, and which saved fighter (on this device) banks their XP
+    p.prog = r.prog || (ROSTER.length ? null : curFighter().prog);
+    p.fi = ROSTER.length ? r.fi : CHR.cur;
+    setBuild(p);
     return p;
   });
   PK = [];
   RUN.stars = 0;
   RUN.items = [];
+  RUN.xp = 0;
   camX = camY = 0;
   E = [];
   FX = [];
@@ -202,7 +212,7 @@ function init() {
 // ===== PLAYER =====
 // Kneeling block pose. It trembles harder as the Surge bar empties, and flinches when a hit is blocked.
 function blockPose(f) {
-  const weak = 1 - f.stm.v / SURGE.max,
+  const weak = 1 - f.stm.v / f.smax,
     amp = 1 + weak * 7 + (f.blkT > 0 ? f.blkT * 0.8 : 0),
     j = Math.sin(f.t * 1.9) * amp,
     j2 = Math.cos(f.t * 2.3) * amp;
@@ -307,6 +317,7 @@ function updP(f) {
     tp = LIE;
     f.pose[9] = 90;
     f.vx *= 0.8;
+    f.dt -= modOf(f, 'rise'); // Quick Rise (skill tree)
     if (--f.dt <= 0) {
       f.st = 'getup';
       f.dt = 14;
@@ -331,7 +342,8 @@ function updP(f) {
       const m = (K.r ? 1 : 0) - (K.l ? 1 : 0);
       if (want('k')) {
         eat('k');
-        throwE(f, e, K.u ? 'u' : K.d ? 'd' : m && m !== f.face ? 'b' : 'f');
+        const dir = K.u ? 'u' : K.d ? 'd' : m && m !== f.face ? 'b' : 'f';
+        throwE(f, e, f.bd && f.bd.locked.has({ u: 'tup', d: 'tslam' }[dir]) ? 'f' : dir);
       } else if (want('p') && f.pt <= 0 && f.pum < 3) {
         eat('p');
         f.pum++;
@@ -514,16 +526,19 @@ function updP(f) {
       f.running = 0;
       dust(f.x, f.gy, 6);
       sfx(300, 0.2, 'sawtooth', 0.04, -200);
-    } else if (want('x') && f.meter >= 100) {
+    } else if (want('x') && f.meter >= 100 && f.bd && f.bd.ult) {
+      // the ultimate: the step of the chosen branch's ultimate this fighter's level has opened (skill tree)
       eat('x');
       f.meter = 0;
-      go(A.tornado);
+      const u = f.bd.ult;
+      go(u);
       f.inv = 999;
-      f.vy = -6;
+      if (u.tatsu) f.vy = -6;
       zoom = 0.05;
       shake = 6;
-      bn('TORNADO KICK!');
+      bn(u.nm.toUpperCase() + '!');
       sfx(150, 0.5, 'sawtooth', 0.07, 500);
+      if (u !== A.tornado) ultBurst(f, u);
     }
     if (f.st === 'free') {
       if (f.flip > 0) {

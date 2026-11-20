@@ -2,7 +2,7 @@
 // ===== ECONOMY (VISION.md rule R7) =====
 // Stars change only through grantStars / spendStars, and ownership only through grantItem / buyItem, so this file
 // can one day ask a server instead of trusting the device. Nothing here changes how anyone fights (rule R8).
-const RUN = { stars: 0, items: [] }; // what this run earned, for the results screen
+const RUN = { stars: 0, items: [], xp: 0, last: [] }; // what this run earned, for the results screen
 let ecoTimer = 0;
 // Saving after every star would write the save many times a second, so wait a moment and save once.
 function ecoSave(now) {
@@ -119,7 +119,8 @@ function normFighter(c, any) {
     lw: Math.round(num(f.lw, 5, 10, 7)),
     stance: STANCES.some(s => s.id === f.stance) ? f.stance : d.stance,
     eq,
-    wheel: wheel.length ? wheel : ['pose-flex']
+    wheel: wheel.length ? wheel : ['pose-flex'],
+    prog: normProg(f.prog)
   };
 }
 // A house with every field valid: unknown squares, materials, solids and items dropped, everything kept on the land.
@@ -209,13 +210,18 @@ function deleteFighter(i) {
 // End of a run: bank anything still on the ground, check unlocks, and write the stars line for the results screen.
 function runEnd(el, extra) {
   collectAll();
+  const xpLine = runXP(extra),
+    lucky = RUN.last.reduce((m, r) => Math.max(m, r.stars), 0); // Fortune: the luckiest player's bonus
+  if (lucky && RUN.stars) grantStars(Math.round(RUN.stars * lucky), 'fortune');
   const got = checkUnlocks(extra);
   ecoSave(true);
   const items = [...new Set(RUN.items)].map(id => ITEM[id].name);
   $(el).textContent =
     (RUN.stars
       ? '+' + RUN.stars + ' ninja stars (you have ' + ECO.stars + ')'
-      : 'Ninja stars: ' + ECO.stars) + (items.length ? ' · NEW: ' + items.join(', ') + '!' : '');
+      : 'Ninja stars: ' + ECO.stars) +
+    (items.length ? ' · NEW: ' + items.join(', ') + '!' : '') +
+    (xpLine ? ' · ' + xpLine : '');
   return got;
 }
 // The star counter in the HUD jumps a little when stars come in

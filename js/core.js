@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 26;
+const GAME_VERSION = 27;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -50,7 +50,8 @@ const HOUSE = {
 //   v9: ladders and spiral stairs (now climbed straight up) live in house.climbs; old spiralR / spiralL move there
 //   v10: floors get their own layer (house.floors), so a floor and stairs can share a square
 //   v11: fighters gain headType ('donut' = the ring head they always had, or 'full')
-const SAVE_VERSION = 11;
+//   v12: fighters gain prog = { xp, sk (skill points by node id), ult (the branch whose ultimate they use) }
+const SAVE_VERSION = 12;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -110,6 +111,11 @@ function migrate(s) {
     if (s.chr && Array.isArray(s.chr.list))
       for (const f of s.chr.list) if (f && !f.headType) f.headType = 'donut';
     s.saveVersion = 11;
+  }
+  if (s.saveVersion === 11) {
+    if (s.chr && Array.isArray(s.chr.list))
+      for (const f of s.chr.list) if (f && !f.prog) f.prog = { xp: 0, sk: {}, ult: null };
+    s.saveVersion = 12;
   }
   return s;
 }

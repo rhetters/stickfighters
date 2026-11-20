@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 const S=process.argv[2];let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];
 const p=await b.newPage({viewport:{width:1280,height:800}});p.on('pageerror',e=>errs.push(e.message));
-await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.click('#b-train');await p.waitForTimeout(300);
+await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.click('#b-train');await p.waitForTimeout(300);await p.evaluate('PL.forEach(p=>p.bd=FULL_BUILD)'); // every move open (the skill tree is tested in m12test)
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms),key=async(k,ms=60)=>{await p.keyboard.press(k);await W(ms)};
 await ev(`window.IMP=[];const _i=impact;impact=function(w,dr,x,y,k){IMP.push(w);return _i(w,dr,x,y,k)}`);
 const setup=async(list,px=300)=>{await ev(`releaseAll();combo=0;PL[0].x=${px};PL[0].y=G;PL[0].vx=0;PL[0].vy=0;PL[0].st='free';PL[0].att=null;PL[0].gt=null;PL[0].face=1;PL[0].inv=0;PL[0].stm.v=100;
@@ -54,7 +54,7 @@ const jit=Math.max(...xs[0].map((_,j)=>{const v=xs.map(r=>r[j]);const m=v.reduce
 ok(jit<.5,'a packed crowd settles without jitter (max wobble '+jit.toFixed(2)+' px)');
 await p.screenshot({path:S+'/shots/4-crowd.png'});
 // 9. stress run in play mode
-await ev('start()');await ev("SET.hist=0");const ks=['a','d','w','s',' ','j','k','Shift'];const held={};
+await ev('start();PL.forEach(p=>p.bd=FULL_BUILD)');await ev("SET.hist=0");const ks=['a','d','w','s',' ','j','k','Shift'];const held={};
 for(let i=0;i<900;i++){const k=ks[Math.floor(Math.random()*ks.length)];const kk=k===' '?'Space':k;if(held[k]){await p.keyboard.up(kk);held[k]=0}else{await p.keyboard.down(kk);held[k]=1}await W(12);
  if(i%150===0){await ev("PL[0].hp=100");}}
 for(const k in held)if(held[k])await p.keyboard.up(k===' '?'Space':k);

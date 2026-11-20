@@ -212,7 +212,7 @@ function levelClear() {
   };
   save();
   grantStars(old.done ? STAR_BONUS.level : STAR_BONUS.levelFirst, 'level');
-  runEnd('c-st', { combo: maxc });
+  runEnd('c-st', { combo: maxc, level: 1 });
   sfx(520, 0.5, 'square', 0.05, 500);
   $('c-l1').textContent =
     'Time ' + fmtT(LV.t) + ' · Score ' + score + ' (time bonus ' + tb + ') · Best combo ' + maxc;

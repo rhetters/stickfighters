@@ -365,3 +365,14 @@ Fixed along the way: a grab no longer fires by accident from the third press of 
 **Status: done** (November 17, 2026, version 16). Built as a side-view house on a 20 x 7 grid with walls paid per square, store furniture, decorations and backgrounds, a Walk Around mode, and visiting the host's house online. The Character button became Customize (Character | House).
 
 Reopened the same evening (version 17 work): the house builder is still in progress; see ROADMAP.md.
+
+### M18 · House builder and visiting 
+
+- Built so far (versions 16 and 17): Customize → House; a side-view land up to 240 x 60 squares that grows as you build; walls, floors and stairs per square; furniture, decorations and backgrounds; Erase refunds everything; Walk Around with floors and stairs as terrain; visiting the host's house online. Details in CHANGELOG.md.
+- Reopened November 17: Ron and Rhett are trying it and adding to the list.
+
+**Done when:** Ron and Rhett say the house builder is finished.
+
+**Status: done** (November 19, 2026, version 26). Ron and Rhett finished testing; the builder grew to a land of 240 x 60 squares with barriers (floors, side walls, stairs, ladders, spiral stairs), zoom, full refunds and Walk Around with climbing.
+
+**Decided November 19, 2026 (for M12):** moves beyond the basics are locked and earned back in the skill tree (open decision 2); each fighting branch gets its own three-step ultimate, with the Tornado Kick as the Legs branch's level-30 step (open decision 3).

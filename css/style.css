@@ -1873,3 +1873,233 @@ body.padnav #ui select:focus {
   border-radius: 8px;
   padding: 1px 8px;
 }
+
+/* Skills screen: five branch columns of nodes, the selected node's info, and the ultimate picker */
+#ch-skills {
+  font-size: clamp(12px, 1.7vw, 16px);
+  padding: 4px 10px;
+  margin: 0;
+}
+#ch-skills.has,
+#sk-pts.has {
+  background: #ffd400;
+}
+.sktop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.sktop h2 {
+  margin: 0;
+}
+#sk-who,
+#sk-lv {
+  font:
+    900 clamp(14px, 2vw, 20px) Impact,
+    'Arial Black',
+    sans-serif;
+}
+.skxp {
+  position: relative;
+  flex: 1;
+  height: 18px;
+  border: 3px solid #1c1626;
+  border-radius: 9px;
+  background: #fff8ee;
+  overflow: hidden;
+}
+#sk-xpbar {
+  height: 100%;
+  background: #3ec5ff;
+}
+#sk-xp {
+  position: absolute;
+  inset: 0;
+  font:
+    800 11px 'Trebuchet MS',
+    sans-serif;
+  line-height: 12px;
+}
+#sk-pts {
+  border: 3px solid #1c1626;
+  border-radius: 9px;
+  padding: 0 8px;
+  font:
+    800 13px 'Trebuchet MS',
+    sans-serif;
+}
+#s-skills button:not(.btn) {
+  font:
+    800 clamp(10px, 1.3vw, 13px) 'Trebuchet MS',
+    sans-serif;
+  border: 3px solid #1c1626;
+  border-radius: 9px;
+  background: #fff8ee;
+  color: #1c1626;
+  padding: 3px 8px;
+  min-height: 30px;
+  cursor: pointer;
+}
+#s-skills .btn {
+  margin: 0;
+  padding: 4px 12px;
+}
+#s-skills button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+#sk-tabs {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+#s-skills .sktab {
+  flex: 1;
+  border-top: 6px solid var(--bc);
+  font-size: clamp(12px, 1.7vw, 16px);
+}
+#s-skills .sktab i {
+  font-style: normal;
+  color: var(--bc);
+}
+#s-skills .sktab.on {
+  background: var(--bc);
+  color: #fff;
+}
+#s-skills .sktab.on i {
+  color: #fff;
+}
+#sk-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border-left: 6px solid var(--bc);
+  padding-left: 6px;
+}
+.skrow {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  flex: 1;
+}
+.skrow > small {
+  width: 64px;
+  flex: none;
+  align-self: center;
+  font:
+    800 11px 'Trebuchet MS',
+    sans-serif;
+  color: #6a6070;
+  line-height: 1.1;
+}
+#s-skills .sknode {
+  flex: 1;
+  padding: 2px 6px;
+  line-height: 1.1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.sknode i,
+.skult i {
+  font-style: normal;
+  font-size: 0.9em;
+  color: var(--bc, #1c1626);
+  letter-spacing: 2px;
+}
+.skrow.shut .sknode {
+  border-style: dashed;
+  color: #8a8090;
+}
+#s-skills .sknode.on {
+  background: #fff1c2;
+}
+#s-skills .sknode.full {
+  background: #ffd98a;
+}
+#s-skills .sknode.sel {
+  outline: 4px solid #ff7a00;
+  outline-offset: 1px;
+}
+#s-skills .btn {
+  min-width: 0;
+  font-size: clamp(14px, 2vw, 18px);
+}
+.skfoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+#sk-info {
+  flex: 1;
+  text-align: left;
+  margin: 0;
+  max-width: none;
+  min-height: 2.6em;
+  font-size: clamp(11px, 1.5vw, 14px);
+}
+#sk-msg {
+  margin: 0;
+  min-height: 1.2em;
+  color: #8a3a00;
+  font-weight: 700;
+}
+#sk-ult {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+}
+#sk-ult > span {
+  font:
+    900 clamp(13px, 1.8vw, 18px) Impact,
+    'Arial Black',
+    sans-serif;
+}
+#s-skills .skult {
+  border-left: 10px solid var(--bc);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+#s-skills .skult.on {
+  background: #ff7a00;
+  color: #fff;
+}
+#s-skills .skult.on i {
+  color: #fff;
+}
+#s-skills .skult i {
+  letter-spacing: 0;
+}
+/* Skills on a phone held sideways: one line per skill, smaller buttons */
+@media (max-height: 440px) {
+  #s-skills h2 {
+    display: none;
+  }
+  #s-skills button:not(.btn) {
+    min-height: 24px;
+    padding: 1px 6px;
+  }
+  #s-skills .sknode {
+    flex-direction: row;
+    gap: 6px;
+  }
+  #sk-tree {
+    flex: none;
+  }
+  .skrow > small {
+    width: 44px;
+    font-size: 9px;
+  }
+  #sk-info {
+    min-height: 0;
+  }
+}

@@ -411,6 +411,8 @@ function netStartLocal(m) {
       d2: L.d2,
       name: L.name,
       look: L,
+      prog: normFighter(p.f, true).prog,
+      fi: p.slot === NET.mySlot ? CHR.cur : null, // only this device's own fighter banks XP here
       team: m.teams ? p.team : undefined
     };
   });
