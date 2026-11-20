@@ -127,7 +127,7 @@ function normFighter(c, any) {
 function normHouse(h, any) {
   const src = h && typeof h === 'object' ? h : {},
     flip = !!src.flip7,
-    out = { bg: 'hbg-paper', cells: {}, solids: {}, fills: {}, climbs: {}, sides: {}, items: [] },
+    out = { bg: 'hbg-paper', cells: {}, solids: {}, floors: {}, fills: {}, climbs: {}, sides: {}, items: [] },
     inLand = (c, r) => c >= 0 && r >= 0 && c < HGRID.maxCols && r < HGRID.maxRows,
     squares = (o, ok, dst) => {
       const o0 = o && typeof o === 'object' ? o : {};
@@ -147,6 +147,8 @@ function normHouse(h, any) {
   squares(src.solids, solidOk, out.solids);
   squares(src.sides, sideOk, out.sides);
   squares(src.climbs, climbOk, out.climbs);
+  squares(src.floors, { floor: HSOLID.floor }, out.floors);
+  squares(src.solids, { floor: HSOLID.floor }, out.floors); // floors kept with the stairs before version 10
   squares(src.fills, HTILE, out.fills);
   // a fill only makes sense inside stairs
   for (const k in out.fills) if (!isStair(out.solids[k])) delete out.fills[k];

@@ -26,11 +26,14 @@ await Promise.all([hold(H,['d'],900),hold(A,['a'],600),hold(C,['d'],400),hold(X,
 await H.waitForTimeout(2600);
 ok(await C.evaluate(()=>NET.match&&state==='play'),'no desync with a mix of direct and passed-along buttons');
 // pose wheel: RHETT holds T; only RHETT's screen draws the wheel
-await A.keyboard.down('t');await A.waitForTimeout(500);
-const wA=await A.evaluate(()=>{let n=0;const o=drawWheel;drawWheel=f=>{n++;o(f)};render();drawWheel=o;return n}),wH=await H.evaluate(()=>{let n=0;const o=drawWheel;drawWheel=f=>{n++;o(f)};render();drawWheel=o;return [n,!!PL.find(p=>p.slot===1).wheel]});
-ok(wA===1&&wH[0]===0&&wH[1],'pose wheel drawn only on RHETT’s screen (host knows it is open: '+wH[1]+')');
+await H.evaluate(()=>{window.sawWheel=0;const t=setInterval(()=>{const p=PL.find(p=>p.slot===1);if(p&&p.wheel)window.sawWheel=1},16);setTimeout(()=>clearInterval(t),1500)});
+await A.keyboard.down('t');await A.waitForTimeout(1200);
+const wA=await A.evaluate(()=>{let n=0;const o=drawWheel;drawWheel=f=>{n++;o(f)};render();drawWheel=o;return n||(PL.find(p=>p.slot===1).wheel?0:-1)}),wH=await H.evaluate(()=>{let n=0;const o=drawWheel;drawWheel=f=>{n++;o(f)};render();drawWheel=o;return [n,!!window.sawWheel]});
+ok(wA!==0&&wH[0]===0&&wH[1],'pose wheel drawn only on RHETT’s screen (host knows it is open: '+wH[1]+')');
+await H.evaluate(()=>{window.sawPose=0;window.sawHit=0;const t=setInterval(()=>{const p=PL.find(p=>p.slot===1);if(p&&p.emote)window.sawPose=1;if(p&&p.st!=='free')window.sawHit=1},16);setTimeout(()=>clearInterval(t),3000)});
 await A.keyboard.down('ArrowRight');await A.waitForTimeout(100);await A.keyboard.up('t');await A.keyboard.up('ArrowRight');await A.waitForTimeout(600);
-const em=await H.evaluate(()=>{const p=PL.find(p=>p.slot===1);return [!!p.emote,p.st,p.hp]});ok(em[0]||em[1]!=='free','everyone sees RHETT strike the pose '+JSON.stringify(em));
+// an enemy hitting RHETT ends the pose (or the wheel), so look for the pose at any moment, or a hit that stopped it
+const em=await H.evaluate(()=>{const p=PL.find(p=>p.slot===1);return [window.sawPose,window.sawHit,p.hp]});ok(em[0]||em[1],'everyone sees RHETT strike the pose '+JSON.stringify(em));
 // RAELYNN leaves
 await C.evaluate(()=>{pause(true);$('b-quit').click()});await H.waitForTimeout(500);
 const st=await H.evaluate(()=>({stop:NET.stop,left:PL.filter(p=>p.left).map(p=>p.slot)}));console.log(JSON.stringify(st));

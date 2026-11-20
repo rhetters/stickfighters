@@ -31,7 +31,7 @@ await ev("$('hs-tabs').children[5].click()");await p.locator('.hcell').nth(5*20+
 ok(await ev("HOUSE.items.filter(i=>i.id==='hf-bed').length===1&&ECO.stars===389"),'ERASE removes a bed and refunds all 100');
 await p.locator('.hcell').nth(5*20+12).tap();ok(await ev("!HOUSE.cells['12,0']&&ECO.stars===392"),'ERASE refunds a brick square (3)');
 await ev("$('hs-tabs').children[1].click()");await card('Floor');await p.locator('.hcell').nth(1*20+3).tap();
-ok(await ev("HOUSE.solids['3,4']==='floor'&&ECO.stars===390"),'FLOORS & STAIRS: a floor square costs 2');
+ok(await ev("HOUSE.floors['3,4']==='floor'&&ECO.stars===390"),'BARRIERS: a floor square costs 2');
 // the land grows as you build
 await ev("HS.ox=0;HS.oy=0;houseDraw()");const L0=await ev("houseLimits().x");await ev("$('hs-tabs').children[0].click();houseAct(30,0)");
 ok(await ev("houseLimits().x")>L0,'building further out makes the land bigger ('+L0+' -> '+await ev("houseLimits().x")+')');
@@ -39,26 +39,28 @@ await ev("$('hs-right').click();$('hs-up').click()");ok(await ev("HS.ox===5&&HS.
 await ev("$('hs-tabs').children[2].click()");await card('Bed');await p.locator('.hcell').nth(5*20+0).tap();
 ok(await ev("HOUSE.items.some(i=>i.id==='hf-bed'&&i.x===5&&i.y===3)"),'placing while the view is moved uses the land position');
 await ev("$('hs-tabs').children[4].click()");await card('Mint');await card('Mint');ok(await ev("HOUSE.bg==='hbg-mint'&&owns('hbg-mint')"),'a background is bought once and put up');
-const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))");ok(sv.saveVersion===9&&sv.house.bg==='hbg-mint'&&sv.house.solids['3,4']==='floor','saved as version 9 with walls, barriers and items');
-await p.waitForTimeout(600);await p.reload();await p.waitForFunction(()=>typeof openHouse==='function'&&typeof loop==='function');await p.waitForTimeout(400);ok(await ev("HOUSE.bg==='hbg-mint'&&HOUSE.solids['3,4']==='floor'&&CHR.list[0].name==='RHETT'"),'the house survives a reload '+await ev("JSON.stringify({bg:HOUSE.bg,s:HOUSE.solids,raw:(localStorage.getItem('orangeArmy.v1')||'').slice(0,160)})"));
+const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))");ok(sv.saveVersion===10&&sv.house.bg==='hbg-mint'&&sv.house.floors['3,4']==='floor','saved as version 10 with walls, barriers and items');
+await p.waitForTimeout(600);await p.reload();await p.waitForFunction(()=>typeof openHouse==='function'&&typeof loop==='function');await p.waitForTimeout(400);ok(await ev("HOUSE.bg==='hbg-mint'&&HOUSE.floors['3,4']==='floor'&&CHR.list[0].name==='RHETT'"),'the house survives a reload '+await ev("JSON.stringify({bg:HOUSE.bg,s:HOUSE.floors,raw:(localStorage.getItem('orangeArmy.v1')||'').slice(0,160)})"));
 // a version 6 house (rows counted from the top) is turned over
-ok(await ev("JSON.stringify(normHouse({flip7:1,bg:'hbg-paper',cells:{'1,6':'wood','2,0':'roof'},items:[{id:'hf-shelf',x:4,y:4}]}))")==='{"bg":"hbg-paper","cells":{"1,0":"wood","2,6":"roof"},"solids":{},"fills":{},"climbs":{},"sides":{},"items":[{"id":"hf-shelf","x":4,"y":0}]}','a version 6 house is turned the right way up');
-ok(await ev("JSON.stringify(normHouse({bg:'nope',cells:{'999,1':'wood','1,1':'lava','2,2':'brick'},solids:{'1,1':'trampoline','3,3':'stairR'},items:[{id:'hd-trophy',x:1,y:1},{id:'hf-shelf',x:500,y:-3}]}))")==='{"bg":"hbg-paper","cells":{"2,2":"brick"},"solids":{"3,3":"stairR"},"fills":{},"climbs":{},"sides":{},"items":[{"id":"hf-shelf","x":238,"y":0}]}','bad squares, solids and locked items are dropped; positions kept on the land');
+ok(await ev("JSON.stringify(normHouse({flip7:1,bg:'hbg-paper',cells:{'1,6':'wood','2,0':'roof'},items:[{id:'hf-shelf',x:4,y:4}]}))")==='{"bg":"hbg-paper","cells":{"1,0":"wood","2,6":"roof"},"solids":{},"floors":{},"fills":{},"climbs":{},"sides":{},"items":[{"id":"hf-shelf","x":4,"y":0}]}','a version 6 house is turned the right way up');
+ok(await ev("JSON.stringify(normHouse({bg:'nope',cells:{'999,1':'wood','1,1':'lava','2,2':'brick'},solids:{'1,1':'trampoline','3,3':'stairR'},items:[{id:'hd-trophy',x:1,y:1},{id:'hf-shelf',x:500,y:-3}]}))")==='{"bg":"hbg-paper","cells":{"2,2":"brick"},"solids":{"3,3":"stairR"},"floors":{},"fills":{},"climbs":{},"sides":{},"items":[{"id":"hf-shelf","x":238,"y":0}]}','bad squares, solids and locked items are dropped; positions kept on the land');
 // barriers and layering: wood wall, then stairs, then stone fills just the steps; erase goes stone, stairs, wood
 await ev(`titleOpenAll();$('b-house').click();HS.ox=0;HS.oy=0;HS.zi=0;houseCells();houseDraw();HS.tab='walls';HS.tile='wood';houseAct(2,2);HS.tab='solids';HS.solid='stairR';houseAct(2,2);HS.tab='walls';HS.tile='stone';houseAct(2,2)`);
 ok(await ev("HOUSE.cells['2,2']==='wood'&&HOUSE.solids['2,2']==='stairR'&&HOUSE.fills['2,2']==='stone'"),'a wall on stairs fills just the steps; the wall behind stays');
 const st0=await ev('ECO.stars');await ev("HS.tab='erase';houseAct(2,2)");ok(await ev("!HOUSE.fills['2,2']&&HOUSE.solids['2,2']==='stairR'&&ECO.stars==="+(st0+3)),'erase takes the stone fill first (refund 3)');
 await ev("houseAct(2,2)");ok(await ev("!HOUSE.solids['2,2']&&HOUSE.cells['2,2']==='wood'"),'then the stairs');
 await ev("houseAct(2,2)");ok(await ev("!HOUSE.cells['2,2']"),'then the wood wall');
-await ev("HS.tab='solids';HS.solid='side';houseAct(4,1);HS.solid='floor';houseAct(4,1)");ok(await ev("HOUSE.sides['4,1']==='side'&&HOUSE.solids['4,1']==='floor'"),'a square can hold a floor and a side wall');
-await ev("HS.tab='erase';houseAct(4,1);houseAct(4,1)");ok(await ev("!HOUSE.sides['4,1']&&!HOUSE.solids['4,1']"),'erase takes the side wall, then the floor');
+await ev("HS.tab='solids';HS.solid='side';houseAct(4,1);HS.solid='floor';houseAct(4,1)");ok(await ev("HOUSE.sides['4,1']==='side'&&HOUSE.floors['4,1']==='floor'"),'a square can hold a floor and a side wall');
+await ev("HS.tab='erase';houseAct(4,1);houseAct(4,1)");ok(await ev("!HOUSE.sides['4,1']&&!HOUSE.floors['4,1']"),'erase takes the side wall, then the floor');
+await ev("HS.tab='solids';HS.solid='stairR';houseAct(14,5);HS.solid='floor';houseAct(14,5)");ok(await ev("HOUSE.solids['14,5']==='stairR'&&HOUSE.floors['14,5']==='floor'"),'a floor and stairs can share a square');
+await ev("HS.tab='erase';houseAct(14,5);houseAct(14,5)");ok(await ev("!HOUSE.solids['14,5']&&!HOUSE.floors['14,5']"),'erase takes the floor, then the stairs');
 ok(await ev("$('hs-tabs').children[1].textContent==='BARRIERS'&&[...$('hs-pal').children].length>=0"),'the tab is called BARRIERS');
 ok(await ev("getComputedStyle($('hs-cv')).position==='absolute'&&$('hs-cv').getBoundingClientRect().width>=$('s-house').getBoundingClientRect().width-2"),'the house fills the whole frame');
 await ev("$('b-houseback').click();$('b-char').click()");ok(await ev("getComputedStyle(document.querySelector('.hsdpad')).display!=='none'?!document.querySelector('.hsdpad').offsetParent:true"),'the house buttons are gone on other screens');
 await ev("$('b-charback').click();$('b-house').click()");
 // walking around: floors and stairs are terrain
-await ev(`Object.assign(HOUSE,{cells:{},items:[],solids:{'8,0':'stairR','9,1':'stairR','10,2':'stairR','11,3':'floor','12,3':'floor','13,3':'floor','14,3':'floor','15,3':'floor','21,4':'floor','23,4':'floor','24,4':'floor'},sides:{'19,0':'side','19,1':'side'},fills:{},climbs:{'22,0':'ladder','22,1':'ladder','22,2':'spiral','22,3':'spiral'}});titleOpenAll();$('b-house').click();$('b-hvisit').click()`);
-ok(await ev("state==='play'&&MODE.id==='house'&&E.length===0&&TERRAIN.n===17"),'WALK AROUND: your house with its floors and stairs, no enemies');
+await ev(`Object.assign(HOUSE,{cells:{},items:[],solids:{'8,0':'stairR','9,1':'stairR','10,2':'stairR','10,3':'stairL','9,4':'stairL','8,5':'stairL','11,3':'floor','12,3':'floor','13,3':'floor','14,3':'floor','15,3':'floor','21,4':'floor','23,4':'floor','24,4':'floor'},floors:{},sides:{'19,0':'side','19,1':'side'},fills:{},climbs:{'22,0':'ladder','22,1':'ladder','22,2':'spiral','22,3':'spiral'}});titleOpenAll();$('b-house').click();$('b-hvisit').click()`);
+ok(await ev("state==='play'&&MODE.id==='house'&&E.length===0&&TERRAIN.n===20"),'WALK AROUND: your house with its floors and stairs, no enemies');
 const run=(keys,n)=>ev(`(()=>{for(const b of ACT)setA('kb',b,0,0);for(const k of '${keys}')setA('kb',k,1,0);let lo=1e9;for(let i=0;i<${n};i++){fr++;update();lo=Math.min(lo,PL[0].y)}return {x:Math.round(PL[0].x),y:Math.round(PL[0].y),gy:Math.round(PL[0].gy),lo:Math.round(lo)}})()`);
 await ev("PL[0].x=300");let r1=await run('r',60);
 await ev("PL[0].x=300;PL[0].vx=0");await run('',10);const u1=await run('ru',50);ok(u1.gy<345,'holding Up while walking into stairs steps onto them '+JSON.stringify(u1));
@@ -70,10 +72,13 @@ const r3=await run('r',60);ok(r3.y===345-135&&r3.x>520,'walking up the stairs on
 const r4=await run('dj',2);const r5=await run('',40);ok(r5.y===345&&r5.gy===345,'Down + Jump drops through the floor '+JSON.stringify(r5));
 await ev("PL[0].x=600");await run('',5);await run('j',2);await run('',14);await run('j',2);const r6=await run('',60);ok(r6.y===345-135,'jumping up through the floor from below (double jump) lands on top of it '+JSON.stringify(r6));
 await p.screenshot({path:S+'/shots/m18-visit.png'});
-// stairs: Up always walks up them and Down always down, whichever way you face
-await run('',60);await ev("PL[0].x=300;PL[0].y=PL[0].gy=345");await run('',5);const s0=await run('ru',22);const s1=await run('lu',8);ok(s0.gy<345&&s1.y<s0.y&&s1.x>s0.x,'on stairs, holding Up while facing the other way still walks up '+JSON.stringify([s0,s1]));
-const s2=await run('d',8);ok(s2.y>s1.y&&s2.x<s1.x,'holding Down walks down them '+JSON.stringify(s2));
-await run('',60);await ev("PL[0].x=505;PL[0].y=PL[0].gy=210;PL[0].vx=0");await run('',5);const s3=await run('d',70);ok(s3.y===345,'Down at the top of the stairs walks down them to the ground '+JSON.stringify(s3));
+// stairs: walking you stay on your level; Up takes stairs going up the way you walk, Down takes stairs going down
+await run('',60);await ev("PL[0].x=300;PL[0].y=PL[0].gy=345;PL[0].vx=0");await run('',5);const sw0=await run('r',70);ok(sw0.lo===345&&sw0.x>495,'walking along the ground past stairs, without Up, you stay on the ground '+JSON.stringify(sw0));
+await ev("PL[0].x=300;PL[0].vx=0");await run('',5);const sw1=await run('ru',50);const sw2=await run('r',20);ok(sw1.gy<345&&sw2.y===210,'holding Up while walking into stairs takes them up, then you walk on along the floor '+JSON.stringify([sw1,sw2]));
+await run('',20);await ev("PL[0].x=600;PL[0].vx=0");await run('',5);const sw3=await run('ld',70);ok(sw3.y===345,'walking back holding Down takes the stairs down to the ground '+JSON.stringify(sw3));
+await run('',20);await ev("PL[0].x=600;PL[0].y=PL[0].gy=210;PL[0].vx=0");await run('',5);const sw4=await run('lu',55);ok(sw4.y<210-20&&sw4.x<495,'walking back holding Up takes the other stairs, the ones going up that way '+JSON.stringify(sw4));
+await run('',20);await ev("PL[0].x=500;PL[0].y=PL[0].gy=210;PL[0].vx=0;PL[0].face=-1");await run('',5);const sw5=await run('u',30);ok(sw5.y<210-20&&sw5.x<495,'Up alone where two staircases meet goes up the one going up (not back along the floor) '+JSON.stringify(sw5));
+await run('',20);await ev("PL[0].x=500;PL[0].y=PL[0].gy=210;PL[0].vx=0");await run('',5);const sw6=await run('l',60);ok(sw6.lo>=210&&sw6.y===345,'walking off the end without Up or Down: no climbing, you go down '+JSON.stringify(sw6));
 // ladder and spiral stairs: climbed straight up and down
 await ev("PL[0].x=22*45+22;PL[0].y=PL[0].gy=345;PL[0].vx=0");await run('',5);const l1=await run('u',80);ok(l1.y===345-180&&Math.abs(l1.x-(22*45+22))<3,'holding Up climbs the ladder and spiral stairs to the top '+JSON.stringify(l1));
 const l2=await run('',30);ok(l2.y===345-180,'letting go holds you on the ladder '+JSON.stringify(l2));
@@ -87,7 +92,7 @@ await ev("HS.zi=0;HS.ox=0;HS.oy=0;titleOpenAll();$('b-house').click();$('hs-zout
 ok(await ev("$('hs-cells').children.length===40*12&&HS.zi===1"),'zoom out shows 40 x 12 squares');
 await ev("$('hs-zout').click()");ok(await ev("$('hs-cells').children.length===60*18&&$('hs-zout').disabled"),'zoom out again: 60 x 18, the farthest');
 await ev("$('hs-tabs').children[1].click()");await p.locator('.hcell').nth(17*60+30).tap();
-ok(await ev("HOUSE.solids['30,0']==='floor'"),'tapping while zoomed out builds on the right square');
+ok(await ev("HOUSE.floors['30,0']==='floor'"),'tapping while zoomed out builds on the right square');
 await p.screenshot({path:S+'/shots/m18-zoom.png'});
 await ev("$('hs-zin').click();$('hs-zin').click()");ok(await ev("$('hs-cells').children.length===20*6"),'zoom back in');
 // two players far apart: the camera zooms out to keep both on screen
@@ -98,6 +103,7 @@ ok(cam.z<0.2&&fits,'players at both ends and up high are both on screen (zoom '+
 await p.screenshot({path:S+'/shots/m18-far.png'});
 await ev("PL[1].x=PL[0].x+80;PL[1].y=PL[1].gy=345;for(let i=0;i<150;i++)render()");ok(await ev("CAM.z>0.95"),'together again: back to normal size');
 await ev("ROSTER=[]");
+ok(await ev("(()=>{const o={},o2={};drawFig(0,345,1,STANCES[0].p,1,'#f00','#f00',0,1,7,o,1);drawFig(0,345,1,STANCES[0].p,1,'#f00','#f00',0,1,10,o2,1);return limbK({...o,s:1})===1&&limbK({...o2,s:1})>1.4&&Math.abs(itemR({...o,s:1})-(o.hr+o.hw/2-1.1))<0.01})()"),'gloves and shoes grow with thicker limbs; head items reach the head\'s outer edge');
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged');
 // online: a guest visits the host's house
 const srv=spawn('node',[__dirname+'/sigserver.js','9316']);await new Promise(r=>setTimeout(r,400));

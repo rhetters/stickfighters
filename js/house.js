@@ -405,7 +405,14 @@ function houseFill(t, sid, x, y, s) {
 const HCACHE = new WeakMap();
 function houseLists(h) {
   let L = HCACHE.get(h.cells);
-  if (!L || L.of[0] !== h.solids || L.of[1] !== h.fills || L.of[2] !== h.sides || L.of[3] !== h.climbs) {
+  if (
+    !L ||
+    L.of[0] !== h.solids ||
+    L.of[1] !== h.fills ||
+    L.of[2] !== h.sides ||
+    L.of[3] !== h.climbs ||
+    L.of[4] !== h.floors
+  ) {
     const parse = o => Object.entries(o || {}).map(([k, v]) => [...k.split(',').map(Number), v]);
     L = {
       tiles: parse(h.cells),
@@ -413,7 +420,8 @@ function houseLists(h) {
       fills: parse(h.fills),
       sides: parse(h.sides),
       climbs: parse(h.climbs),
-      of: [h.solids, h.fills, h.sides, h.climbs]
+      floors: parse(h.floors),
+      of: [h.solids, h.fills, h.sides, h.climbs, h.floors]
     };
     HCACHE.set(h.cells, L);
   }
@@ -424,7 +432,7 @@ function houseExt(h) {
   let cols = 0,
     rows = 0;
   const L = houseLists(h);
-  for (const [c, r] of [...L.tiles, ...L.solids, ...L.sides, ...L.climbs]) {
+  for (const [c, r] of [...L.tiles, ...L.solids, ...L.floors, ...L.sides, ...L.climbs]) {
     cols = Math.max(cols, c + 1);
     rows = Math.max(rows, r + 1);
   }
@@ -440,7 +448,7 @@ function houseTerrain(h) {
   const s = HGRID.cell,
     L = houseLists(h);
   return {
-    surfaces: L.solids.map(([c, r, id]) => {
+    surfaces: [...L.floors, ...L.solids].map(([c, r, id]) => {
       const x1 = c * s,
         lo = G - r * s,
         hi = lo - s;
@@ -491,6 +499,7 @@ function drawHouse(h, cx, cy, z = 1) {
   for (const [c, r, t] of L.fills)
     if (seen(c, r, 1, 1) && sol[c + ',' + r]) houseFill(HTILE[t], sol[c + ',' + r], HX(c), HY(r), s);
   for (const [c, r, id] of L.solids) if (seen(c, r, 1, 1)) houseSolid(id, HX(c), HY(r), s);
+  for (const [c, r] of L.floors) if (seen(c, r, 1, 1)) houseSolid('floor', HX(c), HY(r), s);
   for (const [c, r, id] of L.climbs) if (seen(c, r, 1, 1)) houseSolid(id, HX(c), HY(r), s);
   for (const [c, r] of L.sides) if (seen(c, r, 1, 1)) houseSolid('side', HX(c), HY(r), s);
   ctx.restore();
@@ -540,7 +549,11 @@ const HOUSE_MODE = {
       ctx.textAlign = 'center';
       ctx.fillText(HVIEW.name || 'MY HOUSE', W / 2, 26);
       ctx.font = '700 13px "Trebuchet MS",sans-serif';
-      ctx.fillText('Jump onto floors and stairs · Down + Jump drops through', W / 2, 104);
+      ctx.fillText(
+        'Hold Up or Down to take stairs and ladders \u00b7 Down + Jump drops through a floor',
+        W / 2,
+        104
+      );
     }
   }
 };

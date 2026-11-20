@@ -22,6 +22,9 @@ function itemR(J) {
   if (!J.hw || !J.hs) return J.hr;
   return J.hr + J.hw / 2 - 1.1 * Math.pow(J.hs, 0.7);
 }
+// How much thicker (or thinner) this fighter's limbs are than the default line: gloves and shoes grow with it so
+// they still cover the hands and feet (shirts, jackets, pants and ties already follow J.lw). 1 at the default.
+const limbK = J => (J.lw && J.s ? Math.max(0.7, Math.min(1.7, J.lw / (7 * Math.pow(J.s, 0.7)))) : 1);
 // Draws in a frame fixed to the head: origin = point, x = the way you face, y = down along the neck.
 function headFrame(J, at, fn) {
   frameAt(at, unit(sub(J.hd, J.nk)), J.face, fn);
@@ -715,13 +718,13 @@ function drawGlove(it, J, back) {
   const e = back ? J.eb : J.ea,
     h = back ? J.hb : J.h;
   if (!h) return;
-  const s = J.s,
+  const s = J.s * limbK(J),
     c = back ? shade(it.c, -0.2) : it.c,
     d = e ? unit(sub(h, e)) : [J.face, 0],
     nr = [-d[1], d[0]],
     at = k => [h[0] + d[0] * k * s, h[1] + d[1] * k * s],
     ang = Math.atan2(d[1], d[0]),
-    w = 1.8 * Math.pow(s, 0.7),
+    w = 1.8 * Math.pow(J.s, 0.7),
     oval = (p, rx, ry, col) => {
       ctx.beginPath();
       ctx.ellipse(p[0], p[1], rx * s, ry * s, ang, 0, 7);
@@ -792,9 +795,9 @@ function drawShoe(f, it, J, back) {
   const ft = back ? J.fb : J.f,
     kn = back ? J.kb : J.kf;
   if (!ft) return;
-  const s = J.s,
+  const s = J.s * limbK(J),
     c = back ? shade(it.c, -0.2) : it.c,
-    w = 1.8 * Math.pow(s, 0.7);
+    w = 1.8 * Math.pow(J.s, 0.7);
   // boots and high-tops go up the shin; the foot itself stays level
   if ((it.k === 'boot' || it.k === 'hightop') && kn) {
     const top = lerp2(ft, kn, it.k === 'boot' ? 0.5 : 0.3);

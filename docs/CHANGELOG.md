@@ -2,6 +2,14 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: stairs done right, floors and stairs together, gloves and shoes (November 19, 2026)
+- **Stairs:** walking left or right you stay on the level you're on, and stairs are ignored. Hold **Up** while walking to take stairs that go up that way, **Down** to take stairs that go down that way; once on stairs you follow them to the end. Walk off the end of a floor without Up or Down and you drop. Up or Down alone, beside stairs going that way, walks you onto them (where two staircases meet, Up picks the one going up).
+- A **floor and stairs can share a square** now (floors have their own layer); erase takes the floor first, then the stairs.
+- **Gloves and shoes** grow with the fighter's line thickness, so they cover thick hands and feet.
+- Tests: the online pose check no longer fails when an enemy happens to hit the posing player.
+- Save version 10. Self-test fingerprints unchanged.
+- Version 21.
+
 ## M18 in progress: ladders, climbing and a few fixes (November 19, 2026)
 - **Ladders** (new) and **spiral stairs** (now straight up and down) are climbed: hold Up to climb, Down to go down, let go to hang on; Jump or walk sideways to get off, or walk off the top onto a floor.
 - **Stairs:** Up always walks up them and Down always walks down, whichever way you face. Down at the top of a staircase walks down it.
