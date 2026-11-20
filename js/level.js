@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Level mode: a scrolling level built from chunk data (js/data/levels.js), with
+// StickFighters: Level mode: a scrolling level built from chunk data (js/data/levels.js), with
 // encounters, a breakable gate, checkpoints, and a level-complete screen.
 // ===== LEVEL MODE =====
 // Run-time copy of the level being played; the data in LEVELS/CHUNKS is never changed.

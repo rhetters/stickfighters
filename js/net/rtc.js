@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Online connection layer: WebRTC data channels between browsers
+// StickFighters: Online connection layer: WebRTC data channels between browsers
 // ===== CONNECTION =====
 // This file only moves messages between devices; it knows nothing about the game. The match code (session.js)
 // talks to it through four calls and a few callbacks, so a different connection (Steam networking, our own

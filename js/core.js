@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Settings and save, seeded random, screen constants, feel knobs, sound
+// StickFighters: Settings and save, seeded random, screen constants, feel knobs, sound
 // ===== SETTINGS & SAVE =====
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out

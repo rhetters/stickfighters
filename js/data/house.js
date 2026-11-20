@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: House builder data (plain data; VISION.md rule R3)
+// StickFighters: House builder data (plain data; VISION.md rule R3)
 // ===== HOUSE =====
 // A house is a big side view built on squares: c counts from the left edge of the land, r up from the floor (row 0
 // sits on the floor line G). Each square has layers, back to front: a wall material filling the square (scenery), a

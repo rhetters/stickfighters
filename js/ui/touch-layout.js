@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Touch controls layout, profiles and the layout editor
+// StickFighters: Touch controls layout, profiles and the layout editor
 // ===== TOUCH LAYOUT: every control's centre (x, y) and size are fractions of the game area, so a layout fits any screen =====
 const CTL = ['stick', 'x', 'j', 's', 'p', 'k'],
   CTLNAME = { stick: 'Stick', x: 'ULT', j: 'JUMP', s: 'SURGE', p: 'PUNCH', k: 'KICK' };

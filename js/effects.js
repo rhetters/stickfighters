@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Effect spawners (sparks, rings, dust, text, ghosts)
+// StickFighters: Effect spawners (sparks, rings, dust, text, ghosts)
 // ===== EFFECTS =====
 function fxp(o) {
   if (FX.length > 150) FX.shift();

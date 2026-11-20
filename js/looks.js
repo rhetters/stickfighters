@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Drawing a fighter's look: hair, hats, headbands, scarves, ties, shirts, jackets,
+// StickFighters: Drawing a fighter's look: hair, hats, headbands, scarves, ties, shirts, jackets,
 // gloves, pants, skirts, dresses, shoes, Surge styles, idle stances, poses and the pose wheel.
 // Drawing only: nothing here changes the game, and it never calls rnd().
 // ===== LOOKS =====

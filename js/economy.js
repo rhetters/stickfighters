@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Ninja stars, owned cosmetics and saved fighters
+// StickFighters: Ninja stars, owned cosmetics and saved fighters
 // ===== ECONOMY (VISION.md rule R7) =====
 // Stars change only through grantStars / spendStars, and ownership only through grantItem / buyItem, so this file
 // can one day ask a server instead of trusting the device. Nothing here changes how anyone fights (rule R8).

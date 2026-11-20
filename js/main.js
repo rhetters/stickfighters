@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Game shell (screens, settings), screen fit, simulation step update(), main loop and boot. Loads last.
+// StickFighters: Game shell (screens, settings), screen fit, simulation step update(), main loop and boot. Loads last.
 // ===== GAME SHELL: title, pause, settings, save =====
 let paused = false,
   back = 's-title',

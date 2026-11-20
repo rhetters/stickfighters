@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Drawing: gear, figures, background, effects, HUD, frame render
+// StickFighters: Drawing: gear, figures, background, effects, HUD, frame render
 // Gear that tells the types apart at a glance: Guard shield, Flanker scarf, Captain helmet
 function drawGear(f, o, a) {
   const s = f.s,

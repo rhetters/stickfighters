@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Scenery for levels: parallax layers, props, gate, foreground and ambient effects.
+// StickFighters: Scenery for levels: parallax layers, props, gate, foreground and ambient effects.
 // Everything here is drawing only. It never changes the game and uses Math.random() only for cosmetic effects.
 // ===== SCENERY: the Wooded Trail in the hand-drawn paper style =====
 // Stable pseudo-random value in [0, 1) for scenery index i, so hills and trees stay put as you walk.

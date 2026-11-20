@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Player move table, poses, route tree, move info
+// StickFighters: Player move table, poses, route tree, move info
 // ===== MOVE TABLE & POSES (data-driven; startup=h[0], active=h[1]-h[0]+1, recovery=d-h[1]) =====
 // poses: [lean, frontArm shoulder, elbow, backArm shoulder, elbow, frontLeg hip, knee, backLeg hip, knee, spin]
 const IDLE = [6, 35, 75, 20, 90, 18, 20, -18, 12, 0],

@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: House screen: build walls and barriers (floors, side walls, stairs) square by square,
+// StickFighters: House screen: build walls and barriers (floors, side walls, stairs) square by square,
 // place furniture and decorations, pick a background. Everything placed costs stars and erasing gives them all back.
 // The house fills the whole frame; the buttons sit on top of it, and the tabs and pieces live on the floor below the
 // building area. The land is much bigger than the view: the D-pad moves around it, - and + zoom, and it grows as you

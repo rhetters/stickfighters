@@ -1,4 +1,4 @@
-# Orange vs. the Pink Army
+# StickFighters
 
 A stick-figure beat-'em-up: you're the orange fighter holding off waves of the pink army. Plain HTML, CSS and JavaScript with no build step, so GitHub Pages serves it as-is.
 

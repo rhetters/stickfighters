@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Terrain: floors, stairs and walls above the ground line G. Any mode can set it (the
+// StickFighters: Terrain: floors, stairs and walls above the ground line G. Any mode can set it (the
 // house does today; levels with platforms and stairs can use the same thing). With no terrain everyone stands on G.
 // ===== TERRAIN =====
 // A surface is a line { x1, x2, y1, y2 } (x1 < x2): flat when y1 === y2 (a floor), a ramp otherwise (stairs).
