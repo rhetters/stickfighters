@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Input: every device goes through setA() into a player input slot
+// StickFighters: Input: every device goes through setA() into a player input slot
 // ===== INPUT =====
 // Every device (keyboard, touch, gamepad) calls setA(); nothing else reads raw input.
 //   l r  move        u d  aim (the direction held when an attack is pressed picks the move)

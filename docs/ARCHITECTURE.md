@@ -124,7 +124,7 @@ Editor (ui/house.js): the canvas fills the screen; the floor line is raised to `
 
 ## Screen layout
 
-`.screen` stacks its contents in a column. Centered screens are centered by two growing spacers (`::before` / `::after`) rather than `justify-content: center`, so a screen taller than the frame (Settings) scrolls from its top instead of cutting it off. Screens that start at the top hide the spacers. The title screen uses them for its art instead: a blurred copy fills the frame's sides and the whole picture sits in the middle; with container queries, the menu is sized in `cqh` (percent of the frame's height) so it stays in the gap between the fighters on any screen.
+`.screen` stacks its contents in a column. Centered screens are centered by two growing spacers (`::before` / `::after`) rather than `justify-content: center`, so a screen taller than the frame (Settings) scrolls from its top instead of cutting it off. Screens that start at the top hide the spacers. The title screen hides them too: its art (`img/title.jpg`) covers the frame, and with container queries the name and menu are sized in `cqh` (percent of the frame's height) so they stay in the drawing's open space on any screen.
 
 ## Menu highlight
 

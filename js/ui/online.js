@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Online screen: host or join a room, pick your fighter, start a match.
+// StickFighters: Online screen: host or join a room, pick your fighter, start a match.
 // Works with touch, mouse and controllers (the room code is picked with arrows, no typing needed).
 // ===== ONLINE SCREEN =====
 const ONC = { w: 0, a: 1, b: 0 }; // the room code being picked: word, first digit, second digit

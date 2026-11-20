@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Determinism self-test (open the game with ?selftest)
+// StickFighters: Determinism self-test (open the game with ?selftest)
 // ===== SELF-TEST: open the game with ?selftest to check the simulation is deterministic =====
 // Runs a fixed seed with scripted inputs and no drawing, then prints a fingerprint (hash) of the game state.
 // The hash must be identical before and after any refactor. Cosmetic effects (FX) are not part of the hash.

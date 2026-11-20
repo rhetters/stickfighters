@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Training panels: move list, fighter info, feel sliders
+// StickFighters: Training panels: move list, fighter info, feel sliders
 // ===== MOVE LIST: every Combat Chart row, ticked off as you land it in training =====
 const MOVELIST = [
   [

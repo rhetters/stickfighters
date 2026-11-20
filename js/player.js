@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Fighters, game state, Surge stamina, move picking, player creation and per-frame player update
+// StickFighters: Fighters, game state, Surge stamina, move picking, player creation and per-frame player update
 // ===== FIGHTERS & GAME STATE =====
 let PL = [],
   E,

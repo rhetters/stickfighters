@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Online matches: the room, and lockstep play over the connection in rtc.js
+// StickFighters: Online matches: the room, and lockstep play over the connection in rtc.js
 // ===== ONLINE SESSION =====
 // Three layers, so matchmaking or Steam can replace one without the others (see docs/ARCHITECTURE.md):
 //   connection  rtc.js: moves messages between devices

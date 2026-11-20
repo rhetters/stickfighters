@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Character screen: four saved fighters, their look, and the store.
+// StickFighters: Character screen: four saved fighters, their look, and the store.
 // Every shelf is also the store: tap an item you own to wear it (or None to take it off); tap one you don't own
 // to try it on, then tap again to buy it with ninja stars. Poses go on the pose wheel instead of being worn.
 // Everything here is cosmetic.

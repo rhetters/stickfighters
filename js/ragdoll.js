@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Ragdolls, death poses and corpse cleanup
+// StickFighters: Ragdolls, death poses and corpse cleanup
 // ===== RAGDOLL =====
 // 13 points: 0 head, 1 neck, 2 shoulders, 3 mid-spine, 4 pelvis, 5/6 front elbow/hand, 7/8 back elbow/hand, 9/10 front knee/foot, 11/12 back knee/foot.
 // Verlet physics: each point keeps its last position; segments hold their length; a few min-distance links stop elbows/knees folding flat.

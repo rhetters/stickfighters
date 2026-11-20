@@ -2,6 +2,13 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: the game is now StickFighters (November 19, 2026)
+- **New name:** the game is now **StickFighters** everywhere (title screen, browser tab, docs). Saves, backup codes and settings carry over untouched.
+- **Title screen:** Rhett's new notebook drawing, with the StickFighters name in orange-to-pink at the top and the menu in the open space between the fighters.
+- **Esc** backs out of Settings (and its Buttons page), also when Settings was opened from the pause menu.
+- Self-test fingerprints unchanged.
+- Version 24.
+
 ## M18 in progress: new title art, Settings fix (November 19, 2026)
 - **Title screen:** Rhett's StickFighters picture is now the main menu art, with the menu in the space between the two fighters. The picture is shown whole; blurred edges fill the wider game frame.
 - Fixed: on a short screen the top of **Settings** was cut off and couldn't be scrolled to. Settings now scrolls from the top (the same fix covers every centered menu screen).

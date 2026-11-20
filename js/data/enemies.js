@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Enemy moves (EA), enemy types (T), names and tips; decorates every move with its info
+// StickFighters: Enemy moves (EA), enemy types (T), names and tips; decorates every move with its info
 const EA = {
   pj: {
     d: 34,

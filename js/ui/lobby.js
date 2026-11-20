@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Players screen. Up to 4 players join with a controller, the keyboard or touch,
+// StickFighters: Players screen. Up to 4 players join with a controller, the keyboard or touch,
 // then pick Versus or Co-op. The chosen players become the ROSTER the game is built from.
 // ===== PLAYERS SCREEN =====
 const PCOL = [

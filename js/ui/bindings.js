@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Buttons screen (Settings > Buttons): change the keyboard keys and controller buttons
+// StickFighters: Buttons screen (Settings > Buttons): change the keyboard keys and controller buttons
 // for every action. The input layer (js/input.js) reads the result through KEYS and padBinds().
 // ===== BUTTONS SCREEN =====
 const ACTNAME = {

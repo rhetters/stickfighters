@@ -28,7 +28,10 @@ const c=await b.newContext({viewport:{width:1280,height:800}});const p=await c.n
 await p.evaluate("window.dispatchEvent(new Event('gamepadconnected'))");await p.waitForTimeout(100);ok(await p.isVisible('#tmenu'),'a controller connecting on PRESS START opens the menu');
 // the title art loads, and a tall Settings screen scrolls from its top (nothing cut off above)
 ok(await p.evaluate(()=>new Promise(r=>{const i=new Image();i.onload=()=>r(i.naturalWidth>1000);i.onerror=()=>r(false);i.src='img/title.jpg'})),'the title art loads');
-ok(await p.evaluate(()=>getComputedStyle($('s-title'),'::after').backgroundImage.includes('title.jpg')),'the title screen shows it');
+ok(await p.evaluate(()=>getComputedStyle($('s-title')).backgroundImage.includes('title.jpg')),'the title screen shows it');
 await p.evaluate(()=>{titleOpenAll();$('b-set1').click()});await p.waitForTimeout(200);
 ok(await p.evaluate(()=>{const e=$('s-settings');return e.scrollHeight>e.clientHeight&&e.firstElementChild.getBoundingClientRect().top>=e.getBoundingClientRect().top}),'Settings scrolls and its heading is not cut off');
+await p.keyboard.press('Escape');await p.waitForTimeout(150);ok(await p.evaluate(()=>$('s-settings').hidden&&!$('s-title').hidden),'Esc backs out of Settings');
+await p.evaluate(()=>{$('b-start').click()});await p.waitForTimeout(300);await p.keyboard.press('Escape');await p.waitForTimeout(100);await p.evaluate(()=>$('b-set2')?$('b-set2').click():0);await p.waitForTimeout(100);
+if(await p.evaluate(()=>!$('s-settings').hidden)){await p.keyboard.press('Escape');await p.waitForTimeout(150);ok(await p.evaluate(()=>$('s-settings').hidden&&!$('s-pause').hidden&&paused),'Esc backs out of Settings opened from pause, back to the pause menu')}else ok(false,'Settings opens from pause');
 ok(errs.length===0,'no page errors '+errs.join('|'));await b.close();console.log(fails?fails+' FAILED':'ALL PASS')})();

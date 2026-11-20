@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Enemies: per-frame update, AI director, boss framework, spawning and waves
+// StickFighters: Enemies: per-frame update, AI director, boss framework, spawning and waves
 // ===== ENEMIES =====
 function updE(e) {
   e.t++;

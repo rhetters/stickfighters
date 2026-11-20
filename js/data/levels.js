@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Level data (plain JSON-compatible objects; never code, VISION.md rule R3)
+// StickFighters: Level data (plain JSON-compatible objects; never code, VISION.md rule R3)
 // ===== LEVELS =====
 // A level is an ordered list of chunks. A chunk is one stretch of trail:
 //   w      width in pixels (the screen is 900 wide)

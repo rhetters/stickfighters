@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Game shell (screens, settings), screen fit, simulation step update(), main loop and boot. Loads last.
+// StickFighters: Game shell (screens, settings), screen fit, simulation step update(), main loop and boot. Loads last.
 // ===== GAME SHELL: title, pause, settings, save =====
 let paused = false,
   back = 's-title',
@@ -351,7 +351,15 @@ addEventListener(
       titleReveal();
       e.preventDefault();
       e.stopImmediatePropagation();
-    } else if (e.key === 'Escape' && !$('s-title').hidden && !$('ui').hidden) titleBack();
+    } else if (e.key === 'Escape' && !$('ui').hidden && !CAP) {
+      if (!$('s-title').hidden) titleBack();
+      else if (!$('s-settings').hidden || !$('s-binds').hidden) {
+        // Esc backs out of Settings (and its Buttons page) like its BACK button, also when opened from pause
+        navBack();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }
   },
   true
 );

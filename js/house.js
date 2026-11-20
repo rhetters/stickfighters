@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Drawing a house, and House mode (walking around a house, alone or with visitors online)
+// StickFighters: Drawing a house, and House mode (walking around a house, alone or with visitors online)
 // Drawing never calls rnd() or changes the game; the house's floors and stairs become terrain (terrain.js).
 // ===== HOUSE DRAWING =====
 // Square (c, r): c counts from the left edge of the land, r up from the floor (row 0 sits on the floor line G).

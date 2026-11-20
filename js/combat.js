@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Combat and collision: hitboxes, attacks, blocking, grabs/throws, hits, bowling, separation, physics, poses
+// StickFighters: Combat and collision: hitboxes, attacks, blocking, grabs/throws, hits, bowling, separation, physics, poses
 // ===== COMBAT & COLLISION =====
 const ov = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
 function hbox(f) {

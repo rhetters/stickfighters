@@ -1,4 +1,4 @@
-# CLAUDE.md: working on Orange vs. the Pink Army (repo: stickfighters)
+# CLAUDE.md: working on StickFighters (repo: stickfighters)
 
 Family game. Creative director: Rhett (Ron's son). Players: Ron's 4 kids, mostly iPad (touch), plus keyboard
 and Bluetooth controllers. Hosted on GitHub Pages from `main` / root (https://rhetters.github.io/stickfighters,

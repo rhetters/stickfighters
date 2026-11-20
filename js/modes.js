@@ -1,4 +1,4 @@
-// Orange vs. the Pink Army: Game modes. The combat engine knows nothing about waves, levels or score rules;
+// StickFighters: Game modes. The combat engine knows nothing about waves, levels or score rules;
 // a mode sets up the world and runs the rules on top of it (VISION.md rule R1).
 // ===== MODES =====
 // A mode is { id, update() once per simulation step while someone is alive, hud?(), fg?() foreground drawing }.

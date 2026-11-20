@@ -1,4 +1,4 @@
-# Orange vs. the Pink Army
+# StickFighters
 
 A stick-figure beat-'em-up: you're the orange fighter holding off waves of the pink army. Plain HTML, CSS and JavaScript with no build step, so GitHub Pages serves it as-is.
 
@@ -36,7 +36,7 @@ The title says **PRESS START**: press any key, button or tap.
 
 **Changing buttons:** Settings → **Buttons** lets you change the keyboard keys and controller buttons for every action. Tap + then press the key or button; tap a key to remove it. Controller mappings are saved per kind of controller (Switch, Xbox, PlayStation) on that device, so any controller of that kind uses them.
 
-**Menus with a controller:** the d-pad or left stick moves the yellow highlight, A confirms, B goes back (on Switch controllers: A right, B bottom), and Start pauses and resumes.
+**Menus with a controller:** the d-pad or left stick moves the yellow highlight, A confirms, B goes back (on Switch controllers: A right, B bottom), and Start pauses and resumes. On a keyboard, Esc goes back out of menus like Settings.
 
 **Touch layout:** Settings → Touch layout → **Customize** lets you drag every button and the stick where you want them, resize them, and save named layouts (Default and Left-handed are built in).
 
