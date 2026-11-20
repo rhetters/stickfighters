@@ -28,6 +28,8 @@ Each test opens `index.html` from disk in a headless browser, plays scripted inp
 | `menu2test`, `navtest` | Title menu with a controller (and its orange poof), the title art, Settings scrolling from its top, Esc backing out of Settings, the multiplayer drawing, directional menu navigation |
 | `m10test` | Stars, store, saved fighters, save migration, pose wheel |
 | `m18test` | Menu highlight (nothing lit until navigated), house builder: Customize menu, prices and full refunds, barriers and layering (fills inside stairs, erase front to back, floor and side wall in one square), the full-frame editor, the land growing, moving and zooming, saving at the current version (upgraded from 5), walking around (Esc returns to the builder, passing through stairs, Up to climb, staying on your level, Up / Down taking stairs going that way (including where two staircases meet), floors and stairs sharing a square, gloves and shoes following line width, ladders and spiral stairs, landing, dropping through, poses on an upper floor, side walls stop you), the camera keeping far-apart players on screen, head types (save version 11, full heads filled); online: visiting the host's house, Versus teams, the room fitting without a scroll bar |
+| `m12test` | XP and levels, points and rows, taking points back and reset, untrusted trees, locked moves (a string starts over), boosts adding up per rank, Versus without boosts, each ultimate step by level, ULT starting the chosen ultimate, a bigger Surge bar, Second Wind once, XP banked at the end of a run, save version 12, the Skills screen (tap twice, ADD, TAKE BACK, RESET, branch tabs, the ultimate picker, fits without scrolling, Esc) |
+| `devtest` | The temporary TEST row on the Skills screen (delete with `js/devtools.js`) |
 | `spam` | Fast touch spamming on a phone-sized screen |
 | `nettest`, `nettest2`, `nettest3`, `netlag` | Online: rooms, joining, every mode, leaving, direct links and a blocked link, desync detection, 100 ms of simulated lag |
 
@@ -48,6 +50,7 @@ To add a test: copy a similar one, keep the `ok(condition, 'what it means')` lin
 - Block (Surge + down, standing still): kneels and shakes harder as Surge drains; hits from behind and hits after Surge runs out land. Hitting a downed enemy flops it around and it still gets up on time.
 - A Guard breaking, a Flanker leap, a Captain on wave 5 (enrages at about half health).
 - Ragdolls, death poses, confetti cleanup.
+- Skills: use TEST to reach level 5, 15 and 30; spend and take back points; pick each branch's ultimate and try it in Arcade (each should look and feel rewarding); check locked moves don't come out and come out once unlocked; finish a run and see the XP line and level-up on the results screen.
 - Character: switch the head between Donut and Full, try on and buy an item, the pose wheel in a fight (hold POSE, aim, let go), stars dropping and flying to you.
 - House: drag walls with a finger, build a tall tower with floors and stairs, climb it in WALK AROUND, erase (stars come back), and visit a host's house online.
 - Training Room: spawn 1–6, hitboxes, frame data, speeds, freeze/step, Feel / Moves / Info.

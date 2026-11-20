@@ -16,6 +16,7 @@ The title says **PRESS START**: press any key, button or tap.
 - **Multiplayer → Online** plays house to house: one player hosts a room and shares its code (a word and a number); others pick the code with arrows and join. Up to 4 players, one per device, PC, iPad and phone together, in co-op, Arcade, Versus (free-for-all or teams: tap your card to pick a team) or the host's house. Every device needs the same version of the game, so reload the page on all of them after an update.
 - **Customize → Character** holds four saved fighters. Change the name, height, head size, head type (**Donut**, a ring, or **Full**, filled in), line thickness and stance, and dress them from the tabs: Colors, Head (hair, hats, headbands), Neck (scarves, ties), Upper Body (shirts, jackets, gloves), Lower Body (pants, shorts, skirts, dresses, shoes), Surge (the color of your Surge) and Poses (up to 8 on your pose wheel; the first is your victory pose). Each shelf is also the store: tap an item to try it on, tap again to buy it with ninja stars. Delete a fighter from the Body tab. Defeated enemies drop the stars, and Captains drop gifts. Everything is looks only and never changes how you fight. In multiplayer, each player picks a fighter on the Players screen and can change their color and hat.
 - **Customize → House** builds your house, as big as you like (even a little city): walls square by square, **barriers** (floors, side walls, stairs, spiral stairs and ladders, drawn as black lines), furniture and decorations piece by piece (each costs a few ninja stars), and a background. A wall painted on stairs fills just the steps. The D-pad moves around your land, which grows as you build, and **−** / **+** zoom out and in. Erase gives back every star, front first. **WALK AROUND** lets your fighter explore it: jump onto floors; walking keeps you on your level, holding **Up** while walking takes stairs going up that way and **Down** takes stairs going down; on ladders and spiral stairs **Up** climbs and **Down** goes down; press **Down + Jump** to drop through a floor; side walls stop you; **Esc** (or Start / II) goes straight back to the builder. With several players the camera zooms out to keep everyone on screen. Online, the host can pick **HOST'S HOUSE** so everyone visits.
+- **Skills** (Customize → Character → SKILLS): each saved fighter earns XP for every enemy beaten (everyone in the fight gets it) and for clearing levels and Arcade waves, and levels up to 30. Each level gives a skill point (bonus points at 5, 10, 15, 20, 25 and 30) to spend in five branches: Fists, Legs, Surge, Body and Fortune. New fighters start with the basic moves; points unlock the rest and add small boosts. Tap a skill to see what it does and tap it again (or + ADD) to spend a point; TAKE BACK and RESET give points back for free. At level 5 pick an **ultimate** from a branch you have a point in: it gets stronger at 15 and 30 (Legs ends with the Tornado Kick). In Versus your moves and ultimate count, but boosts don't, so a high level can't overpower a low one. A TEST row at the bottom (temporary, for testing) sets the level.
 - **Back up your save** in Settings → Save: copy a code or save a file, and restore it on any device.
 - **Training Room** has dummies, hitboxes, frame data and the Feel / Moves / Info panels.
 
@@ -30,7 +31,7 @@ The title says **PRESS START**: press any key, button or tap.
 | Surge (hold, or tap on/off: Settings → Surge button): run through enemies, super jump, Surge moves | Shift | SURGE | Bumpers / triggers |
 | Block (hits from the front cost Surge instead of health; drops when Surge runs out) | Shift + S, standing still | SURGE + stick down | Bumper + d-pad down |
 | Grab | J + K together | PUNCH + KICK | X + B |
-| Tornado Kick (blue meter full) | U | ULT | Y |
+| Ultimate (blue meter full; pick it on the Skills screen) | U | ULT | Y |
 | Pose wheel (hold, aim, let go) | T | POSE (hold, aim with the stick) | Select / View / − |
 | Pause | Esc or P | II | Start |
 
@@ -49,7 +50,7 @@ The **Training Room** (title screen) has spawnable dummies, hitbox and frame-dat
 | Grunt | Basic puncher | Anything |
 | Runner | Fast lunge from range | Interrupt it with quick hits |
 | Brute | Heavy, has poise (blue bar) | Heavy hits to break poise, then launch or grab |
-| Guard | Shield blocks hits from the front | Hit it from behind, sweep low, grab it, Tornado Kick, or smash the shield (GUARD BREAK) |
+| Guard | Shield blocks hits from the front | Hit it from behind, sweep low, grab it, an ultimate, or smash the shield (GUARD BREAK) |
 | Flanker | Sneaks or leaps behind you | Hits that cover both sides: Spin Back-Kick, sweeps, Whirlwind |
 | Captain (boss, waves 5/10/15) | Slam, charge; enraged at 55% adds a quake leap and backup | Break its poise; jump the quake |
 

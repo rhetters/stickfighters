@@ -2,6 +2,17 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M12 in progress: XP, levels and the skill tree (November 19, 2026)
+- **M18 (house builder) is done.**
+- **XP and levels:** each saved fighter earns XP for every enemy beaten (shared by everyone in the fight), plus bonuses for clearing a level, Arcade waves and Versus rounds and wins. Levels go up to 30; XP shows on the results screen with any level-up.
+- **Skill tree** (Customize → Character → SKILLS): five branches (Fists, Legs, Surge, Body, Fortune), four rows each. Points unlock moves (new fighters start with the basics, so moves are earned back) and small boosts that add up over many levels. Respec is free: take back any point a higher row doesn't need, or RESET everything.
+- **Ultimates:** the Tornado Kick is no longer for everyone. Pick a branch with a point in it: Fists (Flurry, Hundred Fists, Comet Fist), Legs (Spin Kick, Twisting Kick, Tornado Kick), Surge (Surge Dash, Lightning Rush, Thunder Step) or Body (Shoulder Charge, Quake Stomp, Earthshaker), opening at levels 5, 15 and 30, each with a colour burst and a slow-motion moment.
+- **Versus:** moves and ultimates count, boosts don't.
+- **Testing:** a temporary TEST row on the Skills screen sets the level (one file, `js/devtools.js`).
+- Training Room: the Moves panel shows which skill unlocks each locked move.
+- Save version 12 (fighters gain their progress; everyone starts at level 1). Self-test fingerprints unchanged (it plays with everything open).
+- Version 27.
+
 ## M18 in progress: last of the old name (November 19, 2026)
 - A saved backup file is now named `stickfighters-save-<date>.json`. Older backup files (and backup codes, which still start with `OVPA-`) restore as before.
 - Version 26.
