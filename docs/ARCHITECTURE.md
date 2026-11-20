@@ -36,13 +36,13 @@ How the code fits together: files, the simulation, and how each system works. Up
 | 26 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
 | 27 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
 | 28 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
-| 29 | `js/ui/online.js` | Online screen: Host / Join, room code picker, room cards, mode and Start, online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
+| 29 | `js/ui/online.js` | Online screen: Host / Join, room code picker, room cards, mode and Start (in a room the screen gets `.inroom`, a compact layout that fits without scrolling), online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
 | 30 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
 | 31 | `js/ui/character.js` | Character screen and store: four fighter slots, Body tab (height, head, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
 | 32 | `js/ui/house.js` | House screen: tabs (walls, furniture, decorations, background, erase), the palette (`housePal`, buying with the two-tap rule), one button per grid square (`houseCells`; drag paints), `houseAct`, WALK AROUND |
 | 33 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
 | 34 | `js/selftest.js` | `selfTest()` determinism check and the fingerprints it expects (`SELFTEST_EXPECT`) |
-| 35 | `js/main.js` | Screens, settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
+| 35 | `js/main.js` | Screens, the title menu (`splitOpen` swaps a button for its pair; `titlePoof` plays the orange poof), `playerPause()` (Esc / Start / II: pause, or straight back to the builder when walking around a house), settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
 
 Nothing runs game code at load except data setup; boot (`checkUnlocks(); init(); applySet(); resize(); bindSettings(); syncTrain(); openTitle(); requestAnimationFrame(loop)`) is the last thing in `main.js`.
 

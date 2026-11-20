@@ -195,8 +195,9 @@ addEventListener('keydown', e => {
     a = KEYS[key];
   if (a === 'pause') {
     if (!e.repeat && (state === 'play' || state === 'train')) {
-      togglePause();
+      playerPause();
       e.preventDefault();
+      e.stopImmediatePropagation(); // the menus' own Esc handlers must not see this press too
     }
     return;
   }
@@ -371,7 +372,7 @@ function pollPad() {
     }
     // Start pauses; on the pause menu it resumes. Any controller can pause.
     if ((M.pause || []).some(down)) {
-      if (live()) pause(true);
+      if (live()) playerPause();
       else if (paused && !$('s-pause').hidden) pause(false);
     }
     if (!live()) padMenu(g, now, down, ax);

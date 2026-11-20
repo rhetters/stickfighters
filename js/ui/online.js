@@ -31,6 +31,7 @@ function onlineCode() {
   return ROOM_WORDS[ONC.w] + '-' + ONC.a + ONC.b;
 }
 function renderOnline() {
+  $('s-online').classList.toggle('inroom', NET.on);
   $('on-menu').hidden = NET.on;
   $('on-room').hidden = !NET.on;
   $('on-w').textContent = ROOM_WORDS[ONC.w];
@@ -84,13 +85,14 @@ function renderOnline() {
     cards.appendChild(c);
   }
   const live = NET.players.filter(p => !p.left).length;
-  for (const b of $('on-modes').querySelectorAll('button')) {
+  for (const b of $('on-modes').querySelectorAll('[data-mode]')) {
     b.classList.toggle('on', b.dataset.mode === NET.mode);
     b.disabled = !NET.host;
   }
   $('on-teams').hidden = NET.mode !== 'vs';
   $('on-teams').disabled = !NET.host;
-  $('on-teams').textContent = NET.teams ? 'VERSUS: TEAMS' : 'VERSUS: FREE-FOR-ALL';
+  $('on-teams').textContent = NET.teams ? 'TEAMS' : 'FREE-FOR-ALL';
+  $('on-teams').classList.toggle('on', NET.teams);
   $('on-start').hidden = !NET.host;
   $('on-start').disabled = NET.mode === 'vs' && !netVsReady();
   $('on-wait').textContent = NET.host
@@ -212,7 +214,7 @@ $('on-a-').onclick = onStep('a', 10, -1);
 $('on-a+').onclick = onStep('a', 10, 1);
 $('on-b-').onclick = onStep('b', 10, -1);
 $('on-b+').onclick = onStep('b', 10, 1);
-for (const b of $('on-modes').querySelectorAll('button'))
+for (const b of $('on-modes').querySelectorAll('[data-mode]'))
   b.onclick = () => {
     if (!NET.host) return;
     NET.mode = b.dataset.mode;

@@ -110,6 +110,12 @@ function pause(on) {
   } else show(null);
 }
 const togglePause = () => pause(!paused);
+// A player pressing pause (Esc, a controller's Start, the pause button). Walking around your own house, that goes
+// straight back to the house builder; automatic pauses (switching apps, turning the iPad) still show the menu.
+function playerPause() {
+  if (!paused && live() && MODE === HOUSE_MODE && !NET.match) return openHouse();
+  togglePause();
+}
 function over() {
   if (state !== 'play') return;
   if (MODE.over) return MODE.over();
@@ -247,9 +253,55 @@ function splitShow(k, open, quiet) {
   $(row).hidden = !open;
   if (!quiet) $(open ? first : btn).focus({ preventScroll: true });
 }
-function splitOpen(k) {
+function splitOpen(k, poof) {
   for (const o in SPLITS) if (o !== k) splitShow(o, false, true);
   splitShow(k, true);
+  if (poof) titlePoof(k);
+}
+// An orange puff of cloud where the button was, fading as its two buttons pop in (drawing only; skipped when the
+// device asks for reduced motion)
+const POOF = [
+  [0, 0, 1.15, 0],
+  [-0.62, 0.1, 0.8, 30],
+  [0.6, -0.08, 0.85, 20],
+  [-0.3, -0.38, 0.7, 50],
+  [0.32, 0.36, 0.72, 40],
+  [-0.95, -0.2, 0.5, 70],
+  [0.98, 0.22, 0.55, 60],
+  [0.05, 0.45, 0.6, 80]
+];
+function titlePoof(k) {
+  const [btn, row] = SPLITS[k],
+    slot = $(btn).parentElement;
+  $(row).classList.remove('popin');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  void $(row).offsetWidth; // restart the pop-in animation
+  $(row).classList.add('popin');
+  const w = $(btn).offsetWidth,
+    h = $(btn).offsetHeight,
+    cloud = document.createElement('span');
+  cloud.className = 'poof';
+  cloud.setAttribute('aria-hidden', 'true');
+  for (const [x, y, r, d] of POOF) {
+    const p = document.createElement('i');
+    p.style.cssText =
+      'left:' +
+      (50 + x * 40) +
+      '%;top:' +
+      (50 + y * 50) +
+      '%;width:' +
+      h * r * 1.5 +
+      'px;height:' +
+      h * r * 1.5 +
+      'px;animation-delay:' +
+      d +
+      'ms';
+    cloud.appendChild(p);
+  }
+  cloud.style.width = w + 'px';
+  cloud.style.height = h + 'px';
+  slot.appendChild(cloud);
+  setTimeout(() => cloud.remove(), 700);
 }
 // Back on the title: fold whichever row is open. Returns true if something was folded.
 function titleBack() {
@@ -268,9 +320,9 @@ function titleOpenAll() {
   TITLE.ready = TITLE.keepOpen = true;
   titleView();
 }
-$('b-solo').onclick = () => splitOpen('solo');
-$('b-mp').onclick = () => splitOpen('mp');
-$('b-cust').onclick = () => splitOpen('cust');
+$('b-solo').onclick = () => splitOpen('solo', true);
+$('b-mp').onclick = () => splitOpen('mp', true);
+$('b-cust').onclick = () => splitOpen('cust', true);
 $('b-online').onclick = () => openOnline();
 addEventListener('gamepadconnected', () => {
   if (pressMode()) titleReveal();
@@ -337,7 +389,7 @@ $('b-level').onclick = () => startLevel('woods1');
 $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : startLevel(LV.id)), 'again');
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(openTitle, 'room');
-$('pausebtn').onclick = () => pause(true);
+$('pausebtn').onclick = () => playerPause();
 // Pose wheel on touch: hold POSE, aim with the stick, let go to strike the pose
 {
   const pb = $('posebtn'),
