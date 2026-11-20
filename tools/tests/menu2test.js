@@ -15,7 +15,7 @@ await tap(1);await W(100);ok(await ev("!$('solorow').hidden&&document.activeElem
 const g1=await geo();ok(g0===g1,nm+': title and other buttons do not move or resize');
 await p.screenshot({path:S+'/shots/menu2-'+nm+'-b.png'});
 await tap(0);ok(await ev("$('solorow').hidden&&document.activeElement.id==='b-solo'"),nm+': B folds it back');
-await tap(13);await tap(1);await W(100);ok(await ev("!$('mprow').hidden&&document.activeElement.id==='b-multi'"),nm+': MULTIPLAYER shows LOCAL | ONLINE');
+await tap(13);await tap(1);ok(await ev("document.querySelectorAll('.poof i').length>=6&&$('mprow').classList.contains('popin')"),nm+': an orange poof as the two buttons pop in');await W(800);ok(await ev("!document.querySelector('.poof')"),nm+': the poof cleans itself up');ok(await ev("!$('mprow').hidden&&document.activeElement.id==='b-multi'"),nm+': MULTIPLAYER shows LOCAL | ONLINE');
 const g2=await geo().then(s=>s.split(' | ').slice(0,4).join(' | '));ok(g0.split(' | ').slice(0,4).join(' | ')===g2,nm+': still nothing moves');
 await p.screenshot({path:S+'/shots/menu2-'+nm+'-c.png'});
 await tap(15);await tap(1);await W(100);ok(await p.isVisible('#s-online'),nm+': ONLINE opens the placeholder');

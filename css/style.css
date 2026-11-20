@@ -1530,6 +1530,30 @@ body.padnav #ui select:focus {
   font-size: 11px;
   color: #7a6e80;
 }
+/* In a room everything fits on one screen: the room code stands in for the title, the cards are shorter, the
+   Versus teams switch sits with the modes, and START sits beside LEAVE ROOM. */
+#s-online.inroom h2 {
+  display: none;
+}
+#s-online.inroom .pcard {
+  min-height: 0;
+}
+#on-wait {
+  margin: 0;
+  font-size: 13px;
+}
+#on-teams {
+  border-style: dashed;
+}
+.onfoot {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+#s-online .onfoot .btn {
+  min-width: 180px;
+}
 /* House screen: the house fills the frame; everything else sits on top of it. The floor line is at 270 of 420
    (64.3%), and the tabs and pieces sit on the floor below it. */
 #s-house:not([hidden]) {
@@ -1693,4 +1717,71 @@ body.padnav #ui select:focus {
   color: #1c1626;
   background: #fff3c4;
   box-shadow: inset 0 0 0 3px #ffd400;
+}
+/* short screens (phones): tighter online room */
+@media (max-height: 440px) {
+  #s-online.inroom .onroomcode b {
+    font-size: 22px;
+  }
+  #s-online.inroom #on-diag {
+    display: none;
+  }
+  #s-online.inroom #on-msg:empty {
+    min-height: 0;
+    margin: 0;
+  }
+  #s-online.inroom .onmodes button {
+    min-height: 30px;
+    padding: 2px 10px;
+  }
+  #s-online.inroom .onfoot .btn {
+    min-height: 34px;
+  }
+}
+/* The title's orange poof: puffs swell and fade where a button was, while its two buttons pop in */
+.poof {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 2;
+}
+.poof i {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffc27a 0 30%, #ff9a2e 55%, #ff7a00 100%);
+  box-shadow: 0 0 0 2px rgba(28, 22, 38, 0.35);
+  transform: translate(-50%, -50%) scale(0.2);
+  opacity: 0;
+  animation: poof 560ms ease-out forwards;
+}
+@keyframes poof {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.95;
+  }
+  45% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 0;
+  }
+}
+.split.popin {
+  animation: popin 380ms 140ms ease-out backwards;
+}
+@keyframes popin {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.6);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.06);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
 }

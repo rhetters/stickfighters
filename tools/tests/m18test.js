@@ -58,6 +58,9 @@ ok(await ev("$('hs-tabs').children[1].textContent==='BARRIERS'&&[...$('hs-pal').
 ok(await ev("getComputedStyle($('hs-cv')).position==='absolute'&&$('hs-cv').getBoundingClientRect().width>=$('s-house').getBoundingClientRect().width-2"),'the house fills the whole frame');
 await ev("$('b-houseback').click();$('b-char').click()");ok(await ev("getComputedStyle(document.querySelector('.hsdpad')).display!=='none'?!document.querySelector('.hsdpad').offsetParent:true"),'the house buttons are gone on other screens');
 await ev("$('b-charback').click();$('b-house').click()");
+// Esc while walking around goes straight back to the builder
+await ev("$('b-hvisit').click()");await p.waitForTimeout(200);await p.keyboard.press('Escape');await p.waitForTimeout(200);
+ok(await ev("!$('s-house').hidden&&!paused&&state!=='play'"),'Esc in WALK AROUND returns to the house builder (no pause menu)');
 // walking around: floors and stairs are terrain
 await ev(`Object.assign(HOUSE,{cells:{},items:[],solids:{'8,0':'stairR','9,1':'stairR','10,2':'stairR','10,3':'stairL','9,4':'stairL','8,5':'stairL','11,3':'floor','12,3':'floor','13,3':'floor','14,3':'floor','15,3':'floor','21,4':'floor','23,4':'floor','24,4':'floor'},floors:{},sides:{'19,0':'side','19,1':'side'},fills:{},climbs:{'22,0':'ladder','22,1':'ladder','22,2':'spiral','22,3':'spiral'}});titleOpenAll();$('b-house').click();$('b-hvisit').click()`);
 ok(await ev("state==='play'&&MODE.id==='house'&&E.length===0&&TERRAIN.n===20"),'WALK AROUND: your house with its floors and stairs, no enemies');
@@ -119,6 +122,7 @@ ok(await G.evaluate(()=>PL.length===2&&NET.match),'both fighters are there');
 await H.evaluate(()=>{pause(true);$('b-quit').click()});await H.waitForTimeout(800);
 await H.evaluate(()=>{NET.mode='vs';netRoomChanged();$('on-teams').click()});await H.waitForTimeout(500);
 ok(await G.evaluate(()=>NET.teams&&!$('on-teams').hidden&&document.querySelectorAll('#on-cards .pteam').length===2),'online Versus: the host turns on teams and everyone sees team buttons');
+ok(await H.evaluate(()=>{const e=$('s-online');return e.scrollHeight<=e.clientHeight+1&&document.documentElement.scrollHeight<=innerHeight+1}),'the online room fits without a scroll bar in Versus with teams');
 ok(await H.evaluate(()=>$('on-start').disabled===false),'one player on each team: ready to start');
 await G.evaluate(()=>netSetTeam(NET.mySlot));await G.waitForTimeout(500);ok(await H.evaluate(()=>NET.players.every(p=>!p.team)&&$('on-start').disabled),'a guest can switch their own team; both on one team cannot start');
 await G.evaluate(()=>netSetTeam(NET.mySlot));await G.waitForTimeout(500);await H.evaluate(()=>$('on-start').click());await H.waitForTimeout(1500);
