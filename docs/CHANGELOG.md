@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: new title art, Settings fix (November 19, 2026)
+- **Title screen:** Rhett's StickFighters picture is now the main menu art, with the menu in the space between the two fighters. The picture is shown whole; blurred edges fill the wider game frame.
+- Fixed: on a short screen the top of **Settings** was cut off and couldn't be scrolled to. Settings now scrolls from the top (the same fix covers every centered menu screen).
+- Self-test fingerprints unchanged.
+- Version 23.
+
 ## M18 in progress: polish (November 19, 2026)
 - **Online room** fits on the screen without a scroll bar, in every mode (Versus with teams too) and on phones in landscape.
 - **House: WALK AROUND** — Esc (or Start / the pause button) goes straight back to the house builder instead of the pause menu.
