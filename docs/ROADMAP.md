@@ -21,7 +21,6 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M9 | Local multiplayer: co-op and versus | Done | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
 | M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
 | M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
-| M11.5 | Rollback for online play (proposed) | Planned | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | M12 | XP, levels, skill tree | Next | L | M3, M8, M10 | Level-ups, skill points, tree screen |
 | M13 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M10, M12 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
 | M14 | Boss level | Planned | L | M13 | Multi-phase boss fight |
@@ -29,18 +28,10 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
 | M18 | House builder and visiting | Next | L | M10, M11 | Build a house with stars, invite friends over |
-| Someday | Cloud saves, Steam | Maybe | — | — | Desktop app, Steam Workshop, server-backed stars |
+| M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
+| Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
 ## Upcoming milestones
-
-### M11.5 · Rollback for online play (proposed)
-
-- Why: Versus at 58 ping felt laggy in the first real test. The direct-connection patch halved the delay; rollback removes most of the rest.
-- How: your own presses take effect at once (with a small built-in delay of 1–2 frames). Other players are predicted to keep pressing what they last pressed; when their real presses arrive and differ, the game rewinds to that frame and replays up to now within the same screen refresh.
-- Needs: saving and restoring the whole fight state every frame (fighters, enemies, ragdolls, the random seed, mode state), replays that don't repeat sounds and effects, and a limit on how far back it rewinds (about 8 frames).
-- Ordering: before or after M12 is Ron and Rhett's call.
-
-**Done when:** Versus between two houses at about 60 ping feels close to local, with no desyncs over a 10-minute match.
 
 ### M12 · XP, levels, skill tree
 
@@ -113,6 +104,15 @@ A short prototype first: jump-through platforms, real stairs, and vertical camer
 
 **Done when:** Ron and Rhett say the house builder is finished.
 
+### M11.5 · Rollback for online play (suggested before Steam)
+
+- Why: Versus at 58 ping felt laggy in the first real test. The direct-connection patch halved the delay; rollback removes most of the rest.
+- How: your own presses take effect at once (with a small built-in delay of 1–2 frames). Other players are predicted to keep pressing what they last pressed; when their real presses arrive and differ, the game rewinds to that frame and replays up to now within the same screen refresh.
+- Needs: saving and restoring the whole fight state every frame (fighters, enemies, ragdolls, the random seed, mode state), replays that don't repeat sounds and effects, and a limit on how far back it rewinds (about 8 frames).
+- When: someday, before the move to Steam. It only helps online Versus between houses (not local play, same-house play or co-op against the computer), and it adds a little to every later change that adds gameplay state, so it waits until online Versus between houses is a regular thing.
+
+**Done when:** Versus between two houses at about 60 ping feels close to local, with no desyncs over a 10-minute match.
+
 ### Someday · Cloud saves and Steam
 
 Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Workshop for editor levels and server-owned stars and inventory (why rules R7 and R8 exist). Anything public-facing with kids' accounts raises privacy and moderation questions, so it stays family-only unless Ron decides otherwise.
@@ -122,10 +122,9 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 1. **Back moves.** Add Back+P Backfist and Back+K Back Kick, which hit behind you? Not in the combat chart yet.
 2. **Unlock approach (decide before M12).** Today every move is unlocked, and each carries its tier (FST-1, LEG-2 and so on) so the skill tree can lock them. Start with the base strings and unlock the rest, or start with everything and unlock upgrades?
 3. **Ultimate name.** The Tornado Kick keeps its own blue meter, separate from Surge. Rename it Typhoon?
-4. **Rollback before or after M12.** Ron and Rhett's call.
 
 Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocking) are in the archive.
 
 ## Suggested next step
 
-Decide whether rollback (M11.5) comes before M12. For M12, settle the unlock approach first (Open decisions, item 2).
+For M12, settle the unlock approach first (Open decisions, item 2).
