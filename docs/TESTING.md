@@ -25,7 +25,7 @@ Each test opens `index.html` from disk in a headless browser, plays scripted inp
 | `cptest` | Blocking and Winded |
 | `bindtest` | Settings → Buttons for keys and controllers |
 | `m9lobby`, `m9vs`, `pm9test` | Players screen, Versus, co-op, teams, player grabs |
-| `menu2test`, `navtest` | Title menu with a controller (and its orange poof), the title art, Settings scrolling from its top, directional menu navigation |
+| `menu2test`, `navtest` | Title menu with a controller (and its orange poof), the title art, Settings scrolling from its top, Esc backing out of Settings, directional menu navigation |
 | `m10test` | Stars, store, saved fighters, save migration, pose wheel |
 | `m18test` | Menu highlight (nothing lit until navigated), house builder: Customize menu, prices and full refunds, barriers and layering (fills inside stairs, erase front to back, floor and side wall in one square), the full-frame editor, the land growing, moving and zooming, save version 8 (upgraded from 5, 6 and 7), walking around (Esc returns to the builder, passing through stairs, Up to climb, staying on your level, Up / Down taking stairs going that way (including where two staircases meet), floors and stairs sharing a square, gloves and shoes following line width, ladders and spiral stairs, landing, dropping through, poses on an upper floor, side walls stop you), the camera keeping far-apart players on screen; online: visiting the host's house, Versus teams, the room fitting without a scroll bar |
 | `spam` | Fast touch spamming on a phone-sized screen |
