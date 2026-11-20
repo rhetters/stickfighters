@@ -390,6 +390,9 @@ function netFresh(e) {
   NETIN.forEach((I, i) => (NETIN[i] = mkSlot()));
   // the first D frames have no buttons
   for (let f = 0; f < NET.D; f++) for (const p of NET.roster) netStore(f, p.slot, 0);
+  // buttons that arrived before this match started on this device
+  const early = NET_EARLY.splice(0).filter(q => q.e === e);
+  for (const q of early) if (!(NET.stop[q.s] !== undefined && q.f >= NET.stop[q.s])) netStore(q.f, q.s, q.m);
 }
 function netStartLocal(m) {
   if (!NET.match) NET.feelKeep = { ...FEEL };
@@ -471,8 +474,15 @@ function netStore(f, slot, m) {
     if (H.size > 600) H.delete(H.keys().next().value);
   }
 }
+// Buttons for a match this device hasn't started yet (they came straight from another guest before the host's
+// 'start' or restart got here) are kept, and used when it starts (netFresh); losing them would stall the match.
+const NET_EARLY = [];
 function netGotInput(m) {
-  if (!NET.match || m.e !== NET.epoch) return;
+  if (!NET.match || m.e > NET.epoch) {
+    if (NET_EARLY.length < 4000) NET_EARLY.push(m);
+    return;
+  }
+  if (m.e !== NET.epoch) return;
   if (NET.stop[m.s] !== undefined && m.f >= NET.stop[m.s]) return;
   netStore(m.f, m.s, m.m);
 }

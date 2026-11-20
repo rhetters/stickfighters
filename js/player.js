@@ -232,7 +232,9 @@ function updP(f) {
   if (f.dcd > 0) f.dcd--;
   if (f.phase > 0) f.phase--;
   stamTick(f);
-  f.climb = !!K.u; // holding Up steps onto stairs (terrain.js)
+  // Up / Down: which way to go on stairs, ladders and spiral stairs (terrain.js)
+  f.cl = (K.u ? 1 : 0) - (K.d ? 1 : 0);
+  f.climb = f.cl !== 0;
   f.hpT += (f.hp - f.hpT) * 0.1; // the HUD's health bar trails behind a hit
   // Surge sparkles rising off a player holding Surge (cosmetic: Math.random, and effects aren't part of the game state)
   if (K.s && f.st !== 'dead' && !STM.winded && fr % 4 === 0)
@@ -402,8 +404,13 @@ function updP(f) {
     f.wheel = null;
   }
   if (f.st === 'free') {
-    const g = f.y >= f.gy - 1,
-      m = (K.r ? 1 : 0) - (K.l ? 1 : 0);
+    const g = f.y >= f.gy - 1;
+    let m = (K.r ? 1 : 0) - (K.l ? 1 : 0);
+    // On stairs, Up always walks up them and Down always walks down, whichever way you face
+    if (TERRAIN.n && g && f.cl && !K.s && !f.lad) {
+      const rd = terrainRampDir(f.x, f.gy);
+      if (rd) m = f.cl * rd;
+    }
     // Block: Down + Surge, standing still on the ground. Drains Surge slowly while held (see blockHit).
     if (g && K.d && K.s && !m && !f.flip && canSurge(f)) {
       f.blk = 1;

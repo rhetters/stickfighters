@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 19;
+const GAME_VERSION = 20;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -27,7 +27,7 @@ const ECO = { stars: 0, got: 0, own: [], seen: [] };
 // Saved fighters: four slots, cur = the one Player 1 uses. A slot is null until it's created.
 const CHR = { cur: 0, list: [null, null, null, null] };
 // The house (see data/house.js for its shape). Checked with normHouse() before it's used.
-const HOUSE = { bg: 'hbg-paper', cells: {}, solids: {}, fills: {}, sides: {}, items: [] };
+const HOUSE = { bg: 'hbg-paper', cells: {}, solids: {}, fills: {}, climbs: {}, sides: {}, items: [] };
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
 //   v2: adds prog = { levelId: { done, score, time, combo } }
@@ -38,7 +38,8 @@ const HOUSE = { bg: 'hbg-paper', cells: {}, solids: {}, fills: {}, sides: {}, it
 //   v7: the house grows: rows count up from the floor (v6 counted 7 rows down from the top) and squares can hold
 //       solids; normHouse() turns the rows over for a house marked flip7
 //   v8: barriers: house.fills (material inside stairs) and house.sides (side walls)
-const SAVE_VERSION = 8;
+//   v9: ladders and spiral stairs (now climbed straight up) live in house.climbs; old spiralR / spiralL move there
+const SAVE_VERSION = 9;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -69,6 +70,19 @@ function migrate(s) {
     if (s.house) Object.assign(s.house, { fills: s.house.fills || {}, sides: s.house.sides || {} });
     s.saveVersion = 8;
   }
+  if (s.saveVersion === 8) {
+    const h = s.house;
+    if (h) {
+      h.climbs = h.climbs || {};
+      for (const k in h.solids || {})
+        if (/^spiral/.test(h.solids[k])) {
+          h.climbs[k] = 'spiral';
+          delete h.solids[k];
+          if (h.fills) delete h.fills[k];
+        }
+    }
+    s.saveVersion = 9;
+  }
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).
@@ -93,6 +107,7 @@ function loadSave(s) {
   HOUSE.solids = map(h.solids);
   HOUSE.fills = map(h.fills);
   HOUSE.sides = map(h.sides);
+  HOUSE.climbs = map(h.climbs);
   if (h.flip7) HOUSE.flip7 = 1;
 }
 try {

@@ -355,23 +355,36 @@ function houseSolid(id, x, y, s) {
     ctx.lineTo(x + s, y + s);
   } else if (id.startsWith('stair'))
     stairPts(id, x, y, s).forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
-  else {
-    // spiral: rounded steps curling up the square, with the centre post they turn around
-    const R = id.endsWith('R'),
-      X = u => (R ? x + u : x + s - u),
-      b = y + s,
-      d = s / 3;
-    ctx.moveTo(X(0), b);
-    for (let i = 0; i < 3; i++) {
-      ctx.lineTo(X(i * d), b - (i + 1) * d + d * 0.35);
-      ctx.quadraticCurveTo(X(i * d), b - (i + 1) * d, X(i * d + d * 0.45), b - (i + 1) * d);
-      ctx.lineTo(X((i + 1) * d), b - (i + 1) * d);
+  else if (id === 'ladder') {
+    for (const u of [0.25, 0.75]) {
+      ctx.moveTo(x + s * u, y);
+      ctx.lineTo(x + s * u, y + s);
+    }
+    for (const v of [1 / 6, 1 / 2, 5 / 6]) {
+      ctx.moveTo(x + s * 0.25, y + s * v);
+      ctx.lineTo(x + s * 0.75, y + s * v);
+    }
+  } else {
+    // spiral stairs, seen from the side: a centre post and steps fanning out to alternate sides as they climb
+    const cx = x + s / 2;
+    ctx.moveTo(cx, y);
+    ctx.lineTo(cx, y + s);
+    for (let i = 0; i < 4; i++) {
+      const ty = y + s - (i + 0.5) * (s / 4),
+        d = i % 2 ? -1 : 1;
+      ctx.moveTo(cx, ty);
+      ctx.lineTo(cx + d * s * 0.42, ty - s * 0.06);
+      ctx.lineTo(cx + d * s * 0.42, ty + s * 0.06);
     }
     ctx.stroke();
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(X(s * 0.15), b);
-    ctx.lineTo(X(s), b - s * 0.85);
+    for (let i = 0; i <= 16; i++) {
+      const t = i / 16,
+        px = cx + Math.sin(t * Math.PI * 2) * s * 0.42,
+        py = y + s - t * s;
+      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    }
   }
   ctx.stroke();
 }
@@ -379,7 +392,7 @@ function houseSolid(id, x, y, s) {
 function houseFill(t, sid, x, y, s) {
   ctx.save();
   ctx.beginPath();
-  const pts = stairPts(sid.startsWith('spiral') ? (sid.endsWith('R') ? 'stairR' : 'stairL') : sid, x, y, s);
+  const pts = stairPts(sid, x, y, s);
   pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
   ctx.lineTo(sid.endsWith('R') ? x + s : x, y + s);
   ctx.closePath();
@@ -392,14 +405,15 @@ function houseFill(t, sid, x, y, s) {
 const HCACHE = new WeakMap();
 function houseLists(h) {
   let L = HCACHE.get(h.cells);
-  if (!L || L.of[0] !== h.solids || L.of[1] !== h.fills || L.of[2] !== h.sides) {
+  if (!L || L.of[0] !== h.solids || L.of[1] !== h.fills || L.of[2] !== h.sides || L.of[3] !== h.climbs) {
     const parse = o => Object.entries(o || {}).map(([k, v]) => [...k.split(',').map(Number), v]);
     L = {
       tiles: parse(h.cells),
       solids: parse(h.solids),
       fills: parse(h.fills),
       sides: parse(h.sides),
-      of: [h.solids, h.fills, h.sides]
+      climbs: parse(h.climbs),
+      of: [h.solids, h.fills, h.sides, h.climbs]
     };
     HCACHE.set(h.cells, L);
   }
@@ -410,7 +424,7 @@ function houseExt(h) {
   let cols = 0,
     rows = 0;
   const L = houseLists(h);
-  for (const [c, r] of [...L.tiles, ...L.solids, ...L.sides]) {
+  for (const [c, r] of [...L.tiles, ...L.solids, ...L.sides, ...L.climbs]) {
     cols = Math.max(cols, c + 1);
     rows = Math.max(rows, r + 1);
   }
@@ -432,11 +446,12 @@ function houseTerrain(h) {
         hi = lo - s;
       return id === 'floor'
         ? { x1, x2: x1 + s, y1: lo, y2: lo }
-        : id.endsWith('R')
+        : id === 'stairR'
           ? { x1, x2: x1 + s, y1: lo, y2: hi }
           : { x1, x2: x1 + s, y1: hi, y2: lo };
     }),
-    walls: L.sides.map(([c, r]) => ({ x: (c + 1) * s, y1: G - (r + 1) * s, y2: G - r * s }))
+    walls: L.sides.map(([c, r]) => ({ x: (c + 1) * s, y1: G - (r + 1) * s, y2: G - r * s })),
+    climbs: L.climbs.map(([c, r]) => ({ x: c * s + s / 2, y1: G - (r + 1) * s, y2: G - r * s }))
   };
 }
 // A whole house: the background fills the screen, the rest is drawn in world space seen from (cx, cy)
@@ -476,6 +491,7 @@ function drawHouse(h, cx, cy, z = 1) {
   for (const [c, r, t] of L.fills)
     if (seen(c, r, 1, 1) && sol[c + ',' + r]) houseFill(HTILE[t], sol[c + ',' + r], HX(c), HY(r), s);
   for (const [c, r, id] of L.solids) if (seen(c, r, 1, 1)) houseSolid(id, HX(c), HY(r), s);
+  for (const [c, r, id] of L.climbs) if (seen(c, r, 1, 1)) houseSolid(id, HX(c), HY(r), s);
   for (const [c, r] of L.sides) if (seen(c, r, 1, 1)) houseSolid('side', HX(c), HY(r), s);
   ctx.restore();
 }
@@ -537,7 +553,7 @@ function startHouse(h) {
   state = 'play';
   WB.r = WW.r = Math.max(W, (houseExt(h).cols + 3) * HGRID.cell);
   const T = houseTerrain(h);
-  terrainSet(T.surfaces, T.walls);
+  terrainSet(T.surfaces, T.walls, T.climbs);
   PL.forEach((p, i) => {
     p.x = 160 + i * 90;
     p.face = 1;
