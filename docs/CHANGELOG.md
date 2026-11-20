@@ -2,6 +2,13 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: head types, multiplayer art, tidy-up (November 19, 2026)
+- **Customize → Character → Body:** a new **Head** setting: **Donut** (the ring head everyone had) or **Full** (filled in with your color). It shows everywhere your fighter does: fights, ragdolls, the Players screen, the house and online.
+- **Multiplayer screens:** Rhett's campaign-and-versus drawing is behind the Players (Local) and Online screens, with paper behind the cards and notes so they stay easy to read.
+- Tidy-up: the code was checked for unused functions and styles (none found besides a doubled comment, removed), and ARCHITECTURE, README and TESTING were checked against the code and corrected where they had fallen behind (the house land size, the terrain functions, the house tabs, the save version).
+- Save version 11 (fighters gain a head type; old fighters keep the donut head). Self-test fingerprints unchanged.
+- Version 25.
+
 ## M18 in progress: the game is now StickFighters (November 19, 2026)
 - **New name:** the game is now **StickFighters** everywhere (title screen, browser tab, docs). Saves, backup codes and settings carry over untouched.
 - **Title screen:** Rhett's new notebook drawing, with the StickFighters name in orange-to-pink at the top and the menu in the open space between the fighters.
