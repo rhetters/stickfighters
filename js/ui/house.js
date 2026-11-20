@@ -110,7 +110,22 @@ function houseDraw() {
         S = (STANCES.find(t => t.id === L.stance) || STANCES[0]).p,
         f = { look: L, face: 1, s: 1, slot: 0, vx: 0 },
         o = {};
-      drawFig(110, G, 1, S, L.ht, L.col, L.d2, 0, 1, L.lw, o, L.head, lookLayers(f, { face: 1, s: L.ht }, 1));
+      drawFig(
+        110,
+        G,
+        1,
+        S,
+        L.ht,
+        L.col,
+        L.d2,
+        0,
+        1,
+        L.lw,
+        o,
+        L.head,
+        lookLayers(f, { face: 1, s: L.ht }, 1),
+        L.hfull
+      );
       drawLook(f, { ...o, face: 1, s: L.ht }, 1, 'front');
     }
     ctx.restore();

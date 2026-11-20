@@ -324,12 +324,18 @@ const FIGHTER0 = {
   col: 'col-orange',
   ht: 1,
   head: 1,
+  headType: 'donut',
   lw: 7,
   stance: 'classic',
   eq: Object.fromEntries(EQ.map(s => [s, null])),
   wheel: ['pose-flex', 'pose-wave']
 };
 const FIGHTERS = 4; // saved fighter slots
+// Head types: [id, name]. A donut head is a ring; a full head is filled with the fighter's colour.
+const HEAD_TYPES = [
+  ['donut', 'Donut'],
+  ['full', 'Full']
+];
 // Ninja stars dropped per enemy type [min, max]; plus 1 more for every 10 hits of combo (up to 5 more)
 const STAR_DROP = { g: [1, 2], r: [2, 3], b: [8, 12], u: [4, 6], f: [3, 5], c: [20, 30] };
 // Stars for finishing things

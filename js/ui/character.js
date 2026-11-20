@@ -89,6 +89,7 @@ function charRandom() {
     c.col = pick(ITEMS.filter(i => i.slot === 'color' && owns(i.id))).id;
     c.ht = pick([0.9, 0.95, 1, 1, 1.05, 1.1]);
     c.head = pick([0.9, 1, 1, 1.1, 1.2]);
+    c.headType = pick(HEAD_TYPES)[0];
     c.lw = pick([6, 7, 7, 8]);
     c.stance = pick(STANCES).id;
     for (const s of EQ) {
@@ -215,6 +216,15 @@ function renderBody(c) {
     b.textContent = s.name;
     b.onclick = () => setChar(c => (c.stance = s.id));
     st.appendChild(b);
+  }
+  const ht = $('ch-htype');
+  ht.innerHTML = '';
+  for (const [id, name] of HEAD_TYPES) {
+    const b = document.createElement('button');
+    b.className = 'chopt' + (c.headType === id ? ' on' : '');
+    b.textContent = name;
+    b.onclick = () => setChar(c => (c.headType = id));
+    ht.appendChild(b);
   }
 }
 function card(g, cls, label, status, draw, onTap, id) {
@@ -422,11 +432,28 @@ function charAnim() {
           0.32 - i * 0.05,
           7,
           null,
-          L.head
+          L.head,
+          null,
+          L.hfull
         );
       }
       const c = surgeCol(L, t >> 2);
-      drawFig(f.x, f.y, 1, pose, sc, c, c, 0, 0.45 + 0.2 * Math.sin(t * 0.4), 17, null, L.head);
+      drawFig(
+        f.x,
+        f.y,
+        1,
+        pose,
+        sc,
+        c,
+        c,
+        0,
+        0.45 + 0.2 * Math.sin(t * 0.4),
+        17,
+        null,
+        L.head,
+        null,
+        L.hfull
+      );
     }
     const o = {};
     k.save();
@@ -448,7 +475,8 @@ function charAnim() {
       L.lw,
       o,
       L.head,
-      lookLayers(f, { face: 1, s: sc }, 1)
+      lookLayers(f, { face: 1, s: sc }, 1),
+      L.hfull
     );
     drawLook(f, { ...o, face: 1, s: sc }, 1, 'front');
     k.restore();

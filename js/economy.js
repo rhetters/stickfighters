@@ -115,6 +115,7 @@ function normFighter(c, any) {
     col: ok(f.col, 'color') ? f.col : d.col,
     ht: Math.round(num(f.ht, 0.85, 1.15, 1) * 20) / 20,
     head: Math.round(num(f.head, 0.8, 1.4, 1) * 10) / 10,
+    headType: HEAD_TYPES.some(t => t[0] === f.headType) ? f.headType : d.headType,
     lw: Math.round(num(f.lw, 5, 10, 7)),
     stance: STANCES.some(s => s.id === f.stance) ? f.stance : d.stance,
     eq,
@@ -176,7 +177,16 @@ const curFighter = () => fighter(CHR.cur) || normFighter(FIGHTER0);
 // lookRaw skips the ownership check (the store's try-on preview); everything in the game uses lookOf.
 function lookRaw(f) {
   const col = ITEM[f.col].c,
-    L = { col, d2: shade(col, -0.22), ht: f.ht, head: f.head, lw: f.lw, stance: f.stance, name: f.name };
+    L = {
+      col,
+      d2: shade(col, -0.22),
+      ht: f.ht,
+      head: f.head,
+      hfull: f.headType === 'full',
+      lw: f.lw,
+      stance: f.stance,
+      name: f.name
+    };
   for (const s of EQ) L[s] = f.eq[s] ? ITEM[f.eq[s]] : null;
   L.wheel = f.wheel.map(id => ITEM[id]).filter(Boolean);
   L.pose = L.wheel[0] || ITEM['pose-flex'];

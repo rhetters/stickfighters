@@ -451,9 +451,7 @@ function drawRag(f, a) {
   look('back');
   layer(() => {
     L(c1, [4, 3, 2, 1]);
-    ctx.beginPath();
-    ctx.arc(hx, hy, 9 * s * hk, 0, 7);
-    ctx.stroke();
+    figHead(hx, hy, 9 * s * hk, lk && lk.hfull);
   });
   look('mid');
   layer(() => L(c1, [4, 9, 10]));
@@ -541,10 +539,8 @@ function drawTatsu(f, a, fl) {
     [x + f.face * 2 * s, shY - 4 * s]
   ]);
   const hy0 = y - 64 * s - 9 * s * (hk - 1);
-  ctx.beginPath();
-  ctx.arc(x + f.face * 3 * s, hy0, 9 * s * hk, 0, 7);
   ctx.strokeStyle = c1;
-  ctx.stroke();
+  figHead(x + f.face * 3 * s, hy0, 9 * s * hk, lk && lk.hfull);
   ln(c1, [[x, shY], el, hd]);
   if (!behind) ln(c1, [[x, hipY], knee, leg], (lw0 + 1.5) * Math.pow(s, 0.7));
   arc(true);

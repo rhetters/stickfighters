@@ -39,7 +39,7 @@ await ev("$('hs-right').click();$('hs-up').click()");ok(await ev("HS.ox===5&&HS.
 await ev("$('hs-tabs').children[2].click()");await card('Bed');await p.locator('.hcell').nth(5*20+0).tap();
 ok(await ev("HOUSE.items.some(i=>i.id==='hf-bed'&&i.x===5&&i.y===3)"),'placing while the view is moved uses the land position');
 await ev("$('hs-tabs').children[4].click()");await card('Mint');await card('Mint');ok(await ev("HOUSE.bg==='hbg-mint'&&owns('hbg-mint')"),'a background is bought once and put up');
-const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))");ok(sv.saveVersion===10&&sv.house.bg==='hbg-mint'&&sv.house.floors['3,4']==='floor','saved as version 10 with walls, barriers and items');
+const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))"),SAVE_V=await ev('SAVE_VERSION');ok(sv.saveVersion===SAVE_V&&sv.house.bg==='hbg-mint'&&sv.house.floors['3,4']==='floor','saved at the current version with walls, barriers and items');
 await p.waitForTimeout(600);await p.reload();await p.waitForFunction(()=>typeof openHouse==='function'&&typeof loop==='function');await p.waitForTimeout(400);ok(await ev("HOUSE.bg==='hbg-mint'&&HOUSE.floors['3,4']==='floor'&&CHR.list[0].name==='RHETT'"),'the house survives a reload '+await ev("JSON.stringify({bg:HOUSE.bg,s:HOUSE.floors,raw:(localStorage.getItem('orangeArmy.v1')||'').slice(0,160)})"));
 // a version 6 house (rows counted from the top) is turned over
 ok(await ev("JSON.stringify(normHouse({flip7:1,bg:'hbg-paper',cells:{'1,6':'wood','2,0':'roof'},items:[{id:'hf-shelf',x:4,y:4}]}))")==='{"bg":"hbg-paper","cells":{"1,0":"wood","2,6":"roof"},"solids":{},"floors":{},"fills":{},"climbs":{},"sides":{},"items":[{"id":"hf-shelf","x":4,"y":0}]}','a version 6 house is turned the right way up');
@@ -107,6 +107,8 @@ await p.screenshot({path:S+'/shots/m18-far.png'});
 await ev("PL[1].x=PL[0].x+80;PL[1].y=PL[1].gy=345;for(let i=0;i<150;i++)render()");ok(await ev("CAM.z>0.95"),'together again: back to normal size');
 await ev("ROSTER=[]");
 ok(await ev("(()=>{const o={},o2={};drawFig(0,345,1,STANCES[0].p,1,'#f00','#f00',0,1,7,o,1);drawFig(0,345,1,STANCES[0].p,1,'#f00','#f00',0,1,10,o2,1);return limbK({...o,s:1})===1&&limbK({...o2,s:1})>1.4&&Math.abs(itemR({...o,s:1})-(o.hr+o.hw/2-1.1))<0.01})()"),'gloves and shoes grow with thicker limbs; head items reach the head\'s outer edge');
+ok(await ev("(()=>{const m=migrate({saveVersion:10,chr:{cur:0,list:[{name:'A'},null]}});return m.saveVersion===11&&m.chr.list[0].headType==='donut'&&normFighter({headType:'full'}).headType==='full'&&normFighter({headType:'x'}).headType==='donut'&&lookRaw(normFighter({headType:'full'})).hfull===true})()"),'head type: save version 11 gives old fighters donut heads; full heads reach the drawing');
+ok(await ev("(()=>{ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,60,60);ctx.strokeStyle='#ff0000';ctx.lineWidth=2;figHead(30,30,12,true);const a=ctx.getImageData(30,30,1,1).data[3];ctx.clearRect(0,0,60,60);figHead(30,30,12,false);const b=ctx.getImageData(30,30,1,1).data[3];ctx.restore();return a>200&&b===0})()"),'a full head is filled, a donut head is a ring');
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged');
 // online: a guest visits the host's house
 const srv=spawn('node',[__dirname+'/sigserver.js','9316']);await new Promise(r=>setTimeout(r,400));

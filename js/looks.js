@@ -1228,7 +1228,7 @@ function drawItemIcon(it, cx, cy, sz, baseCol) {
     drawFig(x, y, 1, pz, sc, surgeCol(L, 0), surgeCol(L, 0), 0, 0.5, 15, null, 1);
   }
   const J = {};
-  drawFig(x, y, 1, pz, sc, col, L.d2, pz[9], 1, 7, J, 1, lookLayers(f, { face: 1, s: sc }, 1));
+  drawFig(x, y, 1, pz, sc, col, L.d2, pz[9], 1, 7, J, 1, lookLayers(f, { face: 1, s: sc }, 1), L.hfull);
   drawLook(f, { ...J, face: 1, s: sc, col }, 1, 'front');
   ctx.restore();
 }

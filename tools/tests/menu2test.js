@@ -34,4 +34,6 @@ ok(await p.evaluate(()=>{const e=$('s-settings');return e.scrollHeight>e.clientH
 await p.keyboard.press('Escape');await p.waitForTimeout(150);ok(await p.evaluate(()=>$('s-settings').hidden&&!$('s-title').hidden),'Esc backs out of Settings');
 await p.evaluate(()=>{$('b-start').click()});await p.waitForTimeout(300);await p.keyboard.press('Escape');await p.waitForTimeout(100);await p.evaluate(()=>$('b-set2')?$('b-set2').click():0);await p.waitForTimeout(100);
 if(await p.evaluate(()=>!$('s-settings').hidden)){await p.keyboard.press('Escape');await p.waitForTimeout(150);ok(await p.evaluate(()=>$('s-settings').hidden&&!$('s-pause').hidden&&paused),'Esc backs out of Settings opened from pause, back to the pause menu')}else ok(false,'Settings opens from pause');
+ok(await p.evaluate(()=>['s-lobby','s-online'].every(id=>getComputedStyle($(id)).backgroundImage.includes('multiplayer.jpg'))),'the multiplayer drawing is behind the Players and Online screens');
+ok(await p.evaluate(()=>new Promise(r=>{const i=new Image();i.onload=()=>r(i.naturalWidth>1000);i.onerror=()=>r(false);i.src='img/multiplayer.jpg'})),'the multiplayer drawing loads');
 ok(errs.length===0,'no page errors '+errs.join('|'));await b.close();console.log(fails?fails+' FAILED':'ALL PASS')})();
