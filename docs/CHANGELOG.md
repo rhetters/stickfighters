@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M18 in progress: last of the old name (November 19, 2026)
+- A saved backup file is now named `stickfighters-save-<date>.json`. Older backup files (and backup codes, which still start with `OVPA-`) restore as before.
+- Version 26.
+
 ## M18 in progress: head types, multiplayer art, tidy-up (November 19, 2026)
 - **Customize → Character → Body:** a new **Head** setting: **Donut** (the ring head everyone had) or **Full** (filled in with your color). It shows everywhere your fighter does: fights, ragdolls, the Players screen, the house and online.
 - **Multiplayer screens:** Rhett's campaign-and-versus drawing is behind the Players (Local) and Online screens, with paper behind the cards and notes so they stay easy to read.
