@@ -88,7 +88,7 @@ $('bk-file').onclick = () => {
   const a = document.createElement('a'),
     d = new Date();
   a.href = URL.createObjectURL(new Blob([JSON.stringify(saveData(), null, 1)], { type: 'application/json' }));
-  a.download = 'orange-army-save-' + d.toISOString().slice(0, 10) + '.json';
+  a.download = 'stickfighters-save-' + d.toISOString().slice(0, 10) + '.json';
   document.body.appendChild(a);
   a.click();
   setTimeout(() => {
