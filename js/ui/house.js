@@ -33,7 +33,7 @@ const HS_TABS = [
 const HS_HELP = {
   walls: 'Pick a material, then tap or drag. On stairs it fills just the steps.',
   solids:
-    'Barriers hold you up or stop you: jump onto floors, hold Up to walk up stairs, Down + Jump drops through.',
+    'Barriers hold you up or stop you. Hold Up or Down to climb stairs, ladders and spirals; Down + Jump drops through a floor.',
   hfurn: 'Pick one, then tap where its bottom-left corner goes.',
   hdecor: 'Pick one, then tap where its bottom-left corner goes.',
   hbg: 'Tap a background to use it.',
@@ -208,7 +208,7 @@ function houseAct(c, r) {
       delete HOUSE.fills[k];
     }
   } else if (HS.tab === 'erase') {
-    // front to back: a thing, the stairs' fill, a side wall, the floor or stairs, the wall behind
+    // front to back: a thing, the stairs' fill, a side wall, a ladder or spiral stairs, the floor or stairs, the wall
     const i = houseItemAt(c, r),
       take = (layer, list) => {
         refundStars(list[HOUSE[layer][k]].price, 'house');
@@ -218,6 +218,7 @@ function houseAct(c, r) {
     if (i >= 0) refundStars(ITEM[HOUSE.items.splice(i, 1)[0].id].price || 0, 'house');
     else if (HOUSE.fills[k]) take('fills', HTILE);
     else if (HOUSE.sides[k]) take('sides', HSOLID);
+    else if (HOUSE.climbs[k]) take('climbs', HSOLID);
     else if (HOUSE.solids[k]) take('solids', HSOLID);
     else if (HOUSE.cells[k]) take('cells', HTILE);
     else return;
