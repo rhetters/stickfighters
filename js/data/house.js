@@ -7,7 +7,7 @@
 // along its right edge nobody walks through). Barriers are drawn as black lines. Furniture and decorations are placed by their bottom-left square.
 // Everything placed costs stars and erasing gives them all back; backgrounds are bought once (store items in
 // items.js, sections hbg / hfurn / hdecor). The land grows as you build, up to maxCols x maxRows.
-// Saved as { bg, cells, solids, fills, climbs, sides: { "c,r": id }, items: [{ id, x, y }] }.
+// Saved as { bg, cells, solids, floors, fills, climbs, sides: { "c,r": id }, items: [{ id, x, y }] }.
 const HGRID = { cell: 45, maxCols: 240, maxRows: 60, viewCols: 20, grow: 12 };
 const HTILES = [
   { id: 'wood', name: 'Wood', c: '#d39a5e', c2: '#a96e3a', price: 2 },
@@ -19,10 +19,10 @@ const HTILES = [
   { id: 'glass', name: 'Window', c: '#cdeeff', c2: '#7fc4ee', price: 4 }
 ];
 const HTILE = Object.fromEntries(HTILES.map(t => [t.id, t]));
-// Barriers. layer = where it's kept: solids (what you stand on), climbs (what you climb) or sides (a side wall on the
-// square's right edge)
+// Barriers. layer = where each is kept, so one square can hold one of each: floors (a floor along the bottom edge),
+// solids (stairs), climbs (a ladder or spiral stairs) and sides (a side wall along the right edge)
 const HSOLIDS = [
-  { id: 'floor', name: 'Floor', price: 2, layer: 'solids' },
+  { id: 'floor', name: 'Floor', price: 2, layer: 'floors' },
   { id: 'side', name: 'Side Wall', price: 2, layer: 'sides' },
   { id: 'stairR', name: 'Stairs \u2197', price: 3, layer: 'solids' },
   { id: 'stairL', name: 'Stairs \u2196', price: 3, layer: 'solids' },

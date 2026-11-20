@@ -208,7 +208,7 @@ function houseAct(c, r) {
       delete HOUSE.fills[k];
     }
   } else if (HS.tab === 'erase') {
-    // front to back: a thing, the stairs' fill, a side wall, a ladder or spiral stairs, the floor or stairs, the wall
+    // front to back: a thing, the stairs' fill, a side wall, a ladder or spiral stairs, a floor, stairs, the wall
     const i = houseItemAt(c, r),
       take = (layer, list) => {
         refundStars(list[HOUSE[layer][k]].price, 'house');
@@ -219,6 +219,7 @@ function houseAct(c, r) {
     else if (HOUSE.fills[k]) take('fills', HTILE);
     else if (HOUSE.sides[k]) take('sides', HSOLID);
     else if (HOUSE.climbs[k]) take('climbs', HSOLID);
+    else if (HOUSE.floors[k]) take('floors', HSOLID);
     else if (HOUSE.solids[k]) take('solids', HSOLID);
     else if (HOUSE.cells[k]) take('cells', HTILE);
     else return;

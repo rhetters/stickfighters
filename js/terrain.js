@@ -3,8 +3,9 @@
 // ===== TERRAIN =====
 // A surface is a line { x1, x2, y1, y2 } (x1 < x2): flat when y1 === y2 (a floor), a ramp otherwise (stairs).
 // The rules, like most platformers: going up, or walking into a surface from the ground, passes through it; falling
-// onto it from above lands on it; holding Up while walking into stairs steps onto them; standing on a surface,
-// walking follows it (up and down stairs) and carries on onto a touching surface; walking off its end, you fall.
+// onto it from above lands on it. Walking along a floor (or the ground) you stay on that level: holding Up while
+// walking onto stairs that go up that way takes them, and holding Down takes stairs that go down that way. On stairs
+// you follow them to their end and carry on onto a floor at that height; with nothing there, you fall.
 // Down + Jump drops through. Each fighter keeps f.gy = the height it stands on.
 // A wall { x, y1, y2 } (y1 < y2) is a vertical line nobody walks or flies through, from either side.
 // A climb { x, y1, y2 } (a ladder or spiral stairs; x = its middle) is climbed with Up and Down: hold Up or Down
@@ -39,17 +40,34 @@ function surfAt(x) {
     for (const s of TERRAIN.b.get(k) || []) if (x >= s.x1 && x <= s.x2) out.push(s);
   return out;
 }
-// The surface height closest to y within tol (walking along), or null. ramps = only stairs (stepping on with Up);
-// with climb, stairs win a tie with a floor at the same height, so Up turns you onto stairs that start from a floor.
-function surfNear(x, y, tol, climb, ramps) {
+const isRamp = s => s.y1 !== s.y2;
+const rise = s => (s.y2 < s.y1 ? 1 : -1); // which way stairs go up: 1 = to the right
+// Stairs a fighter walking in direction d can step onto at its feet (x, y): with Up, stairs that go up that way;
+// with Down (cl < 0), stairs that go down that way. They must carry on in that direction from here.
+function rampToTake(x, y, d, cl, tol, not) {
+  if (!d || !cl) return null;
+  for (const s of surfAt(x))
+    if (
+      s !== not &&
+      isRamp(s) &&
+      rise(s) * d * cl > 0 &&
+      x + d * 0.5 >= s.x1 &&
+      x + d * 0.5 <= s.x2 &&
+      Math.abs(surfY(s, x) - y) <= tol
+    )
+      return s;
+  return null;
+}
+// Where walking carries on when the surface you stood on ends: a floor at about the same height, or more of the same
+// stairs (the same way up). Other stairs are only taken with Up or Down (rampToTake).
+function surfNext(x, y, tol, cur) {
   let best = null,
     bd = 1e9;
   for (const s of surfAt(x)) {
-    if (ramps && s.y1 === s.y2) continue;
-    const sy = surfY(s, x),
-      d = Math.abs(sy - y) - (climb && s.y1 !== s.y2 ? 0.5 : 0);
-    if (Math.abs(sy - y) <= tol && d < bd) {
-      best = sy;
+    if (s === cur || (isRamp(s) && !(cur && isRamp(cur) && rise(cur) === rise(s)))) continue;
+    const d = Math.abs(surfY(s, x) - y);
+    if (d <= tol && d < bd) {
+      best = s;
       bd = d;
     }
   }
@@ -60,7 +78,7 @@ function surfCross(x, y0, y1) {
   let best = null;
   for (const s of surfAt(x)) {
     const sy = surfY(s, x);
-    if (y0 <= sy + 0.5 && y1 >= sy && (best === null || sy < best)) best = sy;
+    if (y0 <= sy + 0.5 && y1 >= sy && (best === null || sy < surfY(best, x))) best = s;
   }
   return best;
 }
@@ -70,13 +88,12 @@ function climbAt(x, y) {
     if (Math.abs(x - r.x) <= 20 && y >= r.y1 - 0.5 && y <= r.y2 + 0.5) return r;
   return null;
 }
-// Stairs at the feet (x, y): 1 if they rise to the right, -1 to the left, 0 if none. Looks a little either side so
-// it finds stairs that start at the end of a floor or at the bottom on the ground.
-function terrainRampDir(x, y) {
-  for (const dx of [0, 10, -10, 20, -20])
-    for (const s of surfAt(x + dx))
-      if (s.y1 !== s.y2 && Math.abs(surfY(s, Math.max(s.x1, Math.min(s.x2, x + dx))) - y) <= 10)
-        return s.y2 < s.y1 ? 1 : -1;
+// Up or Down with no sideways input: the way to walk to take stairs going up (cl 1) or down (cl -1) from the feet
+// (x, y), or 0 if there are none. On stairs (cur), along them. Looks a little either side, for stairs that start
+// just beside you.
+function terrainRampDir(x, y, cl, cur) {
+  if (cur && isRamp(cur)) return cl * rise(cur); // already on stairs: keep going along them
+  for (const d of [1, -1]) for (const dx of [0, 8, 16]) if (rampToTake(x + d * dx, y, d, cl, 10)) return d;
   return 0;
 }
 const CLIMB_SPEED = 3;
@@ -102,31 +119,35 @@ function terrainLadder(f, y0) {
   return true;
 }
 // One physics step's terrain check (called by phys between moving and landing). x0, y0 = position before the move.
+// f.surf = the surface the fighter stands on (null on the ground, a ladder or in the air).
 function terrainStep(f, x0, y0) {
   if (f.drop > 0) f.drop--;
   terrainWalls(f, x0);
-  if (terrainLadder(f, y0)) return;
+  if (terrainLadder(f, y0)) return (f.surf = null);
   const was = f.gy,
     onSurf = was < G && y0 >= was - 0.5,
     onAny = y0 >= was - 0.5,
-    tol = Math.abs(f.vx) + 6;
+    tol = Math.abs(f.vx) + 6,
+    d = Math.sign(f.x - x0),
+    put = s => {
+      f.surf = s;
+      f.gy = s ? surfY(s, f.x) : G;
+      if (s) f.y = Math.max(f.y, f.gy); // stick to stairs going down; the landing check puts us on them
+    };
   if (onSurf && f.vy >= 0) {
-    const s = surfNear(f.x, was, tol, f.climb);
-    if (s !== null) {
-      f.gy = s;
-      f.y = Math.max(f.y, s); // stick to the surface going down stairs; the landing check puts us on it
-    } else f.gy = G; // walked off the end
+    // walking along: Up or Down can turn onto stairs; otherwise stay on what you're on, then carry on onto a floor at
+    // the same height or more of the same stairs; nothing there and you fall
+    const cur = f.surf;
+    let s = rampToTake(f.x, was, d, f.cl, tol, cur);
+    if (!s && cur && f.x >= cur.x1 && f.x <= cur.x2) s = cur;
+    if (!s) s = surfNext(f.x, was, tol, cur);
+    put(s);
   } else if (onAny && f.vy >= 0 && f.cl > 0 && !f.drop) {
-    // on the ground, holding Up: step onto stairs that start at your feet
-    const s = surfNear(f.x, was, tol, true, true);
-    if (s !== null && s <= was) {
-      f.gy = s;
-      f.y = s;
-    }
-  } else if (f.vy > 0 && !f.drop && y0 < was - 0.5) {
-    const s = surfCross(f.x, y0, f.y);
-    f.gy = s === null ? G : s;
-  } else if (f.vy < 0) f.gy = G;
+    // on the ground, holding Up while walking into stairs going up that way: step onto them
+    const s = rampToTake(f.x, was, d, 1, tol);
+    if (s) put(s);
+  } else if (f.vy > 0 && !f.drop && y0 < was - 0.5) put(surfCross(f.x, y0, f.y));
+  else if (f.vy < 0) put(null);
 }
 // Walls: a fighter whose body overlaps a wall's height can't cross its line this step
 function terrainWalls(f, x0) {
@@ -151,6 +172,7 @@ function terrainDrop(f) {
   if (f.gy >= G) return false;
   f.drop = 12;
   f.gy = G;
+  f.surf = null;
   f.y += 1;
   return true;
 }
