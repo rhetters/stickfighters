@@ -94,7 +94,7 @@ function debugUI() {
         ' dmg · ' +
         LAST.fx +
         (LAST.cost ? ' · ' + LAST.cost + ' Surge' : '') +
-        (LAST.ul && LAST.ul !== 'Start' ? ' · ' + LAST.ul : '');
+        (LAST.ul === 'Tree' ? ' · ' + skillOf(LAST.key) : LAST.ul === 'Ult' ? ' · Ult' : '');
     chip(12, Y1, t, INK, '#fff');
   }
   if (showS)

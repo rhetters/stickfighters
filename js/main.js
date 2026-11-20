@@ -13,6 +13,7 @@ const SCREENS = [
   's-title',
   's-online',
   's-char',
+  's-skills',
   's-house',
   's-lobby',
   's-pause',
@@ -352,8 +353,8 @@ addEventListener(
       e.stopImmediatePropagation();
     } else if (e.key === 'Escape' && !$('ui').hidden && !CAP) {
       if (!$('s-title').hidden) titleBack();
-      else if (!$('s-settings').hidden || !$('s-binds').hidden) {
-        // Esc backs out of Settings (and its Buttons page) like its BACK button, also when opened from pause
+      else if (!$('s-settings').hidden || !$('s-binds').hidden || !$('s-skills').hidden) {
+        // Esc backs out of Settings (and its Buttons page, also when opened from pause) and Skills, like their back buttons
         navBack();
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -505,7 +506,10 @@ function update() {
   for (const e of E) updE(e);
   bowl();
   sep();
-  if (MODE.drops && state === 'play') dropScan();
+  if (MODE.drops && state === 'play') {
+    dropScan();
+    xpScan();
+  }
   pickTick();
   E = E.filter(e => !e.gone);
   {

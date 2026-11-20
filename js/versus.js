@@ -14,6 +14,7 @@ function startVersus() {
 function vsRound() {
   init();
   MODE = VERSUS;
+  for (const p of PL) setBuild(p, true); // Versus: moves and ultimates count, boosts don't
   state = 'play';
   LV = buildLevel('arena');
   CAM.x = WB.l = WW.l = 0;
@@ -67,7 +68,7 @@ function vsEnd(w) {
     : PL.map(p => 'P' + (p.slot + 1) + ' ' + p.name + ': ' + (VS.wins['P' + p.slot] || 0)).join(' · ');
   $('c-l2').textContent = 'Best combo ' + VS.maxc + ' hits';
   $('c-l3').textContent = '';
-  runEnd('c-st', { vs: 1 });
+  runEnd('c-st', { vs: { rounds: VS.round, win: PL.filter(p => vsKey(p) === vsKey(w)) } });
   $('b-next').textContent = 'REMATCH';
   sfx(520, 0.5, 'square', 0.05, 500);
   show('s-clear');

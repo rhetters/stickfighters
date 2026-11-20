@@ -374,8 +374,8 @@ function drawFX(x) {
     ctx.stroke();
   } else if (x.k === 'r') {
     ctx.globalAlpha = p;
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = x.c || INK;
+    ctx.lineWidth = x.w || 3;
     ctx.beginPath();
     ctx.arc(x.x, x.y, 8 + x.r * (1 - p), 0, 7);
     ctx.stroke();
@@ -399,6 +399,23 @@ function drawFX(x) {
     ctx.fillStyle = x.c;
     ctx.fillRect(-3, -2, 6, 4);
     ctx.restore();
+  } else if (x.k === 'z') {
+    // a lightning bolt from the sky to the ground (Surge ultimates); its zigzag comes from x.a, never from rnd()
+    ctx.globalAlpha = p;
+    ctx.lineWidth = 5;
+    for (const [c, w] of [
+      ['#ffd400', 7],
+      ['#fffbe0', 3]
+    ]) {
+      ctx.strokeStyle = c;
+      ctx.lineWidth = w;
+      ctx.beginPath();
+      ctx.moveTo(x.x, x.y - x.h);
+      for (let i = 1; i <= 6; i++)
+        ctx.lineTo(x.x + Math.sin(x.a * 1.7 + i * 2.3) * 14, x.y - x.h + (x.h * i) / 6);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
   } else if (x.k === 'b') {
     ctx.strokeStyle = INK;
     ctx.lineWidth = 3;
@@ -468,9 +485,11 @@ function hudPlayers() {
     ctx.fillStyle = INK;
     ctx.fillRect(50, y + 16, 184, 8);
     ctx.fillStyle = q.stm.winded ? '#b8202c' : '#ffd400';
-    ctx.fillRect(52, y + 18, (q.stm.winded ? 0.3 : q.stm.v / SURGE.max) * 120, 4);
-    ctx.fillStyle = q.meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
-    ctx.fillRect(176, y + 18, (q.meter / 100) * 56, 4);
+    ctx.fillRect(52, y + 18, (q.stm.winded ? 0.3 : q.stm.v / q.smax) * 120, 4);
+    if (q.bd && q.bd.ult) {
+      ctx.fillStyle = q.meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
+      ctx.fillRect(176, y + 18, (q.meter / 100) * 56, 4);
+    }
     if (q.st === 'dead' && MODE.revive)
       txt0(q.rv > 0 ? 'REVIVING' : 'DOWN: stand next to them', 242, y + 13, '#e8212b');
     if (MODE.wins) for (let w = 0; w < MODE.wins(q); w++) star5(250 + w * 20, y + 12);
@@ -510,7 +529,7 @@ function hud() {
     ctx.fillStyle = '#ff7a00';
     ctx.fillRect(18, 16, (256 * Math.max(0, P.hp)) / P.max, 16);
     // Surge bar (yellow): flashes when low, red when you can't afford a move, refills from red while Winded
-    const sv = STM.v / SURGE.max,
+    const sv = STM.v / P.smax,
       bl = (fr >> 2) % 2,
       held = K.s && live();
     ctx.fillStyle = INK;
@@ -522,7 +541,12 @@ function hud() {
         : sv < 0.25 && bl
           ? '#fff3a0'
           : '#ffd400';
-    ctx.fillRect(17, 43, STM.winded ? 218 * (1 - STM.winded / (SURGE.winded * 60)) : 218 * sv, 10);
+    ctx.fillRect(
+      17,
+      43,
+      STM.winded ? 218 * (1 - STM.winded / (SURGE.winded * 60 * (1 - modOf(P, 'wind')))) : 218 * sv,
+      10
+    );
     if (held && !STM.winded) {
       ctx.strokeStyle = '#ffd400';
       ctx.lineWidth = 2;
@@ -535,16 +559,19 @@ function hud() {
     ctx.fillStyle = STM.winded ? '#e8212b' : held ? '#ffd400' : '#fff8ee';
     ctx.strokeText(sl, 248, 54);
     ctx.fillText(sl, 248, 54);
-    // Ultimate meter (blue)
-    ctx.fillStyle = INK;
-    ctx.fillRect(14, 60, 184, 12);
-    ctx.fillStyle = P.meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
-    ctx.fillRect(17, 63, (178 * P.meter) / 100, 6);
-    if (P.meter >= 100) {
-      ctx.font = '900 14px Impact,"Arial Black",sans-serif';
-      ctx.fillStyle = '#3ec5ff';
-      ctx.strokeText('U: TORNADO!', 206, 73);
-      ctx.fillText('U: TORNADO!', 206, 73);
+    // Ultimate meter (blue), once the skill tree has given this fighter an ultimate
+    if (P.bd && P.bd.ult) {
+      ctx.fillStyle = INK;
+      ctx.fillRect(14, 60, 184, 12);
+      ctx.fillStyle = P.meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
+      ctx.fillRect(17, 63, (178 * P.meter) / 100, 6);
+      if (P.meter >= 100) {
+        const t = 'ULT: ' + P.bd.ult.nm.toUpperCase() + '!';
+        ctx.font = '900 14px Impact,"Arial Black",sans-serif';
+        ctx.fillStyle = '#3ec5ff';
+        ctx.strokeText(t, 206, 73);
+        ctx.fillText(t, 206, 73);
+      }
     }
   }
   {

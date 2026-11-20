@@ -201,6 +201,11 @@ function renderChar() {
   if (CH.tab === 'body') renderBody(c);
   else renderShelf(c);
   $('ch-msg').textContent = CH.msg;
+  const pr = c.prog,
+    lv = levelOf(pr.xp),
+    pts = pointsAt(lv) - spentOf(pr.sk);
+  $('ch-skills').textContent = 'SKILLS · LV ' + lv + (pts ? ' · ' + pts + ' NEW' : '');
+  $('ch-skills').classList.toggle('has', pts > 0);
 }
 function renderBody(c) {
   $('ch-ht').textContent = Math.round(c.ht * 100) + '%';

@@ -81,6 +81,12 @@ const MOVELIST = [
   ]
 ];
 const DONE = new Set();
+// The skill-tree node that unlocks a move Player 1 can't use yet (empty when it's open)
+function moveLock(k) {
+  const P = PL[0];
+  if (!P || !P.bd || !P.bd.locked.has(k)) return '';
+  return skillOf(k);
+}
 function renderMoves() {
   const el = $('moves');
   if (el.hidden) return;
@@ -104,7 +110,7 @@ function renderMoves() {
         m.nm +
         '</td><td>' +
         m.fx +
-        (m.ul && m.ul !== 'Start' ? ' <span class="tier">' + m.ul + '</span>' : '') +
+        (moveLock(k) ? ' <span class="tier">LOCKED: ' + moveLock(k) + '</span>' : '') +
         '</td></tr>';
     }
     h += '</table>';

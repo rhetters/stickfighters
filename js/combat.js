@@ -4,7 +4,7 @@ const ov = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
 function hbox(f) {
   const d = f.att.d,
     s = f.s,
-    r = d.r * s,
+    r = d.r * s * (f.pl && f.att.b === 'k' ? 1 + modOf(f, 'kr') : 1), // Long Legs (skill tree)
     fc = d.back ? -f.face : f.face;
   let x0 = fc > 0 ? f.x - 8 * s : f.x - r,
     x1 = fc > 0 ? f.x + r : f.x + 8 * s;
@@ -50,7 +50,7 @@ function endAtk(f, q) {
   f.last = fr;
   if (!f.pl && !f.T.boss) f.cd = f.T.cd + rnd() * 40;
   else if (f.inv > 100) f.inv = 45;
-} // grace after the Tornado Kick so a swing that started during it can't land
+} // grace after an ultimate so a swing that started during it can't land
 function tickAtk(f) {
   // enemies press nothing: their moves never read buttons, so they get the idle slot
   const a = f.att,
@@ -106,10 +106,10 @@ function tickAtk(f) {
   }
   if (d.tatsu) {
     const m = (K.r ? 1 : 0) - (K.l ? 1 : 0),
-      hy = f.gy - 46;
-    if (a.f <= 7) f.vy = -6.5;
+      hy = f.gy - (d.rise ?? 46);
+    if (a.f <= (d.riseF ?? 7)) f.vy = -6.5;
     else if (a.f < d.d - 4) f.vy = (hy - f.y) * 0.25;
-    f.vx = f.face * 3.4 + m * 1.6;
+    f.vx = f.face * (d.tv ?? 3.4) + m * 1.6;
     if (a.f % 4 === 0)
       fxp({
         k: 'l',
@@ -131,6 +131,14 @@ function tickAtk(f) {
     f.vy = Math.max(f.vy, d.dvy || 9);
   }
   if ((d.multi && a.f % (d.multi > 1 ? d.multi : 7) === 0) || (d.finalAt && a.f === d.finalAt)) a.hit.clear();
+  if (d.pass && a.f % d.pass === 0 && a.f < d.d - 4) {
+    // a dash that turns around and hits everyone again (Lightning Rush, Thunder Step)
+    f.face *= -1;
+    a.hit.clear();
+    ultFx(f, d, 1);
+  }
+  if (d.fxk) ultFx(f, d, 0);
+  if (d.boom) for (const b of d.boom) if (a.f === b[0]) shockwave(f, b);
   if (d.quake && a.f === d.h[0]) {
     ring(f.x, f.gy, d.r);
     dust(f.x - 60, f.gy, 6);
@@ -167,11 +175,15 @@ function tickAtk(f) {
         else if (f.pl) {
           hurtE(
             e,
-            d.spikeAt && a.f >= d.spikeAt
-              ? { ...d, dmg: 7, lift: 10, kb: 4, st: 6, sh: 6, ef: 'bounce' }
-              : d.finalAt && a.f >= d.finalAt
-                ? { ...d, dmg: 10, lift: -10, kb: 9, w: 'H', ef: 'launch' }
-                : d,
+            boost(
+              f,
+              d.spikeAt && a.f >= d.spikeAt
+                ? { ...d, dmg: 7, lift: 10, kb: 4, st: 6, sh: 6, ef: 'bounce' }
+                : d.finalAt && a.f >= d.finalAt
+                  ? { ...d, dmg: d.fdmg || 10, lift: -10, kb: 9, w: 'H', ef: 'launch' }
+                  : d,
+              a.b
+            ),
             dr,
             f
           );
@@ -218,7 +230,11 @@ function tickAtk(f) {
           continue;
         hurtE(
           e,
-          { dmg: d.adm || 12, kb: 9, lift: -7, st: 7, sh: 9, ef: 'kd', fold: d.n === 'meteor' },
+          boost(
+            f,
+            { dmg: d.adm || 12, kb: 9, lift: -7, st: 7, sh: 9, ef: 'kd', fold: d.n === 'meteor' },
+            a.b
+          ),
           e.x >= f.x ? 1 : -1,
           null,
           f
@@ -255,8 +271,8 @@ function tickAtk(f) {
     f.att.chained = 1;
   }
 }
-// Guards block hits that come from in front of them while they're ready. Low hits go under the shield, the Tornado Kick
-// cuts through, and hits from behind land. Each block drains the guard meter; empty = GUARD BREAK (dizzy, shield dropped 4 s).
+// Guards block hits that come from in front of them while they're ready. Low hits go under the shield, ultimates
+// cut through, and hits from behind land. Each block drains the guard meter; empty = GUARD BREAK (dizzy, shield dropped 4 s).
 function blocks(e, f, d) {
   if (!e.T.guard || e.noShield > 0 || e.dying) return false;
   if (!(e.st === 'free' || e.st === 'block')) return false;
@@ -399,14 +415,14 @@ function throwE(f, e, dir) {
   startAtk(f, A[mv], 0);
   f.st = 'atk';
   const fc = f.face;
-  if (dir === 'u') hurtE(e, { dmg: 6, kb: 1, lift: -13, ef: 'launch', w: 'M' }, fc, null, f);
+  if (dir === 'u') hurtE(e, boost(f, { dmg: 6, kb: 1, lift: -13, ef: 'launch', w: 'M' }, 't'), fc, null, f);
   else if (dir === 'd') {
     e.y = f.gy - 4;
-    hurtE(e, { dmg: 10, kb: 1, lift: -8, ef: 'bounce', w: 'H' }, fc, null, f);
+    hurtE(e, boost(f, { dmg: 10, kb: 1, lift: -8, ef: 'bounce', w: 'H' }, 't'), fc, null, f);
     ring(e.x, f.gy, 70);
     dust(e.x, f.gy, 12);
   } else {
-    hurtE(e, { dmg: 8, kb: 12, lift: -5, ef: 'splat', w: 'H' }, fc, null, f);
+    hurtE(e, boost(f, { dmg: 8, kb: 12, lift: -5, ef: 'splat', w: 'H' }, 't'), fc, null, f);
     e.thrown = 1;
     e.ch = 0;
   }
@@ -438,7 +454,8 @@ function hurtE(e, d, dr, src, by) {
   if (e.dying) return;
   const ap = by || src,
     w = wtOf(d),
-    dmg = Math.max(1, Math.round(d.dmg * (ap.combo < 4 ? 1 : Math.max(0.45, 1 - (ap.combo - 3) * 0.04)))); // long combos deal less per hit
+    raw = d.dmg * (ap.combo < 4 ? 1 : Math.max(0.45, 1 - (ap.combo - 3) * 0.04)), // long combos deal less per hit
+    dmg = Math.max(1, d.exact ? raw : Math.round(raw)); // skill-tree boosts keep their fractions so small ones count
   if (fr - (e.lh || -999) > 60) e.jug = 0;
   e.lh = fr;
   if (src && src.pl) {
@@ -536,11 +553,11 @@ function hurtE(e, d, dr, src, by) {
     py = e.y - 42 * e.s;
   spark(px, py, 10 + d.dmg * 2.2, w === 'H' ? '#ffd400' : '#fff3a0');
   if (w !== 'L') ring(px, py, w === 'H' ? 55 : 35);
-  txt(e.x, e.y - 95 * e.s, dmg, INK);
+  txt(e.x, e.y - 95 * e.s, Math.round(dmg), INK);
   impact(w, dr, px, py, e.hp <= 0);
   ap.combo++;
   ap.comboT = 100;
-  ap.meter = Math.min(100, ap.meter + 4);
+  ap.meter = Math.min(100, ap.meter + 4 * meterK(ap, d));
   maxc = Math.max(maxc, ap.combo);
   const cw = { 5: 'NICE!', 10: 'GREAT!', 20: 'AMAZING!', 35: 'UNSTOPPABLE!', 50: 'GODLIKE!' }[ap.combo];
   if (cw) txt(ap.x, ap.y - 120, cw, '#ff7a00', 26);
@@ -660,7 +677,7 @@ function hurtP(q, d, dr) {
     }
     q.gt = null;
   } // getting hit lets go
-  q.hp -= d.dmg;
+  q.hp -= d.dmg * (1 - modOf(q, 'arm')); // Tough Skin, Thick Skin (skill tree)
   q.inv = 65;
   q.flash = 4;
   q.hs = 7;
@@ -677,6 +694,20 @@ function hurtP(q, d, dr) {
   sfxHit('M');
   sfx(90, 0.25, 'sawtooth', 0.07, -50);
   q.ri = { dr, ef: d.kb >= 12 ? 'launch' : 'kd' };
+  if (q.hp <= 0 && modOf(q, 'sw') && !q.swUsed) {
+    // Second Wind (skill tree): once a fight, a knockout becomes a knockdown with some health back
+    q.swUsed = 1;
+    q.hp = 30;
+    q.st = 'fly';
+    q.vx = dr * 7;
+    q.vy = -7;
+    q.spv = dr * 14;
+    q.sp = 0;
+    q.inv = 110;
+    txt(q.x, q.y - 120, 'SECOND WIND!', '#47b34a', 26);
+    ring(q.x, q.y - 45, 80);
+    return;
+  }
   if (q.hp <= 0) {
     q.hp = 0;
     q.st = 'dead';
@@ -895,4 +926,26 @@ function near(f) {
     }
   }
   return b;
+}
+// An ultimate's shockwave: [frame, radius, damage, launch?] hits everyone on the ground within reach
+function shockwave(f, [, r, dmg, up]) {
+  ring(f.x, f.gy, r);
+  ring(f.x, f.gy, r * 0.6);
+  dust(f.x - r * 0.4, f.gy, 6);
+  dust(f.x + r * 0.4, f.gy, 6);
+  shake = Math.max(shake, up ? 14 : 10);
+  camY += 5;
+  sfx(up ? 45 : 60, 0.35, 'sine', 0.14);
+  const hit = up
+    ? { dmg, kb: 8, lift: -12, st: 8, sh: 10, ef: 'launch', w: 'H' }
+    : { dmg, kb: 7, lift: -7, st: 7, sh: 9, ef: 'kd', w: 'H' };
+  if (MODE.pvp)
+    for (const q of foes(f)) {
+      if (q.inv > 0 || q.st === 'dead' || q.y < q.gy - 24 || Math.abs(q.x - f.x) > r) continue;
+      pvpHit(q, hit, q.x >= f.x ? 1 : -1, f);
+    }
+  for (const e of E) {
+    if (e.gone || e.dying || e.st === 'down' || e.y < e.gy - 60 || Math.abs(e.x - f.x) > r) continue;
+    hurtE(e, hit, e.x >= f.x ? 1 : -1, null, f);
+  }
 }

@@ -4,7 +4,7 @@ const {chromium}=require('playwright');let fails=0;const ok=(c,m)=>{console.log(
 await p.goto(GAME);await p.waitForTimeout(300);const ev=s=>p.evaluate(s);
 await ev("ECO.own=ITEMS.map(i=>i.id);saveFighter(0,{...FIGHTER0,name:'DAD'});saveFighter(1,{...FIGHTER0,name:'RHETT'});saveFighter(2,{...FIGHTER0,name:'RAELYNN'});titleOpenAll();$('b-char').click();CH.tab='neck';renderChar();document.querySelectorAll('.chslot')[1].focus()");
 const name=()=>ev("document.activeElement.textContent.trim()");
-await ev("navMove('d')");ok(/Head/.test(await name()),'down from RHETT goes to the Head tab: '+await name());
+await ev("navMove('d')");ok(/Head|Colors/.test(await name()),'down from RHETT goes to the tab row: '+await name());
 await ev("document.querySelectorAll('.chslot')[1].focus();navMove('r')");ok(/RAELYNN/.test(await name()),'right from RHETT goes to RAELYNN');
 await ev("navMove('l');navMove('l')");ok(/DAD/.test(await name()),'left twice goes to DAD');
 await ev("$('ch-tabs').querySelector('.on').focus();navMove('d')");ok(/Scarf/.test(await name()),'down from Neck tab goes into the shelf below it: '+await name());

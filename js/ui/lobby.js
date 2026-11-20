@@ -29,6 +29,8 @@ function lbLook(r) {
   if (taken.includes(c.col)) c.col = cols.find(x => !taken.includes(x)) || c.col;
   r.cid = c.col;
   r.look = lookOf(c);
+  r.prog = c.prog;
+  r.fi = r.pick >= 0 ? r.pick : null; // the saved fighter that banks this player's XP
   r.col = r.look.col;
   r.d2 = r.look.d2;
   const same = LOBBY.filter(o => o !== r && o.slot < r.slot && o.name === r.look.name).length;
