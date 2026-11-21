@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: house camera fix (November 21, 2026)
+- **The house camera follows again:** version 40 broke it. To let each online screen have its own view in a level, drawing put the game's camera back after every frame; but the house camera is set while drawing, so it got undone every frame and the view stuck in place, at home and visiting. Now that only happens in online levels. In the house, online, each screen follows its own player; at home it frames everyone as before.
+- Version 41.
+
 ## M13 in progress: the online leash, rope fix, calmer ADMIN hits (November 21, 2026)
 - **Online campaign on a leash (to try out):** each player's screen now follows their own fighter. The group still moves together: anyone can fall up to half a screen behind the lead player's camera before its edge pushes them along, and when a fight starts, anyone outside its arena is brought in (with a ring). Teammates off your screen show as an arrow at the edge. The online house follows your own player too. Local play is unchanged (one shared screen).
 - **Scenes with several players:** a player who finished their part early (the first one across the rope, out of the balloon, off the ladder…) made the next one skip theirs, so the second rope swinger froze in the air and then appeared on the far side. Each player now keeps their place in the scene.
