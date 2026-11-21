@@ -795,7 +795,7 @@ function render() {
 function viewFollow() {
   const me = PL.find(p => p.slot === NET.mySlot) || PL[0],
     still = LV.cine || LV.encs.some(e => e.st === 1),
-    t = still || !me ? CAM.x : Math.max(0, Math.min(CAM.x, me.x - W * 0.45));
+    t = still || !me ? CAM.x : Math.max(backWall(), Math.min(CAM.x, me.x - W * 0.45));
   VIEW.x = Math.abs(t - VIEW.x) > W * 2 ? t : VIEW.x + (t - VIEW.x) * 0.15;
   return VIEW.x;
 }

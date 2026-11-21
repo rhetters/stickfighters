@@ -537,7 +537,8 @@ const HAY0 = [-15, -80, 60, 40, 90, 20, 25, -30, 15, 0],
   KNEEL = [30, 60, 40, 40, 40, 90, 150, -10, 120, 0],
   SPL = [0, 150, 10, -150, 10, 30, 0, -30, 0, 0];
 // extra fields: top/bot hitbox height (low moves hit low, Up moves reach high), flipAt/back turn and hit behind, iv invulnerable frames,
-//  air = air move (chains in the air, ends on landing), airhop rise in the air, float slows the fall, smear = motion trail, limb = which limb trails
+//  air = air move (chains in the air, ends on landing), airhop rise in the air, float slows the fall, hang = holds
+//  you in the air while its hits last, smear = motion trail, limb = which limb trails
 Object.assign(A, {
   haymaker: {
     d: 30,
@@ -929,6 +930,8 @@ Object.assign(A, {
     multi: 6,
     air: 1,
     lg: 3,
+    hang: 1,
+    lv: 5,
     cx: 1,
     limb: 'f',
     k: [

@@ -88,6 +88,7 @@ function pick(f, btn, chain, plain, stop) {
     seq = btn;
   }
   if (!open(name) && !plain) return pick(f, btn, false, true);
+  if (name === 'dive' && f.dvl) name = 'flykick'; // after three Dive Kicks in a row, none until you land
   const mv = A[name];
   if (mv.cost && !spend(f, mv.cost * (1 - modOf(f, 'scost')))) return pick(f, btn, false, true);
   f.ckey = key;
@@ -441,6 +442,8 @@ function updP(f) {
     if (g) {
       f.jumps = 0;
       f.hop = 0;
+      f.dvc = 0; // Dive Kicks in a row (see combat.js)
+      f.dvl = 0;
     }
     // Surge run: hold Surge + a direction. Faster, drains the bar, passes through enemy bodies.
     const run = K.s && m && canSurge(f);
@@ -493,6 +496,7 @@ function updP(f) {
       } else {
         f.hop = 1;
         f.flip = 0;
+        f.pose[9] = 0; // a hop out of a flip stands you upright again
         f.vy = -5;
         f.vx = (m || f.face) * 12;
         if (m) f.face = m;
