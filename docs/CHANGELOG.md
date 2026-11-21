@@ -2,6 +2,16 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: Castle Siege, the first generated campaign (November 20, 2026)
+- **Campaign is now Castle Siege**, a new run every time from a random seed: the Wooded Trail, the Sewer Tunnels and the Castle Keep, about three minutes each, five fights per biome with a Captain at the end of the first two.
+- **Transitions** between biomes, picked at random: a catapult launches everyone into the next biome, a pipe slide (into or out of the sewer), a rope swing over a chasm, or smashing the castle gate. Where you walk through (gate, rope), one biome's background fades into the next.
+- **Mini-bosses** (rare, about one run in two): the Big Bruiser, the Sludge Brute or the Captain of the Guard leaps in, lands with a quake that knocks everyone down, and says something in a speech bubble.
+- **The Pink General** waits at the end: everyone freezes while a pencil draws him in, he fills with colour, comes to life and talks, then fights in three phases, calling his army.
+- **New scenery:** the sewer (arches, pipes, valves, a water channel, drips, a slippery floor) and the castle (towers with flags, the wall, banners, torches, windows, suits of armour).
+- The fixed Wooded Trail stays in the game files for the self-test; getting through the woods in a run still counts for the Ranger Hat.
+- Self-test fingerprints unchanged.
+- Version 32.
+
 ## M12 done (November 20, 2026)
 - **M12 (XP, levels, skill tree) is done.** The level-up sound is a little quieter.
 - Version 31.

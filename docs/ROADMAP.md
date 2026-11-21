@@ -22,7 +22,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
 | M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
 | M12 | XP, levels, skill tree | Done | L | M3, M8, M10 | Level-ups, skill points, tree screen |
-| M13 | Levels 2–5, themes and procedural runs | Next | XL | M8, M10, M12 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
+| M13 | Themes and procedural runs | Next | XL | M8, M10, M12 | Castle Siege (woods, sewer, castle) generated from a seed, transitions, mini-bosses, the Pink General |
 | M14 | Boss level | Planned | L | M13 | Multi-phase boss fight |
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
@@ -33,20 +33,16 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 
 ## Upcoming milestones
 
-### M13 · Levels 2–5, themes and procedural runs
+### M13 · Themes and procedural runs (in progress)
 
-| Level | Theme | Look | Gameplay twist |
-|---|---|---|---|
-| 2 | Sewer Entrance | Stone arches, pipes, dripping water, green-gray palette | Slick floor: bodies slide farther, bowling is stronger |
-| 3 | Castle Stairs | Stone steps, torches, banners | Guards with shields; stair terrain if G1 says yes |
-| 4 | Main Hall | Pillars, chandeliers, long carpet | Breakable props, swarm waves, a mini-boss |
-| 5 | Tower Top | Open sky, wind, moving clouds | Narrow arena, Surge-focused enemies |
+**Goal:** the foundation for many themes and campaigns. Decided by Ron and Rhett (November 20): a theme is three biomes, about three minutes each; runs are generated from a seed; transitions between biomes are seamless and random (catapult, gate smash, pipe slide, rope swing); rare mini-bosses; main bosses arrive with an in-game scene (one leaps in and knocks everyone down and talks; another is drawn in by a pencil and comes to life). The first boss comes in M13; M14 builds more on it.
 
-- Each level is a biome with its own layers, chunk pool, enemy mix and one new enemy variant.
-- **Themes and procedural runs:** a theme is an ordered list of biomes (for example *Castle Siege* = Woods → Sewer → Castle Stairs → Spire). A run is generated from a seed: the biome order is fixed, but each biome's chunks are drawn from its pool with rules (no repeats, a difficulty curve, an occasional rest or treasure chunk, a few fixed landmark chunks like the castle gate). The same seed always makes the same run, so seeds can be shared.
-- Co-op lobby: pick a player count, ready up, and a theme is drawn.
+- **Castle Siege** (first theme): Wooded Trail → Sewer Tunnels (slippery floor) → Castle Keep, then the Pink General (drawn in by a pencil; three phases, calls his army).
+- **Data, not code:** biomes, transitions and themes are data (`js/data/themes.js`). A new theme is new data plus, for a new look, its scenery.
+- **Runs:** each biome is a sign, five fights from its own enemy mix (toughness rising, a Captain closing each biome but the last) and a transition. Scenery is scattered from the biome's props. The same seed always makes the same run.
+- **Mini-bosses:** one per biome type (Big Bruiser, Sludge Brute, Captain of the Guard), about one run in two meets one.
 
-**Done when:** All four levels play in order with themed transitions, and the same seed always produces the same run.
+**Done when:** Castle Siege plays through alone and online with every transition and both boss intros, and the same seed always makes the same run.
 
 ### M14 · Boss level
 
@@ -96,4 +92,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-M13: themes of three biomes, procedural runs, transitions and boss intros (plan being settled with Ron and Rhett).
+Finish M13 (Castle Siege) with Ron and Rhett's testing, then M14 (more bosses on the same foundation).
