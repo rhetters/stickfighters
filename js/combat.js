@@ -88,6 +88,7 @@ function tickAtk(f) {
   if (d.flipAt && a.f === d.flipAt) f.face *= -1;
   if (d.iv && a.f >= d.iv[0] && a.f <= d.iv[1]) f.inv = Math.max(f.inv, 2);
   if (d.float) f.vy = Math.min(f.vy, 1.2);
+  if (d.hang && a.f <= d.h[1]) f.vy = Math.min(f.vy, 0.3); // hangs in the air while its hits last
   if (d.lg && a.f === Math.max(1, d.h[0] - 3)) f.vx = f.face * d.lg * 1.6;
   if (d.lv && a.f >= d.h[0] && a.f <= d.h[1]) f.vx = f.face * d.lv;
   if (d.blink && a.f === 1 && f.pl) {
@@ -190,6 +191,18 @@ function tickAtk(f) {
         }
         if (f.pl) {
           if (diving && !d.area) {
+            // bounce off and dive again; the third in a row before landing ends in a backflip away instead, and no
+            // more Dive Kicks until you land (they could be chained endlessly on top of an enemy)
+            f.dvc = (f.dvc || 0) + 1;
+            if (f.dvc >= 3) {
+              f.vy = -11;
+              f.vx = -f.face * 6;
+              f.jumps = 2;
+              f.dvl = 1;
+              endAtk(f);
+              f.flip = 24;
+              return;
+            }
             f.vy = -8;
             f.vx = -f.face * 3;
             f.jumps = 1;

@@ -57,8 +57,8 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 | J, then P, P | Air Cross | Opposite arm | Stagger | Start |
 | J, then P, P, P | Air Flurry | Three rapid jabs, fall slows slightly | Stagger | Fists: Air Fists (row 2) |
 | J, then K | Flying Kick | Leg fully extended, body horizontal | Pushback | Start |
-| J, then K, K | Scissor Kick | Both legs snap in sequence | Stagger | Legs: Scissor Kick |
-| J, then D+K | Dive Kick | Diagonal dive, shock ring on landing | Knockdown | Start |
+| J, then K, K | Scissor Kick (Bicycle Kick) | Both legs snap in sequence; you hang in the air and drive forward while it hits | Stagger | Legs: Scissor Kick |
+| J, then D+K | Dive Kick | Diagonal dive, shock ring on landing. A hit bounces you up to dive again, but only three in a row: the third ends in a backflip away, and no more Dive Kicks until you land (J, then D+K turns into a Flying Kick) | Knockdown | Start |
 | J, then D+P | Spike Fist | Both fists overhead, slam downward | Bounce | Fists: Air Fists (row 2) |
 | J, then U+K | Rising Scissor | Upward diagonal kick, good for juggles | Pop | Legs: Flips (row 2) |
 

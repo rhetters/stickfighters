@@ -77,6 +77,8 @@ ok(await ev("['hair-short','hair-buzz','hair-sidepart'].every(id=>ITEM[id]&&ITEM
 // with two players every scene carries both: the second one swings on the rope too (it used to freeze in the air)
 const rp=await ev("(()=>{ROSTER.length=0;ROSTER.push({slot:0,col:'#ff7a00',d2:'#c25a00'},{slot:1,col:'#3ec5ff',d2:'#1f8fc0'});let sd=1;while(!genRun('castle',sd).trans.some(t=>t.k==='rope'))sd++;SET.seed=String(sd);startRun('castle');cineEnd();E.length=0;LV.encs.forEach(e=>e.st=2);const tr=LV.trans.find(t=>t.k==='rope');CAM.x=tr.x-W+260;levelWalls();PL.forEach((p,i)=>{p.x=tr.x-200-i*40;p.y=G});cineStart('rope',{tr});const sw=[0,0];while(LV.cine){fr++;update();PL.forEach((p,i)=>{if(p.rope)sw[i]++})}const r={sw,x:PL.map(p=>Math.round(p.x-tr.nx))};ROSTER.length=0;return r})()");
 ok(rp.sw.every(n=>n>=40),'two players on the rope: both swing across '+JSON.stringify(rp));
+// after a scene carries you into a new biome, an invisible wall at its start keeps you out of the old one (online too)
+ok(await ev("(()=>{SET.seed='3';startRun('space');cineEnd();E.length=0;LV.encs.forEach(e=>e.st=2);const tr=LV.trans[1];CAM.x=tr.x-W+260;levelWalls();PL[0].x=tr.x-200;cineStart('landing',{tr});while(LV.cine){fr++;update()}setA('kb','l',1);for(let i=0;i<200;i++){fr++;update()}setA('kb','l',0);const solo=PL[0].x>=tr.nx;NET.match=true;levelWalls();const online=WB.l>=tr.nx;NET.match=false;levelWalls();return solo&&online})()"),'after landing on the moon nobody can walk back into the rocket, alone or online');
 const r5=await play(3,'space');
 ok(r5.state==='clear'&&r5.seen.launch&&r5.seen.landing&&r5.seen.beam,'a Space run plays through: '+Object.keys(r5.seen).join(', '));
 await ev("setA('kb','r',0)");

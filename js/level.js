@@ -100,8 +100,12 @@ function warpIn() {
     }
   });
 }
+// Where the biome you were carried into by a scene starts: an invisible wall there keeps anyone from walking back
+// into the old biome (0 before the first such scene)
+const backWall = () =>
+  LV.trans ? LV.trans.reduce((m, t) => (t.done && TRANSITIONS[t.k].cine ? Math.max(m, t.nx) : m), 0) : 0;
 function levelWalls() {
-  WB.l = ownView() && !LV.encs.some(e => e.st === 1) ? 0 : CAM.x;
+  WB.l = Math.max(backWall(), ownView() && !LV.encs.some(e => e.st === 1) ? 0 : CAM.x);
   WB.r = CAM.x + W;
   const g = LV.gates.find(g => g.hp > 0);
   if (g && g.x - 44 < WB.r) WB.r = g.x - 44;
