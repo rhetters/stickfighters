@@ -6,7 +6,9 @@ const c=await b.newContext(opt);await c.addInitScript(PADS(['Pro Controller (Ven
 await p.goto(GAME);await p.waitForTimeout(400);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);const tap=async(i,ms=90)=>{await ev(`__pads[0].buttons[${i}].pressed=true`);await W(ms);await ev(`__pads[0].buttons[${i}].pressed=false`);await W(90)};
 const geo=()=>ev("['s-title','b-char','b-train','b-set1','b-mp'].map(id=>{const e=id==='s-title'?document.querySelector('#s-title h1'):$(id);const r=e.getBoundingClientRect();return [Math.round(r.left),Math.round(r.top),Math.round(r.width),Math.round(r.height)].join(',')}).join(' | ')");
-ok(await p.isVisible('#press')||await p.isVisible('#tmenu'),nm+': PRESS START (or the menu, if the test controller already woke it)');
+// PRESS START blinks (its visibility flips), so check it's shown rather than visible this instant
+const shown=id=>ev(`(()=>{const e=$('${id}');return !!e&&!e.hidden&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0})()`);
+ok(await shown('press')||await shown('tmenu'),nm+': PRESS START (or the menu, if the test controller already woke it)');
 await tap(9);await W(100);ok(await p.isVisible('#tmenu'),nm+': Start on the controller opens the menu');
 const labels=await ev("[...document.querySelectorAll('#tmenu button')].filter(b=>b.offsetParent&&getComputedStyle(b).visibility!=='hidden').map(b=>b.textContent)");
 ok(JSON.stringify(labels)==='["SOLO","MULTIPLAYER","CUSTOMIZE","TRAINING ROOM","SETTINGS"]',nm+': menu '+labels.join(', '));
