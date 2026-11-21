@@ -67,7 +67,9 @@ function stamTick(p) {
     STM.v = Math.min(p.smax, STM.v + (SURGE.regen * (1 + modOf(p, 'sreg'))) / 60);
 }
 // Picks the move for a button from the route table (aim + Surge captured at the press), and keeps strings going.
-function pick(f, btn, chain, plain) {
+// stop (a chain from tickAtk): return null instead of starting the string over when its next move is locked, so the
+// string ends there, as it would at its last move
+function pick(f, btn, chain, plain, stop) {
   const I = inputOf(f),
     air = f.y < f.gy - 4,
     aim = I.AIM[btn] || 'n',
@@ -78,6 +80,7 @@ function pick(f, btn, chain, plain) {
   // a move the fighter's skill tree hasn't unlocked yet is skipped: the string starts over, then the plain version
   const open = n => n && !(f.bd && f.bd.locked.has(n));
   let seq = (chain && f.ckey === key ? f.seq : '') + btn;
+  if (stop && tbl[seq] && !open(tbl[seq])) return null;
   if (!open(tbl[seq])) seq = btn;
   let name = tbl[seq];
   if (!open(name)) {

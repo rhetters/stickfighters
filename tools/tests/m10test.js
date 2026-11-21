@@ -38,7 +38,7 @@ ok(await ev("JSON.parse(localStorage.getItem('orangeArmy.v1')).saveVersion===SAV
 await ev("SET.seed='7';start();PL[0].hp=PL[0].max=1e6");ok(await ev("PL[0].look&&PL[0].name==='RHETT!!B'"),'Player 1 uses the current fighter');
 await ev("for(let i=0;i<400;i++){fr++;update();} for(const e of E){e.hp=1;hurtE(e,A.jab,1,PL[0]);} for(let i=0;i<500;i++){fr++;update();}");
 ok(await ev("RUN.stars>0&&ECO.stars===60+RUN.stars"),'kills drop stars that reach the wallet ('+await ev('RUN.stars')+')');
-ok(await ev("selfTest().hash==='c87c9470'"),'self-test unchanged while stars drop');
+ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged while stars drop');
 // pose wheel in a fight
 await ev("start();PL[0].hp=PL[0].max=1e6;setA('kb','e',1,0);for(let i=0;i<5;i++){fr++;update();} setA('kb','l',1,0);for(let i=0;i<5;i++){fr++;update();}");
 ok(await ev("PL[0].wheel&&PL[0].wheel.d===6&&Math.abs(PL[0].vx)<0.5"),'holding the pose button opens the wheel and stands still');
