@@ -392,6 +392,78 @@ const T = {
     boss: 'ICE GIANT',
     ai: 'boss'
   },
+  mk: {
+    hp: 210,
+    s: 1.8,
+    spd: 1.1,
+    col: '#c74a8a',
+    d2: '#8c3060',
+    atk: 'cslam',
+    cd: 70,
+    sc: 300,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'LAUNCH GUARD',
+    ai: 'boss'
+  },
+  mx: {
+    hp: 230,
+    s: 1.85,
+    spd: 1.1,
+    col: '#b8407e',
+    d2: '#7f2a56',
+    atk: 'cslam',
+    cd: 70,
+    sc: 330,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 110,
+    boss: 'SPACE BRUTE',
+    ai: 'boss'
+  },
+  mn: {
+    hp: 240,
+    s: 1.9,
+    spd: 1.1,
+    col: '#d9559c',
+    d2: '#9e3a70',
+    atk: 'cslam',
+    cd: 70,
+    sc: 340,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 110,
+    boss: 'MOON MAULER',
+    ai: 'boss'
+  },
+  Z: {
+    hp: 600,
+    s: 1.95,
+    spd: 1.25,
+    col: '#ff5fb8',
+    d2: '#b8327f',
+    atk: 'cslam',
+    cd: 58,
+    sc: 1700,
+    ar: 100,
+    stop: 75,
+    m: 4.6,
+    fr: 0.62,
+    bnc: 0.15,
+    poise: 150,
+    boss: 'THE PINK ALIEN',
+    ai: 'boss'
+  },
   Y: {
     hp: 600,
     s: 2,
@@ -465,7 +537,11 @@ const TNAME = {
   mh: 'Hilltop Hulk',
   mr: 'Rock Roller',
   mi: 'Ice Giant',
-  Y: 'The Pink Yeti'
+  Y: 'The Pink Yeti',
+  mk: 'Launch Guard',
+  mx: 'Space Brute',
+  mn: 'Moon Mauler',
+  Z: 'The Pink Alien'
 };
 // How to beat each type, shown in the training Info panel (I)
 const TTIP = {
@@ -486,7 +562,11 @@ const TTIP = {
   mh: 'HILLTOP HULK (meadow mini-boss): break its poise, then juggle it',
   mr: 'ROCK ROLLER (mountainside mini-boss): jump its quake leap and hit it from behind',
   mi: 'ICE GIANT (peak mini-boss): icy floor, so keep your distance after it slams',
-  Y: 'THE PINK YETI: leaps down from the peak, three phases, calls his climbers. Get up fast and save Surge'
+  Y: 'THE PINK YETI: leaps down from the peak, three phases, calls his climbers. Get up fast and save Surge',
+  mk: 'LAUNCH GUARD (launch base mini-boss): break its poise, then juggle it',
+  mx: 'SPACE BRUTE (rocket mini-boss): jump its quake leap and hit it from behind',
+  mn: 'MOON MAULER (moon mini-boss): tough poise; heavy hits and throws',
+  Z: 'THE PINK ALIEN: beamed down from a flying saucer, three phases, calls the army. Break his poise'
 };
 for (const o of [A, EA])
   for (const k in o) {

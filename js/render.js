@@ -56,6 +56,26 @@ function drawGear(f, o, a) {
     ctx.beginPath();
     ctx.arc(hx, hy - r * 1.6, r * 0.35, 0, 7);
     ctx.fill();
+  } else if (f.tk === 'Z' && o.hd) {
+    // the Pink Alien's antennae
+    const hx = o.hd[0],
+      hy = o.hd[1],
+      r = 9 * s;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.5;
+    for (const d of [-1, 1]) {
+      const tx = hx + d * r * 1.2,
+        ty = hy - r * 2.6 + Math.sin(fr * 0.15 + d) * 2;
+      ctx.beginPath();
+      ctx.moveTo(hx + d * r * 0.4, hy - r * 0.8);
+      ctx.quadraticCurveTo(hx + d * r * 0.4, hy - r * 2, tx, ty);
+      ctx.stroke();
+      ctx.fillStyle = '#7dff9a';
+      ctx.beginPath();
+      ctx.arc(tx, ty, r * 0.4, 0, 7);
+      ctx.fill();
+      ctx.stroke();
+    }
   } else if (f.tk === 'Y' && o.hd) {
     // the Pink Yeti's shaggy white fur around his head, and little horns
     const hx = o.hd[0],
@@ -287,6 +307,7 @@ function drawF(f) {
     );
     if (L) drawLook(f, { ...o, face: f.face, s: ds }, fa, 'front');
     ctx.restore();
+    if (f.pl) drawHelmet(f, o, ds * (L ? L.head : 1));
     // the pose wheel shows only on the device of the player using it (online); everyone sees the pose
     if (f.wheel && L && (!NET.match || f.slot === NET.mySlot)) drawWheel(f);
   }
@@ -324,6 +345,7 @@ function drawF(f) {
     }
     if (f.broken > 0 && !f.dying && !RS(f) && f.st !== 'getup') stars(f.x, f.y - 88 * f.s);
     if (!(rOn && R.blend >= 1) && o.hd) drawGear(f, o, a);
+    if (!(rOn && R.blend >= 1)) drawHelmet(f, o, f.s);
     if (f.T.guard && !f.dying) {
       const w = 34 * f.s,
         y = f.y - 98 * f.s + (f.pmax ? 12 : 6);

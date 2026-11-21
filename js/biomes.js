@@ -11,7 +11,10 @@ const LOOKS = {
   cave: { bg: () => drawCave(), fg: () => drawSewerFg(1) },
   meadow: { bg: () => drawMeadow(), fg: () => drawWoodsFg() },
   slope: { bg: () => drawSlope(), fg: () => {} },
-  peak: { bg: () => drawPeak(), fg: () => drawSnowFg() }
+  peak: { bg: () => drawPeak(), fg: () => drawSnowFg() },
+  base: { bg: () => drawBase(), fg: () => {} },
+  rocket: { bg: () => drawRocketIn(), fg: () => {} },
+  moon: { bg: () => drawMoon(), fg: () => {} }
 };
 const lookOfSeg = s => LOOKS[BIOMES[s.b].look];
 // ===== SLOPES (a climb biome; LV.ramps from run.js). Drawing only: the game itself stays on flat ground, and each
@@ -25,7 +28,9 @@ function altAt(x) {
   for (const r of LV.ramps) a += r.k * Math.max(0, Math.min(x, r.x1) - r.x0);
   return a;
 }
+let helmOn = false;
 function slopeStart() {
+  helmOn = !!(MODE === LEVEL && LV && LV.segs);
   slopeOn = !!(MODE === LEVEL && LV && LV.ramps);
   slopeRef = slopeOn ? altAt(CAM.x + SLOPE_REF) : 0;
 }
@@ -98,7 +103,8 @@ function drawLevelBg() {
   const cx = CAM.x,
     dk = chunkVal(cx + W / 2, 'dusk');
   ctx.save();
-  ctx.translate(-cx, 0);
+  ctx.translate(-cx, -CAM.y);
+  if (LV.terr) drawPlatforms();
   for (const c of LV.ch)
     if (c.x0 < cx + W + 400 && c.x0 + c.w > cx - 400)
       for (const p of c.props) {
@@ -506,8 +512,10 @@ function drawBiomeProp(p, x) {
   } else if (k === 'trans-catapult') drawCatapult(x);
   else if (k === 'trans-cannon') drawBigCannon(x);
   else if (drawMountainTransDone(k, x)) return;
+  else if (drawSpaceTransDone(k, x)) return;
   else if (drawPiratePropDone(k, x, s)) return;
   else if (drawMountainPropDone(k, x, s)) return;
+  else if (drawSpacePropDone(k, x, s)) return;
   else if (k === 'trans-pipe' || k === 'trans-pipeout') drawBigPipe(x, k === 'trans-pipeout');
   else if (k === 'trans-rope') drawChasm(x);
   else if (k === 'trans-gate') {
@@ -1534,4 +1542,523 @@ function drawMountainTransDone(k, x) {
     ctx.stroke();
   } else return false;
   return true;
+}
+
+// ===== SPACE: the launch base, inside the rocket, the moon =====
+// The launch base: desert sky, far launch towers, a fence; the camera can look up the launch tower (CAM.y < 0), so
+// the ground sinks when it does
+function drawBase() {
+  const cy = CAM.y;
+  paperBg();
+  skyWash('#9ccbf0', '#fff1d6', 0.45);
+  ctx.save();
+  ctx.translate(0, -cy * 0.3);
+  // far mesas and launch towers (slow)
+  layer(0.08, 420, 61, (x, r) => {
+    ctx.fillStyle = 'rgba(214,170,130,0.35)';
+    ctx.strokeStyle = 'rgba(170,120,90,0.5)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x - 160, G);
+    ctx.lineTo(x - 120, G - 70 - r * 40);
+    ctx.lineTo(x + 110, G - 70 - r * 40);
+    ctx.lineTo(x + 150, G);
+    ctx.fill();
+    ctx.stroke();
+  });
+  layer(0.2, 520, 67, (x, r) => {
+    ctx.strokeStyle = 'rgba(120,120,140,0.5)';
+    ctx.lineWidth = 2;
+    const h = 150 + r * 60;
+    ctx.beginPath();
+    ctx.moveTo(x - 14, G);
+    ctx.lineTo(x - 8, G - h);
+    ctx.lineTo(x + 8, G - h);
+    ctx.lineTo(x + 14, G);
+    for (let y = G - 20; y > G - h; y -= 20) {
+      ctx.moveTo(x - 12, y);
+      ctx.lineTo(x + 12, y - 20);
+    }
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.beginPath();
+    ctx.ellipse(x + 30, G - h * 0.55, 10, h * 0.42, 0, 0, 7);
+    ctx.fill();
+    ctx.stroke();
+  });
+  ctx.restore();
+  const gy = G + 6 - cy;
+  ctx.fillStyle = '#efe0c2';
+  ctx.fillRect(-30, gy, W + 60, H + 400);
+  // concrete pad lines
+  ctx.strokeStyle = 'rgba(170,150,120,0.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let x = -(CAM.x % 160) - 160; x < W + 160; x += 160) {
+    ctx.moveTo(x, gy);
+    ctx.lineTo(x - 40, H + 30);
+  }
+  ctx.moveTo(-30, gy + 30);
+  ctx.lineTo(W + 30, gy + 30);
+  ctx.stroke();
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-30, gy);
+  ctx.lineTo(W + 30, gy);
+  ctx.stroke();
+}
+// Inside the rocket: a long metal corridor with round windows on space; stars stream past
+function drawRocketIn() {
+  const cx = CAM.x;
+  paperBg();
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = '#c9cfdc';
+  ctx.fillRect(-30, -30, W + 60, G + 36);
+  ctx.globalAlpha = 1;
+  // wall panels and rivets (speed 1)
+  ctx.strokeStyle = 'rgba(110,118,140,0.55)';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let x = -(cx % 220) - 220; x < W + 220; x += 220) {
+    ctx.moveTo(x, 40);
+    ctx.lineTo(x, G);
+  }
+  ctx.moveTo(-30, 40);
+  ctx.lineTo(W + 30, 40);
+  ctx.moveTo(-30, G - 60);
+  ctx.lineTo(W + 30, G - 60);
+  ctx.stroke();
+  // windows: a starfield streaming past behind round glass
+  for (let x = -(cx % 440) - 440 + 110; x < W + 440; x += 440) {
+    const wy = 150;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, wy, 56, 0, 7);
+    ctx.fillStyle = '#1d2140';
+    ctx.fill();
+    ctx.clip();
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 18; i++) {
+      const sx = x - 60 + ((i * 53 - fr * (1 + (i % 3)) - cx * 0.05) % 120 + 120) % 120,
+        sy = wy - 56 + ((i * 37) % 112);
+      ctx.fillRect(sx, sy, 2 + (i % 3), 2);
+    }
+    ctx.restore();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(x, wy, 56, 0, 7);
+    ctx.stroke();
+    ctx.strokeStyle = '#9aa3b5';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x, wy, 62, 0, 7);
+    ctx.stroke();
+  }
+  // the floor: metal grating
+  ctx.fillStyle = '#b7bdcb';
+  ctx.fillRect(-30, G + 6, W + 60, H);
+  ctx.strokeStyle = 'rgba(90,96,115,0.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let x = -(cx % 30) - 30; x < W + 30; x += 30) {
+    ctx.moveTo(x, G + 6);
+    ctx.lineTo(x - 20, H);
+  }
+  ctx.stroke();
+  groundLine();
+}
+// The moon: a dark sky full of stars, the Earth, grey ground with craters
+function drawMoon() {
+  const cx = CAM.x;
+  // the sky: lighter at the top so the scores stay easy to read, darkening down to the horizon
+  const sky = ctx.createLinearGradient(0, 0, 0, G);
+  sky.addColorStop(0, '#9da2c4');
+  sky.addColorStop(0.35, '#4d5380');
+  sky.addColorStop(1, '#23263f');
+  ctx.fillStyle = sky;
+  ctx.fillRect(-30, -30, W + 60, H + 60);
+  ctx.globalAlpha = 0.18;
+  const gx = -(cx % 30);
+  ctx.drawImage(gridC, gx, 0, W, H);
+  ctx.drawImage(gridC, gx + W, 0, W, H);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#fff';
+  layer(0.03, 37, 97, (x, r) => ctx.fillRect(x, 90 + r * (G - 150), 1.5 + r * 2, 1.5 + r * 2));
+  // the Earth
+  const ex = 650 - cx * 0.01,
+    ey = 150;
+  ctx.fillStyle = '#5fb3ff';
+  ctx.strokeStyle = '#cfe9ff';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(ex, ey, 42, 0, 7);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#7fd07f';
+  ctx.beginPath();
+  ctx.ellipse(ex - 12, ey - 8, 14, 18, 0.5, 0, 7);
+  ctx.ellipse(ex + 16, ey + 14, 10, 8, 0, 0, 7);
+  ctx.fill();
+  // far grey hills
+  layer(0.2, 300, 101, (x, r) => {
+    ctx.fillStyle = '#8b8fa3';
+    ctx.strokeStyle = '#5f6378';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(x, G + 8, 180 + r * 80, 50 + r * 40, 0, Math.PI, 0);
+    ctx.fill();
+    ctx.stroke();
+  });
+  ctx.fillStyle = '#c3c6d1';
+  ctx.fillRect(-30, G + 6, W + 60, H);
+  ctx.strokeStyle = '#a3a7b6';
+  ctx.lineWidth = 2;
+  layer(1, 90, 103, (x, r) => {
+    ctx.beginPath();
+    ctx.ellipse(x, G + 22 + r * 40, 16 + r * 14, 4 + r * 2, 0, 0, 7);
+    ctx.stroke();
+  });
+  ctx.strokeStyle = '#f2f3f7';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-30, G + 6);
+  ctx.lineTo(W + 30, G + 6);
+  ctx.stroke();
+}
+// The launch tower's platforms (terrain) as steel girders, and the tower's frame behind them
+function drawPlatforms() {
+  for (const s of LV.terr.s) {
+    const w = s.x2 - s.x1;
+    inkRect(s.x1, s.y1, w, 12, '#ff9a3c', 3);
+    ctx.strokeStyle = 'rgba(28,22,38,0.6)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let x = s.x1 + 10; x < s.x2 - 5; x += 20) {
+      ctx.moveTo(x, s.y1 + 12);
+      ctx.lineTo(x + 10, s.y1);
+    }
+    ctx.stroke();
+    // little posts down to the ground
+    ctx.strokeStyle = 'rgba(120,120,140,0.6)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(s.x1 + 12, s.y1 + 12);
+    ctx.lineTo(s.x1 + 12, G + 6);
+    ctx.moveTo(s.x2 - 12, s.y1 + 12);
+    ctx.lineTo(s.x2 - 12, G + 6);
+    ctx.stroke();
+  }
+}
+// A rocket standing at x (its middle) with its bottom at y; fire = flames under it
+function drawRocket(x, y, fire) {
+  const w = 110,
+    h = 520;
+  if (fire) {
+    for (let i = 0; i < 3; i++) {
+      const fl = 60 + Math.random() * 50 - i * 18;
+      ctx.fillStyle = ['#ff7a00', '#ffd23f', '#fff6c8'][i];
+      ctx.beginPath();
+      ctx.moveTo(x - 34 + i * 10, y);
+      ctx.quadraticCurveTo(x, y + fl * 1.6, x + 34 - i * 10, y);
+      ctx.fill();
+    }
+  }
+  // fins
+  ctx.fillStyle = '#ff4fa3';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  for (const d of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(x + (d * w) / 2, y - 140);
+    ctx.lineTo(x + d * (w / 2 + 50), y);
+    ctx.lineTo(x + (d * w) / 2, y - 20);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+  // body and nose
+  inkRect(x - w / 2, y - h + 100, w, h - 100, '#fbfaf4', 4);
+  ctx.fillStyle = '#ff4fa3';
+  ctx.beginPath();
+  ctx.moveTo(x - w / 2, y - h + 100);
+  ctx.quadraticCurveTo(x - w / 2, y - h + 20, x, y - h - 40);
+  ctx.quadraticCurveTo(x + w / 2, y - h + 20, x + w / 2, y - h + 100);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  inkRect(x - w / 2, y - 200, w, 20, '#ff4fa3', 3);
+  inkRect(x - w / 2, y - 60, w, 20, '#3ec5ff', 3);
+  // window and the door (at the top deck's height)
+  ctx.fillStyle = '#cfe9fb';
+  ctx.beginPath();
+  ctx.arc(x, y - 330, 22, 0, 7);
+  ctx.fill();
+  ctx.stroke();
+  inkRect(x - w / 2 + 6, y - 496, 34, 60, '#dfe3ea', 3);
+  ctx.fillStyle = 'rgba(28,22,38,0.5)';
+  ctx.font = '900 18px Impact,"Arial Black",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.save();
+  ctx.translate(x + 8, y - 250);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('PINK-1', 0, 6);
+  ctx.restore();
+}
+// A flying saucer at (x, y); beaming = the fighter it beams down (a cone of light down to them)
+function drawSaucer(x, y, beaming) {
+  if (beaming) {
+    const g = ctx.createLinearGradient(0, y, 0, G);
+    g.addColorStop(0, 'rgba(160,255,200,0.6)');
+    g.addColorStop(1, 'rgba(160,255,200,0.15)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(x - 24, y + 10);
+    ctx.lineTo(x - 90, G + 6);
+    ctx.lineTo(x + 90, G + 6);
+    ctx.lineTo(x + 24, y + 10);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#cfe9fb';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(x, y - 12, 32, 26, 0, Math.PI, 0);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#9aa3b5';
+  ctx.beginPath();
+  ctx.ellipse(x, y, 80, 18, 0, 0, 7);
+  ctx.fill();
+  ctx.stroke();
+  for (let i = -2; i <= 2; i++) {
+    ctx.fillStyle = (fr >> 3) % 2 === (i & 1) ? '#ffd23f' : '#ff4fa3';
+    ctx.beginPath();
+    ctx.arc(x + i * 28, y + 2, 5, 0, 7);
+    ctx.fill();
+  }
+}
+function drawSpaceTransDone(k, x) {
+  const gy = G + 6;
+  if (k === 'trans-launch') {
+    // the launch tower's frame, and the rocket (until it has left)
+    // the tower: a braced steel frame under the top deck, up beside the rocket
+    const o = x - 1110,
+      l = o + 750,
+      r = o + 1050;
+    ctx.strokeStyle = '#8a8fa3';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for (let y = gy; y > G - 430; y -= 86) {
+      ctx.moveTo(l, y);
+      ctx.lineTo(r, Math.max(G - 418, y - 86));
+      ctx.moveTo(r, y);
+      ctx.lineTo(l, Math.max(G - 418, y - 86));
+      ctx.moveTo(l, y);
+      ctx.lineTo(r, y);
+    }
+    ctx.moveTo(r - 10, G - 430);
+    ctx.lineTo(r - 10, G - 560);
+    ctx.lineTo(x - 40, G - 560);
+    ctx.stroke();
+    inkRect(l - 4, G - 425, 10, 431, '#9aa3b5', 2.5);
+    inkRect(r - 6, G - 425, 10, 431, '#9aa3b5', 2.5);
+    const t = transAt(x);
+    if (!(t && (t.done || riding('launch')))) drawRocket(x, gy, false);
+  } else if (k === 'trans-landing') {
+    // the hatch to the landing module
+    inkRect(x - 50, gy - 170, 100, 170, '#9aa3b5', 4);
+    inkRect(x - 36, gy - 156, 72, 156, '#dfe3ea', 3);
+    ctx.fillStyle = '#ffd23f';
+    ctx.font = '900 16px Impact,"Arial Black",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('MOON', x, gy - 120);
+    ctx.fillText('LANDER', x, gy - 100);
+    ctx.fillStyle = '#ff4fa3';
+    ctx.beginPath();
+    ctx.arc(x + 24, gy - 70, 6, 0, 7);
+    ctx.fill();
+  } else if (k === 'trans-landingout') {
+    if (!riding('landing')) drawRocket(x, gy, false);
+  } else return false;
+  return true;
+}
+function drawSpacePropDone(k, x, s) {
+  const gy = G + 6;
+  if (k === 'radar') {
+    inkRect(x - 6, gy - 90, 12, 90, '#9aa3b5', 3);
+    ctx.save();
+    ctx.translate(x, gy - 100);
+    ctx.rotate(-0.5 + Math.sin(fr * 0.02 + x) * 0.3);
+    ctx.fillStyle = '#fbfaf4';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 46, 18, 0, 0, Math.PI);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, 4);
+    ctx.lineTo(0, -30);
+    ctx.stroke();
+    ctx.restore();
+  } else if (k === 'fueltank') {
+    ctx.fillStyle = '#fbfaf4';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.ellipse(x, gy - 50 * s, 56 * s, 44 * s, 0, 0, 7);
+    ctx.fill();
+    ctx.stroke();
+    inkRect(x - 56 * s, gy - 54 * s, 112 * s, 10, '#ff4fa3', 2);
+    ctx.strokeStyle = INK;
+    ctx.beginPath();
+    ctx.moveTo(x - 30 * s, gy - 10 * s);
+    ctx.lineTo(x - 36 * s, gy);
+    ctx.moveTo(x + 30 * s, gy - 10 * s);
+    ctx.lineTo(x + 36 * s, gy);
+    ctx.stroke();
+  } else if (k === 'cone') {
+    ctx.fillStyle = '#ff7a00';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x - 14, gy);
+    ctx.lineTo(x, gy - 34);
+    ctx.lineTo(x + 14, gy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x - 7, gy - 18, 14, 5);
+  } else if (k === 'lamp') {
+    inkRect(x - 4, gy - 180, 8, 180, '#9aa3b5', 2.5);
+    inkRect(x - 22, gy - 196, 44, 18, '#fff6c8', 3);
+  } else if (k === 'panel') {
+    inkRect(x - 40, gy - 150, 80, 90, '#9aa3b5', 3);
+    for (let i = 0; i < 6; i++) {
+      ctx.fillStyle = ((fr >> 4) + i) % 3 ? '#3ec5ff' : '#ffd23f';
+      ctx.fillRect(x - 30 + (i % 3) * 22, gy - 138 + Math.floor(i / 3) * 22, 14, 10);
+    }
+    ctx.fillStyle = '#ff4fa3';
+    ctx.beginPath();
+    ctx.arc(x, gy - 78, 7, 0, 7);
+    ctx.fill();
+  } else if (k === 'porthole') {
+    // a small round window low on the wall
+    ctx.fillStyle = '#1d2140';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(x, gy - 110, 22, 0, 7);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x - 8, gy - 116, 2, 2);
+    ctx.fillRect(x + 6, gy - 104, 2, 2);
+  } else if (k === 'tank') {
+    inkRect(x - 18, gy - 90, 36, 90, '#cfe9fb', 3);
+    inkRect(x - 18, gy - 90, 36, 14, '#9aa3b5', 3);
+  } else if (k === 'plant') {
+    inkRect(x - 14, gy - 26, 28, 26, '#c99c6e', 3);
+    ctx.strokeStyle = '#4f8f4f';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    for (const a of [-0.6, 0, 0.6]) {
+      ctx.moveTo(x, gy - 26);
+      ctx.quadraticCurveTo(x + a * 30, gy - 50, x + a * 40, gy - 64);
+    }
+    ctx.stroke();
+  } else if (k === 'crater') {
+    ctx.fillStyle = '#a9adbb';
+    ctx.strokeStyle = '#7d8193';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(x, gy + 10, 46 * s, 10, 0, 0, 7);
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = '#eceef3';
+    ctx.beginPath();
+    ctx.ellipse(x, gy + 10, 46 * s, 10, 0, Math.PI, 0);
+    ctx.stroke();
+  } else if (k === 'moonrock') {
+    ctx.fillStyle = '#b2b5c2';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x - 24 * s, gy);
+    ctx.lineTo(x - 18 * s, gy - 22 * s);
+    ctx.lineTo(x + 4 * s, gy - 30 * s);
+    ctx.lineTo(x + 24 * s, gy - 14 * s);
+    ctx.lineTo(x + 26 * s, gy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else if (k === 'moonflag') {
+    ctx.strokeStyle = '#eceef3';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x, gy);
+    ctx.lineTo(x, gy - 130);
+    ctx.lineTo(x + 60, gy - 130);
+    ctx.stroke();
+    inkRect(x, gy - 128, 60, 36, '#ff4fa3', 3);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(x + 30, gy - 110, 8, 0, 7);
+    ctx.fill();
+  } else if (k === 'antenna') {
+    ctx.strokeStyle = '#eceef3';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x - 20, gy);
+    ctx.lineTo(x, gy - 110);
+    ctx.lineTo(x + 20, gy);
+    ctx.moveTo(x - 12, gy - 50);
+    ctx.lineTo(x + 12, gy - 50);
+    ctx.stroke();
+    ctx.fillStyle = (fr >> 4) % 2 ? '#ff4fa3' : '#ffd23f';
+    ctx.beginPath();
+    ctx.arc(x, gy - 114, 6, 0, 7);
+    ctx.fill();
+  } else if (k === 'lander') {
+    ctx.strokeStyle = '#eceef3';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x - 30, gy - 40);
+    ctx.lineTo(x - 50, gy);
+    ctx.moveTo(x + 30, gy - 40);
+    ctx.lineTo(x + 50, gy);
+    ctx.stroke();
+    inkRect(x - 36, gy - 90, 72, 52, '#ffd23f', 3);
+    ctx.fillStyle = '#cfe9fb';
+    ctx.strokeStyle = INK;
+    ctx.beginPath();
+    ctx.arc(x, gy - 104, 20, Math.PI, 0);
+    ctx.fill();
+    ctx.stroke();
+  } else return false;
+  return true;
+}
+// A glass bubble helmet around a fighter's head (on the moon)
+function drawHelmet(f, o, s) {
+  if (!helmOn || !o.hd || !BIOMES[segAt(f.x).b].helmet) return;
+  const [hx, hy] = o.hd,
+    r = 9 * s * 2;
+  ctx.save();
+  ctx.fillStyle = 'rgba(200,230,255,0.22)';
+  ctx.strokeStyle = 'rgba(70,110,150,0.9)';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(hx, hy, r, 0, 7);
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(hx, hy, r * 0.75, -2.6, -1.9);
+  ctx.stroke();
+  ctx.restore();
 }
