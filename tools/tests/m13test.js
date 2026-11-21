@@ -15,7 +15,7 @@ const minis=await ev("(()=>{let m=0;for(let s=1;s<500;s++)m+=genRun('castle',s).
 ok(minis>0.3&&minis<1,'mini-bosses are rare: '+minis.toFixed(2)+' per run (15 fights)');
 // play two runs through (enemies beaten and gates smashed by the test) with every scene
 const play=async (seed,th='castle',again)=>{await ev(again?`$('b-again').click()`:`SET.seed='${seed}';titleOpenAll();startRun('${th}')`);await ev(`LV.encs[1].mini=BIOMES[LV.segs[0].b].mini.t;LV.encs[1].line='HI'`);const seen={};
- for(let i=0;i<900;i++){const st=await ev("(()=>{setA('kb','r',1);const P=PL[0];P.hp=P.max;let k='';for(let n=0;n<30;n++){fr++;update();if(LV.cine)k=LV.cine.k;for(const e of E)if(!e.dying&&e.st!=='cine'&&LV.t%20===0){e.hp=0;hurtE(e,{dmg:1,kb:4,lift:-4,ef:'kd'},1,null,P)}for(const g of LV.gates)if(g.hp>0&&g.x-P.x<120)hurtGate(g,99)}return {k,state}})()");if(st.k)seen[st.k]=1;if(st.state!=='play')return {seen,state:st.state}}
+ for(let i=0;i<900;i++){const st=await ev("(()=>{setA('kb','r',1);const P=PL[0];P.hp=P.max;let k='';const tw=nextTrans();if(tw&&tw.top&&!LV.cine&&P.x>tw.deck-500&&P.gy>tw.top+1&&!LV.encs.some(e=>e.st===1)){P.x=tw.deck+20;P.y=tw.top-2;P.vy=0}for(let n=0;n<30;n++){fr++;update();if(LV.cine)k=LV.cine.k;for(const e of E)if(!e.dying&&e.st!=='cine'&&LV.t%20===0){e.hp=0;hurtE(e,{dmg:1,kb:4,lift:-4,ef:'kd'},1,null,P)}for(const g of LV.gates)if(g.hp>0&&g.x-P.x<120)hurtGate(g,99)}return {k,state}})()");if(st.k)seen[st.k]=1;if(st.state!=='play')return {seen,state:st.state}}
  return {seen,state:'stuck'}};
 const r1=await play(7),r2=await play(39);
 ok(r1.state==='clear'&&r2.state==='clear','two runs play through to the end ('+r1.state+', '+r2.state+')');
@@ -49,6 +49,23 @@ await ev("setA('kb','r',0)");
 // the slope is drawing only: the same fight on the mountainside plays the same with or without it
 const flat=await ev("(()=>{const go=keep=>{SET.seed='6';startRun('mountain');cineEnd();if(!keep)LV.ramps=null;const s=LV.segs[1];CAM.x=s.x0+1500;PL[0].x=CAM.x+200;setA('kb','r',1);for(let n=0;n<400;n++){fr++;update();render()}setA('kb','r',0);return Math.round(PL[0].x)+','+E.length+','+rnd()};return go(1)===go(0)})()");
 ok(flat,'the climb is only drawn: the game plays the same on the slope as on flat ground');
+// Space: launch base, the rocket, the moon; the Pink Alien beamed down; the launch tower's platforms
+ok(await ev("(()=>{const L=genRun('space',5);return L.segs.map(s=>s.b).join()==='base,rocket,moon'&&L.trans.map(t=>t.k).join()==='launch,landing'&&L.encs[L.encs.length-1].boss==='Z'&&L.encs[L.encs.length-1].intro==='beam'&&L.terr&&L.terr.s.length===4&&!genRun('castle',5).terr})()"),'Space: launch base, rocket, moon, the launch then the landing, the Pink Alien, and platforms only there');
+// climbing the tower with ordinary jumps: from the ground to each platform and onto the top deck, which starts the launch
+const climb=await ev(`(()=>{SET.seed='3';titleOpenAll();startRun('space');cineEnd();LV.encs.forEach((e,i)=>{if(i<5)e.st=2});const tw=LV.trans[0],o=tw.x-1110;CAM.x=tw.x-W+260;levelWalls();const P=PL[0];P.x=o+520;P.y=G;
+ const S=LV.terr.s,out=[];let cy=0;const step=n=>{for(let i=0;i<n;i++){fr++;update();cy=Math.min(cy,CAM.y)}};const key=(k,v)=>setA('kb',k,v);
+ for(const s of S){let tries=0;const mid=(s.x1+s.x2)/2,last=s===S[3];while(Math.abs(P.gy-s.y1)>1&&tries++<6){const cu=P.surf,cx=cu?Math.max(cu.x1+12,Math.min(cu.x2-12,mid)):Math.min(mid,o+735);
+   for(let i=0;i<120&&Math.abs(P.x-cx)>8;i++){key(P.x<cx?'r':'l',1);key(P.x<cx?'l':'r',0);step(1)}key('l',0);key('r',0);step(4);
+   key('j',1);step(2);key('j',0);const tx=last?s.x1+90:mid;for(let i=0;i<80;i++){const d=tx-P.x;key('r',d>6?1:0);key('l',d<-6?1:0);step(1);if(P.vy===0&&P.y>=P.gy-0.5&&i>5)break}key('l',0);key('r',0);step(2)}
+   out.push(P.gy===s.y1)}
+ const camUp=cy<-150;key('r',1);step(30);key('r',0);return {out,camUp,cine:LV.cine&&LV.cine.k}})()`);
+ok(climb.out.every(x=>x),'the launch tower can be climbed with ordinary jumps, platform by platform: '+JSON.stringify(climb.out));
+ok(climb.camUp&&climb.cine==='launch','the camera rises with you, and stepping onto the top deck starts the launch '+JSON.stringify(climb));
+ok(await ev("(()=>{SET.seed='3';startRun('space');cineEnd();const tw=LV.trans[0],o=tw.x-1110;CAM.x=tw.x-W+260;levelWalls();const P=PL[0];P.x=o+700;P.y=G;setA('kb','r',1);for(let i=0;i<60;i++){fr++;update()}setA('kb','r',0);return P.x<o+750&&!LV.cine})()"),'you cannot walk in under the tower from the ground');
+const r5=await play(3,'space');
+ok(r5.state==='clear'&&r5.seen.launch&&r5.seen.landing&&r5.seen.beam,'a Space run plays through: '+Object.keys(r5.seen).join(', '));
+await ev("setA('kb','r',0)");
+ok(await ev("BIOMES.moon.helmet===1&&!BIOMES.base.helmet&&!BIOMES.rocket.helmet"),'bubble helmets on the moon only');
 ok(await ev("(()=>{const all=[...Object.values(BIOMES).map(b=>b.mini.lines),...Object.values(THEMES).map(t=>t.boss.lines)].flat();return all.length>10&&all.every(l=>!/ORANGE/i.test(l))})()"),'no line says ORANGE (players rename their fighters)');
 // the opening draw-in: every player is drawn by the pencil, then the sketches are gone for good
 await ev("SET.seed='7';titleOpenAll();startRun('castle');for(let n=0;n<30;n++){fr++;update()}");
@@ -79,5 +96,5 @@ ok(slide.sewer>slide.woods*1.5,'bodies keep sliding on the sewer floor (speed af
 // a new run each time (no fixed seed)
 ok(await ev("(()=>{SET.seed='';startRun('castle');const a=LV.run.seed;replayLevel();return a!==LV.run.seed})()"),'PLAY AGAIN makes a new run');
 await p.screenshot({path:S+'/shots/m13.png'});
-ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged');
+{const st=await ev('JSON.stringify(selfTest())');ok(JSON.parse(st).hash===await ev('SELFTEST_EXPECT.arcade'),'self-test unchanged '+st)}
 ok(errs.length===0,'no errors '+errs.join(' | '));console.log(fails?fails+' FAILED':'ALL PASS');await b.close()})();

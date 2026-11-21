@@ -36,6 +36,9 @@ function levelSim() {
   WW.r = LV.len;
   const cpE = LV.encs[LV.cp];
   CAM.x = cpE ? cpE.lock : 0;
+  CAM.y = 0;
+  // platforms (a run's launch tower); none otherwise
+  if (LV.terr) terrainSet(LV.terr.s, LV.terr.w);
   PL.forEach((p, i) => {
     p.x = CAM.x + 200 - i * 60;
     p.face = 1;
@@ -181,8 +184,14 @@ function levelTick() {
       biomeDone(tr.from);
       bn(BIOMES[tr.to].name);
     }
-    // reaching a transition's scene (catapult, pipe, rope) starts it
-    if (trc && !LV.encs.some(e => e.st === 1) && lead >= trc.x - 150) cineStart(trc.k, { tr: trc });
+    // reaching a transition's scene (catapult, pipe, rope) starts it; the launch, once someone is on the top deck
+    const there = trc && (trc.top ? alive.some(p => p.gy <= trc.top + 1 && p.x >= trc.deck) : lead >= trc.x - 150);
+    if (there && !LV.encs.some(e => e.st === 1)) cineStart(trc.k, { tr: trc });
+    // on platforms the camera rises with the highest player standing on one
+    if (LV.terr) {
+      const ty = Math.max(-400, Math.min(0, Math.min(...alive.map(p => p.gy)) - 230));
+      CAM.y += (ty - CAM.y) * 0.08;
+    }
   }
   levelWalls();
   if (ae) {

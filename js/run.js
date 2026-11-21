@@ -15,7 +15,7 @@ function runRng(seed) {
   };
 }
 // Transitions that leave something at the start of the next biome (its prop 'trans-<k>out' at this x)
-const OUTS = { pipe: 120, balloon: 300, gondola: 200 };
+const OUTS = { pipe: 120, balloon: 300, gondola: 200, landing: 300 };
 // Builds a run: the same shape as buildLevel() (level.js) plus segs (one per biome), trans (transitions) and run.
 function genRun(themeId, seed) {
   const th = THEMES[themeId],
@@ -34,7 +34,8 @@ function genRun(themeId, seed) {
     gates = [],
     segs = [],
     trans = [],
-    ramps = [];
+    ramps = [],
+    terr = { s: [], w: [] };
   let x = 0;
   // scenery for a chunk: a few props spread across it
   const scatter = (B, w, n) => {
@@ -136,8 +137,26 @@ function genRun(themeId, seed) {
         }),
         k = fits[ri(0, fits.length - 1)],
         T_ = TRANSITIONS[k],
-        c = chunk(B, bi, k === 'rope' ? 600 : 900, [...scatter(B, 480, 2), { k: 'trans-' + k, x: 600 }]),
-        t = { k, from: bid, to: nb, x: c.x0 + 600, done: 0 };
+        at = T_.tower ? 1110 : 600,
+        c = chunk(B, bi, k === 'rope' ? 600 : T_.tower ? 1500 : 900, [
+          ...scatter(B, 460, 2),
+          { k: 'trans-' + k, x: at }
+        ]),
+        t = { k, from: bid, to: nb, x: c.x0 + at, done: 0 };
+      if (T_.tower) {
+        // the launch tower: platforms to jump up (each about half a jump higher), then the top deck by the rocket.
+        // Walls under the deck and at the rocket keep you from walking (or falling) in under it.
+        const o = c.x0;
+        terr.s.push(
+          { x1: o + 480, x2: o + 620, y1: G - 100, y2: G - 100 },
+          { x1: o + 640, x2: o + 740, y1: G - 210, y2: G - 210 },
+          { x1: o + 480, x2: o + 620, y1: G - 320, y2: G - 320 },
+          { x1: o + 700, x2: o + 1055, y1: G - 430, y2: G - 430 }
+        );
+        terr.w.push({ x: o + 750, y1: G - 425, y2: G }, { x: o + 1058, y1: G - 700, y2: G });
+        t.top = G - 430;
+        t.deck = o + 760;
+      }
       if (k === 'gate') gates.push({ k: 'door', x: t.x, hp: T_.hp, max: T_.hp, hit: 0, to: nb });
       // the gap between the biomes: a chasm for the rope, an unseen stretch for scenes that fly or slide you there
       x += T_.gap;
@@ -155,6 +174,7 @@ function genRun(themeId, seed) {
     segs,
     trans,
     ramps: ramps.length ? ramps : null,
+    terr: terr.s.length ? terr : null,
     run: { theme: themeId, seed },
     len: x,
     cp: -1,
@@ -225,9 +245,11 @@ function cineEnd() {
 // Puts players (and the camera) at the start of the next biome
 function cineArrive(tr) {
   CAM.x = tr.nx;
+  CAM.y = 0;
   PL.forEach((p, i) => {
     p.x = tr.nx + 220 - i * 60;
     p.gy = G;
+    p.surf = null;
   });
 }
 const ease = t => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
@@ -467,6 +489,132 @@ function cineTick() {
       }
     });
     if (t >= top + 6 + PL.length * 12 + 40) cineEnd();
+  } else if (c.k === 'launch') {
+    // everyone boards the rocket by the top deck; a countdown; lift-off (c.ry = how high the rocket has gone)
+    const tr = c.tr,
+      dx = tr.x - 60,
+      dy = tr.top;
+    if (t === 1) c.ry = 0;
+    if (t <= 40)
+      ps.forEach((p, i) => {
+        const a = ease((t - i * 4) / 30);
+        p.x = p.sx + (dx - p.sx) * a;
+        p.y = p.sy + (dy - p.sy) * a - Math.sin(a * Math.PI) * 40;
+        if (a >= 1 && !p.hide) {
+          p.hide = 1;
+          sfx(700 + i * 50, 0.08, 'square', 0.04);
+        }
+      });
+    if (t === 50 || t === 80 || t === 110) {
+      txt(tr.x, tr.top - 120, String((140 - t) / 30), '#ffd400', 40);
+      sfx(440, 0.15, 'square', 0.05);
+    }
+    if (t >= 140 && t < 240) {
+      if (t === 140) {
+        txt(tr.x, tr.top - 120, 'LIFT OFF!', '#ff7a00', 36);
+        sfx(60, 1.2, 'sawtooth', 0.12, 200);
+        noise(1, 0.14, 300);
+      }
+      const u = t - 140;
+      c.ry = u * u * 0.06;
+      shake = Math.max(shake, u < 40 ? 6 : 2);
+      if (t % 3 === 0) dust(tr.x + (rnd() - 0.5) * 60, G, 3);
+      // the camera follows it up
+      CAM.y += (Math.max(-500, -c.ry) - CAM.y) * 0.1;
+    }
+    if (t === 240) {
+      cineArrive(tr);
+      PL.forEach(p => (p.hide = 1));
+    }
+    ps.forEach((p, i) => {
+      if (t === 250 + i * 10) {
+        // aboard: step out into the rocket's corridor
+        p.hide = 0;
+        p.x = tr.nx + 160 + i * 40;
+        p.y = G;
+        p.st = 'free';
+        ring(p.x, G - 45, 36);
+        sfx(520 + i * 60, 0.1, 'square', 0.04, 200);
+      }
+    });
+    if (t >= 250 + PL.length * 10 + 30) cineEnd();
+  } else if (c.k === 'landing') {
+    // everyone goes through the hatch; the rocket comes down on the moon, and out they step
+    const tr = c.tr,
+      lx = tr.nx + OUTS.landing;
+    if (t <= 36)
+      ps.forEach((p, i) => {
+        const a = ease((t - i * 4) / 28);
+        p.x = p.sx + (tr.x - p.sx) * a;
+        if (a >= 1 && !p.hide) {
+          p.hide = 1;
+          sfx(500 - i * 30, 0.1, 'square', 0.04, -200);
+        }
+      });
+    if (t === 60) {
+      cineArrive(tr);
+      PL.forEach(p => (p.hide = 1));
+    }
+    if (t >= 60 && t <= 170) {
+      const a = ease((t - 60) / 110);
+      c.lx = lx;
+      c.ly = (1 - a) * -520;
+      if (t % 4 === 0) sfx(90, 0.1, 'sawtooth', 0.03);
+      if (t === 170) {
+        dust(lx - 50, G, 8);
+        dust(lx + 50, G, 8);
+        shake = Math.max(shake, 8);
+        sfx(70, 0.4, 'sine', 0.12);
+      }
+    }
+    ps.forEach((p, i) => {
+      if (t === 190 + i * 12) {
+        p.hide = 0;
+        p.x = lx - 70;
+        p.y = G;
+        p.st = 'free';
+        p.vx = -3 - i;
+        p.vy = -7;
+        sfx(600 + i * 60, 0.1, 'square', 0.04, 200);
+      }
+    });
+    if (t >= 190 + PL.length * 12 + 40) cineEnd();
+  } else if (c.k === 'beam') {
+    // a flying saucer comes over, beams the boss down, says something, and flies off
+    const e = c.e;
+    if (t === 1) {
+      c.ux = CAM.x + W + 120;
+      c.uy = 60;
+    }
+    if (t <= 60) {
+      c.ux += (e.x - c.ux) * 0.1;
+      e.hide = 1;
+    } else if (t <= 150) {
+      e.hide = 0;
+      c.beam = 1;
+      e.y = G - 300 + 300 * ease((t - 60) / 90);
+      if (t % 10 === 0) sfx(900 + ((t / 10) % 3) * 200, 0.08, 'sine', 0.03);
+    }
+    if (t === 150) {
+      c.beam = 0;
+      e.y = G;
+      ring(e.x, G - 40, 120);
+      shake = Math.max(shake, 8);
+      sfx(120, 0.5, 'sawtooth', 0.08, -40);
+      LV.say = { e, txt: c.line, t };
+      for (const p of PL) if (p.st === 'cine') p.st = 'free';
+    }
+    if (t > 170) {
+      c.ux += (t - 170) * 0.6;
+      c.uy -= (t - 170) * 0.25;
+    }
+    if (t >= 220) {
+      e.st = 'free';
+      e.inv = 0;
+      e.cd = 40;
+      LV.say = null;
+      cineEnd();
+    }
   } else if (c.k === 'jump') {
     // a mini-boss leaps in, lands with a quake that knocks everyone down, and says something
     const e = c.e;
@@ -542,6 +690,10 @@ function bossArrive(ne) {
     e.y = G;
     e.draw = 0;
     cineStart('pencil', { e, line: ne.line });
+  } else if (ne.intro === 'beam') {
+    e.y = G - 300;
+    e.hide = 1;
+    cineStart('beam', { e, line: ne.line });
   } else {
     e.y = -280;
     e.vy = 0;
@@ -551,9 +703,12 @@ function bossArrive(ne) {
 // The moving basket or cabin of a balloon or gondola ride (world space, drawn over the riders so it hides their legs)
 function drawCine() {
   const c = LV && LV.cine;
-  if (!c || !(c.k === 'balloon' || c.k === 'gondola') || c.vx === undefined) return;
-  if (c.k === 'balloon') drawBalloon(c.vx, c.vy);
-  else drawGondolaCab(c.vx, c.vy);
+  if (!c) return;
+  if (c.k === 'balloon' && c.vx !== undefined) drawBalloon(c.vx, c.vy);
+  else if (c.k === 'gondola' && c.vx !== undefined) drawGondolaCab(c.vx, c.vy);
+  else if (c.k === 'launch' && c.ry !== undefined) drawRocket(c.tr.x, G + 6 - c.ry, c.ry > 0);
+  else if (c.k === 'landing' && c.lx !== undefined) drawRocket(c.lx, G + 6 + c.ly, c.ly < 0);
+  else if (c.k === 'beam' && c.ux !== undefined) drawSaucer(c.ux, c.uy, c.beam ? c.e : null);
 }
 // Speech bubble over whoever is talking (world space, drawn by render.js after the fighters)
 function drawSay() {

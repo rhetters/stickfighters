@@ -278,6 +278,12 @@ BOSSPH.Y = [
   { at: 0.66, cd: 0.75, enter: () => (bn('THE YETI IS ANGRY!'), bossCall(['g', 'r', 'f'])) },
   { at: 0.33, cd: 0.5, enter: () => (bn('THE YETI IS FURIOUS!'), bossCall(['b', 'u', 'g', 'r'])) }
 ];
+// The Pink Alien: the same three phases, beaming his army down
+BOSSPH.Z = [
+  { at: 1, cd: 1 },
+  { at: 0.66, cd: 0.75, enter: () => (bn('THE ALIEN IS ANGRY!'), bossCall(['g', 'f', 'r'])) },
+  { at: 0.33, cd: 0.5, enter: () => (bn('THE ALIEN IS FURIOUS!'), bossCall(['u', 'b', 'g', 'f'])) }
+];
 function bossThink(e, Q, T_, spd) {
   const ph = BOSSPH[e.tk] || BOSSPH.c,
     hpf = e.hp / e.max;

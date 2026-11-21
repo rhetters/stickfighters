@@ -16,6 +16,8 @@ function selfTest(n) {
   SET.surge = 'hold';
   SET.vol = 0;
   releaseAll();
+  // forget earlier button presses: the frame count starts over, so a press remembered from earlier play would look new
+  for (const I of INP) for (const k in I.press) I.press[k] = -99;
   reseed(20261116);
   fr = 0;
   init();
