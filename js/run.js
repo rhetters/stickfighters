@@ -27,7 +27,8 @@ function catBucket(x, t) {
 // Transitions that leave something at the start of the next biome (its prop 'trans-<k>out' at this x)
 const OUTS = { pipe: 120, balloon: 300, gondola: 200, landing: 300 };
 // Builds a run: the same shape as buildLevel() (level.js) plus segs (one per biome), trans (transitions) and run.
-function genRun(themeId, seed) {
+// ng (harder replays): fights start tougher and hold more enemies, and mini-bosses turn up more often.
+function genRun(themeId, seed, ng = 0) {
   const th = THEMES[themeId],
     R = runRng(seed),
     ri = (a, b) => a + Math.floor(R() * (b - a + 1)),
@@ -84,9 +85,9 @@ function genRun(themeId, seed) {
     // 2. the fights
     for (let k = 0; k < B.fights; k++) {
       const w = ri(B.w[0], B.w[1]),
-        lvl = base + Math.floor(k / 2),
+        lvl = base + Math.floor(k / 2) + ng,
         mix = B.mix.filter(m => m.at <= lvl).pop() || B.mix[0],
-        count = Math.min(8, 3 + Math.floor(k / 2) + bi),
+        count = Math.min(8 + ng, 3 + Math.floor(k / 2) + bi + ng),
         list = [];
       for (let i = 0; i < count; i++) list.push(pickW(mix.w));
       if (k === B.fights - 1 && !last) list.push('c'); // a Captain closes each biome
@@ -104,7 +105,7 @@ function genRun(themeId, seed) {
           st: 0,
           q: []
         };
-      if (B.mini && R() < B.mini.chance) {
+      if (B.mini && R() < B.mini.chance * (1 + ng)) {
         e.mini = B.mini.t;
         e.line = B.mini.lines[ri(0, B.mini.lines.length - 1)];
       }
@@ -188,7 +189,12 @@ function genRun(themeId, seed) {
   });
   return {
     id: 'run:' + themeId,
-    def: { name: th.name, num: 0, theme: themeId, next: 'A new ' + th.name + ' run (a new seed)' },
+    def: {
+      name: th.name + (ng ? ' +' + ng : ''),
+      num: 0,
+      theme: themeId,
+      next: 'A new ' + th.name + ' run (a new seed)'
+    },
     ch,
     encs,
     gates,
@@ -196,7 +202,7 @@ function genRun(themeId, seed) {
     trans,
     ramps: ramps.length ? ramps : null,
     terr: terr.s.length ? terr : null,
-    run: { theme: themeId, seed },
+    run: { theme: themeId, seed, ng },
     len: x,
     cp: -1,
     t: 0,
@@ -205,11 +211,13 @@ function genRun(themeId, seed) {
 }
 // The biome segment at world x
 const segAt = x => (LV.segs ? LV.segs.find(s => x < s.x1) || LV.segs[LV.segs.length - 1] : null);
-function startRun(themeId) {
+// ng = how many times harder than normal (0; each PLAY AGAIN from the victory screen adds one)
+function startRun(themeId, ng = 0) {
   closePanels();
   newSeed();
   init();
-  LV = genRun(themeId, curSeed);
+  LV = genRun(themeId, curSeed, ng);
+  LV.stats = {}; // each player's stats for the victory screen (LEVEL.tally), kept through a continue
   levelSim();
   paused = false;
   releaseAll();
@@ -219,9 +227,10 @@ function startRun(themeId) {
   cineStart('drawin');
   bn(LV.def.name);
 }
-// Play the same level again: a campaign run gets a new run (new seed), a fixed level starts over
-function replayLevel() {
-  if (LV && LV.run) startRun(LV.run.theme);
+// Play the same level again: a campaign run gets a new run (new seed), a fixed level starts over. harder = one
+// step harder than the run just played (the victory screen's ready-up)
+function replayLevel(harder) {
+  if (LV && LV.run) startRun(LV.run.theme, (LV.run.ng || 0) + (harder ? 1 : 0));
   else startLevel(LV ? LV.id : 'woods1');
 }
 // A biome is behind you: it counts as done for anything tied to it (the Wooded Trail's Ranger Hat)

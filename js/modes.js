@@ -1,7 +1,9 @@
 // StickFighters: Game modes. The combat engine knows nothing about waves, levels or score rules;
 // a mode sets up the world and runs the rules on top of it (VISION.md rule R1).
 // ===== MODES =====
-// A mode is { id, update() once per simulation step while someone is alive, hud?(), fg?() foreground drawing }.
+// A mode is { id, update() once per simulation step while someone is alive, hud?(), fg?() foreground drawing,
+//   tally?(player, what, n) to count a player's stats ('dealt', 'taken', 'kos', 'combo' (highest), 'revives'),
+//   onKill?(enemy, by) when an enemy is beaten, hard?() how many times harder the enemies are (0 = normal) }.
 // Arcade: endless waves on one screen (the original game).
 const ARCADE = {
   id: 'arcade',
@@ -33,6 +35,9 @@ let MODE = ARCADE;
 // ===== CO-OP RULES =====
 // Enemies get 35% more health per extra player, and each fight gets about 30% more grunts per extra player.
 const coopScale = () => (MODE.pvp || PL.length < 2 ? 1 : 1 + 0.35 * (PL.length - 1));
+// Harder replays (a theme played again after beating it): enemies get 40% more health and hit 20% harder each time
+const hardScale = () => (MODE.hard ? MODE.hard() : 0);
+const tally = (p, k, n) => MODE.tally && p && p.pl && MODE.tally(p, k, n);
 function coopExtra(q) {
   if (MODE.pvp || PL.length < 2) return;
   const n = Math.round(q.length * 0.3 * (PL.length - 1));
@@ -59,6 +64,7 @@ function reviveTick() {
       });
       q.pose[9] = 0;
       txt(q.x, q.y - 110, 'REVIVED!', q.col, 22);
+      for (const p of PL) if (p !== q && p.st !== 'dead' && Math.abs(p.x - q.x) < 70) tally(p, 'revives', 1);
       ring(q.x, q.y - 40, 60);
       sfx(600, 0.3, 'triangle', 0.06, 500);
     }
