@@ -267,6 +267,7 @@ function cineEnd() {
 function cineArrive(tr) {
   CAM.x = tr.nx;
   CAM.y = 0;
+  CAM.z = 1;
   PL.forEach((p, i) => {
     p.x = tr.nx + 220 - i * 60;
     p.gy = G;
@@ -572,8 +573,9 @@ function cineTick() {
       c.ry = u * u * 0.06;
       shake = Math.max(shake, u < 40 ? 6 : 2);
       if (t % 3 === 0) dust(tr.x + (rnd() - 0.5) * 60, G, 3);
-      // the camera follows it up
+      // the camera follows it up, back to full size
       CAM.y += (Math.max(-500, -c.ry) - CAM.y) * 0.1;
+      CAM.z += (1 - CAM.z) * 0.1;
     }
     if (t === 240) {
       cineArrive(tr);

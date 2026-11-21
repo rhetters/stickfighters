@@ -109,7 +109,8 @@ function drawLevelBg() {
   const cx = CAM.x,
     dk = chunkVal(cx + W / 2, 'dusk');
   ctx.save();
-  ctx.translate(-cx, -CAM.y);
+  // the world's props in the same view as the fighters (zoomed out and raised on the launch tower)
+  camApply(viewX(), CAM.y, CAM.z);
   if (LV.terr) drawPlatforms();
   for (const c of LV.ch)
     if (c.x0 < cx + W + 400 && c.x0 + c.w > cx - 400)
@@ -1624,14 +1625,34 @@ function drawBase() {
       ctx.lineTo(x + 12, y - 20);
     }
     ctx.stroke();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    // the rocket standing beside its tower: body, pointed nose, two fins
+    const rx = x + 34,
+      rh = h * 0.85,
+      rw = 11;
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
     ctx.beginPath();
-    ctx.ellipse(x + 30, G - h * 0.55, 10, h * 0.42, 0, 0, 7);
+    ctx.moveTo(rx - rw, G);
+    ctx.lineTo(rx - rw, G - rh + 22);
+    ctx.quadraticCurveTo(rx - rw, G - rh + 4, rx, G - rh - 8);
+    ctx.quadraticCurveTo(rx + rw, G - rh + 4, rx + rw, G - rh + 22);
+    ctx.lineTo(rx + rw, G);
+    ctx.closePath();
     ctx.fill();
     ctx.stroke();
+    ctx.fillStyle = 'rgba(255,79,163,0.45)';
+    for (const d of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(rx + d * rw, G - 30);
+      ctx.lineTo(rx + d * (rw + 10), G);
+      ctx.lineTo(rx + d * rw, G - 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.fillRect(rx - rw, G - rh * 0.55, rw * 2, 5);
   });
   ctx.restore();
-  const gy = G + 6 - cy;
+  const gy = G + (6 - cy) * CAM.z; // where the ground is on screen (the view can be raised and zoomed out)
   ctx.fillStyle = '#efe0c2';
   ctx.fillRect(-30, gy, W + 60, H + 400);
   // concrete pad lines

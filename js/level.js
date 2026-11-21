@@ -37,6 +37,7 @@ function levelSim() {
   const cpE = LV.encs[LV.cp];
   CAM.x = cpE ? cpE.lock : 0;
   CAM.y = 0;
+  CAM.z = 1;
   // platforms (a run's launch tower); none otherwise
   if (LV.terr) terrainSet(LV.terr.s, LV.terr.w);
   PL.forEach((p, i) => {
@@ -187,14 +188,7 @@ function levelTick() {
     // reaching a transition's scene (catapult, pipe, rope) starts it; the launch, once someone is on the top deck
     const there = trc && (trc.top ? alive.some(p => p.gy <= trc.top + 1 && p.x >= trc.deck) : lead >= trc.x - 150);
     if (there && !LV.encs.some(e => e.st === 1)) cineStart(trc.k, { tr: trc });
-    // on platforms the camera keeps the highest player in view, in the air too: it moves only when their feet
-    // leave the band between 170 and 300 px down the screen (so a little hop doesn't move it)
-    if (LV.terr && alive.length) {
-      const top = Math.min(...alive.map(p => p.y)),
-        sy = top - CAM.y,
-        ty = sy < 170 ? top - 170 : sy > 300 ? top - 300 : CAM.y;
-      CAM.y += (Math.max(-400, Math.min(0, ty)) - CAM.y) * 0.15;
-    }
+    if (LV.terr) levelCamUp(alive);
   }
   levelWalls();
   if (ae) {
@@ -347,3 +341,30 @@ const LEVEL = {
   world: () => (drawCine(), drawSay()),
   revive: 1
 };
+
+// The camera near platforms (the launch tower). Drawing only: CAM.y raises the view and CAM.z zooms it out; the
+// game's own camera (CAM.x: walls, fights) never changes. Only while the view is over the platforms: everywhere
+// else it settles back to the ground at full size, so jumping on flat ground never moves it.
+// Over the platforms it frames everyone, in the air too, from the highest head to the lowest feet, zooming out as
+// far as CAM_ZMIN like the house camera; past that, it keeps the highest player in view (the others show an arrow
+// at the screen's edge: drawOffArrows in render.js).
+const CAM_ZMIN = 0.6;
+function levelCamUp(alive) {
+  let s = LV.terr.s,
+    x0 = Math.min(...s.map(q => q.x1)) - 200,
+    x1 = Math.max(...s.map(q => q.x2)) + 200,
+    ty = 0,
+    tz = 1;
+  if (alive.length && CAM.x + W > x0 && CAM.x < x1) {
+    const top = Math.min(...alive.map(p => p.y)) - 110, // headroom above the highest player
+      bot = Math.max(...alive.map(p => p.y)) + 30,
+      sTop = 70, // keep heads below the scores
+      sBot = H - 10;
+    tz = Math.max(CAM_ZMIN, Math.min(1, (sBot - sTop) / Math.max(1, bot - top)));
+    // put the highest head at sTop on screen (screen y = G + (y - G - CAM.y) * z), never showing below the ground
+    ty = Math.min(0, top - G - (sTop - G) / tz);
+  }
+  CAM.z += (tz - CAM.z) * 0.12;
+  CAM.y += (ty - CAM.y) * 0.15;
+  if (Math.abs(CAM.z - 1) < 0.002) CAM.z = 1;
+}

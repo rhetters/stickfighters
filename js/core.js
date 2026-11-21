@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 38;
+const GAME_VERSION = 39;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -206,6 +206,10 @@ const CAM = { x: 0, y: 0, z: 1 }, // y < 0 = looking up, z < 1 = zoomed out (the
   WB = { l: 0, r: W },
   WW = { l: 0, r: W };
 // World space as the camera sees it: (cx, cy) at zoom z, zooming about the floor line so the floor stays put at z 1
+// The left edge of the view in the world. In a level the game's own camera (CAM.x, which walls and fights use)
+// stays put and a zoomed-out view (CAM.z < 1, drawing only) widens around its middle; other modes set CAM.x to the
+// view's edge themselves.
+const viewX = () => (MODE === LEVEL && CAM.z < 1 ? CAM.x + (W - W / CAM.z) / 2 : CAM.x);
 function camApply(cx, cy, z) {
   ctx.translate(0, G);
   ctx.scale(z, z);

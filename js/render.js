@@ -792,7 +792,7 @@ function render() {
   slopeStart();
   bg();
   ctx.save();
-  camApply(CAM.x, CAM.y, CAM.z);
+  camApply(viewX(), CAM.y, CAM.z);
   for (const f of [...PL, ...E]) {
     const s = f.s * 16 * Math.max(0.4, 1 - (f.gy - f.y) / 400);
     ctx.fillStyle = 'rgba(0,0,0,.14)';
@@ -845,6 +845,7 @@ function render() {
   if (MODE.fg) MODE.fg();
   ctx.restore();
   slopeOn = false;
+  if (state === 'play' && MODE === LEVEL) drawOffArrows();
   if (state !== 'menu') hud();
   debugUI();
   shake *= 0.85;
@@ -917,6 +918,38 @@ function drawLevelUps(back) {
       ctx.fillStyle = '#fff';
       ctx.fillText('LEVEL ' + x.lv, 0, 26);
     }
+    ctx.restore();
+  }
+}
+
+// A player out of the view (in a level, the camera could not fit everyone) gets an arrow in their colour at the
+// edge of the screen, pointing to where they are
+function drawOffArrows() {
+  if (PL.length < 2) return;
+  const vx = viewX(),
+    z = CAM.z;
+  for (const p of PL) {
+    if (p.st === 'dead' || p.hide) continue;
+    const sx = (p.x - vx) * z,
+      sy = G + (p.y - 45 * p.s - G - CAM.y) * z;
+    if (sx > -10 && sx < W + 10 && sy > -10 && sy < H + 10) continue;
+    const ax = Math.max(24, Math.min(W - 24, sx)),
+      ay = Math.max(70, Math.min(H - 24, sy)),
+      a = Math.atan2(sy - ay, sx - ax);
+    ctx.save();
+    ctx.translate(ax, ay);
+    ctx.rotate(a);
+    ctx.fillStyle = p.col;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(18, 0);
+    ctx.lineTo(-10, -13);
+    ctx.lineTo(-4, 0);
+    ctx.lineTo(-10, 13);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
     ctx.restore();
   }
 }

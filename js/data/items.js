@@ -60,6 +60,9 @@ const ITEMS = [
   { id: 'col-brown', sec: 'color', name: 'Brown', c: '#8a5a2b', price: 60 },
   { id: 'col-slate', sec: 'color', name: 'Slate', c: '#4a5262', price: 80 },
   // hair (drawn under a hat)
+  { id: 'hair-short', sec: 'hair', name: 'Short Hair', c: '#4a3020', price: 30 },
+  { id: 'hair-buzz', sec: 'hair', name: 'Buzz Cut', c: '#2b2533', price: 30 },
+  { id: 'hair-sidepart', sec: 'hair', name: 'Side Part', c: '#8a5a2b', price: 40 },
   { id: 'hair-spiky', sec: 'hair', name: 'Spiky', c: '#2b2533', price: 40 },
   { id: 'hair-messy', sec: 'hair', name: 'Messy', c: '#6b4420', price: 40 },
   { id: 'hair-flat', sec: 'hair', name: 'Flat Top', c: '#2b2533', price: 40 },

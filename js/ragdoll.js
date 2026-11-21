@@ -458,6 +458,7 @@ function drawRag(f, a) {
   look('legs');
   layer(() => L(c1, [2, 5, 6]));
   look('front');
+  drawHelmet(f, { hd: [hx, hy], hr: 9 * s * hk }); // the moon's bubble helmet stays on a flying body too
 }
 // Tornado Kick drawing: the fighter stays upright and turns around its own vertical axis, one leg locked straight out.
 // The leg's sideways reach is cos(angle); when it swings behind the body it's drawn in the back colour, before the body.
