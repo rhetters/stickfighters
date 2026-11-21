@@ -21,6 +21,7 @@ const NET = {
   players: [], // [{ slot, id, name, f (fighter), cid (colour id), team (0 or 1), rtt, left }]
   mode: 'level',
   teams: false, // Versus in two teams instead of free-for-all
+  theme: 'castle', // the campaign a co-op run plays
   match: false, // a match is running
   epoch: 0, // which match (messages from an older match are ignored)
   seed: 0,
@@ -116,6 +117,7 @@ function netRoomMsg() {
     code: NET.code,
     mode: NET.mode,
     teams: NET.teams,
+    theme: NET.theme,
     players: NET.players.map(p => ({
       slot: p.slot,
       id: p.id,
@@ -156,7 +158,8 @@ function netReset() {
     players: [],
     match: false,
     mySlot: 0,
-    teams: false
+    teams: false,
+    theme: 'castle'
   });
   NET.tab.clear();
   NET.hashes.clear();
@@ -350,6 +353,7 @@ function netClientMsg(m) {
     NET.players = m.players;
     NET.mode = m.mode;
     NET.teams = !!m.teams;
+    if (THEMES[m.theme]) NET.theme = m.theme;
     netMesh();
     if (typeof renderOnline === 'function') renderOnline();
   } else if (m.t === 'pong') NET.rtt = performance.now() - m.ts;
@@ -388,6 +392,7 @@ function netStart() {
       e: NET.epoch + 1,
       seed: (Math.random() * 4294967296) >>> 0,
       mode: NET.mode,
+      theme: NET.theme,
       D,
       feel: { ...FEEL, ...NET_FEEL, body: Math.min(1, FEEL.body) },
       players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid, team: p.team })),
@@ -440,7 +445,7 @@ function netStartLocal(m) {
   applyTouchVis();
   fr = 0;
   if (m.mode === 'vs') startVersus();
-  else if (m.mode === 'level') startRun('castle');
+  else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle');
   else if (m.mode === 'house') {
     const host = m.players.find(p => p.slot === 0);
     startHouse({ ...normHouse(m.house, true), name: ((host && host.name) || 'HOST') + "'S HOUSE" });

@@ -3,7 +3,7 @@
 // gets a sign chunk, `fights` fight chunks drawn from its rules, and a transition into the next biome. The same seed
 // always makes the same run. To add a theme: add its biomes here (and a look in scenery.js if it's a new look).
 // ===== BIOMES =====
-//   look     which scenery draws it (scenery.js: woods, sewer, castle)
+//   look     which scenery draws it (woods in scenery.js; sewer, castle, beach, ship, cave in biomes.js)
 //   props    [kind, weight]: scenery kinds scattered in each chunk (sizes vary for trees)
 //   w        [min, max] chunk width in pixels (the screen is 900 wide)
 //   fights   fight chunks per biome (about 3 minutes of play)
@@ -37,7 +37,7 @@ const BIOMES = {
     mini: {
       t: 'mw',
       chance: 0.04,
-      lines: ['WHO STOMPED IN MY WOODS?', 'TIME FOR A NAP, ORANGE!', 'I EAT TWIGS FOR BREAKFAST!']
+      lines: ['WHO STOMPED IN MY WOODS?', 'TIME FOR A NAP!', 'I EAT TWIGS FOR BREAKFAST!']
     }
   },
   sewer: {
@@ -72,7 +72,6 @@ const BIOMES = {
       ['torch', 3],
       ['pillar', 2],
       ['window', 2],
-      ['armor', 1],
       ['shield', 1]
     ],
     w: [1050, 1300],
@@ -86,6 +85,63 @@ const BIOMES = {
       chance: 0.04,
       lines: ['HALT! NONE SHALL PASS!', 'THE GENERAL SENDS HIS REGARDS!', 'GUARDS! ...OH, IT IS JUST ME.']
     }
+  },
+  beach: {
+    name: 'SUNNY BEACH',
+    look: 'beach',
+    props: [
+      ['palm', 4],
+      ['shell', 2],
+      ['starfish', 1],
+      ['crate', 2],
+      ['driftwood', 1],
+      ['sandcastle', 1]
+    ],
+    w: [1000, 1300],
+    fights: 5,
+    mix: [
+      { at: 1, w: { g: 6, r: 3 } },
+      { at: 2, w: { g: 5, r: 3, f: 2, u: 1 } },
+      { at: 3, w: { g: 4, r: 3, f: 2, u: 1, b: 1 } }
+    ],
+    mini: { t: 'mb', chance: 0.04, lines: ['NO SPLASHING ON MY BEACH!', 'SAND IN YOUR SHOES!', 'SURF IS UP... AND SO ARE MY FISTS!'] }
+  },
+  ship: {
+    name: 'PIRATE SHIP',
+    look: 'ship',
+    props: [
+      ['cannon', 2],
+      ['barrel', 2],
+      ['crate', 2],
+      ['ropecoil', 1],
+      ['anchor', 1],
+      ['mast', 2]
+    ],
+    w: [1000, 1250],
+    fights: 5,
+    mix: [
+      { at: 3, w: { g: 4, r: 2, f: 3, b: 1, u: 1 } },
+      { at: 4, w: { g: 3, r: 2, f: 3, b: 2, u: 1 } }
+    ],
+    mini: { t: 'mf', chance: 0.04, lines: ['ALL HANDS ON DECK!', 'SWAB THIS!', 'THE CAPTAIN WILL HEAR OF THIS!'] }
+  },
+  cave: {
+    name: 'TREASURE CAVE',
+    look: 'cave',
+    props: [
+      ['stalagmite', 3],
+      ['crystal', 3],
+      ['chest', 2],
+      ['torch', 2],
+      ['coins', 2]
+    ],
+    w: [1050, 1300],
+    fights: 5,
+    mix: [
+      { at: 5, w: { g: 3, f: 2, b: 2, u: 2, r: 1 } },
+      { at: 6, w: { g: 2, f: 2, b: 2, u: 3, r: 1 } }
+    ],
+    mini: { t: 'mt', chance: 0.04, lines: ['MY SHINY! ALL MINE!', 'ECHO... ECHO... GO HOME!', 'NOBODY TOUCHES THE TREASURE!'] }
   }
 };
 // ===== TRANSITIONS between biomes (one picked at random among those that fit) =====
@@ -94,22 +150,36 @@ const BIOMES = {
 //   needs  only between these biomes (either side)
 const TRANSITIONS = {
   catapult: { cine: 1, gap: 700 },
+  cannon: { cine: 1, gap: 700, needs: ['ship'] },
   pipe: { cine: 1, gap: 700, needs: ['sewer'] },
   rope: { cine: 1, gap: 340 },
-  gate: { cine: 0, gap: 0, hp: 60 }
+  gate: { cine: 0, gap: 0, hp: 60, needs: ['sewer', 'castle'] }
 };
 // ===== THEMES =====
+//   c      the theme's colour (its card on the Campaign screen)
 //   boss   the main boss at the end: enemy type, how it arrives (intro: 'pencil' is drawn in, 'jump' leaps in and
 //          knocks everyone down), who comes with it, and the lines it may say
 const THEMES = {
   castle: {
     name: 'CASTLE SIEGE',
+    c: '#ff4fa3',
     biomes: ['woods', 'sewer', 'castle'],
     boss: {
       t: 'G',
       intro: 'pencil',
       adds: ['g', 'g', 'u', 'r', 'g', 'f'],
-      lines: ['SO, YOU FINALLY MADE IT, ORANGE.', 'MY ARMY IS PINK AND PROUD!', 'THIS CASTLE IS MINE!']
+      lines: ['SO, YOU FINALLY MADE IT.', 'MY ARMY IS PINK AND PROUD!', 'THIS CASTLE IS MINE!']
+    }
+  },
+  pirate: {
+    name: 'PIRATE COVE',
+    c: '#3ec5ff',
+    biomes: ['beach', 'ship', 'cave'],
+    boss: {
+      t: 'P',
+      intro: 'jump',
+      adds: ['g', 'r', 'f', 'g', 'b', 'f'],
+      lines: ['ARRR! THAT TREASURE BE MINE!', 'YE CAME A LONG WAY FOR NOTHING!', 'PREPARE TO BE PLUNDERED!']
     }
   }
 };

@@ -1613,7 +1613,8 @@ body.padnav #ui select:focus {
   margin: 0;
   font-size: 13px;
 }
-#on-teams {
+#on-teams,
+#on-theme {
   border-style: dashed;
 }
 .onfoot {
@@ -2085,4 +2086,42 @@ body.padnav #ui select:focus {
 #s-skills .sknode.early {
   border-style: dotted;
   color: #8a8090;
+}
+/* Campaign screen: one card per theme */
+#th-cards {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.thcard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(300px, 42vw);
+  padding: 14px;
+  border: 4px solid #1c1626;
+  border-top: 14px solid var(--tc);
+  border-radius: 14px;
+  background: #fff8ee;
+  color: #1c1626;
+  font: 700 clamp(12px, 1.6vw, 15px) 'Trebuchet MS', sans-serif;
+  cursor: pointer;
+  text-align: left;
+}
+.thcard b {
+  font: 900 clamp(20px, 3vw, 30px) Impact, 'Arial Black', sans-serif;
+}
+.thcard small {
+  color: #6a6070;
+}
+@media (hover: hover) {
+  .thcard:hover {
+    background: #ffe0b8;
+  }
+}
+.thcard:active,
+body.padnav .thcard:focus {
+  background: #ffe0b8;
+  outline: 4px solid #ff7a00;
 }

@@ -37,7 +37,26 @@ function drawGear(f, o, a) {
     ctx.quadraticCurveTo(hx - fc * 18 * s, hy + w, hx - fc * 30 * s, hy + 3 + w * 1.6);
     ctx.stroke();
   }
-  if (f.T.boss && o.hd) {
+  if (f.tk === 'P' && o.hd) {
+    // Captain Pinkbeard's pirate hat
+    const hx = o.hd[0],
+      hy = o.hd[1],
+      r = 9 * s;
+    ctx.fillStyle = '#2b2233';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(hx - r * 2, hy - r * 0.5);
+    ctx.quadraticCurveTo(hx, hy - r * 1.2, hx + r * 2, hy - r * 0.5);
+    ctx.quadraticCurveTo(hx + r * 0.8, hy - r * 2.6, hx, hy - r * 2.2);
+    ctx.quadraticCurveTo(hx - r * 0.8, hy - r * 2.6, hx - r * 2, hy - r * 0.5);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(hx, hy - r * 1.6, r * 0.35, 0, 7);
+    ctx.fill();
+  } else if (f.T.boss && o.hd) {
     const hx = o.hd[0],
       hy = o.hd[1],
       r = 9 * s;
@@ -362,6 +381,7 @@ function bg() {
 // A boss being drawn in by a pencil (run.js): the sketch appears from the head down with the pencil at its edge,
 // then the colours fill in
 function drawPencilIn(f) {
+  if (f.draw <= 0) return; // not started yet
   const H_ = 84 * f.s + 24,
     top = f.y - H_,
     ey = top + f.draw * H_;

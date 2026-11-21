@@ -284,6 +284,78 @@ const T = {
     boss: 'CAPTAIN OF THE GUARD',
     ai: 'boss'
   },
+  mb: {
+    hp: 200,
+    s: 1.8,
+    spd: 1.15,
+    col: '#ff5fa2',
+    d2: '#c93a78',
+    atk: 'cslam',
+    cd: 75,
+    sc: 300,
+    ar: 90,
+    stop: 70,
+    m: 3.3,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'BEACH BULLY',
+    ai: 'boss'
+  },
+  mf: {
+    hp: 220,
+    s: 1.8,
+    spd: 1.2,
+    col: '#d63c84',
+    d2: '#9e2560',
+    atk: 'cslam',
+    cd: 72,
+    sc: 320,
+    ar: 90,
+    stop: 70,
+    m: 3.3,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'FIRST MATE',
+    ai: 'boss'
+  },
+  mt: {
+    hp: 240,
+    s: 1.85,
+    spd: 1.05,
+    col: '#a8327a',
+    d2: '#741f53',
+    atk: 'cslam',
+    cd: 72,
+    sc: 340,
+    ar: 90,
+    stop: 70,
+    m: 3.3,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'CAVE BRUTE',
+    ai: 'boss'
+  },
+  P: {
+    hp: 560,
+    s: 1.95,
+    spd: 1.25,
+    col: '#e0157a',
+    d2: '#9c0c53',
+    atk: 'cslam',
+    cd: 58,
+    sc: 1600,
+    ar: 100,
+    stop: 75,
+    m: 4.5,
+    fr: 0.62,
+    bnc: 0.15,
+    poise: 140,
+    boss: 'CAPTAIN PINKBEARD',
+    ai: 'boss'
+  },
   G: {
     hp: 520,
     s: 1.95,
@@ -313,7 +385,11 @@ const TNAME = {
   mw: 'Big Bruiser',
   ms: 'Sludge Brute',
   mc: 'Captain of the Guard',
-  G: 'The Pink General'
+  G: 'The Pink General',
+  mb: 'Beach Bully',
+  mf: 'First Mate',
+  mt: 'Cave Brute',
+  P: 'Captain Pinkbeard'
 };
 // How to beat each type, shown in the training Info panel (I)
 const TTIP = {
@@ -326,7 +402,11 @@ const TTIP = {
   mw: 'BIG BRUISER (woods mini-boss): a giant Brute. Break its poise, then juggle it',
   ms: 'SLUDGE BRUTE (sewer mini-boss): slippery floor, so keep your distance after it slams',
   mc: 'CAPTAIN OF THE GUARD (castle mini-boss): jump its quake leap and hit it from behind',
-  G: 'THE PINK GENERAL: three phases, calls his army. Break his poise and save Surge for his rage'
+  G: 'THE PINK GENERAL: three phases, calls his army. Break his poise and save Surge for his rage',
+  mb: 'BEACH BULLY (beach mini-boss): break its poise, then juggle it',
+  mf: 'FIRST MATE (ship mini-boss): jump its quake leap and hit it from behind',
+  mt: 'CAVE BRUTE (cave mini-boss): tough poise; heavy hits and throws',
+  P: 'CAPTAIN PINKBEARD: leaps in and knocks you flat, three phases, calls his crew'
 };
 for (const o of [A, EA])
   for (const k in o) {

@@ -90,6 +90,10 @@ function renderOnline() {
     b.disabled = !NET.host;
   }
   $('on-teams').hidden = NET.mode !== 'vs';
+  // the campaign a co-op run plays (the host picks; tap to switch)
+  $('on-theme').hidden = NET.mode !== 'level';
+  $('on-theme').disabled = !NET.host;
+  $('on-theme').textContent = THEMES[NET.theme].name;
   $('on-teams').disabled = !NET.host;
   $('on-teams').textContent = NET.teams ? 'TEAMS' : 'FREE-FOR-ALL';
   $('on-teams').classList.toggle('on', NET.teams);
@@ -220,6 +224,13 @@ for (const b of $('on-modes').querySelectorAll('[data-mode]'))
     NET.mode = b.dataset.mode;
     netRoomChanged();
   };
+$('on-theme').onclick = () => {
+  if (!NET.host) return;
+  const ids = Object.keys(THEMES);
+  NET.theme = ids[(ids.indexOf(NET.theme) + 1) % ids.length];
+  netRoomChanged();
+  renderOnline();
+};
 $('on-teams').onclick = () => {
   if (!NET.host) return;
   NET.teams = !NET.teams;
