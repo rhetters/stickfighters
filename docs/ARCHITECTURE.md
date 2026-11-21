@@ -4,7 +4,7 @@ How the code fits together: files, the simulation, and how each system works. Up
 
 ## Files and load order
 
-`index.html` holds the markup and loads one stylesheet and 43 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
+`index.html` holds the markup and loads one stylesheet and 45 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
 
 | # | File | What's in it |
 |---|---|---|
@@ -36,22 +36,23 @@ How the code fits together: files, the simulation, and how each system works. Up
 | 26 | `js/scenery.js` | Level drawing only: parallax layers, props, the log gate, foreground grass, leaves and fireflies |
 | 27 | `js/biomes.js` | Campaign scenery: slopes (`altAt`, `slopeStart`, `upAt`, `lifted`: drawing a climb), `LOOKS` (woods, sewer, castle, beach, ship, cave, meadow, slope, peak, base, rocket, moon), `drawLevelBg`/`drawLevelFg` (the biome in view, two mixed where they meet through `drawOver`), the backgrounds (the castle is the inside of the keep), their props (`drawBiomeProp`, pirate ones in `drawPiratePropDone`, mountain ones in `drawMountainPropDone`, space ones in `drawSpacePropDone`), the launch tower's girders (`drawPlatforms`), the rocket and saucer, bubble helmets (`drawHelmet`), the catapult (its arm and bucket come from `catArm`/`catBucket` in run.js; `drawCatBowl` draws the bucket's front over the riders), the castle hall's windows (`CASTLE_WIN`; `onWindow` keeps wall hangings off them), the ship's cannon, the balloon, gondola stations and the cliff (`drawMountainTransDone`), big pipes, chasm and rope, the castle gate (`drawDoor`) |
 | 28 | `js/looks.js` | Drawing a fighter's look: `drawLookUnder` (cape, hood), `drawLook` (legs, shoes, shirts, jackets, dresses, ties, gloves, scarf, hair, band, hat), `drawHat`, `drawHair`, `surgeCol`/`surgeExtra`, `VPOSE` poses, `lookPose` (stance, victory and pose-wheel blending), `cheering`, `drawWheel`, `drawItemIcon` |
-| 29 | `js/house.js` | Drawing a house (`drawHouse`, `houseBg`, `houseTile`, `houseThing`) and House mode (`HOUSE_MODE`, `startHouse(h)`, `HVIEW` = the house being visited) |
-| 30 | `js/render.js` | Gear, figures (`drawFig`, `figHead`), background, effects, HUD, `render()` |
-| 31 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
-| 32 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
-| 33 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
-| 34 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
-| 35 | `js/ui/online.js` | Online screen: Host / Join, room code picker, room cards, mode and Start (in a room the screen gets `.inroom`, a compact layout that fits without scrolling), online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
-| 36 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
-| 37 | `js/ui/character.js` | Character screen and store: four fighter slots, Body tab (height, head size, head type, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
-| 38 | `js/ui/skills.js` | Skills screen: branch tabs, the four rows of nodes (tap to see, tap again to spend), ADD / TAKE BACK / RESET, the ultimate picker |
-| 39 | `js/ui/themes.js` | Campaign screen: `openThemes(go, back)` shows a card per theme (biomes, boss, best clear); solo and local co-op open it, online the host's room button `#on-theme` picks `NET.theme` |
-| 40 | `js/ui/house.js` | House screen: tabs (walls, barriers, furniture, decorations, background, erase), the palette (`housePal`, buying with the two-tap rule), one button per grid square (`houseCells`; drag paints), `houseAct`, zoom and panning (`houseZoom`, `housePan`), WALK AROUND |
-| 41 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
-| 42 | `js/devtools.js` | TEMPORARY: the TEST row on the Skills screen that sets a fighter's level, and ADMIN mode (wraps `hurtE` so a player's hit drops the enemy to 1 health first, and `hud` to show an ADMIN tag; off online; remembered in its own `sfAdmin` storage key). Nothing refers to it; remove the file, its script tag and `tools/tests/devtest.js` |
-| 43 | `js/selftest.js` | `selfTest()` determinism check and the fingerprints it expects (`SELFTEST_EXPECT`) |
-| 44 | `js/main.js` | Screens, the title menu (`splitOpen` swaps a button for its pair; `titlePoof` plays the orange poof), `playerPause()` (Esc / Start / II: pause, or straight back to the builder when walking around a house), settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
+| 29 | `js/bosslooks.js` | The main bosses' own looks (drawing only): `bossLook(T)` builds a look from an enemy type's `look` data (store items it wears plus boss-only `extra` parts), `drawBossParts` draws those parts in `drawLook`'s layers (the General's cap, mustache, epaulettes and medals; Pinkbeard's coat, tricorn, beard, eyepatch, hook and peg leg; the Yeti's fur, mane and horns; the Alien's suit, eyes and antennae) |
+| 30 | `js/house.js` | Drawing a house (`drawHouse`, `houseBg`, `houseTile`, `houseThing`) and House mode (`HOUSE_MODE`, `startHouse(h)`, `HVIEW` = the house being visited) |
+| 31 | `js/render.js` | Gear, figures (`drawFig`, `figHead`), background, effects, HUD, `render()` |
+| 32 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
+| 33 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
+| 34 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
+| 35 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
+| 36 | `js/ui/online.js` | Online screen: Host / Join, room code picker, room cards, mode and Start (in a room the screen gets `.inroom`, a compact layout that fits without scrolling), online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
+| 37 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
+| 38 | `js/ui/character.js` | Character screen and store: four fighter slots, Body tab (height, head size, head type, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
+| 39 | `js/ui/skills.js` | Skills screen: branch tabs, the four rows of nodes (tap to see, tap again to spend), ADD / TAKE BACK / RESET, the ultimate picker |
+| 40 | `js/ui/themes.js` | Campaign screen: `openThemes(go, back)` shows a card per theme (biomes, boss, best clear); solo and local co-op open it, online the host's room button `#on-theme` picks `NET.theme` |
+| 41 | `js/ui/house.js` | House screen: tabs (walls, barriers, furniture, decorations, background, erase), the palette (`housePal`, buying with the two-tap rule), one button per grid square (`houseCells`; drag paints), `houseAct`, zoom and panning (`houseZoom`, `housePan`), WALK AROUND |
+| 42 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
+| 43 | `js/devtools.js` | TEMPORARY: the TEST row on the Skills screen that sets a fighter's level, and ADMIN mode (wraps `hurtE` so a player's hit drops the enemy to 1 health first, and `hud` to show an ADMIN tag; off online; remembered in its own `sfAdmin` storage key). Nothing refers to it; remove the file, its script tag and `tools/tests/devtest.js` |
+| 44 | `js/selftest.js` | `selfTest()` determinism check and the fingerprints it expects (`SELFTEST_EXPECT`) |
+| 45 | `js/main.js` | Screens, the title menu (`splitOpen` swaps a button for its pair; `titlePoof` plays the orange poof), `playerPause()` (Esc / Start / II: pause, or straight back to the builder when walking around a house), settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
 
 Nothing runs game code at load except data setup; boot (`checkUnlocks(); init(); applySet(); resize(); bindSettings(); syncTrain(); openTitle(); requestAnimationFrame(loop)`) is the last thing in `main.js`.
 

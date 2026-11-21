@@ -37,76 +37,8 @@ function drawGear(f, o, a) {
     ctx.quadraticCurveTo(hx - fc * 18 * s, hy + w, hx - fc * 30 * s, hy + 3 + w * 1.6);
     ctx.stroke();
   }
-  if (f.tk === 'P' && o.hd) {
-    // Captain Pinkbeard's pirate hat
-    const hx = o.hd[0],
-      hy = o.hd[1],
-      r = 9 * s;
-    ctx.fillStyle = '#2b2233';
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(hx - r * 2, hy - r * 0.5);
-    ctx.quadraticCurveTo(hx, hy - r * 1.2, hx + r * 2, hy - r * 0.5);
-    ctx.quadraticCurveTo(hx + r * 0.8, hy - r * 2.6, hx, hy - r * 2.2);
-    ctx.quadraticCurveTo(hx - r * 0.8, hy - r * 2.6, hx - r * 2, hy - r * 0.5);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(hx, hy - r * 1.6, r * 0.35, 0, 7);
-    ctx.fill();
-  } else if (f.tk === 'Z' && o.hd) {
-    // the Pink Alien's antennae
-    const hx = o.hd[0],
-      hy = o.hd[1],
-      r = 9 * s;
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 2.5;
-    for (const d of [-1, 1]) {
-      const tx = hx + d * r * 1.2,
-        ty = hy - r * 2.6 + Math.sin(fr * 0.15 + d) * 2;
-      ctx.beginPath();
-      ctx.moveTo(hx + d * r * 0.4, hy - r * 0.8);
-      ctx.quadraticCurveTo(hx + d * r * 0.4, hy - r * 2, tx, ty);
-      ctx.stroke();
-      ctx.fillStyle = '#7dff9a';
-      ctx.beginPath();
-      ctx.arc(tx, ty, r * 0.4, 0, 7);
-      ctx.fill();
-      ctx.stroke();
-    }
-  } else if (f.tk === 'Y' && o.hd) {
-    // the Pink Yeti's shaggy white fur around his head, and little horns
-    const hx = o.hd[0],
-      hy = o.hd[1],
-      r = 9 * s;
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    for (let i = 0; i <= 12; i++) {
-      const a = Math.PI * 0.95 + (i / 12) * Math.PI * 1.1,
-        rr = r * (i % 2 ? 1.55 : 1.85);
-      ctx.lineTo(hx + Math.cos(a) * rr, hy + Math.sin(a) * rr);
-    }
-    ctx.closePath();
-    // a ring of fur: the face shows through the middle
-    ctx.moveTo(hx + r * 1.05, hy);
-    ctx.arc(hx, hy, r * 1.05, 0, 7);
-    ctx.fill('evenodd');
-    ctx.stroke();
-    ctx.fillStyle = '#f2e6d0';
-    for (const d of [-1, 1]) {
-      ctx.beginPath();
-      ctx.moveTo(hx + d * r * 0.9, hy - r * 1.4);
-      ctx.quadraticCurveTo(hx + d * r * 1.8, hy - r * 2.4, hx + d * r * 1.2, hy - r * 2.9);
-      ctx.lineTo(hx + d * r * 0.5, hy - r * 1.6);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
-  } else if (f.T.boss && o.hd) {
+  // main bosses wear their own look (bosslooks.js); the other bosses (mini-bosses) wear a crown
+  if (f.T.boss && o.hd && !f.look) {
     const hx = o.hd[0],
       hy = o.hd[1],
       r = 9 * s;

@@ -392,3 +392,21 @@ Reopened the same evening (version 17 work): the house builder is still in progr
 **Done when:** level-ups give points, spending them changes your moves and stats visibly, each branch's ultimate works at all three steps, and everything saves.
 
 **Status: done** (November 20, 2026, version 31). Ultimates became nodes bought with points (one branch at a time), the XP curve became 60 × level^1.6, a level-up plays a golden pillar and a recorded sound, hit-stop and shake start off (always off online), and turning ends a string. The TEST row (js/devtools.js) stays for testing M13.
+
+### M13 · Themes and procedural runs
+
+**Goal:** the foundation for many themes and campaigns. Decided by Ron and Rhett (November 20): a theme is three biomes, about three minutes each; runs are generated from a seed; transitions between biomes are seamless and random (catapult, gate smash, pipe slide, rope swing); rare mini-bosses; main bosses arrive with an in-game scene (one leaps in and knocks everyone down and talks; another is drawn in by a pencil and comes to life). The first boss comes in M13; M14 builds more on it.
+
+- **Castle Siege** (first theme): Wooded Trail → Sewer Tunnels (slippery floor) → Castle Keep, then the Pink General (drawn in by a pencil; three phases, calls his army).
+- **Pirate Cove** (second theme): Sunny Beach → Pirate Ship → Treasure Cave, then Captain Pinkbeard (leaps in; three phases, calls his crew). Adds the cannon transition (only next to the ship).
+- **Mountain** (third theme): Alpine Meadow → Mountainside (the path climbs diagonally between fights) → Snowy Peak (slippery), then the Pink Yeti (leaps in). Adds the balloon, gondola and cliff-climb transitions.
+- **Space** (fourth theme): Launch Base → The Rocket → The Moon (bubble helmets), then the Pink Alien (beamed down from a flying saucer). The Launch Base ends with platforms up the launch tower to the rocket; the launch and the moon landing are its transitions.
+- **Transitions per theme:** each theme lists the transitions it can use; one is picked at random between each pair of biomes.
+- **Choosing a campaign:** a Campaign screen with one card per theme (biomes, boss, best clear) for solo and local co-op; online, the host picks the theme in the room. Every run opens with the pencil drawing each player in.
+- **Data, not code:** biomes, transitions and themes are data (`js/data/themes.js`). A new theme is new data plus, for a new look, its scenery.
+- **Runs:** each biome is a sign, five fights from its own enemy mix (toughness rising, a Captain closing each biome but the last) and a transition. Scenery is scattered from the biome's props. The same seed always makes the same run.
+- **Mini-bosses:** one per biome (Big Bruiser, Sludge Brute, Captain of the Guard, Beach Bully, First Mate, Cave Brute, Hilltop Hulk, Rock Roller, Ice Giant, Launch Guard, Space Brute, Moon Mauler), about one run in two meets one.
+
+**Done when:** every theme plays through alone and online with every transition and both boss intros, and the same seed always makes the same run.
+
+**Status: done** (November 21, 2026, version 43). Four themes (Castle Siege, Pirate Cove, Mountain, Space), each with three biomes, its own transitions and its own main boss; a Campaign screen; the opening draw-in; slopes, the launch tower's platforms and low gravity on the moon; online, each screen follows its own player and stragglers warp in for fights and scenes; the ADMIN test mode.

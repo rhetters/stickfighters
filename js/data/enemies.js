@@ -131,6 +131,8 @@ const EA = {
   }
 };
 // m = mass (knockback / sqrt(m), shoves and bowling scale with it), fr = ground friction, bnc = how much a landing bounces, poise = hits it soaks before breaking
+// look = a main boss's own look (drawing only; bosslooks.js): head size, full = filled head, lw = line width,
+//   stance, any store items it wears by slot (jacket, gloves, shoes...), and extra = its boss-only parts
 const T = {
   g: {
     hp: 18,
@@ -450,8 +452,8 @@ const T = {
     hp: 600,
     s: 1.95,
     spd: 1.25,
-    col: '#ff5fb8',
-    d2: '#b8327f',
+    col: '#d65cff',
+    d2: '#8f2fc0',
     atk: 'cslam',
     cd: 58,
     sc: 1700,
@@ -462,6 +464,7 @@ const T = {
     bnc: 0.15,
     poise: 150,
     boss: 'THE PINK ALIEN',
+    look: { head: 1.6, full: 1, lw: 5, stance: 'boxer', gloves: 'gloves-slime', extra: ['spacesuit', 'alienhead'] },
     ai: 'boss'
   },
   Y: {
@@ -480,6 +483,7 @@ const T = {
     bnc: 0.15,
     poise: 150,
     boss: 'THE PINK YETI',
+    look: { head: 1.3, full: 1, lw: 9, stance: 'low', extra: ['furbody', 'furhead', 'horns'] },
     ai: 'boss'
   },
   P: {
@@ -498,6 +502,12 @@ const T = {
     bnc: 0.15,
     poise: 140,
     boss: 'CAPTAIN PINKBEARD',
+    look: {
+      head: 1.05,
+      stance: 'loose',
+      shoes: 'shoes-black',
+      extra: ['piratecoat', 'tricorn', 'beard', 'eyepatch', 'hook', 'pegleg']
+    },
     ai: 'boss'
   },
   G: {
@@ -516,7 +526,15 @@ const T = {
     bnc: 0.15,
     poise: 140,
     boss: 'THE PINK GENERAL',
-    ai: 'boss'
+    ai: 'boss',
+    look: {
+      head: 1.1,
+      stance: 'classic',
+      jacket: 'jacket-cape',
+      gloves: 'gloves-white',
+      shoes: 'shoes-black',
+      extra: ['generalcap', 'mustache', 'epaulettes', 'medals']
+    }
   }
 };
 const TNAME = {

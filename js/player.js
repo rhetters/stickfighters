@@ -98,6 +98,7 @@ function pick(f, btn, chain, plain, stop) {
 function F(x, t, pl) {
   const e_ = F0(x, t, pl);
   e_.tk = t;
+  if (!pl && T[t].look) e_.look = bossLook(T[t]); // a main boss's own look (drawing only)
   return e_;
 }
 function F0(x, t, pl) {

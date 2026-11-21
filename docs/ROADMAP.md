@@ -22,8 +22,8 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
 | M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
 | M12 | XP, levels, skill tree | Done | L | M3, M8, M10 | Level-ups, skill points, tree screen |
-| M13 | Themes and procedural runs | Next | XL | M8, M10, M12 | Castle Siege, Pirate Cove, Mountain and Space generated from a seed, a Campaign screen, transitions per theme, platforms, mini-bosses, four main bosses |
-| M14 | Boss level | Planned | L | M13 | Multi-phase boss fight |
+| M13 | Themes and procedural runs | Done | XL | M8, M10, M12 | Castle Siege, Pirate Cove, Mountain and Space generated from a seed, a Campaign screen, transitions per theme, platforms, mini-bosses, four main bosses |
+| M14 | Boss level | Next | L | M13 | A look of its own for every boss, multi-phase boss fights |
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
@@ -33,24 +33,9 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 
 ## Upcoming milestones
 
-### M13 · Themes and procedural runs (in progress)
+### M14 · Boss level (in progress)
 
-**Goal:** the foundation for many themes and campaigns. Decided by Ron and Rhett (November 20): a theme is three biomes, about three minutes each; runs are generated from a seed; transitions between biomes are seamless and random (catapult, gate smash, pipe slide, rope swing); rare mini-bosses; main bosses arrive with an in-game scene (one leaps in and knocks everyone down and talks; another is drawn in by a pencil and comes to life). The first boss comes in M13; M14 builds more on it.
-
-- **Castle Siege** (first theme): Wooded Trail → Sewer Tunnels (slippery floor) → Castle Keep, then the Pink General (drawn in by a pencil; three phases, calls his army).
-- **Pirate Cove** (second theme): Sunny Beach → Pirate Ship → Treasure Cave, then Captain Pinkbeard (leaps in; three phases, calls his crew). Adds the cannon transition (only next to the ship).
-- **Mountain** (third theme): Alpine Meadow → Mountainside (the path climbs diagonally between fights) → Snowy Peak (slippery), then the Pink Yeti (leaps in). Adds the balloon, gondola and cliff-climb transitions.
-- **Space** (fourth theme): Launch Base → The Rocket → The Moon (bubble helmets), then the Pink Alien (beamed down from a flying saucer). The Launch Base ends with platforms up the launch tower to the rocket; the launch and the moon landing are its transitions.
-- **Transitions per theme:** each theme lists the transitions it can use; one is picked at random between each pair of biomes.
-- **Choosing a campaign:** a Campaign screen with one card per theme (biomes, boss, best clear) for solo and local co-op; online, the host picks the theme in the room. Every run opens with the pencil drawing each player in.
-- **Data, not code:** biomes, transitions and themes are data (`js/data/themes.js`). A new theme is new data plus, for a new look, its scenery.
-- **Runs:** each biome is a sign, five fights from its own enemy mix (toughness rising, a Captain closing each biome but the last) and a transition. Scenery is scattered from the biome's props. The same seed always makes the same run.
-- **Mini-bosses:** one per biome (Big Bruiser, Sludge Brute, Captain of the Guard, Beach Bully, First Mate, Cave Brute, Hilltop Hulk, Rock Roller, Ice Giant, Launch Guard, Space Brute, Moon Mauler), about one run in two meets one.
-
-**Done when:** every theme plays through alone and online with every transition and both boss intros, and the same seed always makes the same run.
-
-### M14 · Boss level
-
+- **A look of its own for every theme's boss** (asked by Ron and Rhett, November 21; done in version 44): the Pink General, Captain Pinkbeard, the Pink Yeti and the Pink Alien each wear their own outfit and parts.
 - Boss arena (working name: The Pink General), built on the boss framework the Captain uses: three phases, clear telegraphs, summons from the army, and a health bar.
 - Finishing blow in slow motion with a special death pose.
 - Victory screen and a New Game+ hook.
@@ -97,4 +82,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-Finish M13 (Castle Siege, Pirate Cove, Mountain and Space) with Ron and Rhett's testing, then M14 (more bosses on the same foundation).
+M14: the bosses now look like themselves; next, decide with Ron and Rhett what else the boss fights need (the plan above).
