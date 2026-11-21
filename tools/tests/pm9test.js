@@ -10,7 +10,7 @@ await ev("titleOpenAll()");
 await p.click('#b-set1');await W(150);ok(await ev("document.querySelectorAll('#o-feel input[type=range]').length===6"),'Settings has all 6 Feel sliders');
 await p.fill('#o-f-hitstop','0.6');await ev("document.getElementById('o-f-hitstop').dispatchEvent(new Event('input'))");ok(await ev("FEEL.hitstop===0.6&&SET.feel.hitstop===0.6"),'moving a Settings Feel slider changes the game and saves');
 await p.screenshot({path:S+'/shots/pm9-settings.png',fullPage:true});
-await p.click('#o-feel button');ok(await ev("FEEL.hitstop===1"),'Reset feel');
+await p.click('#o-feel button');ok(await ev("FEEL.hitstop===FEELDEF.hitstop&&FEEL.body===1"),'Reset feel');
 await p.click('#b-back');await W(100);
 // versus grab
 await p.click('#b-multi');await W(100);await tap(0,0);await tap(1,0);await p.click('#lb-vs');await W(1800);

@@ -1,5 +1,5 @@
 // StickFighters: Skills screen: the current fighter's level and XP, the five-branch tree (add or take back a point,
-// or reset it all, free), and which branch's ultimate the fighter uses. Opened from the Character screen.
+// or reset it all, free), including one branch's ultimate steps. Opened from the Character screen.
 const SK = { sel: null, msg: '', br: 'fists' };
 function openSkills() {
   SK.sel = null;
@@ -77,21 +77,35 @@ function renderSkills() {
     br = SKB.find(b => b.id === SK.br);
   tree.innerHTML = '';
   tree.style.setProperty('--bc', br.c);
-  for (let row = 0; row < 4; row++) {
+  // rows 1-4, then (fighting branches) the ultimate's three steps: levels 5, 15 and 30, one branch only
+  const ub = ultBranch(pr.sk);
+  for (let row = 0; row < 5; row++) {
+    const nodes = SKN.filter(n => n.b === br.id && n.row === row);
+    if (!nodes.length) continue;
     const r = document.createElement('div'),
-      open = branchBelow(pr.sk, br.id, row) >= ROW_NEEDS[row];
-    r.className = 'skrow' + (open ? '' : ' shut');
+      ult = row === 4,
+      open = ult ? !ub || ub === br.id : branchBelow(pr.sk, br.id, row) >= ROW_NEEDS[row];
+    r.className = 'skrow' + (open ? '' : ' shut') + (ult ? ' skultrow' : '');
     r.innerHTML =
       '<small>' +
-      (row === 3 ? 'TOP' : 'ROW ' + (row + 1)) +
-      (open ? '' : '<br>needs ' + ROW_NEEDS[row]) +
+      (ult ? 'ULTIMATE' : row === 3 ? 'TOP' : 'ROW ' + (row + 1)) +
+      (open ? '' : ult ? '<br>' + branchName(ub) + ' has it' : '<br>needs ' + ROW_NEEDS[row]) +
       '</small>';
-    for (const n of SKN.filter(n => n.b === br.id && n.row === row)) {
+    for (const n of nodes) {
       const k = pr.sk[n.id] || 0,
-        bt = document.createElement('button');
+        bt = document.createElement('button'),
+        early = ult && lv < ULT_LEVELS[n.ult];
       bt.className =
-        'sknode' + (k ? ' on' : '') + (k >= n.max ? ' full' : '') + (SK.sel === n.id ? ' sel' : '');
-      bt.innerHTML = n.name + '<i>' + '●'.repeat(k) + '○'.repeat(n.max - k) + '</i>';
+        'sknode' +
+        (k ? ' on' : '') +
+        (k >= n.max ? ' full' : '') +
+        (early ? ' early' : '') +
+        (SK.sel === n.id ? ' sel' : '');
+      bt.innerHTML =
+        n.name +
+        '<i>' +
+        (early ? 'Level ' + ULT_LEVELS[n.ult] : '●'.repeat(k) + '○'.repeat(n.max - k)) +
+        '</i>';
       bt.onclick = () => {
         // the first tap shows what it does; tapping it again (selected) adds a point
         if (SK.sel === n.id) return skAdd(n.id);
@@ -109,9 +123,12 @@ function renderSkills() {
     info = $('sk-info');
   if (n) {
     const k = pr.sk[n.id] || 0,
-      lock = rowOpen(pr.sk, n)
-        ? ''
-        : ' (opens after ' + ROW_NEEDS[n.row] + ' points lower in ' + branchName(n.b) + ')';
+      lock =
+        n.row === 4
+          ? ' (level ' + ULT_LEVELS[n.ult] + (n.ult ? ', after ' + ultNodes(n.b)[n.ult - 1].name : '') + ')'
+          : rowOpen(pr.sk, n)
+            ? ''
+            : ' (opens after ' + ROW_NEEDS[n.row] + ' points lower in ' + branchName(n.b) + ')';
     info.innerHTML =
       '<b>' +
       n.name +
@@ -128,30 +145,9 @@ function renderSkills() {
   $('sk-add').disabled = !n;
   $('sk-take').disabled = !n || !pr.sk[n.id];
   $('sk-msg').textContent = SK.msg;
-  // the ultimate: one branch you have a point in; its step comes from your level
-  const u = $('sk-ult'),
-    st = ultStep(lv);
-  u.innerHTML = '<span>ULTIMATE</span>';
-  for (const b of SKB.filter(b => b.ult)) {
-    const bt = document.createElement('button'),
-      has = branchPts(pr.sk, b.id) > 0;
-    bt.className = 'skult' + (pr.ult === b.id ? ' on' : '');
-    bt.style.setProperty('--bc', b.c);
-    bt.disabled = !has;
-    bt.innerHTML = b.name + '<i>' + (st >= 0 ? A[b.ult[st]].nm : 'Level ' + ULT_LEVELS[0]) + '</i>';
-    bt.onclick = () => {
-      SK.msg =
-        st < 0
-          ? 'Your ultimate opens at level ' +
-            ULT_LEVELS[0] +
-            '. Next steps at ' +
-            ULT_LEVELS.slice(1).join(' and ') +
-            '.'
-          : '';
-      setProg(p => (p.ult = b.id));
-    };
-    u.appendChild(bt);
-  }
+  // the ultimate this fighter has bought (one branch; buy its steps in that branch's ULTIMATE row)
+  const bu = buildOf(pr).ult;
+  $('sk-ult').textContent = bu ? 'ULTIMATE: ' + bu.nm : '';
 }
 $('sk-add').onclick = () => SK.sel && skAdd(SK.sel);
 $('sk-take').onclick = () => SK.sel && skTake(SK.sel);

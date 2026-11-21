@@ -194,12 +194,14 @@ function init() {
     p.prog = r.prog || (ROSTER.length ? null : curFighter().prog);
     p.fi = ROSTER.length ? r.fi : CHR.cur;
     setBuild(p);
+    p.lvShown = 0;
     return p;
   });
   PK = [];
   RUN.stars = 0;
   RUN.items = [];
   RUN.xp = 0;
+  LVFX = [];
   camX = camY = 0;
   E = [];
   FX = [];
@@ -536,9 +538,8 @@ function updP(f) {
       if (u.tatsu) f.vy = -6;
       zoom = 0.05;
       shake = 6;
-      bn(u.nm.toUpperCase() + '!');
       sfx(150, 0.5, 'sawtooth', 0.07, 500);
-      if (u !== A.tornado) ultBurst(f, u);
+      ultBurst(f, u);
     }
     if (f.st === 'free') {
       if (f.flip > 0) {

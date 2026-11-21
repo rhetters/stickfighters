@@ -18,7 +18,8 @@ ok(await G.evaluate(()=>NET.players.length===2&&$('on-cards').textContent.includ
 const X=await mk('LOST');await X.evaluate(()=>{$('b-online').click();ONC.w=(ONC.w+3)%16;renderOnline();$('on-join').click()});
 await X.waitForTimeout(16500);ok(await X.evaluate(()=>!NET.on&&/No room/.test($('on-msg').textContent)),'wrong code says no room: '+await X.evaluate(()=>$('on-msg').textContent));
 // start co-op
-await H.evaluate(()=>{NET.mode='level';netRoomChanged();$('on-start').click()});await H.waitForTimeout(500);
+await H.evaluate(()=>{Object.assign(FEEL,{hitstop:1.2,shake:1.5,body:8})});await H.evaluate(()=>{NET.mode='level';netRoomChanged();$('on-start').click()});await H.waitForTimeout(500);
+ok(await G.evaluate(()=>FEEL.hitstop===0&&FEEL.shake===0&&FEEL.body===1)&&await H.evaluate(()=>FEEL.hitstop===0&&FEEL.body===1),'online: no hit-stop or shake and bodies clear in a second, whatever the host had set');
 ok(await G.evaluate(()=>NET.match&&state==='play'&&MODE===LEVEL&&PL.length===2),'match started on the guest');
 ok(await H.evaluate(()=>PL.map(p=>p.name).join()==='HOSTY,GUESTY'),'both fighters in the match');
 // each plays with their own keyboard

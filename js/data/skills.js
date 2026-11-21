@@ -1,14 +1,15 @@
 // StickFighters: Skill tree data: XP rules, branches, nodes, ultimates (plain data; VISION.md rule R3)
 // XP for the next level = XP_RULES.base × level^XP_RULES.exp (rounded to 10). Points: one per level from 2, plus a
-// bonus at every fifth level.
-const XP_RULES = { base: 40, exp: 1.5, cap: 30, bonusEvery: 5 };
+// bonus at every fifth level. Pace (a Wooded Trail clear is about 450 XP): level 5 in about 2-3 clears, 10 in about
+// 18, 15 in about 55, 30 in about 340 (roughly 40 hours). More levels and harder enemies will pay more XP.
+const XP_RULES = { base: 60, exp: 1.6, cap: 30, bonusEvery: 5 };
 // XP for each enemy beaten (by type, data/enemies.js keys); every player in the fight gets it
 const XP_KILL = { g: 8, r: 10, b: 20, u: 18, f: 15, c: 80 };
 // XP for finishing things: a level, each Arcade wave reached, each Versus KO and a Versus win
 const XP_BONUS = { level: 100, wave: 10, vsKO: 15, vsWin: 40 };
 // Points needed in a branch's lower rows before each row opens
 const ROW_NEEDS = [0, 3, 6, 10];
-// Levels at which an ultimate's three steps open
+// Levels at which an ultimate's three steps can be bought (one point each, in order, in one branch only)
 const ULT_LEVELS = [5, 15, 30];
 // Branches: id, name, colour, and the three steps of its ultimate (move ids in data/moves.js). Fortune has none.
 const SKB = [
@@ -18,7 +19,7 @@ const SKB = [
   { id: 'body', name: 'Body', c: '#47b34a', ult: ['ucharge', 'ustomp', 'ushaker'] },
   { id: 'fortune', name: 'Fortune', c: '#b45cff', ult: null }
 ];
-// Nodes: id, branch, row (0-3), name, max ranks, what one rank does, moves it unlocks (un), boosts per rank (mod).
+// Nodes: id, branch, row (0-3; row 4 = the branch's ultimate, ult = its step 0-2), name, max ranks, what one rank does, moves it unlocks (un), boosts per rank (mod).
 // Boost keys: pd/kd punch/kick damage, kr kick reach, pm/km ultimate meter from punches/kicks, smax Surge bar,
 // sreg Surge refill, scost Surge move cost, wind shorter Winded, arm damage taken, rise get-up speed, thr throw
 // damage, sw Second Wind, xp XP, stars stars (all fractions except smax, which is points of Surge).
@@ -97,6 +98,33 @@ const SKN = [
     mod: { pd: 0.03 }
   },
   {
+    id: 'f-u1',
+    b: 'fists',
+    row: 4,
+    ult: 0,
+    name: 'Flurry',
+    max: 1,
+    txt: 'Ultimate: fast punches, the last one launches'
+  },
+  {
+    id: 'f-u2',
+    b: 'fists',
+    row: 4,
+    ult: 1,
+    name: 'Hundred Fists',
+    max: 1,
+    txt: 'Ultimate: punches while walking forward, the last one launches'
+  },
+  {
+    id: 'f-u3',
+    b: 'fists',
+    row: 4,
+    ult: 2,
+    name: 'Comet Fist',
+    max: 1,
+    txt: 'Ultimate: leap and crash down fist-first with a huge shockwave'
+  },
+  {
     id: 'f-cap',
     b: 'fists',
     row: 3,
@@ -155,6 +183,33 @@ const SKN = [
   },
   { id: 'l-axe', b: 'legs', row: 2, name: 'Axe Kick', max: 1, txt: 'Down + K, K, K: Axe Kick', un: ['axe'] },
   { id: 'l-dmg2', b: 'legs', row: 2, name: 'Steel Shins', max: 3, txt: '+3% kick damage', mod: { kd: 0.03 } },
+  {
+    id: 'l-u1',
+    b: 'legs',
+    row: 4,
+    ult: 0,
+    name: 'Spin Kick',
+    max: 1,
+    txt: 'Ultimate: a low spinning kick that hits both sides'
+  },
+  {
+    id: 'l-u2',
+    b: 'legs',
+    row: 4,
+    ult: 1,
+    name: 'Twisting Kick',
+    max: 1,
+    txt: 'Ultimate: a rising spin moving forward, the last spin launches'
+  },
+  {
+    id: 'l-u3',
+    b: 'legs',
+    row: 4,
+    ult: 2,
+    name: 'Tornado Kick',
+    max: 1,
+    txt: 'Ultimate: a high spinning kick across the screen'
+  },
   {
     id: 'l-cap',
     b: 'legs',
@@ -230,6 +285,33 @@ const SKN = [
     un: ['palm', 'meteor']
   },
   {
+    id: 's-u1',
+    b: 'surge',
+    row: 4,
+    ult: 0,
+    name: 'Surge Dash',
+    max: 1,
+    txt: 'Ultimate: a lightning dash through everyone'
+  },
+  {
+    id: 's-u2',
+    b: 'surge',
+    row: 4,
+    ult: 1,
+    name: 'Lightning Rush',
+    max: 1,
+    txt: 'Ultimate: three lightning dashes back and forth'
+  },
+  {
+    id: 's-u3',
+    b: 'surge',
+    row: 4,
+    ult: 2,
+    name: 'Thunder Step',
+    max: 1,
+    txt: 'Ultimate: five dashes, then a thunderclap that launches everyone near'
+  },
+  {
     id: 's-cap',
     b: 'surge',
     row: 3,
@@ -283,6 +365,33 @@ const SKN = [
     max: 3,
     txt: 'Take 3% less damage',
     mod: { arm: 0.03 }
+  },
+  {
+    id: 'b-u1',
+    b: 'body',
+    row: 4,
+    ult: 0,
+    name: 'Shoulder Charge',
+    max: 1,
+    txt: 'Ultimate: an unstoppable charge that bowls everyone over'
+  },
+  {
+    id: 'b-u2',
+    b: 'body',
+    row: 4,
+    ult: 1,
+    name: 'Quake Stomp',
+    max: 1,
+    txt: 'Ultimate: jump and stomp, knocking down everyone near'
+  },
+  {
+    id: 'b-u3',
+    b: 'body',
+    row: 4,
+    ult: 2,
+    name: 'Earthshaker',
+    max: 1,
+    txt: 'Ultimate: three stomps, each shockwave bigger, the last launches'
   },
   {
     id: 'b-cap',

@@ -680,6 +680,7 @@ function render() {
   }
   for (const e of E) drawF(e);
   drawPickups();
+  drawLevelUps(true);
   for (const p of PL) {
     // Surge glow while Surge is held (the sparkles that rise from it are made in updP)
     if (inputOf(p).K.s && live() && p.st !== 'dead' && !p.stm.winded) {
@@ -692,6 +693,7 @@ function render() {
     drawF(p);
   }
   for (const x of FX) drawFX(x);
+  drawLevelUps(false);
   // co-op revive progress over a downed teammate
   for (const p of PL)
     if (p.st === 'dead' && p.rv > 0) {
@@ -719,4 +721,68 @@ function render() {
   camY *= 0.78;
   if (Math.abs(camX) < 0.2) camX = 0;
   if (Math.abs(camY) < 0.2) camY = 0;
+}
+
+// A level-up celebration (progress.js): a golden pillar of light behind the fighter (back), then rising sparkles and
+// LEVEL UP! in front. Everything comes from the frame count, so it never touches the game's random numbers.
+function drawLevelUps(back) {
+  for (const x of LVFX) {
+    const age = fr - x.t,
+      p = x.p,
+      grow = Math.min(1, age / 12),
+      fade = Math.min(1, (LVUP_T - age) / 30),
+      top = p.gy - 700;
+    if (fade <= 0) continue;
+    ctx.save();
+    if (back) {
+      const w = 46 * grow * (1 + 0.08 * Math.sin(age * 0.3)),
+        g = ctx.createLinearGradient(0, p.gy, 0, top);
+      g.addColorStop(0, 'rgba(255,214,64,0.75)');
+      g.addColorStop(0.6, 'rgba(255,236,150,0.35)');
+      g.addColorStop(1, 'rgba(255,248,210,0)');
+      ctx.globalAlpha = fade;
+      ctx.fillStyle = g;
+      ctx.fillRect(p.x - w, top, w * 2, p.gy - top);
+      ctx.fillStyle = 'rgba(255,255,240,0.8)';
+      ctx.fillRect(p.x - w * 0.25, top, w * 0.5, p.gy - top);
+      ctx.strokeStyle = '#ffb800';
+      ctx.lineWidth = 4;
+      for (let i = 0; i < 2; i++) {
+        const r = ((age * 2.2 + i * 40) % 80) + 20;
+        ctx.globalAlpha = fade * (1 - (r - 20) / 80);
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.gy, r * 1.6, r * 0.35, 0, 0, 7);
+        ctx.stroke();
+      }
+    } else {
+      ctx.globalAlpha = fade;
+      for (let i = 0; i < 16; i++) {
+        const sy = p.gy - ((age * 3.2 + i * 41) % 260),
+          sx = p.x + Math.sin(i * 2.17 + age * 0.05) * (18 + (i % 4) * 9),
+          r = 2.5 + (i % 3);
+        ctx.fillStyle = i % 2 ? '#ffd23f' : '#fff6c8';
+        ctx.beginPath();
+        ctx.arc(sx, sy, r, 0, 7);
+        ctx.fill();
+      }
+      const ty = p.y - 150 - Math.min(20, age * 0.6),
+        pop = age < 10 ? 0.6 + age * 0.05 : 1;
+      ctx.translate(p.x, ty);
+      ctx.scale(pop, pop);
+      ctx.textAlign = 'center';
+      ctx.lineJoin = 'round';
+      ctx.font = '900 34px Impact,"Arial Black",sans-serif';
+      ctx.lineWidth = 7;
+      ctx.strokeStyle = INK;
+      ctx.strokeText('LEVEL UP!', 0, 0);
+      ctx.fillStyle = '#ffc61a';
+      ctx.fillText('LEVEL UP!', 0, 0);
+      ctx.font = '900 20px Impact,"Arial Black",sans-serif';
+      ctx.lineWidth = 5;
+      ctx.strokeText('LEVEL ' + x.lv, 0, 26);
+      ctx.fillStyle = '#fff';
+      ctx.fillText('LEVEL ' + x.lv, 0, 26);
+    }
+    ctx.restore();
+  }
 }
