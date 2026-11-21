@@ -14,6 +14,8 @@ function runRng(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+// Transitions that leave something at the start of the next biome (its prop 'trans-<k>out' at this x)
+const OUTS = { pipe: 120, balloon: 300, gondola: 200 };
 // Builds a run: the same shape as buildLevel() (level.js) plus segs (one per biome), trans (transitions) and run.
 function genRun(themeId, seed) {
   const th = THEMES[themeId],
@@ -31,7 +33,8 @@ function genRun(themeId, seed) {
     encs = [],
     gates = [],
     segs = [],
-    trans = [];
+    trans = [],
+    ramps = [];
   let x = 0;
   // scenery for a chunk: a few props spread across it
   const scatter = (B, w, n) => {
@@ -60,10 +63,11 @@ function genRun(themeId, seed) {
     const light = i => (B.dusk ? B.dusk[0] + ((B.dusk[1] - B.dusk[0]) * i) / (n - 1) : 0);
     // 1. the biome's sign (and the pipe you pop out of, after a pipe slide)
     const prev = trans[trans.length - 1],
-      sign = chunk(B, bi, 900, [
+      sign = chunk(B, bi, B.climb ? 1400 : 900, [
         { k: 'sign', x: 300, t: B.name },
         ...scatter(B, 900, 3),
-        ...(prev && prev.k === 'pipe' ? [{ k: 'trans-pipeout', x: 120 }] : [])
+        // where the last scene lands you: the pipe you pop out of, the balloon or gondola station you arrive at
+        ...(prev && OUTS[prev.k] ? [{ k: 'trans-' + prev.k + 'out', x: OUTS[prev.k] }] : [])
       ]);
     sign.dusk = light(0);
     // 2. the fights
@@ -78,7 +82,8 @@ function genRun(themeId, seed) {
       const c = chunk(B, bi, w, scatter(B, w, ri(4, 6)));
       c.dusk = light(k + 1);
       c.flies = c.dusk > 0.6 ? 1 : 0;
-      const at = Math.round(w * (0.45 + R() * 0.15)),
+      // on a climb, each fight's ledge is near the start of its chunk and the rest of the chunk goes uphill
+      const at = B.climb ? Math.round(560 + R() * 120) : Math.round(w * (0.45 + R() * 0.15)),
         e = {
           x: c.x0 + at,
           lock: Math.max(0, c.x0 + at - W / 2),
@@ -93,6 +98,16 @@ function genRun(themeId, seed) {
         e.line = B.mini.lines[ri(0, B.mini.lines.length - 1)];
       }
       encs.push(e);
+    }
+    // the slopes of a climb: uphill from a screen into the biome to each fight's ledge, and on after it (drawing only;
+    // starting a screen in keeps the slope out of view while the last biome's scenery still shows)
+    if (B.climb) {
+      let s0 = sign.x0 + 900;
+      for (const e of encs.slice(-B.fights)) {
+        if (e.lock - 60 > s0) ramps.push({ x0: s0, x1: e.lock - 60, k: B.climb });
+        s0 = e.lock + W + 60;
+      }
+      if (x > s0) ramps.push({ x0: s0, x1: x, k: B.climb });
     }
     // 3. the main boss (last biome), or a transition into the next biome
     if (last) {
@@ -115,7 +130,7 @@ function genRun(themeId, seed) {
       seg.x1 = x;
     } else {
       const nb = th.biomes[bi + 1],
-        fits = Object.keys(TRANSITIONS).filter(k => {
+        fits = (th.trans || Object.keys(TRANSITIONS)).filter(k => {
           const nd = TRANSITIONS[k].needs;
           return !nd || nd.includes(bid) || nd.includes(nb);
         }),
@@ -139,6 +154,7 @@ function genRun(themeId, seed) {
     gates,
     segs,
     trans,
+    ramps: ramps.length ? ramps : null,
     run: { theme: themeId, seed },
     len: x,
     cp: -1,
@@ -359,6 +375,98 @@ function cineTick() {
       });
       cineEnd();
     }
+  } else if (c.k === 'balloon' || c.k === 'gondola') {
+    // everyone climbs into the balloon's basket (or the gondola's cabin); it rises away, and comes down at the start
+    // of the next biome, where everyone hops out. c.vx, c.vy = where the basket or cabin is now (render.js draws it)
+    const tr = c.tr,
+      gon = c.k === 'gondola',
+      o = OUTS[c.k];
+    if (t === 1) {
+      c.vx = tr.x;
+      c.vy = gon ? G - 70 : G;
+    }
+    if (t <= 36) {
+      ps.forEach((p, i) => {
+        const a = ease(t / 36),
+          tx = c.vx - 16 + i * 11;
+        p.x = p.sx + (tx - p.sx) * a;
+        p.y = p.sy + (G - 10 - p.sy) * a - Math.sin(a * Math.PI) * 30;
+        if (gon && a >= 1) p.hide = 1;
+      });
+    } else if (t <= 150) {
+      // up and away (the gondola along its cable)
+      const u = t - 36;
+      c.vx = tr.x + (gon ? u * 5 : u * u * 0.025);
+      c.vy = (gon ? G - 70 : G) - (gon ? u * 3.4 : u * u * 0.045);
+      if (t === 40) sfx(gon ? 220 : 160, 0.5, gon ? 'square' : 'sine', 0.04, 120);
+    } else if (t <= 230) {
+      // in the next biome: down to the landing spot
+      if (t === 151) cineArrive(tr);
+      const a = ease((t - 150) / 80),
+        lx = tr.nx + o,
+        ly = gon ? G - 70 : G;
+      c.vx = gon ? lx - (1 - a) * 400 : lx - (1 - a) * 160;
+      c.vy = ly - (1 - a) * (gon ? 240 : 420);
+    }
+    if (t > 36 && t <= 230)
+      ps.forEach((p, i) => {
+        p.x = c.vx - 16 + i * 11;
+        p.y = c.vy - (gon ? -60 : 10);
+        p.vx = p.vy = 0;
+      });
+    if (t === 230) {
+      shake = Math.max(shake, 4);
+      dust(c.vx, G, 6);
+      sfx(140, 0.2, 'triangle', 0.06);
+    }
+    ps.forEach((p, i) => {
+      if (t === 240 + i * 10) {
+        // hop out
+        p.hide = 0;
+        p.y = G - 10;
+        p.st = 'free';
+        p.vx = 4 + i * 0.5;
+        p.vy = -10;
+        sfx(600 + i * 60, 0.1, 'square', 0.04, 200);
+      }
+    });
+    if (t >= 240 + PL.length * 10 + 30) cineEnd();
+  } else if (c.k === 'climb') {
+    // a ladder up the cliff: everyone climbs it in turn and out of sight, then pulls up at the start of the next biome
+    const tr = c.tr,
+      lx = tr.x + 34,
+      top = 24 + PL.length * 22 + 110;
+    ps.forEach((p, i) => {
+      const s0 = 24 + i * 22;
+      if (t <= 24) {
+        p.x = p.sx + (lx - 40 - i * 30 - p.sx) * ease(t / 24);
+        p.y = G;
+      } else if (t > s0 && t < top) {
+        p.x += (lx - p.x) * 0.3;
+        p.y = Math.max(-200, G - (t - s0) * 4);
+        const k = Math.sin((t - s0) * 0.35) * 30;
+        p.pose = [0, 170 + k, 30, 190 - k, 30, 10 - k, 40, -10 + k, 40, 0];
+        p.face = 1;
+      }
+    });
+    if (t === top) {
+      cineArrive(tr);
+      ps.forEach(p => (p.hide = 1));
+    }
+    ps.forEach((p, i) => {
+      if (t === top + 6 + i * 12) {
+        // over the edge and onto the ground
+        p.hide = 0;
+        p.x = tr.nx + 120 + i * 40;
+        p.y = G;
+        p.st = 'free';
+        p.vx = 2;
+        p.vy = -11;
+        dust(p.x, G, 4);
+        sfx(500 + i * 50, 0.1, 'square', 0.04, 200);
+      }
+    });
+    if (t >= top + 6 + PL.length * 12 + 40) cineEnd();
   } else if (c.k === 'jump') {
     // a mini-boss leaps in, lands with a quake that knocks everyone down, and says something
     const e = c.e;
@@ -440,6 +548,13 @@ function bossArrive(ne) {
     cineStart('jump', { e, line: ne.line });
   }
 }
+// The moving basket or cabin of a balloon or gondola ride (world space, drawn over the riders so it hides their legs)
+function drawCine() {
+  const c = LV && LV.cine;
+  if (!c || !(c.k === 'balloon' || c.k === 'gondola') || c.vx === undefined) return;
+  if (c.k === 'balloon') drawBalloon(c.vx, c.vy);
+  else drawGondolaCab(c.vx, c.vy);
+}
 // Speech bubble over whoever is talking (world space, drawn by render.js after the fighters)
 function drawSay() {
   const s = LV && LV.say;
@@ -447,7 +562,7 @@ function drawSay() {
   const e = s.e,
     // beside the head, kept on screen (big bosses are taller than the screen allows above them)
     x = Math.max(CAM.x + 230, Math.min(CAM.x + W - 230, e.x - 40)),
-    y = Math.max(168, e.y - 80 * e.s - 70),
+    y = Math.max(168, e.y + upAt(e.x) - 80 * e.s - 70),
     age = LV.cine ? LV.cine.t - s.t : 0;
   ctx.save();
   ctx.font = '900 20px "Trebuchet MS",sans-serif';

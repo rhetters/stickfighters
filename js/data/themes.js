@@ -10,6 +10,7 @@
 //   mix      [{ at: toughness from, w: { enemy type: weight } }]: which enemies a fight draws, by toughness
 //   mini     a rare mini-boss: enemy type, chance per fight, the lines it may say when it lands
 //   slick    1 = slippery floor: knocked-back bodies slide farther
+//   climb    the ground rises this much per pixel between fights (fights stand on flat ledges); drawing only
 //   dusk     [start, end] light over the biome (woods: morning to dusk)
 //   prog     a level id this biome also completes (keeps old unlocks like the Ranger Hat working)
 const BIOMES = {
@@ -142,9 +143,67 @@ const BIOMES = {
       { at: 6, w: { g: 2, f: 2, b: 2, u: 3, r: 1 } }
     ],
     mini: { t: 'mt', chance: 0.04, lines: ['MY SHINY! ALL MINE!', 'ECHO... ECHO... GO HOME!', 'NOBODY TOUCHES THE TREASURE!'] }
+  },
+  meadow: {
+    name: 'ALPINE MEADOW',
+    look: 'meadow',
+    props: [
+      ['pine', 3],
+      ['flowers', 3],
+      ['rock', 2],
+      ['fence', 2],
+      ['haybale', 1]
+    ],
+    w: [1000, 1300],
+    fights: 5,
+    mix: [
+      { at: 1, w: { g: 6, r: 2, f: 1 } },
+      { at: 2, w: { g: 5, r: 3, f: 2, u: 1 } },
+      { at: 3, w: { g: 4, r: 3, f: 2, u: 1, b: 1 } }
+    ],
+    mini: { t: 'mh', chance: 0.04, lines: ['GET OFF MY HILL!', 'THE HILLS ARE ALIVE... WITH PUNCHING!', 'YODEL-AY-HEE-HOO!'] }
+  },
+  slope: {
+    name: 'MOUNTAINSIDE',
+    look: 'slope',
+    props: [
+      ['rock', 3],
+      ['boulder', 2],
+      ['cairn', 2],
+      ['pine', 2],
+      ['flowers', 1]
+    ],
+    w: [1600, 1900],
+    fights: 4,
+    climb: 0.2,
+    mix: [
+      { at: 3, w: { g: 4, r: 3, f: 2, b: 1 } },
+      { at: 4, w: { g: 3, r: 3, f: 2, b: 2, u: 1 } }
+    ],
+    mini: { t: 'mr', chance: 0.05, lines: ['ROCK AND ROLL!', 'WATCH YOUR STEP!', 'IT IS ALL DOWNHILL FROM HERE!'] }
+  },
+  peak: {
+    name: 'SNOWY PEAK',
+    look: 'peak',
+    props: [
+      ['snowpine', 3],
+      ['snowman', 1],
+      ['flag', 2],
+      ['iceblock', 2],
+      ['cairn', 1]
+    ],
+    w: [1050, 1300],
+    fights: 5,
+    slick: 1,
+    mix: [
+      { at: 5, w: { g: 3, u: 2, f: 2, b: 2, r: 1 } },
+      { at: 6, w: { g: 2, u: 3, f: 2, b: 2, r: 1 } }
+    ],
+    mini: { t: 'mi', chance: 0.04, lines: ['BRRR! YOU ARE IN TROUBLE!', 'CHILL OUT!', 'SNOW WAY YOU GET PAST ME!'] }
   }
 };
-// ===== TRANSITIONS between biomes (one picked at random among those that fit) =====
+// ===== TRANSITIONS between biomes =====
+// Each theme lists the ones it can use (THEMES[].trans); between two biomes one is picked at random among those.
 //   cine   1 = a short scene plays (players ride it); 0 = you break through and walk on
 //   gap    pixels of world between the two biomes (the rope swings over a chasm)
 //   needs  only between these biomes (either side)
@@ -153,10 +212,14 @@ const TRANSITIONS = {
   cannon: { cine: 1, gap: 700, needs: ['ship'] },
   pipe: { cine: 1, gap: 700, needs: ['sewer'] },
   rope: { cine: 1, gap: 340 },
-  gate: { cine: 0, gap: 0, hp: 60, needs: ['sewer', 'castle'] }
+  gate: { cine: 0, gap: 0, hp: 60, needs: ['sewer', 'castle'] },
+  balloon: { cine: 1, gap: 700 },
+  gondola: { cine: 1, gap: 700 },
+  climb: { cine: 1, gap: 700 }
 };
 // ===== THEMES =====
 //   c      the theme's colour (its card on the Campaign screen)
+//   trans  the transitions this theme can use between its biomes (TRANSITIONS)
 //   boss   the main boss at the end: enemy type, how it arrives (intro: 'pencil' is drawn in, 'jump' leaps in and
 //          knocks everyone down), who comes with it, and the lines it may say
 const THEMES = {
@@ -164,6 +227,7 @@ const THEMES = {
     name: 'CASTLE SIEGE',
     c: '#ff4fa3',
     biomes: ['woods', 'sewer', 'castle'],
+    trans: ['catapult', 'pipe', 'rope', 'gate'],
     boss: {
       t: 'G',
       intro: 'pencil',
@@ -175,11 +239,24 @@ const THEMES = {
     name: 'PIRATE COVE',
     c: '#3ec5ff',
     biomes: ['beach', 'ship', 'cave'],
+    trans: ['catapult', 'cannon', 'rope', 'balloon'],
     boss: {
       t: 'P',
       intro: 'jump',
       adds: ['g', 'r', 'f', 'g', 'b', 'f'],
       lines: ['ARRR! THAT TREASURE BE MINE!', 'YE CAME A LONG WAY FOR NOTHING!', 'PREPARE TO BE PLUNDERED!']
+    }
+  },
+  mountain: {
+    name: 'MOUNTAIN',
+    c: '#7fbf5f',
+    biomes: ['meadow', 'slope', 'peak'],
+    trans: ['gondola', 'balloon', 'climb', 'rope'],
+    boss: {
+      t: 'Y',
+      intro: 'jump',
+      adds: ['g', 'r', 'b', 'g', 'u', 'f'],
+      lines: ['WHO DARES CLIMB MY MOUNTAIN?', 'THE VIEW IS GREAT. ENJOY IT WHILE YOU CAN!', 'I AM THE KING OF THE PEAK!']
     }
   }
 };

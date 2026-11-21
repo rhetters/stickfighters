@@ -56,6 +56,36 @@ function drawGear(f, o, a) {
     ctx.beginPath();
     ctx.arc(hx, hy - r * 1.6, r * 0.35, 0, 7);
     ctx.fill();
+  } else if (f.tk === 'Y' && o.hd) {
+    // the Pink Yeti's shaggy white fur around his head, and little horns
+    const hx = o.hd[0],
+      hy = o.hd[1],
+      r = 9 * s;
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let i = 0; i <= 12; i++) {
+      const a = Math.PI * 0.95 + (i / 12) * Math.PI * 1.1,
+        rr = r * (i % 2 ? 1.55 : 1.85);
+      ctx.lineTo(hx + Math.cos(a) * rr, hy + Math.sin(a) * rr);
+    }
+    ctx.closePath();
+    // a ring of fur: the face shows through the middle
+    ctx.moveTo(hx + r * 1.05, hy);
+    ctx.arc(hx, hy, r * 1.05, 0, 7);
+    ctx.fill('evenodd');
+    ctx.stroke();
+    ctx.fillStyle = '#f2e6d0';
+    for (const d of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(hx + d * r * 0.9, hy - r * 1.4);
+      ctx.quadraticCurveTo(hx + d * r * 1.8, hy - r * 2.4, hx + d * r * 1.2, hy - r * 2.9);
+      ctx.lineTo(hx + d * r * 0.5, hy - r * 1.6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
   } else if (f.T.boss && o.hd) {
     const hx = o.hd[0],
       hy = o.hd[1],
@@ -737,6 +767,7 @@ function render() {
   );
   ctx.scale(1 + zoom * cm, 1 + zoom * cm);
   ctx.translate(-W / 2, -H / 2);
+  slopeStart();
   bg();
   ctx.save();
   camApply(CAM.x, CAM.y, CAM.z);
@@ -744,19 +775,19 @@ function render() {
     const s = f.s * 16 * Math.max(0.4, 1 - (f.gy - f.y) / 400);
     ctx.fillStyle = 'rgba(0,0,0,.14)';
     ctx.beginPath();
-    ctx.ellipse(f.x, f.gy + 6, s, 4, 0, 0, 7);
+    ctx.ellipse(f.x, f.gy + 6 + upAt(f.x), s, 4, 0, 0, 7);
     ctx.fill();
   }
   for (const g of GH) {
     // Surge afterimages take the owner's Surge style
     const c = g.col === '#ffd400' && g.own && g.own.look ? surgeCol(g.own.look, g.l + fr) : g.col,
       gs = g.s * (g.own && g.own.look ? g.own.look.ht : 1);
-    drawFig(g.x, g.y, g.face, g.pose, gs, c, c, g.pose[9], (g.l / 9) * 0.35, 7);
+    drawFig(g.x, g.y + upAt(g.x), g.face, g.pose, gs, c, c, g.pose[9], (g.l / 9) * 0.35, 7);
   }
-  for (const e of E) drawF(e);
+  for (const e of E) lifted(e.x, () => drawF(e));
   drawPickups();
   drawLevelUps(true);
-  for (const p of PL) {
+  for (const p of PL) lifted(p.x, () => {
     // Surge glow while Surge is held (the sparkles that rise from it are made in updP)
     if (inputOf(p).K.s && live() && p.st !== 'dead' && !p.stm.winded) {
       const pul = 0.45 + 0.2 * Math.sin(fr * 0.4),
@@ -766,13 +797,15 @@ function render() {
       surgeExtra(p);
     }
     drawF(p);
-  }
-  for (const x of FX) drawFX(x);
+  });
+  for (const x of FX) lifted(x.x || 0, () => drawFX(x));
   drawLevelUps(false);
   if (MODE.world) MODE.world();
   // co-op revive progress over a downed teammate
   for (const p of PL)
     if (p.st === 'dead' && p.rv > 0) {
+      ctx.save();
+      ctx.translate(0, upAt(p.x));
       ctx.strokeStyle = INK;
       ctx.lineWidth = 7;
       ctx.beginPath();
@@ -783,11 +816,13 @@ function render() {
       ctx.beginPath();
       ctx.arc(p.x, p.y - 70, 18, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * p.rv) / 120);
       ctx.stroke();
+      ctx.restore();
     }
   if (state === 'train' && TR.boxes) drawBoxes();
   ctx.restore();
   if (MODE.fg) MODE.fg();
   ctx.restore();
+  slopeOn = false;
   if (state !== 'menu') hud();
   debugUI();
   shake *= 0.85;
@@ -810,6 +845,7 @@ function drawLevelUps(back) {
       top = p.gy - 700;
     if (fade <= 0) continue;
     ctx.save();
+    ctx.translate(0, upAt(p.x));
     if (back) {
       const w = 46 * grow * (1 + 0.08 * Math.sin(age * 0.3)),
         g = ctx.createLinearGradient(0, p.gy, 0, top);

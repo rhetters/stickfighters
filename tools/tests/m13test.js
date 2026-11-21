@@ -31,10 +31,24 @@ ok(r3.state==='clear'&&r3.seen.drawin&&r3.seen.jump&&r3.seen.pencil,'after a cle
 ok(await ev("(()=>{const L=genRun('pirate',5);return L.segs.map(s=>s.b).join()==='beach,ship,cave'&&L.encs[15].boss==='P'&&L.encs[15].intro==='jump'})()"),'Pirate Cove: beach, ship, cave and Captain Pinkbeard at the end');
 const pk=await ev("(()=>{const o={};for(let s=1;s<200;s++)for(const t of genRun('pirate',s).trans){o[t.k]=(o[t.k]||0)+1;if(t.k==='cannon'&&t.from!=='ship'&&t.to!=='ship')o.bad=1}for(let s=1;s<200;s++)for(const t of genRun('castle',s).trans)if(t.k==='cannon')o.bad=1;return o})()");
 ok(pk.cannon>10&&!pk.bad&&!pk.gate&&!pk.pipe,'pirate transitions (cannon only next to the ship; no gate or pipe): '+JSON.stringify(pk));
-const r4=await play(3,'pirate');
+const r4=await play(1,'pirate');
 ok(r4.state==='clear'&&r4.seen.cannon&&r4.seen.jump,'a Pirate Cove run plays through with the cannon and the leap-in: '+Object.keys(r4.seen).join(', '));
 await ev("setA('kb','r',0)");
 ok(/PIRATE COVE CLEAR/.test(await ev("$('c-h1').textContent")),'the results say PIRATE COVE CLEAR!');
+// Mountain: meadow, mountainside, peak; the Pink Yeti; its own transitions (each theme draws from its own list)
+ok(await ev("(()=>{const L=genRun('mountain',5);return L.segs.map(s=>s.b).join()==='meadow,slope,peak'&&L.encs[L.encs.length-1].boss==='Y'&&L.encs[L.encs.length-1].intro==='jump'})()"),'Mountain: meadow, mountainside, snowy peak and the Pink Yeti at the end');
+ok(await ev("(()=>{for(const id in THEMES)for(let s=1;s<150;s++)for(const t of genRun(id,s).trans)if(!THEMES[id].trans.includes(t.k))return id+' '+t.k;return true})()")===true,'every theme only uses the transitions on its own list');
+const mk=await ev("(()=>{const o={};for(let s=1;s<200;s++)for(const t of genRun('mountain',s).trans)o[t.k]=(o[t.k]||0)+1;return o})()");
+ok(['gondola','balloon','climb','rope'].every(k=>mk[k]>10),'Mountain transitions all come up: '+JSON.stringify(mk));
+// the mountainside climbs: slopes only there, starting a screen in, and every fight on a flat ledge
+ok(await ev("(()=>{for(let s=1;s<60;s++){const L=genRun('mountain',s),sg=L.segs[1];if(!L.ramps||!L.ramps.every(r=>r.x0>=sg.x0+900&&r.x1<=sg.x1&&r.x1>r.x0))return false;for(const e of L.encs)if(L.ramps.some(r=>r.x1>e.lock&&r.x0<e.lock+W))return false;if(genRun('castle',s).ramps||genRun('pirate',s).ramps)return false}return true})()"),'slopes only on the mountainside, a screen in from its start, never under a fight');
+ok(await ev("(()=>{const L=genRun('mountain',6);return L.ramps.reduce((a,r)=>a+(r.x1-r.x0)*r.k,0)>400})()"),'and you climb a long way up it');
+for(const sd of [6,10]){const r=await play(sd,'mountain');ok(r.state==='clear','a Mountain run plays through (seed '+sd+'): '+Object.keys(r.seen).join(', '));Object.assign(all,r.seen)}
+ok(['gondola','balloon','climb'].every(k=>all[k]),'the gondola, the balloon and the cliff climb all played');
+await ev("setA('kb','r',0)");
+// the slope is drawing only: the same fight on the mountainside plays the same with or without it
+const flat=await ev("(()=>{const go=keep=>{SET.seed='6';startRun('mountain');cineEnd();if(!keep)LV.ramps=null;const s=LV.segs[1];CAM.x=s.x0+1500;PL[0].x=CAM.x+200;setA('kb','r',1);for(let n=0;n<400;n++){fr++;update();render()}setA('kb','r',0);return Math.round(PL[0].x)+','+E.length+','+rnd()};return go(1)===go(0)})()");
+ok(flat,'the climb is only drawn: the game plays the same on the slope as on flat ground');
 ok(await ev("(()=>{const all=[...Object.values(BIOMES).map(b=>b.mini.lines),...Object.values(THEMES).map(t=>t.boss.lines)].flat();return all.length>10&&all.every(l=>!/ORANGE/i.test(l))})()"),'no line says ORANGE (players rename their fighters)');
 // the opening draw-in: every player is drawn by the pencil, then the sketches are gone for good
 await ev("SET.seed='7';titleOpenAll();startRun('castle');for(let n=0;n<30;n++){fr++;update()}");

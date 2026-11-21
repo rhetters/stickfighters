@@ -338,6 +338,78 @@ const T = {
     boss: 'CAVE BRUTE',
     ai: 'boss'
   },
+  mh: {
+    hp: 210,
+    s: 1.8,
+    spd: 1.1,
+    col: '#c2447f',
+    d2: '#8a2c59',
+    atk: 'cslam',
+    cd: 72,
+    sc: 300,
+    ar: 90,
+    stop: 70,
+    m: 3.3,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'HILLTOP HULK',
+    ai: 'boss'
+  },
+  mr: {
+    hp: 230,
+    s: 1.85,
+    spd: 1.15,
+    col: '#b23a76',
+    d2: '#7c2552',
+    atk: 'cslam',
+    cd: 70,
+    sc: 330,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 110,
+    boss: 'ROCK ROLLER',
+    ai: 'boss'
+  },
+  mi: {
+    hp: 240,
+    s: 1.9,
+    spd: 1.05,
+    col: '#d65a9a',
+    d2: '#9c3d6e',
+    atk: 'cslam',
+    cd: 72,
+    sc: 340,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 110,
+    boss: 'ICE GIANT',
+    ai: 'boss'
+  },
+  Y: {
+    hp: 600,
+    s: 2,
+    spd: 1.2,
+    col: '#ff6fb0',
+    d2: '#c23f80',
+    atk: 'cslam',
+    cd: 58,
+    sc: 1700,
+    ar: 100,
+    stop: 75,
+    m: 4.8,
+    fr: 0.62,
+    bnc: 0.15,
+    poise: 150,
+    boss: 'THE PINK YETI',
+    ai: 'boss'
+  },
   P: {
     hp: 560,
     s: 1.95,
@@ -389,7 +461,11 @@ const TNAME = {
   mb: 'Beach Bully',
   mf: 'First Mate',
   mt: 'Cave Brute',
-  P: 'Captain Pinkbeard'
+  P: 'Captain Pinkbeard',
+  mh: 'Hilltop Hulk',
+  mr: 'Rock Roller',
+  mi: 'Ice Giant',
+  Y: 'The Pink Yeti'
 };
 // How to beat each type, shown in the training Info panel (I)
 const TTIP = {
@@ -406,7 +482,11 @@ const TTIP = {
   mb: 'BEACH BULLY (beach mini-boss): break its poise, then juggle it',
   mf: 'FIRST MATE (ship mini-boss): jump its quake leap and hit it from behind',
   mt: 'CAVE BRUTE (cave mini-boss): tough poise; heavy hits and throws',
-  P: 'CAPTAIN PINKBEARD: leaps in and knocks you flat, three phases, calls his crew'
+  P: 'CAPTAIN PINKBEARD: leaps in and knocks you flat, three phases, calls his crew',
+  mh: 'HILLTOP HULK (meadow mini-boss): break its poise, then juggle it',
+  mr: 'ROCK ROLLER (mountainside mini-boss): jump its quake leap and hit it from behind',
+  mi: 'ICE GIANT (peak mini-boss): icy floor, so keep your distance after it slams',
+  Y: 'THE PINK YETI: leaps down from the peak, three phases, calls his climbers. Get up fast and save Surge'
 };
 for (const o of [A, EA])
   for (const k in o) {
