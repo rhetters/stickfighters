@@ -2,7 +2,7 @@
 // ===== ONLINE SESSION =====
 // Three layers, so matchmaking or Steam can replace one without the others (see docs/ARCHITECTURE.md):
 //   connection  rtc.js: moves messages between devices
-//   room        who's in (up to 4), their fighters, the mode; the host decides and tells everyone
+//   room        who's in (up to the room size, 2 to 6), their fighters, the mode; the host decides and tells everyone
 //   lockstep    every device runs the same simulation (VISION.md rule R2) and only button presses travel.
 // Lockstep (direct): each device sends its buttons for frame f + D straight to every other device
 // (D = input delay, from the measured lag; one trip, not a round trip through the host). Guests connect to each
@@ -21,7 +21,8 @@ const NET = {
   players: [], // [{ slot, id, name, f (fighter), cid (colour id), team (0 or 1), rtt, left }]
   mode: 'level',
   teams: false, // Versus in two teams instead of free-for-all
-  theme: 'castle', // the campaign a co-op run plays
+  theme: 'castle', // the story a co-op run plays ('?' = a surprise theme, with a bonus)
+  max: 4, // the room size the host picked (2 to MAX_ONLINE)
   match: false, // a match is running
   epoch: 0, // which match (messages from an older match are ignored)
   seed: 0,
@@ -37,7 +38,7 @@ const NET = {
   feelKeep: null,
   pingT: 0
 };
-const NETIN = [mkSlot(), mkSlot(), mkSlot(), mkSlot()]; // what the simulation reads during an online match
+const NETIN = [mkSlot(), mkSlot(), mkSlot(), mkSlot(), mkSlot(), mkSlot()]; // what the simulation reads during an online match
 // Room code words, in alphabetical order so the code picker steps through them A to Z
 const ROOM_WORDS = [
   'BANANA',
@@ -57,7 +58,7 @@ const ROOM_WORDS = [
   'WAFFLE',
   'ZEBRA'
 ];
-const MAX_ONLINE = 4;
+const MAX_ONLINE = 6; // the biggest room; the host picks a size up to this (NET.max)
 // ===== FINGERPRINT =====
 function simHash() {
   const r = v => (typeof v === 'number' ? Math.round(v * 1000) / 1000 : v),
@@ -118,6 +119,7 @@ function netRoomMsg() {
     mode: NET.mode,
     teams: NET.teams,
     theme: NET.theme,
+    max: NET.max,
     players: NET.players.map(p => ({
       slot: p.slot,
       id: p.id,
@@ -133,7 +135,8 @@ function netRoomMsg() {
 }
 // ===== READY UP =====
 // Each player readies up (in the room, and on the victory screen after a campaign). The host keeps everyone's
-// ready and tells the others; when everyone is ready, the host starts the match (or the harder run).
+// ready and tells the others; when everyone is ready, the host's START (or the victory screen's harder run) can be
+// pressed. Changing a room option makes everyone ready up again.
 function netSetReady(on) {
   const p = NET.players.find(q => q.slot === NET.mySlot);
   if (!p) return;
@@ -147,21 +150,28 @@ function netReadyApply(p, on) {
   if (NET.match) netAll({ t: 'vr', r: NET.players.map(q => [q.slot, !!q.ready]) });
   else netRoomChanged();
   netReadyUI();
-  const live = NET.players.filter(q => !q.left);
-  if (!live.length || !live.every(q => q.ready)) return;
-  clearTimeout(NET.readyT);
-  NET.readyT = setTimeout(() => {
-    if (!NET.on || !NET.players.filter(q => !q.left).every(q => q.ready)) return;
-    if (!NET.match) netStart();
-    else if (state === 'clear' && MODE === LEVEL && LV.run) netCmd('harder');
-  }, 1000);
 }
+const netAllReady = () => NET.players.filter(q => !q.left).every(q => q.ready);
 const netReadyUI = () => {
   if (typeof vicRefresh === 'function') vicRefresh();
   if (typeof renderOnline === 'function' && !$('s-online').hidden) renderOnline();
 };
 // A match starting, or a new one from the results: nobody is ready any more
 const netUnready = () => NET.players.forEach(q => (q.ready = false));
+// The host changed a room option (mode, story, teams, room size): everyone readies up again
+function netOptChanged() {
+  netUnready();
+  netRoomChanged();
+}
+// The host makes the room bigger or smaller (never smaller than the players already in it)
+function netSetMax(d) {
+  if (!NET.host || NET.match) return;
+  const live = NET.players.filter(q => !q.left).length,
+    m = Math.max(2, live, Math.min(MAX_ONLINE, NET.max + d));
+  if (m === NET.max) return;
+  NET.max = m;
+  netOptChanged();
+}
 // Versus can start with 2 or more players, and in teams only when both teams have someone
 function netVsReady() {
   const live = NET.players.filter(p => !p.left),
@@ -174,7 +184,7 @@ function netSetTeam(slot) {
   if (!p || NET.match) return;
   if (NET.host) {
     p.team = p.team ? 0 : 1;
-    netRoomChanged();
+    netOptChanged();
   } else if (slot === NET.mySlot) netSend(NET.hostId, { t: 'team', team: p.team ? 0 : 1 });
 }
 function netRoomChanged() {
@@ -191,7 +201,8 @@ function netReset() {
     match: false,
     mySlot: 0,
     teams: false,
-    theme: 'castle'
+    theme: 'castle',
+    max: 4
   });
   NET.tab.clear();
   NET.hashes.clear();
@@ -329,7 +340,7 @@ function netHostMsg(id, m) {
     if (m.v !== GAME_VERSION) return netSend(id, { t: 'deny', why: 'VERSION', v: GAME_VERSION });
     if (NET.match) return netSend(id, { t: 'deny', why: 'PLAYING' });
     const live = NET.players.filter(q => !q.left);
-    if (live.length >= MAX_ONLINE) return netSend(id, { t: 'deny', why: 'FULL' });
+    if (live.length >= NET.max) return netSend(id, { t: 'deny', why: 'FULL' });
     let slot = 0;
     while (live.some(q => q.slot === slot)) slot++;
     const f = normFighter(m.f, true);
@@ -343,10 +354,11 @@ function netHostMsg(id, m) {
   else if (m.t === 'fighter' && !NET.match) {
     p.f = normFighter(m.f, true);
     p.name = p.f.name;
+    p.ready = false;
     netRoomChanged();
   } else if (m.t === 'team' && !NET.match) {
     p.team = m.team ? 1 : 0;
-    netRoomChanged();
+    netOptChanged();
   } else if (m.t === 'ready') {
     netReadyApply(p, m.on);
   } else if (m.t === 'ping') {
@@ -387,7 +399,8 @@ function netClientMsg(m) {
     NET.players = m.players;
     NET.mode = m.mode;
     NET.teams = !!m.teams;
-    if (THEMES[m.theme]) NET.theme = m.theme;
+    if (THEMES[m.theme] || m.theme === '?') NET.theme = m.theme;
+    NET.max = Math.max(2, Math.min(MAX_ONLINE, m.max || 4));
     netMesh();
     if (typeof renderOnline === 'function') renderOnline();
   } else if (m.t === 'vr') {
@@ -424,6 +437,8 @@ function netStart() {
   if (!NET.host || NET.match) return;
   const live = NET.players.filter(p => !p.left);
   if (NET.mode === 'vs' && !netVsReady()) return false;
+  const ids = Object.keys(THEMES),
+    myst = NET.theme === '?';
   const r = live.map(p => p.rtt || 0).sort((a, b) => b - a),
     oneWay = ((r[0] || 0) + (r[1] || 0)) / 2,
     D = Math.max(2, Math.min(10, Math.ceil(oneWay / 16.67) + 1)),
@@ -432,7 +447,8 @@ function netStart() {
       e: NET.epoch + 1,
       seed: (Math.random() * 4294967296) >>> 0,
       mode: NET.mode,
-      theme: NET.theme,
+      theme: myst ? ids[Math.floor(Math.random() * ids.length)] : NET.theme,
+      myst,
       D,
       feel: { ...FEEL, ...NET_FEEL, body: Math.min(1, FEEL.body) },
       players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid, team: p.team })),
@@ -486,7 +502,7 @@ function netStartLocal(m) {
   applyTouchVis();
   fr = 0;
   if (m.mode === 'vs') startVersus();
-  else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle');
+  else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle', 0, !!m.myst);
   else if (m.mode === 'house') {
     const host = m.players.find(p => p.slot === 0);
     startHouse({ ...normHouse(m.house, true), name: ((host && host.name) || 'HOST') + "'S HOUSE" });

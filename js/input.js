@@ -18,7 +18,7 @@ const mkSlot = () => {
   for (const a of ACT) I.K[a] = 0;
   return I;
 };
-const INP = [mkSlot(), mkSlot(), mkSlot(), mkSlot()],
+const INP = [mkSlot(), mkSlot(), mkSlot(), mkSlot(), mkSlot(), mkSlot()], // up to 4 local players, 6 online
   SRC = INP[0].src,
   HIST = [];
 let fr = 0;

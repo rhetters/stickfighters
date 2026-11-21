@@ -1572,10 +1572,35 @@ body.padnav #ui select:focus {
 }
 #on-cards {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
   gap: 10px;
   width: 100%;
-  max-width: 760px;
+  max-width: calc(var(--n, 4) * 190px);
+}
+/* The room size beside the code: the host's - and + (guests see the number only) */
+.onsize {
+  margin-left: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.onroomcode .onsize b {
+  font-size: 22px;
+  color: #1c1626;
+  margin: 0 6px;
+}
+.onsize button {
+  font: 900 18px 'Trebuchet MS', sans-serif;
+  border: 3px solid #1c1626;
+  border-radius: 10px;
+  background: #fff8ee;
+  color: #1c1626;
+  min-width: 36px;
+  min-height: 36px;
+  margin: 0 4px;
+  cursor: pointer;
+}
+.onsize button:disabled {
+  opacity: 0.35;
 }
 #on-msg {
   font-weight: 800;
@@ -1596,26 +1621,24 @@ body.padnav #ui select:focus {
   padding: 4px 26px;
   margin: 2px 0;
 }
-#on-diag {
-  margin: 0;
-  font-size: 11px;
-  color: #7a6e80;
-}
 /* In a room everything fits on one screen: the room code stands in for the title, the cards are shorter, the
-   Versus teams switch sits with the modes, and START sits beside LEAVE ROOM. */
+   mode's choices sit under the modes, and START sits beside LEAVE ROOM. */
 #s-online.inroom h2 {
   display: none;
 }
 #s-online.inroom .pcard {
   min-height: 0;
 }
-#on-wait {
-  margin: 0;
+/* Under the modes: which story, or free-for-all / teams */
+.onsub:empty {
+  display: none;
+}
+.onsub button {
+  border-style: dashed;
   font-size: 13px;
 }
-#on-teams,
-#on-theme {
-  border-style: dashed;
+.onsub button.on {
+  border-style: solid;
 }
 .onfoot {
   display: flex;
@@ -1794,9 +1817,6 @@ body.padnav #ui select:focus {
 @media (max-height: 440px) {
   #s-online.inroom .onroomcode b {
     font-size: 22px;
-  }
-  #s-online.inroom #on-diag {
-    display: none;
   }
   #s-online.inroom #on-msg:empty {
     min-height: 0;
@@ -2090,27 +2110,38 @@ body.padnav #ui select:focus {
 /* Campaign screen: one card per theme */
 #th-cards {
   display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
+  width: 100%;
 }
 .thcard {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: min(210px, 22vw);
-  padding: 12px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 200px;
+  padding: 10px;
   border: 4px solid #1c1626;
   border-top: 14px solid var(--tc);
   border-radius: 14px;
   background: #fff8ee;
   color: #1c1626;
-  font: 700 clamp(12px, 1.6vw, 15px) 'Trebuchet MS', sans-serif;
+  font: 700 clamp(11px, 1.4vw, 15px) 'Trebuchet MS', sans-serif;
   cursor: pointer;
   text-align: left;
 }
 .thcard b {
-  font: 900 clamp(20px, 3vw, 30px) Impact, 'Arial Black', sans-serif;
+  font: 900 clamp(16px, 2.2vw, 28px) Impact, 'Arial Black', sans-serif;
+}
+.thq {
+  --tc: #8a7f96;
+  justify-content: center;
+  text-align: center;
+}
+.thq b {
+  font-size: clamp(40px, 6vw, 64px);
+  line-height: 1;
 }
 .thcard small {
   color: #6a6070;
@@ -2163,7 +2194,7 @@ body.padnav .thcard:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: min(190px, 22vw);
+  width: min(190px, 22vw, calc(94vw / var(--n, 1) - 14px)); /* five or six players online fit in one row */
   padding: 4px 10px 8px;
   border: 4px solid #1c1626;
   border-top: 10px solid var(--pc);
@@ -2185,9 +2216,6 @@ body.padnav .thcard:focus {
   margin: 2px 0;
   padding: 0;
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 10px;
   font: 700 clamp(11px, 1.4vw, 14px) 'Trebuchet MS', sans-serif;
 }
 .vstats li {
@@ -2198,6 +2226,10 @@ body.padnav .thcard:focus {
 .vbtns {
   display: flex;
   gap: 10px;
+}
+.vbtns #v-again:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 #s-victory h1 {
   margin: 0;
@@ -2214,7 +2246,6 @@ body.padnav .thcard:focus {
   padding: 4px 20px;
   font-size: clamp(14px, 1.8vw, 20px);
 }
-#v-st,
-#v-msg {
+#v-st {
   font-size: clamp(12px, 1.5vw, 15px);
 }

@@ -518,9 +518,13 @@ function drawFX(x) {
   }
 }
 // Multiplayer HUD: one compact row per player, in their color: health, Surge, blue meter, and round wins in versus.
+// Five or six players (online) get smaller rows, so they take no more room than four.
 function hudPlayers() {
+  const big = PL.length > 4;
   PL.forEach((q, i) => {
     const y = 10 + i * 30;
+    ctx.save();
+    if (big) ctx.scale(0.72, 0.72);
     ctx.fillStyle = q.col;
     ctx.strokeStyle = INK;
     ctx.lineWidth = 3;
@@ -550,8 +554,9 @@ function hudPlayers() {
       ctx.fillRect(176, y + 18, (q.meter / 100) * 56, 4);
     }
     if (q.st === 'dead' && MODE.revive)
-      txt0(q.rv > 0 ? 'REVIVING' : 'DOWN: stand next to them', 242, y + 13, '#e8212b');
+      txt0(q.rv > 0 ? 'REVIVING' : big ? 'DOWN' : 'DOWN: stand next to them', 242, y + 13, '#e8212b');
     if (MODE.wins) for (let w = 0; w < MODE.wins(q); w++) star5(250 + w * 20, y + 12);
+    ctx.restore();
   });
 }
 function txt0(t, x, y, c) {

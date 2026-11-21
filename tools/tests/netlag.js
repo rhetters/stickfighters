@@ -10,7 +10,7 @@ await H.evaluate(()=>{$('b-online').click();$('on-host').click()});await H.waitF
 await G.evaluate(code=>{$('b-online').click();const [w,n]=code.split('-');ONC.w=ROOM_WORDS.indexOf(w);ONC.a=+n[0];ONC.b=+n[1];renderOnline();$('on-join').click();},code);await G.waitForTimeout(1500);
 await G.evaluate(lag);await G.waitForTimeout(3500);
 console.log('guest rtt',await G.evaluate(()=>Math.round(NET.rtt)),'host sees',await H.evaluate(()=>NET.players[1].rtt));
-await H.evaluate(()=>{NET.mode='vs';netRoomChanged();$('on-start').click()});await G.waitForTimeout(800);
+await H.evaluate(()=>{NET.mode='vs';netRoomChanged();netStart()});await G.waitForTimeout(800);
 const D=await H.evaluate(()=>NET.D);ok(D>=4&&D<=6,'input delay covers one trip: D='+D);
 await G.keyboard.down('a');await H.keyboard.down('d');await G.waitForTimeout(1500);await G.keyboard.up('a');await H.keyboard.up('d');
 const t0=Date.now(),f0=await G.evaluate(()=>NET.simF);await G.waitForTimeout(3000);const f1=await G.evaluate(()=>NET.simF);

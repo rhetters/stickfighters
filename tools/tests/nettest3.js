@@ -19,7 +19,7 @@ ok(await H.evaluate(()=>NET.players.length===3),'three in the room');
 const X=await mk('FRIEND');await join(X);await X.waitForTimeout(2000);
 ok(await X.evaluate(()=>NET.links.size>=1),'FRIEND connected directly to another guest ('+await X.evaluate(()=>NET.links.size)+')');
 ok(await A.evaluate(()=>NET.links.size>=1),'RHETT sees the direct link');
-await H.evaluate(()=>{NET.mode='arcade';netRoomChanged();$('on-start').click()});await H.waitForTimeout(700);
+await H.evaluate(()=>{NET.mode='arcade';netRoomChanged();netStart()});await H.waitForTimeout(700);
 ok(await C.evaluate(()=>state==='play'&&PL.length===4),'4-player arcade started');
 const hold=async(p,keys,ms)=>{for(const k of keys)await p.keyboard.down(k);await p.waitForTimeout(ms);for(const k of keys)await p.keyboard.up(k);};
 await Promise.all([hold(H,['d'],900),hold(A,['a'],600),hold(C,['d'],400),hold(X,['k'],300)]);

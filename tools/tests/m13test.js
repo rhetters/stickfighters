@@ -91,7 +91,7 @@ await ev("for(let n=0;n<300&&LV.cine;n++){fr++;update()}");
 ok(await ev("!LV.cine&&PL.every(p=>p.st!=='cine'&&p.draw===undefined&&p.ink===undefined)"),'then everyone can move and no sketch is left behind');
 // the Campaign screen: one card a theme, a card starts that theme, BACK goes home
 await ev("show('s-title');$('b-level').click()");
-ok(await ev("!$('s-themes').hidden&&$('th-cards').querySelectorAll('.thcard').length===Object.keys(THEMES).length"),'CAMPAIGN opens a screen with a card for each theme');
+ok(await ev("!$('s-themes').hidden&&$('th-cards').querySelectorAll('.thcard:not(.thq)').length===Object.keys(THEMES).length&&$('th-cards').querySelector('.thq')"),'STORY opens a screen with a card for each theme');
 await ev("$('th-back').click()");
 ok(await ev("!$('s-title').hidden&&$('s-themes').hidden"),'BACK returns to the title');
 await ev("$('b-level').click();$('th-cards').querySelectorAll('.thcard')[1].click()");

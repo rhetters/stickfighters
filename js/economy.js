@@ -213,6 +213,7 @@ function runEnd(el, extra) {
   const xpLine = runXP(extra),
     lucky = RUN.last.reduce((m, r) => Math.max(m, r.stars), 0); // Fortune: the luckiest player's bonus
   if (lucky && RUN.stars) grantStars(Math.round(RUN.stars * lucky), 'fortune');
+  if (extra && extra.bonus && RUN.stars) grantStars(Math.round(RUN.stars * extra.bonus), 'surprise');
   const got = checkUnlocks(extra);
   ecoSave(true);
   const items = [...new Set(RUN.items)].map(id => ITEM[id].name);

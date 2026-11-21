@@ -212,11 +212,13 @@ function genRun(themeId, seed, ng = 0) {
 // The biome segment at world x
 const segAt = x => (LV.segs ? LV.segs.find(s => x < s.x1) || LV.segs[LV.segs.length - 1] : null);
 // ng = how many times harder than normal (0; each PLAY AGAIN from the victory screen adds one)
-function startRun(themeId, ng = 0) {
+// myst = picked as a surprise ('?' on the Story screen): the run earns 10% more stars and XP
+function startRun(themeId, ng = 0, myst = false) {
   closePanels();
   newSeed();
   init();
   LV = genRun(themeId, curSeed, ng);
+  LV.run.myst = !!myst;
   LV.stats = {}; // each player's stats for the victory screen (LEVEL.tally), kept through a continue
   levelSim();
   paused = false;
@@ -230,7 +232,7 @@ function startRun(themeId, ng = 0) {
 // Play the same level again: a campaign run gets a new run (new seed), a fixed level starts over. harder = one
 // step harder than the run just played (the victory screen's ready-up)
 function replayLevel(harder) {
-  if (LV && LV.run) startRun(LV.run.theme, (LV.run.ng || 0) + (harder ? 1 : 0));
+  if (LV && LV.run) startRun(LV.run.theme, (LV.run.ng || 0) + (harder ? 1 : 0), LV.run.myst);
   else startLevel(LV ? LV.id : 'woods1');
 }
 // A biome is behind you: it counts as done for anything tied to it (the Wooded Trail's Ranger Hat)
@@ -280,7 +282,7 @@ function cineArrive(tr) {
   CAM.y = 0;
   CAM.z = 1;
   PL.forEach((p, i) => {
-    p.x = tr.nx + 220 - i * 60;
+    p.x = tr.nx + 220 - i * (PL.length > 4 ? 36 : 60);
     p.gy = G;
     p.surf = null;
   });

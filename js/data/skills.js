@@ -7,6 +7,8 @@ const XP_RULES = { base: 60, exp: 1.6, cap: 30, bonusEvery: 5 };
 const XP_KILL = { g: 8, r: 10, b: 20, u: 18, f: 15, c: 80, mw: 120, ms: 120, mc: 120, mb: 120, mf: 120, mt: 120, mh: 120, mr: 120, mi: 120, mk: 120, mx: 120, mn: 120, G: 400, P: 400, Y: 420, Z: 420 };
 // XP for finishing things: a level, each Arcade wave reached, each Versus KO and a Versus win
 const XP_BONUS = { level: 100, wave: 10, vsKO: 15, vsWin: 40 };
+// A surprise story ('?' on the Story screen) earns this much more XP and stars
+const SURPRISE_BONUS = 0.1;
 // Points needed in a branch's lower rows before each row opens
 const ROW_NEEDS = [0, 3, 6, 10];
 // Levels at which an ultimate's three steps can be bought (one point each, in order, in one branch only)

@@ -166,6 +166,7 @@ function runXP(extra) {
   let xp = RUN.xp;
   if (x.level) xp += XP_BONUS.level;
   if (x.wave) xp += XP_BONUS.wave * Math.max(0, x.wave - 1);
+  if (x.bonus) xp = Math.round(xp * (1 + x.bonus));
   RUN.xp = 0;
   // Versus: everyone gets XP for each round played, the winners a bonus
   const who = PL.filter(p => p.fi != null).map(p => ({

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>StickFighters</title>
-<link rel="stylesheet" href="css/style.css?v=45">
+<link rel="stylesheet" href="css/style.css?v=46">
 </head>
 <body>
 <div id="wrap">
@@ -37,7 +37,7 @@
   <h1>StickFighters</h1>
   <p id="press">PRESS START<small class="tapalso">or tap the screen</small></p>
   <div id="tmenu" hidden>
-   <div class="tslot"><button class="btn" id="b-solo">SOLO</button><div class="split" id="solorow" hidden><button class="btn" id="b-level">CAMPAIGN</button><button class="btn" id="b-start">ARCADE</button></div></div>
+   <div class="tslot"><button class="btn" id="b-solo">SOLO</button><div class="split" id="solorow" hidden><button class="btn" id="b-level">STORY</button><button class="btn" id="b-start">ARCADE</button></div></div>
    <div class="tslot"><button class="btn" id="b-mp">MULTIPLAYER</button><div class="split" id="mprow" hidden><button class="btn" id="b-multi">LOCAL</button><button class="btn" id="b-online">ONLINE</button></div></div>
    <div class="tslot"><button class="btn alt" id="b-cust">CUSTOMIZE</button><div class="split" id="custrow" hidden><button class="btn" id="b-char">CHARACTER</button><button class="btn" id="b-house">HOUSE</button></div></div>
    <button class="btn alt" id="b-train">TRAINING ROOM</button>
@@ -47,9 +47,7 @@
  <div class="screen" id="s-online" hidden>
   <h2>ONLINE</h2>
   <div id="on-menu" class="onpane">
-   <p>Play with friends on other devices, in this house or another one. One player hosts and gets a room code; everyone else joins with that code.</p>
    <button class="btn" id="on-host">HOST A GAME</button>
-   <p class="onlabel">Join a game: pick the room code</p>
    <div class="oncode">
     <button id="on-w-" aria-label="Previous word">&#9664;</button><b id="on-w">TIGER</b><button id="on-w+" aria-label="Next word">&#9654;</button>
     <span>-</span>
@@ -59,11 +57,10 @@
    <button class="btn alt" id="on-join">JOIN</button>
   </div>
   <div id="on-room" class="onpane" hidden>
-   <p class="onroomcode">ROOM CODE <b id="on-code"></b></p>
+   <p class="onroomcode">ROOM CODE <b id="on-code"></b><span class="onsize"><button id="on-max-" aria-label="Fewer players">&minus;</button><b id="on-max">4</b> PLAYERS<button id="on-max+" aria-label="More players">+</button></span></p>
    <div id="on-cards"></div>
-   <div class="onmodes" id="on-modes"><button data-mode="level">CAMPAIGN</button><button data-mode="arcade">ARCADE</button><button data-mode="vs">VERSUS</button><button data-mode="house">HOST'S HOUSE</button><button id="on-teams" hidden>FREE-FOR-ALL</button><button id="on-theme" hidden>CASTLE SIEGE</button></div>
-   <p id="on-wait"></p>
-   <p id="on-diag"></p>
+   <div class="onmodes" id="on-modes"><button data-mode="level">STORY</button><button data-mode="arcade">ARCADE</button><button data-mode="vs">VERSUS</button><button data-mode="house">HOST'S HOUSE</button></div>
+   <div class="onmodes onsub" id="on-sub"></div>
   </div>
   <p id="on-msg" aria-live="polite"></p>
   <div class="onfoot"><button class="btn" id="on-start" hidden>START</button><button class="btn alt" id="b-onlineback">BACK</button></div>
@@ -92,7 +89,7 @@
   <button class="btn" id="b-charback">DONE</button>
  </div>
  <div class="screen" id="s-themes" hidden>
-  <h2>CAMPAIGN</h2>
+  <h2>STORY</h2>
   <div id="th-cards"></div>
   <button class="btn alt" id="th-back">BACK</button>
  </div>
@@ -118,7 +115,7 @@
   <p class="lbhelp">Controllers: any button joins, B leaves, left/right picks your fighter, the top button changes color, the left button changes hat. Keyboard 2: press 0 on the number pad.</p>
   <div class="lbrow"><button class="btn alt" id="lb-touch">JOIN WITH TOUCH</button><button class="btn alt" id="lb-kb">JOIN WITH KEYBOARD</button><button class="btn alt" id="lb-back">BACK</button></div>
   <p id="lb-msg"></p>
-  <div class="lbrow"><button class="btn alt" id="lb-teams">VERSUS: FREE-FOR-ALL</button><button class="btn" id="lb-vs">VERSUS</button><button class="btn" id="lb-coop">CO-OP: WOODED TRAIL</button><button class="btn" id="lb-arc">CO-OP: ARCADE</button></div>
+  <div class="lbrow"><button class="btn alt" id="lb-teams">VERSUS: FREE-FOR-ALL</button><button class="btn" id="lb-vs">VERSUS</button><button class="btn" id="lb-coop">CO-OP: STORY</button><button class="btn" id="lb-arc">CO-OP: ARCADE</button></div>
  </div>
  <div class="screen" id="s-pause" hidden>
   <h2>PAUSED</h2>
@@ -173,10 +170,9 @@
  </div>
  <div class="screen" id="s-victory" hidden>
   <h1 id="v-h1">VICTORY!</h1>
-  <p id="v-sub"></p>
   <div id="v-cards"></div>
-  <p id="v-st" class="stl"></p><p id="v-msg" aria-live="polite"></p>
-  <div class="vbtns"><button class="btn alt" id="v-lobby">BACK TO PLAYERS</button><button class="btn alt" id="v-title">MAIN MENU</button></div>
+  <p id="v-st" class="stl"></p>
+  <div class="vbtns"><button class="btn" id="v-again">PLAY AGAIN +1</button><button class="btn alt" id="v-lobby">BACK TO PLAYERS</button><button class="btn alt" id="v-title">MAIN MENU</button></div>
  </div>
  <div class="screen" id="s-clear" hidden>
   <h1 id="c-h1">LEVEL CLEAR!</h1>
@@ -192,51 +188,51 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=45" defer></script>
-<script src="js/input.js?v=45" defer></script>
-<script src="js/data/moves.js?v=45" defer></script>
-<script src="js/data/enemies.js?v=45" defer></script>
-<script src="js/data/levels.js?v=45" defer></script>
-<script src="js/data/themes.js?v=45" defer></script>
-<script src="js/data/items.js?v=45" defer></script>
-<script src="js/data/skills.js?v=45" defer></script>
-<script src="js/data/sounds.js?v=45" defer></script>
-<script src="js/data/house.js?v=45" defer></script>
-<script src="js/progress.js?v=45" defer></script>
-<script src="js/economy.js?v=45" defer></script>
-<script src="js/player.js?v=45" defer></script>
-<script src="js/effects.js?v=45" defer></script>
-<script src="js/combat.js?v=45" defer></script>
-<script src="js/terrain.js?v=45" defer></script>
-<script src="js/enemies.js?v=45" defer></script>
-<script src="js/modes.js?v=45" defer></script>
-<script src="js/level.js?v=45" defer></script>
-<script src="js/run.js?v=45" defer></script>
-<script src="js/versus.js?v=45" defer></script>
-<script src="js/pickups.js?v=45" defer></script>
-<script src="js/net/rtc.js?v=45" defer></script>
-<script src="js/net/session.js?v=45" defer></script>
-<script src="js/ragdoll.js?v=45" defer></script>
-<script src="js/scenery.js?v=45" defer></script>
-<script src="js/biomes.js?v=45" defer></script>
-<script src="js/looks.js?v=45" defer></script>
-<script src="js/bosslooks.js?v=45" defer></script>
-<script src="js/house.js?v=45" defer></script>
-<script src="js/render.js?v=45" defer></script>
-<script src="js/ui/panels.js?v=45" defer></script>
-<script src="js/ui/training.js?v=45" defer></script>
-<script src="js/ui/touch-layout.js?v=45" defer></script>
-<script src="js/ui/lobby.js?v=45" defer></script>
-<script src="js/ui/online.js?v=45" defer></script>
-<script src="js/ui/bindings.js?v=45" defer></script>
-<script src="js/ui/character.js?v=45" defer></script>
-<script src="js/ui/skills.js?v=45" defer></script>
-<script src="js/ui/themes.js?v=45" defer></script>
-<script src="js/ui/victory.js?v=45" defer></script>
-<script src="js/ui/house.js?v=45" defer></script>
-<script src="js/ui/backup.js?v=45" defer></script>
-<script src="js/devtools.js?v=45" defer></script>
-<script src="js/selftest.js?v=45" defer></script>
-<script src="js/main.js?v=45" defer></script>
+<script src="js/core.js?v=46" defer></script>
+<script src="js/input.js?v=46" defer></script>
+<script src="js/data/moves.js?v=46" defer></script>
+<script src="js/data/enemies.js?v=46" defer></script>
+<script src="js/data/levels.js?v=46" defer></script>
+<script src="js/data/themes.js?v=46" defer></script>
+<script src="js/data/items.js?v=46" defer></script>
+<script src="js/data/skills.js?v=46" defer></script>
+<script src="js/data/sounds.js?v=46" defer></script>
+<script src="js/data/house.js?v=46" defer></script>
+<script src="js/progress.js?v=46" defer></script>
+<script src="js/economy.js?v=46" defer></script>
+<script src="js/player.js?v=46" defer></script>
+<script src="js/effects.js?v=46" defer></script>
+<script src="js/combat.js?v=46" defer></script>
+<script src="js/terrain.js?v=46" defer></script>
+<script src="js/enemies.js?v=46" defer></script>
+<script src="js/modes.js?v=46" defer></script>
+<script src="js/level.js?v=46" defer></script>
+<script src="js/run.js?v=46" defer></script>
+<script src="js/versus.js?v=46" defer></script>
+<script src="js/pickups.js?v=46" defer></script>
+<script src="js/net/rtc.js?v=46" defer></script>
+<script src="js/net/session.js?v=46" defer></script>
+<script src="js/ragdoll.js?v=46" defer></script>
+<script src="js/scenery.js?v=46" defer></script>
+<script src="js/biomes.js?v=46" defer></script>
+<script src="js/looks.js?v=46" defer></script>
+<script src="js/bosslooks.js?v=46" defer></script>
+<script src="js/house.js?v=46" defer></script>
+<script src="js/render.js?v=46" defer></script>
+<script src="js/ui/panels.js?v=46" defer></script>
+<script src="js/ui/training.js?v=46" defer></script>
+<script src="js/ui/touch-layout.js?v=46" defer></script>
+<script src="js/ui/lobby.js?v=46" defer></script>
+<script src="js/ui/online.js?v=46" defer></script>
+<script src="js/ui/bindings.js?v=46" defer></script>
+<script src="js/ui/character.js?v=46" defer></script>
+<script src="js/ui/skills.js?v=46" defer></script>
+<script src="js/ui/themes.js?v=46" defer></script>
+<script src="js/ui/victory.js?v=46" defer></script>
+<script src="js/ui/house.js?v=46" defer></script>
+<script src="js/ui/backup.js?v=46" defer></script>
+<script src="js/devtools.js?v=46" defer></script>
+<script src="js/selftest.js?v=46" defer></script>
+<script src="js/main.js?v=46" defer></script>
 </body>
 </html>

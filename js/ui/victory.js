@@ -1,7 +1,8 @@
-// StickFighters: the victory screen after a campaign's main boss. Every player strikes their victory pose over
-// their stats for the run (LV.stats, counted by LEVEL.tally), and readies up: when everyone is ready, the same
-// theme starts again, one step harder (a new run, from a new seed). Online each screen readies its own player
-// (NET.players[].ready, kept by the host; net/session.js) and the host starts the harder run for everyone.
+// StickFighters: the victory screen after a story's main boss. Every player strikes their victory pose over their
+// stats for the run (LV.stats, counted by LEVEL.tally), and readies up: when everyone is ready, the THEME +1 button
+// can be pressed, and the same theme starts again, one step harder (a new run, from a new seed). Online each screen
+// readies its own player (NET.players[].ready, kept by the host; net/session.js) and the host presses THEME +1 for
+// everyone.
 const VIC = { ready: {}, raf: 0, t: 0, go: 0 };
 function vicOpen() {
   VIC.ready = {};
@@ -9,13 +10,11 @@ function vicOpen() {
   const ng = LV.run.ng || 0,
     cards = $('v-cards');
   $('v-h1').textContent = LV.def.name + ' CLEAR!';
-  $('v-sub').textContent =
-    'Time ' + fmtT(LV.t) + ' · Score ' + score + ' · Ready up to play ' + THEMES[LV.run.theme].name + ' +' + (ng + 1) + ' (harder)';
-  $('v-msg').textContent = '';
+  $('v-again').textContent = THEMES[LV.run.theme].name + ' +' + (ng + 1);
   cards.innerHTML = '';
-  const co = PL.length > 1;
+  cards.style.setProperty('--n', PL.length);
   for (const p of [...PL].sort((a, b) => a.slot - b.slot)) {
-    const s = (LV.stats && LV.stats[p.slot]) || { dealt: 0, taken: 0, kos: 0, combo: 0, revives: 0 },
+    const s = (LV.stats && LV.stats[p.slot]) || { dealt: 0, taken: 0 },
       c = document.createElement('div'),
       mine = !NET.match || p.slot === NET.mySlot;
     c.className = 'vcard';
@@ -23,11 +22,8 @@ function vicOpen() {
     c.innerHTML =
       '<canvas width="240" height="224"></canvas><b class="vname"></b><ul class="vstats">' +
       [
-        ['Damage', Math.round(s.dealt)],
-        ['Taken', Math.round(s.taken)],
-        ['Beaten', s.kos],
-        ['Combo', s.combo],
-        ...(co ? [['Revives', s.revives]] : [])
+        ['Damage Done', Math.round(s.dealt)],
+        ['Damage Taken', Math.round(s.taken)]
       ]
         .map(([k, v]) => '<li>' + k + ' <b>' + v + '</b></li>')
         .join('') +
@@ -40,9 +36,9 @@ function vicOpen() {
     c.p = p;
     cards.appendChild(c);
   }
-  // back to the players (or the campaigns) and the title; online the host takes everyone back to the room
+  // back to the players (or the Story screen) and the title; online the host takes everyone back to the room
   $('v-lobby').hidden = NET.match && !NET.host;
-  $('v-lobby').textContent = NET.match ? 'BACK TO THE ROOM' : ROSTER.length ? 'BACK TO PLAYERS' : 'CAMPAIGNS';
+  $('v-lobby').textContent = NET.match ? 'BACK TO THE ROOM' : ROSTER.length ? 'BACK TO PLAYERS' : 'STORY';
   $('v-title').textContent = NET.match && !NET.host ? 'LEAVE' : 'MAIN MENU';
   show('s-victory');
   vicRefresh();
@@ -69,7 +65,7 @@ function vicReady(slot) {
   sfx(VIC.ready[slot] ? 700 : 400, 0.08, 'square', 0.04, 200);
   vicRefresh();
 }
-// Red X or green check on each card; when everyone is ready the harder run starts
+// Red X or green check on each card; when everyone is ready THEME +1 can be pressed (online, by the host)
 function vicRefresh() {
   if ($('s-victory').hidden) return;
   for (const b of $('v-cards').querySelectorAll('.vready')) {
@@ -77,15 +73,21 @@ function vicRefresh() {
     b.classList.toggle('on', on);
     b.textContent = on ? '✔ READY' : '✘ NOT READY';
   }
-  const all = PL.every(p => p.left || vicIsReady(p.slot));
-  $('v-msg').textContent = all ? 'Everyone is ready!' : PL.length > 1 ? 'Waiting for everyone to be ready…' : '';
-  if (all && !VIC.go && !NET.match) {
-    VIC.go = 1;
-    setTimeout(() => {
-      if (!$('s-victory').hidden) replayLevel(true);
-    }, 900);
-  }
+  const all = PL.every(p => p.left || vicIsReady(p.slot)),
+    was = $('v-again').disabled;
+  $('v-again').disabled = !all || VIC.go || (NET.match && !NET.host);
+  // a controller's highlight moves to THEME +1 when it lights up
+  if (was && !$('v-again').disabled && document.activeElement && document.activeElement.classList.contains('vready'))
+    $('v-again').focus({ preventScroll: true });
 }
+$('v-again').onclick = () => {
+  if ($('v-again').disabled || VIC.go) return;
+  if (!PL.every(p => p.left || vicIsReady(p.slot))) return;
+  VIC.go = 1;
+  cancelAnimationFrame(VIC.raf);
+  if (NET.match) netCmd('harder');
+  else replayLevel(true);
+};
 // The victory pose (the fighter's first pose-wheel pick), standing on a little shadow
 function vicDraw(cv, p, t) {
   const k = cv.getContext('2d'),
@@ -133,7 +135,7 @@ $('v-lobby').onclick = () => {
   cancelAnimationFrame(VIC.raf);
   if (NET.match) return NET.host && netCmd('room');
   if (ROSTER.length) openLobby();
-  else openThemes(id => startRun(id), 's-title');
+  else openThemes((id, myst) => startRun(id, 0, myst), 's-title');
 };
 $('v-title').onclick = () => {
   cancelAnimationFrame(VIC.raf);

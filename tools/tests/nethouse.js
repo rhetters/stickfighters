@@ -8,7 +8,7 @@ const errs=[];const mk=async(n)=>{const c=await b.newContext();const p=await c.n
 const H=await mk('DAD'),A=await mk('RHETT');
 await H.evaluate(()=>{$('b-online').click();$('on-host').click()});await H.waitForTimeout(3000);const code=await H.evaluate(()=>NET.code);
 await A.evaluate(code=>{$('b-online').click();const [w,n]=code.split('-');ONC.w=ROOM_WORDS.indexOf(w);ONC.a=+n[0];ONC.b=+n[1];renderOnline();$('on-join').click();},code);await A.waitForTimeout(3500);
-await H.evaluate(()=>{NET.mode='house';netRoomChanged();$('on-start').click()});await H.waitForTimeout(800);
+await H.evaluate(()=>{NET.mode='house';netRoomChanged();netStart()});await H.waitForTimeout(800);
 ok(await A.evaluate(()=>state==='play'&&MODE===HOUSE_MODE&&PL.length===2),'online house visit started with two players');
 await H.waitForTimeout(1500);
 await H.evaluate(()=>{WB.r=WW.r=3000});await A.evaluate(()=>{WB.r=WW.r=3000}); // a wide house on both
