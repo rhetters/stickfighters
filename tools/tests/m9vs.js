@@ -40,5 +40,5 @@ await p.screenshot({path:S+'/shots/m9-coop.png'});
 // co-op enemy scaling
 await ev("CAM.x=LV.encs[0].lock-10;levelWalls();PL.forEach(p=>p.x=CAM.x+600)");await W(900);
 ok(await ev("LV.encs[0].st===1&&(LV.encs[0].q.length+E.filter(e=>!e.dying).length)>=4"),'co-op fights add extra enemies (3 grunts became '+await ev("LV.encs[0].q.length+E.filter(e=>!e.dying).length")+')');
-ok(await ev("E.length===0||E[0].max>Math.round(18*1.08)"),'and enemies have more health');
+ok(await ev("E.length===0||E[0].max>T[E[0].tk].hp"),'and enemies have more health');
 ok(errs.length===0,'no page errors '+errs.join('|'));await b.close();console.log(fails?fails+' FAILED':'ALL PASS')})();

@@ -90,7 +90,7 @@ function ragHit(R, dr, ef, s) {
 }
 function ragStep(R, s) {
   const P_ = R.p,
-    g = 0.7 * FEEL.grav;
+    g = 0.7 * FEEL.grav * (lowG(P_[0]) < 1 ? 0.55 : 1);
   for (let i = 0; i < 13; i++) {
     const p = P_[i];
     const vx = (p.x - p.px) * 0.99,

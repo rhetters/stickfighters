@@ -862,11 +862,13 @@ function sep() {
 // The floor line under x (ragdolls still use only this; fighters stand on f.gy, see terrain.js).
 const groundY = x => G;
 function phys(f) {
-  if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav;
+  // low gravity (the moon): the up-and-down motion runs slower, so jumps and launches float, and reach a little higher
+  const lg = lowG(f);
+  if (!(f.att && (f.att.d.hover || f.att.d.tatsu))) f.vy += 0.7 * FEEL.grav * (lg < 1 ? lg * 0.85 : 1);
   const x0 = f.x,
     y0 = f.y;
   f.x += f.vx;
-  f.y += f.vy;
+  f.y += f.vy * lg;
   let imp = 0;
   if (TERRAIN.n) terrainStep(f, x0, y0);
   else f.gy = G;

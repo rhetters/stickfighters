@@ -187,10 +187,13 @@ function levelTick() {
     // reaching a transition's scene (catapult, pipe, rope) starts it; the launch, once someone is on the top deck
     const there = trc && (trc.top ? alive.some(p => p.gy <= trc.top + 1 && p.x >= trc.deck) : lead >= trc.x - 150);
     if (there && !LV.encs.some(e => e.st === 1)) cineStart(trc.k, { tr: trc });
-    // on platforms the camera rises with the highest player standing on one
-    if (LV.terr) {
-      const ty = Math.max(-400, Math.min(0, Math.min(...alive.map(p => p.gy)) - 230));
-      CAM.y += (ty - CAM.y) * 0.08;
+    // on platforms the camera keeps the highest player in view, in the air too: it moves only when their feet
+    // leave the band between 170 and 300 px down the screen (so a little hop doesn't move it)
+    if (LV.terr && alive.length) {
+      const top = Math.min(...alive.map(p => p.y)),
+        sy = top - CAM.y,
+        ty = sy < 170 ? top - 170 : sy > 300 ? top - 300 : CAM.y;
+      CAM.y += (Math.max(-400, Math.min(0, ty)) - CAM.y) * 0.15;
     }
   }
   levelWalls();

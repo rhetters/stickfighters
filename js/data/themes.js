@@ -10,8 +10,10 @@
 //   mix      [{ at: toughness from, w: { enemy type: weight } }]: which enemies a fight draws, by toughness
 //   mini     a rare mini-boss: enemy type, chance per fight, the lines it may say when it lands
 //   slick    1 = slippery floor: knocked-back bodies slide farther
+//   lowg     low gravity: up-and-down motion runs at this speed (jumps float and go a little higher)
 //   helmet   1 = everyone wears a glass bubble helmet here (drawing only)
-//   climb    the ground rises this much per pixel between fights (fights stand on flat ledges); drawing only
+//   climb    [start, end]: how much the ground rises per pixel between fights, getting steeper from the start of
+//            the biome to the end (fights stand on flat ledges); drawing only
 //   dusk     [start, end] light over the biome (woods: morning to dusk)
 //   prog     a level id this biome also completes (keeps old unlocks like the Ranger Hat working)
 const BIOMES = {
@@ -176,7 +178,7 @@ const BIOMES = {
     ],
     w: [1600, 1900],
     fights: 4,
-    climb: 0.2,
+    climb: [0.13, 0.3],
     mix: [
       { at: 3, w: { g: 4, r: 3, f: 2, b: 1 } },
       { at: 4, w: { g: 3, r: 3, f: 2, b: 2, u: 1 } }
@@ -243,6 +245,7 @@ const BIOMES = {
     name: 'THE MOON',
     look: 'moon',
     helmet: 1,
+    lowg: 0.65,
     props: [
       ['crater', 3],
       ['moonrock', 3],

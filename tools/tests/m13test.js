@@ -43,6 +43,7 @@ ok(['gondola','balloon','climb','rope'].every(k=>mk[k]>10),'Mountain transitions
 // the mountainside climbs: slopes only there, starting a screen in, and every fight on a flat ledge
 ok(await ev("(()=>{for(let s=1;s<60;s++){const L=genRun('mountain',s),sg=L.segs[1];if(!L.ramps||!L.ramps.every(r=>r.x0>=sg.x0+900&&r.x1<=sg.x1&&r.x1>r.x0))return false;for(const e of L.encs)if(L.ramps.some(r=>r.x1>e.lock&&r.x0<e.lock+W))return false;if(genRun('castle',s).ramps||genRun('pirate',s).ramps)return false}return true})()"),'slopes only on the mountainside, a screen in from its start, never under a fight');
 ok(await ev("(()=>{const L=genRun('mountain',6);return L.ramps.reduce((a,r)=>a+(r.x1-r.x0)*r.k,0)>400})()"),'and you climb a long way up it');
+ok(await ev("(()=>{for(let s=1;s<30;s++){const R=genRun('mountain',s).ramps,n=Math.floor(R.length/3),a=R.slice(0,n),b=R.slice(-n),m=x=>x.reduce((t,r)=>t+r.k,0)/x.length;if(!(m(b)>m(a)+0.08))return false}return true})()"),'the mountainside gets steeper the farther you climb');
 for(const sd of [6,10]){const r=await play(sd,'mountain');ok(r.state==='clear','a Mountain run plays through (seed '+sd+'): '+Object.keys(r.seen).join(', '));Object.assign(all,r.seen)}
 ok(['gondola','balloon','climb'].every(k=>all[k]),'the gondola, the balloon and the cliff climb all played');
 await ev("setA('kb','r',0)");
@@ -62,6 +63,11 @@ const climb=await ev(`(()=>{SET.seed='3';titleOpenAll();startRun('space');cineEn
 ok(climb.out.every(x=>x),'the launch tower can be climbed with ordinary jumps, platform by platform: '+JSON.stringify(climb.out));
 ok(climb.camUp&&climb.cine==='launch','the camera rises with you, and stepping onto the top deck starts the launch '+JSON.stringify(climb));
 ok(await ev("(()=>{SET.seed='3';startRun('space');cineEnd();const tw=LV.trans[0],o=tw.x-1110;CAM.x=tw.x-W+260;levelWalls();const P=PL[0];P.x=o+700;P.y=G;setA('kb','r',1);for(let i=0;i<60;i++){fr++;update()}setA('kb','r',0);return P.x<o+750&&!LV.cine})()"),'you cannot walk in under the tower from the ground');
+// the camera keeps you in view in the air too (jumping between platforms)
+ok(await ev("(()=>{SET.seed='3';startRun('space');cineEnd();LV.encs.forEach((e,i)=>{if(i<5)e.st=2});const tw=LV.trans[0],o=tw.x-1110;CAM.x=tw.x-W+260;CAM.y=0;levelWalls();const P=PL[0];P.x=o+690;P.y=G-215;P.vy=0;for(let i=0;i<90;i++){fr++;update()}setA('kb','j',1);fr++;update();setA('kb','j',0);setA('kb','l',1);let ok=true;for(let i=0;i<60;i++){fr++;update();const sy=P.y-CAM.y;if(sy<110||sy>H-20)ok=false}setA('kb','l',0);return ok})()"),'on the launch tower the camera keeps you in view in mid-air');
+// low gravity on the moon: jumps float about twice as long and go a little higher
+const jmp=await ev("(()=>{const j=()=>{const P=PL[0];P.y=G;P.vy=0;for(let i=0;i<10;i++){fr++;update()}setA('kb','j',1);fr++;update();setA('kb','j',0);let top=G,n=0;for(;n<300;n++){fr++;update();top=Math.min(top,P.y);if(n>3&&P.y>=P.gy-0.5)break}return [G-top,n]};SET.seed='3';startRun('space');cineEnd();LV.encs.forEach(e=>e.st=2);E.length=0;const sE=LV.segs[0];CAM.x=sE.x0+1000;levelWalls();PL[0].x=sE.x0+1200;const e=j();const sM=LV.segs[2];CAM.x=sM.x0+1000;levelWalls();PL[0].x=sM.x0+1200;const m=j();return {e,m}})()");
+ok(jmp.m[1]>jmp.e[1]*1.5&&jmp.m[0]>jmp.e[0]*1.05&&jmp.m[0]<jmp.e[0]*1.4,'low gravity on the moon: jumps float longer and a little higher '+JSON.stringify(jmp));
 const r5=await play(3,'space');
 ok(r5.state==='clear'&&r5.seen.launch&&r5.seen.landing&&r5.seen.beam,'a Space run plays through: '+Object.keys(r5.seen).join(', '));
 await ev("setA('kb','r',0)");
