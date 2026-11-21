@@ -175,6 +175,8 @@ function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, lay, hf)
   layer(() => L(col, [sho, eA, hA]));
 }
 function drawF(f) {
+  if (f.hide) return; // inside a pipe (run.js)
+  if (f.draw !== undefined) return drawPencilIn(f);
   let a = 1;
   if (f.pl && f.inv > 0 && f.inv < 900 && f.st !== 'dead' && Math.floor(f.t / 3) % 2) a = 0.45;
   if (f.pl && f.phase > 0) a = Math.min(a, 0.55);
@@ -356,6 +358,59 @@ function bg() {
   ctx.moveTo(-30, G + 6);
   ctx.lineTo(W + 30, G + 6);
   ctx.stroke();
+}
+// A boss being drawn in by a pencil (run.js): the sketch appears from the head down with the pencil at its edge,
+// then the colours fill in
+function drawPencilIn(f) {
+  const H_ = 84 * f.s + 24,
+    top = f.y - H_,
+    ey = top + f.draw * H_;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(f.x - 200, top - 40, 400, ey - top + 40);
+  ctx.clip();
+  drawFig(f.x, f.y, f.face, f.pose, f.s, '#5a5560', '#5a5560', f.pose[9], 0.85, 5);
+  ctx.restore();
+  if (f.ink > 0) {
+    const d = f.draw;
+    f.draw = undefined;
+    ctx.save();
+    ctx.globalAlpha = f.ink;
+    drawF(f);
+    ctx.restore();
+    f.draw = d;
+    return;
+  }
+  // the pencil, scribbling back and forth along the edge of the drawing
+  const px = f.x + Math.sin(f.draw * 46) * 46 * f.s,
+    py = ey;
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(-0.75);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = INK;
+  ctx.fillStyle = '#f4c430';
+  ctx.fillRect(14, -9, 78, 18);
+  ctx.strokeRect(14, -9, 78, 18);
+  ctx.fillStyle = '#f28fb0';
+  ctx.fillRect(92, -9, 16, 18);
+  ctx.strokeRect(92, -9, 16, 18);
+  ctx.fillStyle = '#e9c99a';
+  ctx.beginPath();
+  ctx.moveTo(14, -9);
+  ctx.lineTo(0, 0);
+  ctx.lineTo(14, 9);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = INK;
+  ctx.beginPath();
+  ctx.moveTo(5, -3);
+  ctx.lineTo(0, 0);
+  ctx.lineTo(5, 3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 }
 function drawFX(x) {
   const p = x.l / x.m;
@@ -694,6 +749,7 @@ function render() {
   }
   for (const x of FX) drawFX(x);
   drawLevelUps(false);
+  if (MODE.world) MODE.world();
   // co-op revive progress over a downed teammate
   for (const p of PL)
     if (p.st === 'dead' && p.rv > 0) {

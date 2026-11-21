@@ -228,9 +228,93 @@ const T = {
     poise: 90,
     boss: 'CAPTAIN',
     ai: 'boss'
+  },
+  // Mini-bosses (rare, one per biome; data/themes.js) and the Castle Siege main boss. They use the Captain's moves.
+  mw: {
+    hp: 200,
+    s: 1.85,
+    spd: 1,
+    col: '#c2185b',
+    d2: '#880e4f',
+    atk: 'cslam',
+    cd: 80,
+    sc: 300,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'BIG BRUISER',
+    ai: 'boss'
+  },
+  ms: {
+    hp: 210,
+    s: 1.8,
+    spd: 1.15,
+    col: '#9c3d7a',
+    d2: '#6a2453',
+    atk: 'cslam',
+    cd: 75,
+    sc: 320,
+    ar: 90,
+    stop: 70,
+    m: 3.2,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 90,
+    boss: 'SLUDGE BRUTE',
+    ai: 'boss'
+  },
+  mc: {
+    hp: 230,
+    s: 1.8,
+    spd: 1.15,
+    col: '#d81b60',
+    d2: '#9c1145',
+    atk: 'cslam',
+    cd: 70,
+    sc: 340,
+    ar: 90,
+    stop: 70,
+    m: 3.2,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'CAPTAIN OF THE GUARD',
+    ai: 'boss'
+  },
+  G: {
+    hp: 520,
+    s: 1.95,
+    spd: 1.2,
+    col: '#a0004f',
+    d2: '#6b0035',
+    atk: 'cslam',
+    cd: 60,
+    sc: 1500,
+    ar: 100,
+    stop: 75,
+    m: 4.5,
+    fr: 0.62,
+    bnc: 0.15,
+    poise: 140,
+    boss: 'THE PINK GENERAL',
+    ai: 'boss'
   }
 };
-const TNAME = { g: 'Grunt', r: 'Runner', b: 'Brute', u: 'Guard', f: 'Flanker', c: 'Captain' };
+const TNAME = {
+  g: 'Grunt',
+  r: 'Runner',
+  b: 'Brute',
+  u: 'Guard',
+  f: 'Flanker',
+  c: 'Captain',
+  mw: 'Big Bruiser',
+  ms: 'Sludge Brute',
+  mc: 'Captain of the Guard',
+  G: 'The Pink General'
+};
 // How to beat each type, shown in the training Info panel (I)
 const TTIP = {
   g: 'GRUNT: the basic puncher. Anything works',
@@ -238,7 +322,11 @@ const TTIP = {
   b: 'BRUTE: wear its blue poise down with heavy hits, then launch or grab it',
   u: 'GUARD: its shield blocks the front. Hit it from behind, sweep low, grab it, or smash the shield',
   f: 'FLANKER: it sneaks behind you. Spin Back-Kick, sweeps and Whirlwind hit both ways',
-  c: 'CAPTAIN: break its poise with heavy hits. JUMP its quake leap!'
+  c: 'CAPTAIN: break its poise with heavy hits. JUMP its quake leap!',
+  mw: 'BIG BRUISER (woods mini-boss): a giant Brute. Break its poise, then juggle it',
+  ms: 'SLUDGE BRUTE (sewer mini-boss): slippery floor, so keep your distance after it slams',
+  mc: 'CAPTAIN OF THE GUARD (castle mini-boss): jump its quake leap and hit it from behind',
+  G: 'THE PINK GENERAL: three phases, calls his army. Break his poise and save Surge for his rage'
 };
 for (const o of [A, EA])
   for (const k in o) {

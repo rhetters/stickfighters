@@ -6,7 +6,7 @@ const c=await b.newContext({viewport:{width:1280,height:800}});const p=await c.n
 await p.goto(URL);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 ok(await p.isVisible('#b-level')&&await p.isVisible('#b-start'),'title has PLAY: WOODED TRAIL and ARCADE');
-await p.click('#b-level');await W(400);
+await p.evaluate(()=>startLevel('woods1'));await W(400); // the fixed Wooded Trail (CAMPAIGN now starts a generated run: m13test)
 ok(await ev("state==='play'&&MODE===LEVEL&&LV.len===6900"),'Wooded Trail starts (6,900 px long, 6 chunks)');
 await p.screenshot({path:S+'/shots/m8-start.png'});
 await p.keyboard.down('d');await W(2500);await p.keyboard.up('d');await W(700);

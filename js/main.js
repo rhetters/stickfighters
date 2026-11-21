@@ -379,7 +379,7 @@ const netOr = (fn, cmd) => () =>
 $('b-restart').onclick = () => {
   if (NET.match) return NET.host && netCmd('again');
   if (state === 'train') startTrain();
-  else if (MODE === LEVEL) startLevel(LV.id);
+  else if (MODE === LEVEL) replayLevel();
   else if (MODE === VERSUS) startVersus();
   else if (MODE === HOUSE_MODE) startHouse(HVIEW);
   else start();
@@ -391,10 +391,10 @@ $('b-set2').onclick = () => {
 };
 $('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? openHouse() : openTitle()), 'room');
 $('b-back').onclick = () => show(back);
-$('b-again').onclick = netOr(() => (MODE === LEVEL ? startLevel(LV.id) : start()), 'again');
+$('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');
-$('b-level').onclick = () => startLevel('woods1');
-$('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : startLevel(LV.id)), 'again');
+$('b-level').onclick = () => startRun('castle');
+$('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : replayLevel()), 'again');
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(openTitle, 'room');
 $('pausebtn').onclick = () => playerPause();
