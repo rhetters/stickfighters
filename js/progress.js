@@ -19,14 +19,29 @@ const spentOf = sk => Object.values(sk).reduce((n, r) => n + r, 0);
 // Points spent in one branch, counting only rows below `row`
 const branchBelow = (sk, b, row) =>
   SKN.filter(n => n.b === b && n.row < row).reduce((t, n) => t + (sk[n.id] || 0), 0);
-const rowOpen = (sk, n) => branchBelow(sk, n.b, n.row) >= ROW_NEEDS[n.row];
-// Every node with points still has its row open (checked after a point is taken back)
-const treeValid = sk => SKN.every(n => !sk[n.id] || rowOpen(sk, n));
+// The ultimate's steps (row 4): bought in order, and only in one branch at a time
+const ultNodes = b => SKN.filter(n => n.b === b && n.row === 4);
+const ultBranch = sk => (SKN.find(n => n.row === 4 && sk[n.id]) || {}).b || null;
+const rowOpen = (sk, n) =>
+  n.row === 4
+    ? (!n.ult || !!sk[ultNodes(n.b)[n.ult - 1].id]) && (ultBranch(sk) || n.b) === n.b
+    : branchBelow(sk, n.b, n.row) >= ROW_NEEDS[n.row];
+// Every node with points still has its row open (checked after a point is taken back); one ultimate branch at most
+const treeValidRows = sk => SKN.every(n => !sk[n.id] || rowOpen(sk, n));
+const treeValid = sk =>
+  treeValidRows(sk) && new Set(SKN.filter(n => n.row === 4 && sk[n.id]).map(n => n.b)).size <= 1;
 // Can one more point go into node id? Returns '' if yes, otherwise why not (shown on the screen).
 function canAdd(pr, id) {
   const n = SKNODE[id],
     r = pr.sk[id] || 0;
   if (r >= n.max) return 'That one is full.';
+  if (n.row === 4) {
+    const other = ultBranch(pr.sk);
+    if (other && other !== n.b)
+      return 'You already have the ' + branchName(other) + ' ultimate. Take those points back to switch.';
+    if (levelOf(pr.xp) < ULT_LEVELS[n.ult]) return 'Opens at level ' + ULT_LEVELS[n.ult] + '.';
+    if (!rowOpen(pr.sk, n)) return 'Get ' + ultNodes(n.b)[n.ult - 1].name + ' first.';
+  }
   if (spentOf(pr.sk) >= pointsAt(levelOf(pr.xp))) return 'No points left. Level up to earn more.';
   if (!rowOpen(pr.sk, n))
     return 'Spend ' + ROW_NEEDS[n.row] + ' points lower in ' + branchName(n.b) + ' first.';
@@ -43,11 +58,10 @@ function skillOf(move) {
   const n = SKN.find(n => n.un && n.un.includes(move));
   return n ? branchName(n.b) + ': ' + n.name : '';
 }
-const branchPts = (sk, b) => branchBelow(sk, b, 4);
-// The step (0-2) of the ultimate a level gives, or -1 before the first
-const ultStep = lv => ULT_LEVELS.filter(l => lv >= l).length - 1;
+const branchPts = (sk, b) => branchBelow(sk, b, 5);
 // A fighter's progress with every field valid (also used for fighters from other devices, which are trusted for
-// shape only). Points over what the level allows, or rows that aren't open, reset the tree.
+// shape only). Points over what the level allows, rows that aren't open, or an ultimate step above the level reset
+// the tree (points are free to spend again).
 function normProg(p) {
   const src = p && typeof p === 'object' ? p : {},
     xp =
@@ -59,10 +73,12 @@ function normProg(p) {
       r = Math.floor(+s0[id]);
     if (n && r > 0) sk[id] = Math.min(n.max, r);
   }
-  const ok = spentOf(sk) <= pointsAt(levelOf(xp)) && treeValid(sk),
-    tree = ok ? sk : {},
-    ult = SKB.some(b => b.id === src.ult && b.ult && branchPts(tree, b.id) > 0) ? src.ult : null;
-  return { xp, sk: tree, ult };
+  const lv = levelOf(xp),
+    ok =
+      spentOf(sk) <= pointsAt(lv) &&
+      treeValid(sk) &&
+      SKN.every(n => n.row !== 4 || !sk[n.id] || lv >= ULT_LEVELS[n.ult]);
+  return { xp, sk: ok ? sk : {} };
 }
 // What a fighter's progress means in a fight: level, boosts (mod), locked moves and the ultimate's move.
 // even = Versus: moves and the ultimate count, boosts don't.
@@ -77,9 +93,9 @@ function buildOf(pr, even) {
     }
   const open = new Set(Object.keys(pr.sk).flatMap(id => SKNODE[id].un || [])),
     locked = new Set([...SK_LOCKED].filter(n => !open.has(n))),
-    st = ultStep(lv),
-    br = pr.ult && SKB.find(b => b.id === pr.ult);
-  return { lv, mod, locked, ult: br && st >= 0 ? A[br.ult[st]] : null, ultB: br ? br.id : null };
+    ub = ultBranch(pr.sk),
+    st = ub ? ultNodes(ub).filter(n => pr.sk[n.id]).length - 1 : -1;
+  return { lv, mod, locked, ult: st >= 0 ? A[SKB.find(b => b.id === ub).ult[st]] : null, ultB: ub };
 }
 // The self-test plays the game as it was before the tree: everything open, no boosts, the Tornado Kick
 const FULL_BUILD = { lv: XP_RULES.cap, mod: NOMOD, locked: new Set(), ult: A.tornado, ultB: 'legs' };
@@ -116,13 +132,38 @@ function setBuild(p, even) {
   p.stm.v = p.smax;
 }
 const modOf = (p, k) => (p.bd && p.bd.mod[k]) || 0;
-// XP this fight has earned (shared by every player), counted as enemies are beaten
+// XP this fight has earned (shared by every player), counted as enemies are beaten. When it lifts a player on this
+// device to a new level, the level-up celebration plays right away (the XP itself is banked when the run ends).
+let LVFX = []; // level-up celebrations: { p, t (frame), lv }; drawing only, never part of the simulation
 function xpScan() {
+  let got = 0;
   for (const e of E) {
     if (!e.dying || e.xpd || !e.tk) continue;
     e.xpd = 1;
-    RUN.xp += XP_KILL[e.tk] || 0;
+    got = RUN.xp += XP_KILL[e.tk] || 0;
   }
+  if (got && !SELFTESTING)
+    for (const p of PL) {
+      const c = p.fi != null && CHR.list[p.fi];
+      if (!c || !c.prog) continue;
+      const lv = levelOf(c.prog.xp + Math.round(RUN.xp * (1 + modOf(p, 'xp'))));
+      if (lv > (p.lvShown || p.bd.lv)) {
+        p.lvShown = lv;
+        levelUpFx(p, lv);
+      }
+    }
+  if (LVFX.length) LVFX = LVFX.filter(x => fr - x.t < LVUP_T);
+}
+const LVUP_T = 150; // frames a level-up celebration lasts
+function levelUpFx(p, lv) {
+  LVFX.push({ p, t: fr, lv });
+  for (const [n, at] of [
+    [523, 0],
+    [659, 0.09],
+    [784, 0.18],
+    [1047, 0.27]
+  ])
+    sfx(n, at === 0.27 ? 0.6 : 0.22, 'triangle', 0.07, 0, at);
 }
 // Banks the fight's XP (plus bonuses) for the players on this device. Returns a line for the results screen.
 function runXP(extra) {

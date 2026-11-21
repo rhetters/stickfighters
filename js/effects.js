@@ -22,14 +22,21 @@ const dust = (x, y, n) => {
 const txt = (x, y, t, c, sz = 16) => fxp({ k: 't', x, y, t, c, sz, l: 40, m: 40 });
 const ghost = (f, c) =>
   GH.push({ x: f.x, y: f.y, face: f.face, pose: f.pose.slice(), s: f.s, col: c || f.col, l: 9, own: f });
-// The burst when an ultimate starts: rings in its branch's colour and a short slow-motion moment
+// The burst when an ultimate starts: rings in its branch's colour, bigger and more of them at each step (the third,
+// at level 30, is the grandest)
 function ultBurst(f, u) {
   const br = SKB.find(b => b.ult && b.ult.includes(u.n)),
-    c = br ? br.c : '#3ec5ff';
-  fxp({ k: 'r', x: f.x, y: f.y - 45, r: 130, c, w: 7, l: 24, m: 24 });
-  fxp({ k: 'r', x: f.x, y: f.y - 45, r: 80, l: 18, m: 18 });
-  fxp({ k: 'b', x: f.x, y: f.y - 45, l: 14, m: 14, a: 0 });
-  slow = Math.max(slow, 16);
+    c = br ? br.c : '#3ec5ff',
+    step = br ? br.ult.indexOf(u.n) : 0,
+    y = f.y - 45;
+  for (let i = 0; i <= step + 1; i++)
+    fxp({ k: 'r', x: f.x, y, r: 110 + i * 70, c: i % 2 ? INK : c, w: 7 - i, l: 22 + i * 6, m: 22 + i * 6 });
+  fxp({ k: 'b', x: f.x, y, l: 14 + step * 4, m: 14 + step * 4, a: 0 });
+  if (step === 2) {
+    fxp({ k: 'r', x: f.x, y: f.gy, r: 320, c, w: 4, l: 40, m: 40 });
+    shake = Math.max(shake, 8);
+    zoom = Math.max(zoom, 0.08);
+  }
 }
 // An ultimate's running effect: fist sparks, lightning bolts, or ground cracks (turn = a dash just turned around)
 function ultFx(f, d, turn) {

@@ -184,7 +184,7 @@ function toggleInfo() {
 // ===== FEEL PANEL: tune impact while you play; saved on this device =====
 const FEELDEF = { ...FEEL },
   FEELUI = [
-    ['hitstop', 'Hit-stop', 0.4, 1.6],
+    ['hitstop', 'Hit-stop', 0, 1.6],
     ['shake', 'Screen shake', 0, 2],
     ['kb', 'Knockback', 0.6, 1.5],
     ['grav', 'Gravity', 0.7, 1.3],
@@ -242,7 +242,8 @@ function toggleFeel() {
 // Settings copy of the Feel sliders, so players can change them from the pause menu mid-match.
 function renderSetFeel() {
   const el = $('o-feel');
-  el.innerHTML = '<b>Feel (1.0 = default)</b>';
+  el.innerHTML =
+    '<b>Feel (1.0 = default)</b>' + (NET.match ? ' <small>(fixed while playing online)</small>' : '');
   for (const [k, l, a, b, st] of FEELUI) {
     const lab = document.createElement('label'),
       inp = document.createElement('input'),
@@ -250,6 +251,7 @@ function renderSetFeel() {
     lab.textContent = l;
     lab.htmlFor = inp.id = 'o-f-' + k;
     Object.assign(inp, { type: 'range', min: a, max: b, step: st || 0.05, value: FEEL[k] });
+    inp.disabled = !!NET.match; // online everyone plays with the same fixed feel
     out.textContent = fmtF(k);
     inp.oninput = () => {
       FEEL[k] = parseFloat(inp.value);

@@ -10,6 +10,9 @@
 // everyone's buttons for it. Every 2 seconds the guests send a fingerprint of the game state to the host, which
 // checks that everyone still matches. The host still decides the room, starts and ends matches, and when a player
 // leaves it announces the frame their buttons stop, so every device removes them at the same moment.
+// Online everyone plays without hit-stop or screen shake, and bodies clear after at most a second, whatever the host
+// has set: hit-stop freezes the whole game on every hit, which online feels like lag
+const NET_FEEL = { hitstop: 0, shake: 0 };
 const NET = {
   on: false, // in an online room
   host: false,
@@ -369,7 +372,7 @@ function netStart() {
       seed: (Math.random() * 4294967296) >>> 0,
       mode: NET.mode,
       D,
-      feel: { ...FEEL },
+      feel: { ...FEEL, ...NET_FEEL, body: Math.min(1, FEEL.body) },
       players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid, team: p.team })),
       teams: NET.mode === 'vs' && NET.teams,
       // House mode visits the host's house (decoration only, so it can't affect the simulation)

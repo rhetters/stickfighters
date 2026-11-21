@@ -2005,8 +2005,7 @@ body.padnav #ui select:focus {
   align-items: center;
   justify-content: center;
 }
-.sknode i,
-.skult i {
+.sknode i {
   font-style: normal;
   font-size: 0.9em;
   color: var(--bc, #1c1626);
@@ -2050,35 +2049,6 @@ body.padnav #ui select:focus {
   color: #8a3a00;
   font-weight: 700;
 }
-#sk-ult {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  justify-content: center;
-}
-#sk-ult > span {
-  font:
-    900 clamp(13px, 1.8vw, 18px) Impact,
-    'Arial Black',
-    sans-serif;
-}
-#s-skills .skult {
-  border-left: 10px solid var(--bc);
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-#s-skills .skult.on {
-  background: #ff7a00;
-  color: #fff;
-}
-#s-skills .skult.on i {
-  color: #fff;
-}
-#s-skills .skult i {
-  letter-spacing: 0;
-}
 /* Skills on a phone held sideways: one line per skill, smaller buttons */
 @media (max-height: 440px) {
   #s-skills h2 {
@@ -2102,4 +2072,17 @@ body.padnav #ui select:focus {
   #sk-info {
     min-height: 0;
   }
+}
+#sk-ult {
+  font:
+    800 clamp(11px, 1.5vw, 14px) 'Trebuchet MS',
+    sans-serif;
+  color: #1c6e9a;
+}
+.skultrow {
+  border-top: 2px solid var(--bc);
+}
+#s-skills .sknode.early {
+  border-style: dotted;
+  color: #8a8090;
 }

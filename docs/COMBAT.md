@@ -113,7 +113,7 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 
 ## H. Ultimates (ULT, when the blue meter is full)
 
-Each fighter picks one branch it has a point in; the step comes from its level (5, 15, 30). Every ultimate starts with a burst in the branch's colour, a short slow-motion moment and its name on screen, and the fighter can't be hurt while it plays.
+Each step is bought with a skill point in that branch's ULTIMATE row (level 5, 15, 30, in order), and a fighter has one branch's ultimate at a time. Every ultimate starts with rings in the branch's colour (more and bigger at each step; the level-30 step adds a ground ring and a zoom), the fighter can't be hurt while it plays, and its hits don't freeze the game.
 
 | Branch | Level 5 | Level 15 | Level 30 |
 |---|---|---|---|

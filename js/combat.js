@@ -435,9 +435,10 @@ const WT = {
 };
 const wtOf = d =>
   d.w || (d.dmg >= 10 || d.ef === 'launch' || d.ef === 'splat' ? 'H' : d.dmg >= 7 ? 'M' : 'L');
-function impact(w, dr, x, y, kill) {
+function impact(w, dr, x, y, kill, ult) {
   const t = WT[w];
-  stop = Math.max(stop, Math.round((t.st + (kill ? 2 : 0)) * FEEL.hitstop));
+  // an ultimate's many hits don't freeze the whole game (each enemy still flinches)
+  if (!ult) stop = Math.max(stop, Math.round((t.st + (kill ? 2 : 0)) * FEEL.hitstop));
   shake = Math.max(shake, t.sh);
   camX += dr * t.kx;
   camY += t.ky;
@@ -554,7 +555,7 @@ function hurtE(e, d, dr, src, by) {
   spark(px, py, 10 + d.dmg * 2.2, w === 'H' ? '#ffd400' : '#fff3a0');
   if (w !== 'L') ring(px, py, w === 'H' ? 55 : 35);
   txt(e.x, e.y - 95 * e.s, Math.round(dmg), INK);
-  impact(w, dr, px, py, e.hp <= 0);
+  impact(w, dr, px, py, e.hp <= 0, ap.att && ap.att.d.ul === 'Ult');
   ap.combo++;
   ap.comboT = 100;
   ap.meter = Math.min(100, ap.meter + 4 * meterK(ap, d));
@@ -596,7 +597,7 @@ function pvpHit(q, d, dr, f) {
   q.att = null;
   q.running = q.flip = 0;
   q.pose[9] = 0;
-  impact(w, dr, q.x, q.y - 45);
+  impact(w, dr, q.x, q.y - 45, false, f.att && f.att.d.ul === 'Ult');
   txt(q.x, q.y - 95, dmg, f.col);
   if (q.hp <= 0) {
     Object.assign(q, { hp: 0, st: 'dead', dk: 'back', ddir: dr, vx: dr * 6, vy: -9, sp: 0, deadT: 0 });

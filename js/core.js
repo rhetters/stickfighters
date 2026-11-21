@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 27;
+const GAME_VERSION = 28;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -51,7 +51,8 @@ const HOUSE = {
 //   v10: floors get their own layer (house.floors), so a floor and stairs can share a square
 //   v11: fighters gain headType ('donut' = the ring head they always had, or 'full')
 //   v12: fighters gain prog = { xp, sk (skill points by node id), ult (the branch whose ultimate they use) }
-const SAVE_VERSION = 12;
+//   v13: ultimates are bought as skill-tree nodes, so prog.ult goes; hit-stop and screen shake off, bodies stay 1 s
+const SAVE_VERSION = 13;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -116,6 +117,12 @@ function migrate(s) {
     if (s.chr && Array.isArray(s.chr.list))
       for (const f of s.chr.list) if (f && !f.prog) f.prog = { xp: 0, sk: {}, ult: null };
     s.saveVersion = 12;
+  }
+  if (s.saveVersion === 12) {
+    if (s.chr && Array.isArray(s.chr.list)) for (const f of s.chr.list) if (f && f.prog) delete f.prog.ult;
+    if (s.set && s.set.feel)
+      Object.assign(s.set.feel, { hitstop: 0, shake: 0, body: Math.min(1, +s.set.feel.body || 1) });
+    s.saveVersion = 13;
   }
   return s;
 }
@@ -205,7 +212,9 @@ function camApply(cx, cy, z) {
   ctx.translate(-cx, -G - cy);
 }
 // Feel knobs (training room > Feel). Saved per device.
-const FEEL = { hitstop: 1, shake: 1, kb: 1, grav: 1, bounce: 1, body: 2.5 }; // body = seconds a settled body stays before the confetti
+// Feel knobs. Hit-stop (the freeze on each hit) and screen shake start off; body = seconds a settled body stays before
+// the confetti. Online they're fixed (net/session.js).
+const FEEL = { hitstop: 0, shake: 0, kb: 1, grav: 1, bounce: 1, body: 1 };
 let NB;
 function noise(d, v, hp) {
   if (SET.vol <= 0) return;
@@ -248,11 +257,11 @@ function sfxHit(w) {
   }
 }
 let AC;
-function sfx(f, d, t = 'square', v = 0.05, s = 0) {
+function sfx(f, d, t = 'square', v = 0.05, s = 0, at = 0) {
   if (SET.vol <= 0) return;
   try {
     AC = AC || new AudioContext();
-    const n = AC.currentTime,
+    const n = AC.currentTime + at, // at = seconds from now, for little tunes
       o = AC.createOscillator(),
       g = AC.createGain();
     o.type = t;

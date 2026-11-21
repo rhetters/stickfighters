@@ -5,12 +5,14 @@
 // The fingerprints the game should give. A refactor must not change them; a gameplay change will, and then the new
 // values go here (and in the CHANGELOG entry for that change).
 const SELFTEST_EXPECT = { arcade: 'c87c9470', level: '21292ab5' };
+// The feel the fingerprints were made with (the defaults before hit-stop and shake started off)
+const SELFTEST_FEEL = { hitstop: 1, shake: 1, kb: 1, grav: 1, bounce: 1, body: 2.5 };
 let SELFTESTING = false;
 function selfTest(n) {
   SELFTESTING = true;
   n = n || 3600;
   const keep = { feel: { ...FEEL }, surge: SET.surge, vol: SET.vol };
-  Object.assign(FEEL, FEELDEF);
+  Object.assign(FEEL, SELFTEST_FEEL);
   SET.surge = 'hold';
   SET.vol = 0;
   releaseAll();
