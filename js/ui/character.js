@@ -293,7 +293,8 @@ function renderShelf(c) {
       );
       if (slot === 'legs') legsDone = true;
     }
-    for (const it of ITEMS.filter(i => i.sec === sec)) {
+    // secret items (from the treasure chest's codes) only appear once they're yours
+    for (const it of ITEMS.filter(i => i.sec === sec && !(i.how && i.how.code && !owns(i.id)))) {
       const own = owns(it.id),
         wi = slot === 'pose' ? c.wheel.indexOf(it.id) : -1,
         st = own

@@ -13,6 +13,7 @@ const SCREENS = [
   's-title',
   's-online',
   's-char',
+  's-codes',
   's-skills',
   's-themes',
   's-house',

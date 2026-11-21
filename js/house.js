@@ -550,12 +550,12 @@ const HOUSE_MODE = {
       ctx.fillStyle = INK;
       ctx.font = '900 18px "Trebuchet MS",sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(HVIEW.name || 'MY HOUSE', W / 2, 26);
+      ctx.fillText(HVIEW.name || 'MY HOUSE', W / 2, HUD_Y);
       ctx.font = '700 13px "Trebuchet MS",sans-serif';
       ctx.fillText(
         'Hold Up or Down to take stairs and ladders \u00b7 Down + Jump drops through a floor',
         W / 2,
-        104
+        HUD_Y + 20
       );
     }
   }

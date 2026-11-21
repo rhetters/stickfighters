@@ -48,5 +48,25 @@ await ev("document.querySelector('.thq').click()");await p.waitForTimeout(200);
 ok(await ev("state==='play'&&!!THEMES[LV.run.theme]&&LV.run.myst===true"),'? starts a surprise run');
 ok(await ev("(()=>{cineEnd();RUN.stars=0;RUN.xp=200;grantStars(100,'test');runEnd('v-st',{bonus:SURPRISE_BONUS});return RUN.stars===110&&RUN.last.every(r=>r.xp===220)})()"),'a surprise run earns 10% more stars and XP');
 ok(await ev("(()=>{replayLevel(true);return LV.run.myst===true&&LV.run.ng===1})()"),'its harder replay keeps the bonus');
+// the player bars: name, head, hearts, Surge and the ultimate meter for 1 to 6 players, clear of the stars
+const hb=await ev(`(()=>{const out=[];for(const n of [1,2,4,6]){ROSTER.length=0;if(n>1)for(let i=0;i<n;i++){const L=lookRaw({...FIGHTER0,name:'P'+i,col:['col-orange','col-sky','col-green','col-purple','col-red','col-gold'][i],eq:{...FIGHTER0.eq,hair:'hair-afro'}});ROSTER.push({slot:i,dev:i?'pad:'+i:'kb',col:L.col,d2:L.d2,name:'P'+i,look:L})}
+ startRun('castle');cineEnd();PL.forEach(q=>{q.hp=q.max*0.5;q.meter=60;q.bd={...(q.bd||{}),ult:{nm:'x'}}});render();out.push({n,right:8+n*hudPanelW(),W,heads:PL.every(q=>HUDHEAD.get(q))})}return out})()`);
+ok(hb.every(o=>o.right<=o.W-140&&o.heads),'the player bars fit 1 to 6 players left of the stars, each with a head portrait '+JSON.stringify(hb));
+ok(await ev("typeof hudPlayers==='undefined'&&!/segAt|BIOMES/.test(levelHud.toString())"),'the old bars and the map line are gone');
+// the treasure chest: codes give secret items
+await ev("ECO.own=ECO.own.filter(i=>i!=='shirt-rhett');openTitle();CH.tab='upper';openChar();");
+ok(await ev("!$('ch-chest').hidden&&!ITEMS.filter(i=>i.how&&i.how.code).some(i=>owns(i.id))"),'a chest on the Character screen; the secret shirt isn\'t yours yet');
+ok(await ev("!/Rhett/.test($('s-char').textContent)&&/White Tee/.test($('s-char').textContent)"),'Rhett\'s Shirt isn\'t on any shelf before it\'s redeemed');
+await ev("$('ch-chest').click()");
+ok(await ev("!$('s-codes').hidden&&$('cd-slots').children.length===4&&[...$('cd-slots').children].every(b=>b.dataset.icon==='star')"),'the chest opens the code screen: four slots, all stars');
+await ev("document.querySelectorAll('.cdslot')[2].click()");
+ok(await ev("$('cd-slots').children[2].dataset.icon==='shuriken'"),'tapping a slot changes its icon');
+ok(await ev("!redeemCode()&&$('cd-pop').hidden&&!owns('shirt-rhett')"),'a wrong code gives nothing');
+await ev("for(let i=1;i<CODE_ICONS.length;i++)document.querySelectorAll('.cdslot')[2].click()");
+await ev("$('cd-redeem').click()");
+ok(await ev("owns('shirt-rhett')&&!$('cd-pop').hidden&&$('cd-name').textContent===\"Rhett's Shirt\""),'four stars give Rhett\'s Shirt, shown in a window');
+await ev("$('cd-popback').click();$('cd-back').click()");
+ok(await ev("!$('s-char').hidden&&$('cd-pop').hidden"),'BACK closes the window, then returns to the Character screen');
+ok(await ev("(()=>{CH.tab='upper';renderChar();return /Rhett/.test($('s-char').textContent)})()"),'the shirt is on its shelf now');
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged (looks are drawing only)');
 ok(errs.length===0,'no errors '+errs.join(' | '));console.log(fails?fails+' FAILED':'ALL PASS');await b.close()})();

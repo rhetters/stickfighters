@@ -159,7 +159,7 @@ function drawPickups() {
 // HUD: your ninja stars, next to the score
 function starHud() {
   const b = STARHUD.bump > 0 ? STARHUD.bump-- : 0,
-    x = W - 138,
+    x = W - 56, // top right, beside the pause button
     y = 25;
   shuriken(x - 8, y, 9 + b * 0.25, fr * 0.04);
   ctx.textAlign = 'right';
