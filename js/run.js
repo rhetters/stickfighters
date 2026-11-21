@@ -14,6 +14,16 @@ function runRng(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+// The catapult's arm angle at scene frame t (0 = at rest; the bucket end is down low so you can hop in): pulled
+// down a little more from 45, then flung from 62 until the bucket is up high (where the riders let go, at 67)
+const catArm = t => (t < 45 ? 0.5 : t < 62 ? 0.5 + ((t - 45) / 17) * 0.15 : Math.max(-1.3, 0.65 - (t - 62) * 0.4));
+// Where the middle of the catapult's bucket is at scene frame t (the scene puts the riders there)
+function catBucket(x, t) {
+  const r = -catArm(t),
+    lx = -108,
+    ly = -14;
+  return [x + lx * Math.cos(r) - ly * Math.sin(r), G + 6 - 84 + lx * Math.sin(r) + ly * Math.cos(r)];
+}
 // Transitions that leave something at the start of the next biome (its prop 'trans-<k>out' at this x)
 const OUTS = { pipe: 120, balloon: 300, gondola: 200, landing: 300 };
 // Builds a run: the same shape as buildLevel() (level.js) plus segs (one per biome), trans (transitions) and run.
@@ -48,7 +58,7 @@ function genRun(themeId, seed) {
     return props;
   };
   const chunk = (B, bi, w, props, extra) => {
-    const c = { id: B.look + ch.length, x0: x, w, dusk: 0, flies: 0, props, biome: bi, ...extra };
+    const c = { id: B.look + ch.length, look: B.look, x0: x, w, dusk: 0, flies: 0, props, biome: bi, ...extra };
     ch.push(c);
     x += w;
     return c;
@@ -288,6 +298,38 @@ function cineTick() {
     const tr = c.tr,
       can = c.k === 'cannon',
       bx = can ? tr.x - 70 : tr.x - 46;
+    if (!can) {
+      // the catapult: everyone hops into the bucket and rides it as the arm is pulled back and flung, then flies
+      ps.forEach((p, i) => {
+        const [kx, ky] = catBucket(tr.x, t),
+          ox = (i - (ps.length - 1) / 2) * 12,
+          oy = 28 - (i % 2) * 5;
+        if (t <= 40) {
+          const a = ease(Math.max(0, Math.min(1, (t - i * 4) / 30)));
+          p.x = p.sx + (kx + ox - p.sx) * a;
+          p.y = p.sy + (ky + oy - p.sy) * a - Math.sin(a * Math.PI) * 60;
+          p.pose = [...TUCK];
+        } else if (t <= 66) {
+          p.x = kx + ox;
+          p.y = ky + oy;
+        } else if (t === 67) {
+          p.vx = 7 + i * 0.6;
+          p.vy = -24 - i;
+        }
+        if (t >= 67 && t < 100) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.55;
+          p.pose[9] = (p.pose[9] + 24) % 360;
+        }
+        p.face = 1;
+      });
+      if (t === 62) {
+        sfx(120, 0.4, 'sawtooth', 0.08, 500);
+        noise(0.3, 0.1, 500);
+        shake = Math.max(shake, 6);
+      }
+    } else
     ps.forEach((p, i) => {
       if (t <= 40) {
         // climb in
@@ -311,7 +353,7 @@ function cineTick() {
         p.pose[9] = (p.pose[9] + 24) % 360;
       }
     });
-    if (t === 62) {
+    if (t === 62 && can) {
       sfx(can ? 70 : 120, 0.4, 'sawtooth', 0.08, 500);
       noise(can ? 0.5 : 0.3, can ? 0.16 : 0.1, can ? 200 : 500);
       shake = Math.max(shake, can ? 12 : 6);
@@ -720,6 +762,7 @@ function drawCine() {
   else if (c.k === 'launch' && c.ry !== undefined) drawRocket(c.tr.x, G + 6 - c.ry, c.ry > 0);
   else if (c.k === 'landing' && c.lx !== undefined) drawRocket(c.lx, G + 6 + c.ly, c.ly < 0);
   else if (c.k === 'beam' && c.ux !== undefined) drawSaucer(c.ux, c.uy, c.beam ? c.e : null);
+  else if (c.k === 'catapult' && c.t < 100) drawCatBowl(c.tr.x, c.t);
 }
 // Speech bubble over whoever is talking (world space, drawn by render.js after the fighters)
 function drawSay() {

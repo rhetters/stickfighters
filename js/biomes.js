@@ -17,6 +17,12 @@ const LOOKS = {
   moon: { bg: () => drawMoon(), fg: () => {} }
 };
 const lookOfSeg = s => LOOKS[BIOMES[s.b].look];
+// The castle hall's tall windows: one every CASTLE_WIN px, centred halfway along. Things that hang on the wall
+// (banners, torches, shields) are left out where a window is.
+const CASTLE_WIN = 560,
+  onWindow = (k, x) =>
+    (k === 'banner' || k === 'torch' || k === 'shield') &&
+    Math.abs((((x % CASTLE_WIN) + CASTLE_WIN) % CASTLE_WIN) - CASTLE_WIN / 2) < 46 + 34;
 // ===== SLOPES (a climb biome; LV.ramps from run.js). Drawing only: the game itself stays on flat ground, and each
 // thing is drawn raised by how high the ground under it is, measured from a point near the left of the screen
 // (most of the screen is ahead of the players, so the hill goes up from there). render() turns it on per frame. =====
@@ -109,7 +115,8 @@ function drawLevelBg() {
     if (c.x0 < cx + W + 400 && c.x0 + c.w > cx - 400)
       for (const p of c.props) {
         const x = c.x0 + p.x;
-        if (x > cx - 360 && x < cx + W + 360) lifted(x, () => drawProp(p, x, dk));
+        if (x > cx - 360 && x < cx + W + 360 && !(c.look === 'castle' && onWindow(p.k, x)))
+          lifted(x, () => drawProp(p, x, dk));
       }
   for (const g of LV.gates) lifted(g.x, () => drawGate(g));
   ctx.restore();
@@ -254,8 +261,8 @@ function drawCastle() {
     }
   }
   ctx.stroke();
-  // tall windows every 560 px of the hall, looking out at the sky and the far towers
-  const sp = 560,
+  // tall windows every CASTLE_WIN px of the hall, looking out at the sky and the far towers
+  const sp = CASTLE_WIN,
     i0 = Math.floor((cx - 200) / sp),
     i1 = Math.floor((cx + W + 200) / sp);
   for (let i = i0; i <= i1; i++) {
@@ -473,6 +480,25 @@ function drawBiomeProp(p, x) {
     ctx.beginPath();
     ctx.arc(x, gy - 185, 46, 0, 7);
     ctx.fill();
+  } else if (k === 'staketorch') {
+    // a torch on a wooden stake driven into the ground (the cave has no wall to hang one on)
+    inkRect(x - 5, gy - 150, 10, 150, '#7a6a58');
+    inkRect(x - 9, gy - 160, 18, 14, '#5e5044');
+    const fl = Math.sin(fr * 0.3 + x) * 3;
+    ctx.fillStyle = '#ffb347';
+    ctx.beginPath();
+    ctx.moveTo(x - 10, gy - 160);
+    ctx.quadraticCurveTo(x - 12, gy - 180, x + fl, gy - 196);
+    ctx.quadraticCurveTo(x + 12, gy - 180, x + 10, gy - 160);
+    ctx.fill();
+    ctx.fillStyle = '#ffe28a';
+    ctx.beginPath();
+    ctx.ellipse(x, gy - 170, 4, 9, 0, 0, 7);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,200,90,0.16)';
+    ctx.beginPath();
+    ctx.arc(x, gy - 175, 46, 0, 7);
+    ctx.fill();
   } else if (k === 'pillar') {
     inkRect(x - 22, gy - 280, 44, 280, '#efe9df');
     inkRect(x - 30, gy - 290, 60, 16, '#e2dacd');
@@ -523,10 +549,25 @@ function drawBiomeProp(p, x) {
   }
 }
 // The catapult: its arm swings when the scene fires (run.js, LV.cine)
+// The bucket's bowl, drawn again over the riders so they sit inside it
+function drawCatBowl(x, t) {
+  ctx.save();
+  ctx.translate(x, G + 6 - 84);
+  ctx.rotate(-catArm(t));
+  ctx.fillStyle = '#c9a27a';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(-108, -14, 30, 0.15, Math.PI - 0.15);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
 function drawCatapult(x) {
   const gy = G + 6,
     c = LV.cine && LV.cine.k === 'catapult' ? LV.cine.t : 0,
-    a = c < 45 ? -0.35 : c < 62 ? -0.35 - ((c - 45) / 17) * 0.25 : Math.min(1.1, -0.6 + (c - 62) * 0.25);
+    a = catArm(c);
   inkRect(x - 80, gy - 30, 140, 20, '#c9a27a');
   ctx.fillStyle = '#e8cfa9';
   for (const wx of [x - 60, x + 40]) {
@@ -540,12 +581,15 @@ function drawCatapult(x) {
   ctx.translate(x, gy - 84);
   ctx.rotate(-a);
   inkRect(-110, -6, 130, 12, '#a4794f');
-  ctx.fillStyle = '#c9a27a';
+  // the bucket: its back half here, its front drawn over the riders (drawCatBowl)
+  ctx.fillStyle = '#b08a62';
   ctx.beginPath();
-  ctx.arc(-108, -14, 22, 0, Math.PI);
+  ctx.arc(-108, -14, 30, 0, Math.PI);
+  ctx.closePath();
   ctx.fill();
   ctx.stroke();
   ctx.restore();
+  if (!c) drawCatBowl(x, 0);
 }
 // A big pipe sticking out of the floor; out = the one you pop out of in the next biome
 function drawBigPipe(x, out) {
