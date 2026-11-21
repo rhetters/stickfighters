@@ -245,6 +245,7 @@ function cineStart(k, o) {
       p.sx = p.x;
       p.sy = p.y;
     }
+  LV.cine.ps = PL.filter(p => p.st === 'cine');
 }
 function cineEnd() {
   const c = LV.cine;
@@ -278,7 +279,8 @@ const ease = t => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
 function cineTick() {
   const c = LV.cine,
     t = ++c.t,
-    ps = PL.filter(p => p.st === 'cine');
+    // the players in the scene, fixed when it starts: one who hops out early keeps their place in the order
+    ps = c.ps && c.ps.length ? c.ps : PL.filter(p => p.st === 'cine');
   if (c.k === 'drawin') {
     // the run's opening: the pencil draws each player in turn, then they fill with colour
     PL.forEach((p, i) => {

@@ -74,6 +74,9 @@ ok(two.z<0.9&&two.both,'on the tower the view zooms out to keep both players in 
 ok(await ev("(()=>{SET.seed='3';startRun('space');cineEnd();E.length=0;LV.encs.forEach(e=>e.st=2);let m=0;setA('kb','j',1);for(let i=0;i<60;i++){fr++;update();if(i==2)setA('kb','j',0);m=Math.min(m,CAM.y)}return m===0&&CAM.z===1})()"),'jumping on flat ground never moves the camera');
 ok(await ev("(()=>{SET.seed='3';startRun('space');cineEnd();const s=LV.segs[2];CAM.x=s.x0+100;levelWalls();E.length=0;const e=F(CAM.x+400,'g',-1);e.y=G;E.push(e);e.hp=0;hurtE(e,{dmg:5,kb:9,lift:-9,ef:'launch'},1,null,PL[0]);for(let i=0;i<20;i++){fr++;update()}let n=0;const h0=drawHelmet;drawHelmet=(f,o)=>{if(f===e&&f.rag)n++;h0(f,o)};render();drawHelmet=h0;return n>0})()"),'a flying body on the moon keeps its helmet');
 ok(await ev("['hair-short','hair-buzz','hair-sidepart'].every(id=>ITEM[id]&&ITEM[id].sec==='hair')"),'short hair, buzz cut and side part are in the store');
+// with two players every scene carries both: the second one swings on the rope too (it used to freeze in the air)
+const rp=await ev("(()=>{ROSTER.length=0;ROSTER.push({slot:0,col:'#ff7a00',d2:'#c25a00'},{slot:1,col:'#3ec5ff',d2:'#1f8fc0'});let sd=1;while(!genRun('castle',sd).trans.some(t=>t.k==='rope'))sd++;SET.seed=String(sd);startRun('castle');cineEnd();E.length=0;LV.encs.forEach(e=>e.st=2);const tr=LV.trans.find(t=>t.k==='rope');CAM.x=tr.x-W+260;levelWalls();PL.forEach((p,i)=>{p.x=tr.x-200-i*40;p.y=G});cineStart('rope',{tr});const sw=[0,0];while(LV.cine){fr++;update();PL.forEach((p,i)=>{if(p.rope)sw[i]++})}const r={sw,x:PL.map(p=>Math.round(p.x-tr.nx))};ROSTER.length=0;return r})()");
+ok(rp.sw.every(n=>n>=40),'two players on the rope: both swing across '+JSON.stringify(rp));
 const r5=await play(3,'space');
 ok(r5.state==='clear'&&r5.seen.launch&&r5.seen.landing&&r5.seen.beam,'a Space run plays through: '+Object.keys(r5.seen).join(', '));
 await ev("setA('kb','r',0)");

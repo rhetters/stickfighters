@@ -21,7 +21,8 @@
     b.onclick = f;
     row.appendChild(b);
   }
-  // ADMIN mode: wraps hurtE so a player's hits deal 9999 (never online: the other players' games wouldn't know)
+  // ADMIN mode: wraps hurtE so any hit from a player finishes the enemy (it drops to 1 health first, so the hit
+  // itself and its sparks stay normal size). Never online: the other players' games wouldn't know.
   let admin = false;
   try {
     admin = localStorage.getItem('sfAdmin') === '1';
@@ -45,7 +46,7 @@
   const hurt0 = hurtE;
   hurtE = (e, d, dr, src, by) => {
     const ap = by || src;
-    if (admin && !NET.on && ap && PL.includes(ap) && !PL.includes(e)) d = { ...d, dmg: 9999, exact: 1 };
+    if (admin && !NET.on && ap && PL.includes(ap) && !PL.includes(e)) e.hp = Math.min(e.hp, 1);
     return hurt0(e, d, dr, src, by);
   };
   // a small ADMIN tag at the bottom of the screen while it's on
