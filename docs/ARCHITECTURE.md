@@ -49,7 +49,7 @@ How the code fits together: files, the simulation, and how each system works. Up
 | 39 | `js/ui/themes.js` | Campaign screen: `openThemes(go, back)` shows a card per theme (biomes, boss, best clear); solo and local co-op open it, online the host's room button `#on-theme` picks `NET.theme` |
 | 40 | `js/ui/house.js` | House screen: tabs (walls, barriers, furniture, decorations, background, erase), the palette (`housePal`, buying with the two-tap rule), one button per grid square (`houseCells`; drag paints), `houseAct`, zoom and panning (`houseZoom`, `housePan`), WALK AROUND |
 | 41 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
-| 42 | `js/devtools.js` | TEMPORARY: the TEST row on the Skills screen that sets a fighter's level. Nothing refers to it; remove the file, its script tag and `tools/tests/devtest.js` |
+| 42 | `js/devtools.js` | TEMPORARY: the TEST row on the Skills screen that sets a fighter's level, and ADMIN mode (wraps `hurtE` so players' hits deal 9999, and `hud` to show an ADMIN tag; off online; remembered in its own `sfAdmin` storage key). Nothing refers to it; remove the file, its script tag and `tools/tests/devtest.js` |
 | 43 | `js/selftest.js` | `selfTest()` determinism check and the fingerprints it expects (`SELFTEST_EXPECT`) |
 | 44 | `js/main.js` | Screens, the title menu (`splitOpen` swaps a button for its pair; `titlePoof` plays the orange poof), `playerPause()` (Esc / Start / II: pause, or straight back to the builder when walking around a house), settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
 

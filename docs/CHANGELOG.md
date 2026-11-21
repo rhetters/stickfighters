@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: ADMIN test mode (November 21, 2026)
+- **ADMIN (temporary, for testing levels):** a new ADMIN: OFF/ON button in the TEST ONLY row on the Skills screen. While it's on, every hit a player lands does 9999 damage, so one punch beats anything, bosses included; a small ADMIN tag shows at the bottom of the screen. It's remembered on this device (outside the save) and never works online. It lives entirely in js/devtools.js, to be removed with the rest of the test tools.
+- A menu test sometimes failed at random: it checked PRESS START at an instant when its blink had it hidden. It now checks the text is on screen, blink or not.
+- Version 38.
+
 ## M13 in progress: cave torches, castle windows, a better catapult (November 21, 2026)
 - **Treasure Cave torches** now stand on wooden stakes in the ground instead of floating (the cave has no wall to hang them on).
 - **Castle hall:** the small windows are gone (they could land on top of the tall ones), and banners, torches and shields are no longer hung where a tall window is.
