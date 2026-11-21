@@ -23,7 +23,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
 | M12 | XP, levels, skill tree | Done | L | M3, M8, M10 | Level-ups, skill points, tree screen |
 | M13 | Themes and procedural runs | Done | XL | M8, M10, M12 | Castle Siege, Pirate Cove, Mountain and Space generated from a seed, a Campaign screen, transitions per theme, platforms, mini-bosses, four main bosses |
-| M14 | Boss level | Next | L | M13 | A look of its own for every boss, multi-phase boss fights |
+| M14 | Boss level | Next | L | M13 | A look of its own for every boss, a victory screen and harder replays, multi-phase boss fights |
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
@@ -37,8 +37,8 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 
 - **A look of its own for every theme's boss** (asked by Ron and Rhett, November 21; done in version 44): the Pink General, Captain Pinkbeard, the Pink Yeti and the Pink Alien each wear their own outfit and parts.
 - Boss arena (working name: The Pink General), built on the boss framework the Captain uses: three phases, clear telegraphs, summons from the army, and a health bar.
-- Finishing blow in slow motion with a special death pose.
-- Victory screen and a New Game+ hook.
+- **Finishing blow in slow motion** (done in version 45): the hit that beats a theme's boss slows time, and every enemy still standing is knocked out with it.
+- **Victory screen, ready-up and harder replays** (done in version 45): after a theme, each player's victory pose over their stats (damage dealt and taken, enemies beaten, best combo, revives), a ready button each (a red X or a green check, also in the online room), and when everyone is ready the same theme again, newly generated and one step harder (`+1`, `+2`…). BACK TO PLAYERS and MAIN MENU buttons.
 
 **Done when:** The boss is beatable with any build, alone or in co-op, and hard to beat without learning the combat.
 
@@ -82,4 +82,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-M14: the bosses now look like themselves; next, decide with Ron and Rhett what else the boss fights need (the plan above).
+M14: the bosses now look like themselves, and a theme ends with a slow-motion finishing blow, a victory screen and harder replays; next, decide with Ron and Rhett what else the boss fights need (the plan above).
