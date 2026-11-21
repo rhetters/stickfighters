@@ -157,7 +157,7 @@ function xpScan() {
 const LVUP_T = 150; // frames a level-up celebration lasts
 function levelUpFx(p, lv) {
   LVFX.push({ p, t: fr, lv });
-  playSnd('levelup', 0.9);
+  playSnd('levelup', 0.55);
 }
 // Banks the fight's XP (plus bonuses) for the players on this device. Returns a line for the results screen.
 function runXP(extra) {
