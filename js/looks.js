@@ -355,6 +355,43 @@ function drawHair(it, r, w, capped, wv) {
         c
       );
   switch (it.id) {
+    case 'hair-short':
+      // a close cap of hair over the top and back, with a short fringe at the front
+      if (capped) return;
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 1.2, Math.PI * 0.9, -0.32);
+      ctx.lineTo(r * 0.78, -r * 0.42);
+      ctx.lineTo(r * 0.55, -r * 0.62);
+      ctx.arc(0, 0, r * 0.86, -0.85, Math.PI * 0.92, true);
+      ctx.closePath();
+      shapeDo(c, w);
+      break;
+    case 'hair-buzz':
+      // very short: a thin cap that hugs the head
+      if (capped) return;
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 1.1, Math.PI * 0.95, -0.45);
+      ctx.arc(0, 0, r * 0.93, -0.45, Math.PI * 0.95, true);
+      ctx.closePath();
+      shapeDo(c, w * 0.6);
+      break;
+    case 'hair-sidepart':
+      // short at the back, swept up and over at the front
+      if (capped) return;
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 1.2, Math.PI * 0.9, Math.PI * 1.62);
+      ctx.quadraticCurveTo(r * 0.7, -r * 1.65, r * 1.12, -r * 0.62);
+      ctx.quadraticCurveTo(r * 0.75, -r * 0.6, r * 0.45, -r * 0.72);
+      ctx.arc(0, 0, r * 0.86, -1.0, Math.PI * 0.92, true);
+      ctx.closePath();
+      shapeDo(c, w);
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.lineWidth = Math.max(1, w * 0.4);
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.2, -r * 1.15);
+      ctx.quadraticCurveTo(r * 0.3, -r * 1.3, r * 0.8, -r * 0.85);
+      ctx.stroke();
+      break;
     case 'hair-spiky':
       if (capped) return;
       ctx.beginPath();
