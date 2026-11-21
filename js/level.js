@@ -332,6 +332,6 @@ const LEVEL = {
   bg: () => drawLevelBg(),
   fg: () => drawLevelFg(),
   hud: levelHud,
-  world: () => drawSay(),
+  world: () => (drawCine(), drawSay()),
   revive: 1
 };

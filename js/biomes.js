@@ -8,9 +8,38 @@ const LOOKS = {
   castle: { bg: () => drawCastle(), fg: () => drawCastleFg() },
   beach: { bg: () => drawBeach(), fg: () => drawBeachFg() },
   ship: { bg: () => drawShip(), fg: () => drawBeachFg() },
-  cave: { bg: () => drawCave(), fg: () => drawSewerFg(1) }
+  cave: { bg: () => drawCave(), fg: () => drawSewerFg(1) },
+  meadow: { bg: () => drawMeadow(), fg: () => drawWoodsFg() },
+  slope: { bg: () => drawSlope(), fg: () => {} },
+  peak: { bg: () => drawPeak(), fg: () => drawSnowFg() }
 };
 const lookOfSeg = s => LOOKS[BIOMES[s.b].look];
+// ===== SLOPES (a climb biome; LV.ramps from run.js). Drawing only: the game itself stays on flat ground, and each
+// thing is drawn raised by how high the ground under it is, measured from a point near the left of the screen
+// (most of the screen is ahead of the players, so the hill goes up from there). render() turns it on per frame. =====
+let slopeOn = false,
+  slopeRef = 0;
+const SLOPE_REF = 150;
+function altAt(x) {
+  let a = 0;
+  for (const r of LV.ramps) a += r.k * Math.max(0, Math.min(x, r.x1) - r.x0);
+  return a;
+}
+function slopeStart() {
+  slopeOn = !!(MODE === LEVEL && LV && LV.ramps);
+  slopeRef = slopeOn ? altAt(CAM.x + SLOPE_REF) : 0;
+}
+// How far down (negative = up) to draw something standing at world x
+const upAt = x => (slopeOn ? slopeRef - altAt(x) : 0);
+// Draws fn() moved to the height of the ground at x
+function lifted(x, fn) {
+  const u = upAt(x);
+  if (!u) return fn();
+  ctx.save();
+  ctx.translate(0, u);
+  fn();
+  ctx.restore();
+}
 // The paper and its grid, scrolling with the camera
 function paperBg() {
   ctx.fillStyle = '#fbfaf4';
@@ -74,9 +103,9 @@ function drawLevelBg() {
     if (c.x0 < cx + W + 400 && c.x0 + c.w > cx - 400)
       for (const p of c.props) {
         const x = c.x0 + p.x;
-        if (x > cx - 360 && x < cx + W + 360) drawProp(p, x, dk);
+        if (x > cx - 360 && x < cx + W + 360) lifted(x, () => drawProp(p, x, dk));
       }
-  for (const g of LV.gates) drawGate(g);
+  for (const g of LV.gates) lifted(g.x, () => drawGate(g));
   ctx.restore();
 }
 function drawLevelFg() {
@@ -476,7 +505,9 @@ function drawBiomeProp(p, x) {
     ctx.stroke();
   } else if (k === 'trans-catapult') drawCatapult(x);
   else if (k === 'trans-cannon') drawBigCannon(x);
+  else if (drawMountainTransDone(k, x)) return;
   else if (drawPiratePropDone(k, x, s)) return;
+  else if (drawMountainPropDone(k, x, s)) return;
   else if (k === 'trans-pipe' || k === 'trans-pipeout') drawBigPipe(x, k === 'trans-pipeout');
   else if (k === 'trans-rope') drawChasm(x);
   else if (k === 'trans-gate') {
@@ -1018,6 +1049,489 @@ function drawPiratePropDone(k, x, s) {
       ctx.fill();
       ctx.stroke();
     }
+  } else return false;
+  return true;
+}
+
+// ===== MOUNTAIN: an alpine meadow under snowy peaks, the mountainside you climb, the snowy peak =====
+// Far snowy peaks; dy moves them down as you climb (they're far, so they sink slowly)
+function farPeaks(f, dy, col) {
+  layer(f, 330, 23, (x, r) => {
+    const h = 150 + r * 110,
+      w = 170 + r * 70,
+      by = G - 40 + dy;
+    ctx.fillStyle = col;
+    ctx.strokeStyle = '#a9b4c2';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x - w, by);
+    ctx.lineTo(x, by - h);
+    ctx.lineTo(x + w, by);
+    ctx.fill();
+    ctx.stroke();
+    // the snow cap
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(x - w * 0.3, by - h * 0.7);
+    ctx.lineTo(x, by - h);
+    ctx.lineTo(x + w * 0.3, by - h * 0.7);
+    ctx.lineTo(x + w * 0.12, by - h * 0.62);
+    ctx.lineTo(x, by - h * 0.72);
+    ctx.lineTo(x - w * 0.14, by - h * 0.6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  });
+}
+function skyWash(top, bot, a) {
+  const sky = ctx.createLinearGradient(0, 0, 0, G);
+  sky.addColorStop(0, top);
+  sky.addColorStop(1, bot);
+  ctx.globalAlpha = a;
+  ctx.fillStyle = sky;
+  ctx.fillRect(-30, -30, W + 60, H + 60);
+  ctx.globalAlpha = 1;
+}
+function groundLine() {
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-30, G + 6);
+  ctx.lineTo(W + 30, G + 6);
+  ctx.stroke();
+}
+function drawMeadow() {
+  paperBg();
+  skyWash('#a7d3f2', '#f6f8ec', 0.4);
+  farPeaks(0.06, 0, '#dfe6ef');
+  // green hills (1/4 speed)
+  layer(0.25, 260, 29, (x, r) => {
+    ctx.fillStyle = 'rgba(150,200,120,0.35)';
+    ctx.strokeStyle = 'rgba(110,160,90,0.6)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(x, G + 10, 200 + r * 80, 70 + r * 50, 0, Math.PI, 0);
+    ctx.fill();
+    ctx.stroke();
+  });
+  ctx.fillStyle = '#e3f1cf';
+  ctx.fillRect(-30, G + 6, W + 60, H);
+  ctx.fillStyle = '#c4dea6';
+  layer(1, 41, 67, (x, r) => {
+    ctx.beginPath();
+    ctx.ellipse(x, G + 18 + r * 40, 6 + r * 6, 2.5, 0, 0, 7);
+    ctx.fill();
+  });
+  groundLine();
+}
+// The mountainside: the ground is drawn following the slopes (upAt), with rock below it
+function drawSlope() {
+  const cx = CAM.x,
+    dy = Math.min(140, slopeRef * 0.12);
+  paperBg();
+  skyWash('#94c3ea', '#eef3f6', 0.45);
+  farPeaks(0.05, dy, '#e4e9f0');
+  // a nearer ridge (1/3 speed), sinking a little faster as you climb
+  layer(0.33, 300, 31, (x, r) => {
+    const by = G + 30 + dy * 1.6;
+    ctx.fillStyle = 'rgba(160,150,140,0.3)';
+    ctx.strokeStyle = 'rgba(120,110,100,0.5)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x - 200, by);
+    ctx.lineTo(x - 60, by - 120 - r * 60);
+    ctx.lineTo(x + 30, by - 90 - r * 40);
+    ctx.lineTo(x + 200, by);
+    ctx.fill();
+    ctx.stroke();
+  });
+  // the hillside under the path
+  const pts = [];
+  for (let sx = -30; sx <= W + 30; sx += 15) pts.push([sx, G + 6 + upAt(cx + sx)]);
+  ctx.fillStyle = '#e2dbcf';
+  ctx.beginPath();
+  ctx.moveTo(-30, H + 30);
+  for (const [px, py] of pts) ctx.lineTo(px, py);
+  ctx.lineTo(W + 30, H + 30);
+  ctx.closePath();
+  ctx.fill();
+  // rock layers following the hill, and pebbles
+  ctx.strokeStyle = 'rgba(150,135,120,0.45)';
+  ctx.lineWidth = 2;
+  for (const d of [22, 48]) {
+    ctx.beginPath();
+    pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py + d) : ctx.moveTo(px, py + d)));
+    ctx.stroke();
+  }
+  ctx.fillStyle = '#c4b9a8';
+  layer(1, 53, 71, (x, r) => {
+    ctx.beginPath();
+    ctx.ellipse(x, G + 16 + r * 50 + upAt(cx + x), 5 + r * 6, 3, 0, 0, 7);
+    ctx.fill();
+  });
+  // a sprinkle of grass at the edge of the path
+  ctx.strokeStyle = '#8fae74';
+  ctx.lineWidth = 2.5;
+  layer(1, 37, 79, (x, r) => {
+    if (r < 0.5) return;
+    const y = G + 6 + upAt(cx + x);
+    ctx.beginPath();
+    ctx.moveTo(x - 4, y);
+    ctx.lineTo(x - 7, y - 9);
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + 1, y - 12);
+    ctx.moveTo(x + 4, y);
+    ctx.lineTo(x + 8, y - 8);
+    ctx.stroke();
+  });
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+  ctx.stroke();
+}
+function drawPeak() {
+  paperBg();
+  skyWash('#b9d6f0', '#ffffff', 0.45);
+  farPeaks(0.05, 60, '#f1f4f8');
+  // snowy drifts (1/3 speed)
+  layer(0.3, 230, 43, (x, r) => {
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.strokeStyle = 'rgba(150,175,200,0.6)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(x, G + 8, 160 + r * 80, 40 + r * 40, 0, Math.PI, 0);
+    ctx.fill();
+    ctx.stroke();
+  });
+  ctx.fillStyle = '#f6f9fc';
+  ctx.fillRect(-30, G + 6, W + 60, H);
+  ctx.fillStyle = '#dbe6f0';
+  layer(1, 47, 89, (x, r) => {
+    ctx.beginPath();
+    ctx.ellipse(x, G + 20 + r * 40, 14 + r * 10, 3, 0, 0, 7);
+    ctx.fill();
+  });
+  groundLine();
+}
+// Falling snow in front
+function drawSnowFg() {
+  if (!live()) return;
+  if (AMB.filter(a => a.k === 'snow').length < 40 && Math.random() < 0.4)
+    AMB.push({ k: 'snow', x: Math.random() * (W + 200), y: -10, vx: -0.6 - Math.random() * 0.6, vy: 0.8 + Math.random() * 1.2, r: 1.5 + Math.random() * 2.5 });
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.strokeStyle = 'rgba(140,160,190,0.6)';
+  ctx.lineWidth = 1;
+  for (let i = AMB.length - 1; i >= 0; i--) {
+    const a = AMB[i];
+    if (a.k !== 'snow') continue;
+    a.x += a.vx + Math.sin((fr + i * 13) * 0.05) * 0.4;
+    a.y += a.vy;
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, a.r, 0, 7);
+    ctx.fill();
+    ctx.stroke();
+    if (a.y > H + 10) AMB.splice(i, 1);
+  }
+}
+// Meadow, mountainside and peak props; returns true when it drew one
+function drawMountainPropDone(k, x, s) {
+  const gy = G + 6;
+  if (k === 'flowers') {
+    const cols = ['#ff7eb6', '#ffd23f', '#ffffff', '#b48cff'];
+    ctx.strokeStyle = '#6f9a58';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+      const fx = x - 24 + i * 12,
+        h = 10 + ((i * 7) % 9);
+      ctx.beginPath();
+      ctx.moveTo(fx, gy);
+      ctx.lineTo(fx + 1, gy - h);
+      ctx.stroke();
+      ctx.fillStyle = cols[i % 4];
+      ctx.beginPath();
+      ctx.arc(fx + 1, gy - h, 4, 0, 7);
+      ctx.fill();
+    }
+  } else if (k === 'fence') {
+    ctx.strokeStyle = '#8a6a48';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    for (const dx of [-60, 0, 60]) {
+      ctx.moveTo(x + dx, gy);
+      ctx.lineTo(x + dx, gy - 46);
+    }
+    ctx.moveTo(x - 70, gy - 36);
+    ctx.lineTo(x + 70, gy - 36);
+    ctx.moveTo(x - 70, gy - 18);
+    ctx.lineTo(x + 70, gy - 18);
+    ctx.stroke();
+  } else if (k === 'haybale') {
+    ctx.fillStyle = '#f0d27a';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(x, gy - 26 * s, 34 * s, 26 * s, 0, 0, 7);
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = '#c9a54a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(x, gy - 26 * s, 20 * s, 15 * s, 0, 0, 7);
+    ctx.ellipse(x, gy - 26 * s, 8 * s, 6 * s, 0, 0, 7);
+    ctx.stroke();
+  } else if (k === 'boulder') {
+    ctx.fillStyle = '#d6cfc3';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(x - 50 * s, gy);
+    ctx.quadraticCurveTo(x - 56 * s, gy - 60 * s, x - 10 * s, gy - 74 * s);
+    ctx.quadraticCurveTo(x + 46 * s, gy - 70 * s, x + 52 * s, gy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = '#a89e8f';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x - 20 * s, gy - 50 * s);
+    ctx.lineTo(x, gy - 34 * s);
+    ctx.stroke();
+  } else if (k === 'cairn') {
+    ctx.fillStyle = '#cfc8bd';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.5;
+    let y = gy;
+    for (const w of [26, 21, 16, 11, 7]) {
+      ctx.beginPath();
+      ctx.ellipse(x, y - w * 0.45, w, w * 0.45, 0, 0, 7);
+      ctx.fill();
+      ctx.stroke();
+      y -= w * 0.9;
+    }
+  } else if (k === 'snowpine') {
+    // a pine with snow on its branches
+    inkRect(x - 5 * s, gy - 30 * s, 10 * s, 30 * s, '#a4794f', 3);
+    for (let i = 0; i < 3; i++) {
+      const by = gy - 26 * s - i * 40 * s,
+        w = (52 - i * 13) * s;
+      ctx.fillStyle = '#9cc49a';
+      ctx.strokeStyle = '#4f7f4f';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x - w, by);
+      ctx.lineTo(x, by - 60 * s);
+      ctx.lineTo(x + w, by);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(x - w * 0.9, by - 2);
+      ctx.quadraticCurveTo(x, by - 16 * s, x + w * 0.9, by - 2);
+      ctx.quadraticCurveTo(x, by - 6 * s, x - w * 0.9, by - 2);
+      ctx.fill();
+    }
+  } else if (k === 'snowman') {
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    for (const [dy, r] of [
+      [22, 24],
+      [62, 18],
+      [92, 13]
+    ]) {
+      ctx.beginPath();
+      ctx.arc(x, gy - dy, r, 0, 7);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#ff9a3c';
+    ctx.beginPath();
+    ctx.moveTo(x + 4, gy - 93);
+    ctx.lineTo(x + 22, gy - 90);
+    ctx.lineTo(x + 4, gy - 87);
+    ctx.fill();
+    ctx.fillStyle = INK;
+    for (const dx of [-5, 5]) {
+      ctx.beginPath();
+      ctx.arc(x + dx - 2, gy - 98, 2, 0, 7);
+      ctx.fill();
+    }
+    ctx.strokeStyle = '#ff4fa3';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(x - 14, gy - 80);
+    ctx.lineTo(x + 14, gy - 80);
+    ctx.lineTo(x + 18, gy - 62);
+    ctx.stroke();
+  } else if (k === 'flag') {
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x, gy);
+    ctx.lineTo(x, gy - 120);
+    ctx.stroke();
+    const w = Math.sin(fr * 0.12 + x) * 5;
+    ctx.fillStyle = '#ff4fa3';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x, gy - 120);
+    ctx.quadraticCurveTo(x + 22, gy - 116 + w, x + 46, gy - 108);
+    ctx.quadraticCurveTo(x + 22, gy - 100 + w, x, gy - 96);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  } else if (k === 'iceblock') {
+    ctx.fillStyle = 'rgba(180,225,250,0.85)';
+    ctx.strokeStyle = '#4a7fa0';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x - 30 * s, gy);
+    ctx.lineTo(x - 26 * s, gy - 44 * s);
+    ctx.lineTo(x + 8 * s, gy - 54 * s);
+    ctx.lineTo(x + 30 * s, gy - 36 * s);
+    ctx.lineTo(x + 28 * s, gy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.beginPath();
+    ctx.moveTo(x - 16 * s, gy - 36 * s);
+    ctx.lineTo(x - 2 * s, gy - 42 * s);
+    ctx.stroke();
+  } else return false;
+  return true;
+}
+// The transition this prop belongs to (its x), and whether its vehicle is away (riding now, or already gone)
+const transAt = x => LV.trans && LV.trans.find(t => t.x === x);
+const riding = k => LV.cine && LV.cine.k === k;
+// A hot-air balloon: x = the basket's middle, y = the basket's bottom
+function drawBalloon(x, y) {
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (const d of [-26, 26]) {
+    ctx.moveTo(x + d, y - 46);
+    ctx.lineTo(x + d * 1.6, y - 120);
+  }
+  ctx.stroke();
+  // the envelope, in stripes
+  const ey = y - 200;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x - 40, y - 118);
+  ctx.bezierCurveTo(x - 120, y - 170, x - 110, ey - 110, x, ey - 110);
+  ctx.bezierCurveTo(x + 110, ey - 110, x + 120, y - 170, x + 40, y - 118);
+  ctx.closePath();
+  ctx.fillStyle = '#ff4fa3';
+  ctx.fill();
+  ctx.clip();
+  ctx.fillStyle = '#ffd23f';
+  for (const sx of [-60, 0, 60]) {
+    ctx.beginPath();
+    ctx.ellipse(x + sx, ey - 10, 14, 120, 0, 0, 7);
+    ctx.fill();
+  }
+  ctx.restore();
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x - 40, y - 118);
+  ctx.bezierCurveTo(x - 120, y - 170, x - 110, ey - 110, x, ey - 110);
+  ctx.bezierCurveTo(x + 110, ey - 110, x + 120, y - 170, x + 40, y - 118);
+  ctx.closePath();
+  ctx.stroke();
+  // the basket
+  inkRect(x - 32, y - 46, 64, 46, '#c99c6e', 4);
+  ctx.strokeStyle = '#8a6a48';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 1; i < 4; i++) {
+    ctx.moveTo(x - 32, y - 46 + i * 11.5);
+    ctx.lineTo(x + 32, y - 46 + i * 11.5);
+  }
+  ctx.stroke();
+}
+// A gondola cabin hanging from its cable: x, y = where it hangs from the cable; the cabin's floor is 70 below
+function drawGondolaCab(x, y) {
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x, y - 6);
+  ctx.lineTo(x, y + 12);
+  ctx.stroke();
+  ctx.fillStyle = '#4a4252';
+  ctx.beginPath();
+  ctx.arc(x, y - 6, 7, 0, 7);
+  ctx.fill();
+  inkRect(x - 40, y + 12, 80, 58, '#ff4fa3', 4);
+  for (const wx of [-30, 4]) inkRect(x + wx, y + 20, 26, 22, '#cfe9fb', 3);
+}
+// Cable up from a station at (x, y), going up-right (dir 1) or coming down from the left (dir -1)
+function cableFrom(x, y, dir) {
+  ctx.strokeStyle = '#4a4252';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + dir * 1400, y - 1400 * (dir > 0 ? 3.4 / 5 : 240 / 400));
+  ctx.stroke();
+}
+function drawGondolaStation(x, dir, cab) {
+  const gy = G + 6;
+  // the tower and its roof
+  inkRect(x - 70, gy - 150, 18, 150, '#a4794f', 4);
+  inkRect(x + 52, gy - 150, 18, 150, '#a4794f', 4);
+  inkRect(x - 90, gy - 170, 180, 22, '#8a6a48', 4);
+  cableFrom(x, gy - 76, dir);
+  if (cab) drawGondolaCab(x, gy - 76);
+}
+function drawMountainTransDone(k, x) {
+  const gy = G + 6;
+  if (k === 'trans-balloon') {
+    const t = transAt(x);
+    if (!(t && (t.done || riding('balloon')))) drawBalloon(x, gy);
+  } else if (k === 'trans-balloonout') {
+    if (!riding('balloon')) drawBalloon(x, gy);
+  } else if (k === 'trans-gondola') {
+    const t = transAt(x);
+    drawGondolaStation(x, 1, !(t && (t.done || riding('gondola'))));
+  } else if (k === 'trans-gondolaout') {
+    drawGondolaStation(x, -1, !riding('gondola'));
+  } else if (k === 'trans-climb') {
+    // the cliff, with a rope ladder up it
+    ctx.fillStyle = '#d6cdbf';
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x + 10, gy);
+    ctx.lineTo(x + 20, gy - 160);
+    ctx.lineTo(x + 6, gy - 300);
+    ctx.lineTo(x + 18, -40);
+    ctx.lineTo(x + 1000, -40);
+    ctx.lineTo(x + 1000, gy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(150,135,120,0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 1; i < 6; i++) {
+      ctx.moveTo(x + 60 + i * 40, gy - i * 55);
+      ctx.lineTo(x + 140 + i * 40, gy - i * 55 - 20);
+    }
+    ctx.stroke();
+    ctx.strokeStyle = '#a4794f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + 24, gy);
+    ctx.lineTo(x + 24, -40);
+    ctx.moveTo(x + 44, gy);
+    ctx.lineTo(x + 44, -40);
+    for (let y = gy - 14; y > -40; y -= 22) {
+      ctx.moveTo(x + 24, y);
+      ctx.lineTo(x + 44, y);
+    }
+    ctx.stroke();
   } else return false;
   return true;
 }

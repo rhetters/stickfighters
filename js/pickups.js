@@ -153,8 +153,7 @@ function giftDraw(k) {
 function drawPickups() {
   for (const k of PK) {
     if (k.t < 0) continue;
-    if (k.k === 's') shuriken(k.x, k.y, 7, k.a);
-    else giftDraw(k);
+    lifted(k.x, () => (k.k === 's' ? shuriken(k.x, k.y, 7, k.a) : giftDraw(k)));
   }
 }
 // HUD: your ninja stars, next to the score
