@@ -75,7 +75,6 @@ const BIOMES = {
       ['banner', 3],
       ['torch', 3],
       ['pillar', 2],
-      ['window', 2],
       ['shield', 1]
     ],
     w: [1050, 1300],
@@ -136,7 +135,7 @@ const BIOMES = {
       ['stalagmite', 3],
       ['crystal', 3],
       ['chest', 2],
-      ['torch', 2],
+      ['staketorch', 2],
       ['coins', 2]
     ],
     w: [1050, 1300],
