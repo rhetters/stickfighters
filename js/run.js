@@ -236,6 +236,7 @@ function biomeDone(bid) {
 const nextTrans = () => (LV.trans ? LV.trans.find(t => !t.done) : null);
 // ===== SCENES (LV.cine): transitions and boss intros. Players ride them; nothing else moves. =====
 function cineStart(k, o) {
+  if (ownView() && k !== 'drawin') warpIn(); // online, anyone far behind joins the scene
   LV.cine = { k, t: 0, ...o };
   for (const p of PL)
     if (k !== 'jump' && p.st !== 'dead') {

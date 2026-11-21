@@ -86,13 +86,22 @@ function continueLevel() {
   bn('CONTINUE!');
 }
 // Walls for living fighters: the screen edges, or the gate if it is closer.
-// Online the group is on a leash instead of one shared screen: each screen follows its own player (render.js), and
-// anyone can fall up to LEASH px behind the left of the group's camera before that edge pushes them along. When a
-// fight starts, anyone outside its arena is brought in.
-const LEASH = 450;
-const leashOn = () => NET.match && MODE === LEVEL;
+// Online each screen follows its own player (render.js) and players roam freely behind the group: outside fights
+// nothing holds them back but the start of the run. When a fight or a scene starts, anyone outside the group's
+// screen is brought in (warpIn), like a fight's arena walls bring everyone together.
+const ownView = () => NET.match && MODE === LEVEL;
+function warpIn() {
+  PL.forEach((p, i) => {
+    if (p.st !== 'dead' && p.x < CAM.x + 30) {
+      p.x = CAM.x + 60 + i * 30;
+      p.y = Math.min(p.y, G);
+      p.vx = 0;
+      ring(p.x, p.y - 45, 40);
+    }
+  });
+}
 function levelWalls() {
-  WB.l = leashOn() && !LV.encs.some(e => e.st === 1) ? Math.max(0, CAM.x - LEASH) : CAM.x;
+  WB.l = ownView() && !LV.encs.some(e => e.st === 1) ? 0 : CAM.x;
   WB.r = CAM.x + W;
   const g = LV.gates.find(g => g.hp > 0);
   if (g && g.x - 44 < WB.r) WB.r = g.x - 44;
@@ -172,15 +181,8 @@ function levelTick() {
     if (d > 0) CAM.x += Math.min(d, 1 + d * 0.08);
     if (ne && CAM.x >= ne.lock - 0.5) {
       ne.st = 1;
-      // stragglers (online, on the leash) are brought into the arena
-      if (leashOn())
-        PL.forEach((p, i) => {
-          if (p.st !== 'dead' && p.x < CAM.x + 30) {
-            p.x = CAM.x + 60 + i * 30;
-            p.vx = 0;
-            ring(p.x, p.y - 45, 40);
-          }
-        });
+      // online, anyone left behind is brought into the arena
+      if (ownView()) warpIn();
       ne.q = ne.list.slice();
       coopExtra(ne.q);
       wave = ne.lvl;
@@ -203,7 +205,7 @@ function levelTick() {
     const there = trc && (trc.top ? alive.some(p => p.gy <= trc.top + 1 && p.x >= trc.deck) : lead >= trc.x - 150);
     if (there && !LV.encs.some(e => e.st === 1)) cineStart(trc.k, { tr: trc });
     // online each screen frames only its own player (CAM.y and CAM.z are drawing only)
-    if (LV.terr) levelCamUp(leashOn() ? alive.filter(p => p.slot === NET.mySlot) : alive);
+    if (LV.terr) levelCamUp(ownView() ? alive.filter(p => p.slot === NET.mySlot) : alive);
   }
   levelWalls();
   if (ae) {
