@@ -299,42 +299,7 @@ function levelFail() {
 }
 // HUD: level name, a trail map with the fights, the gate and you, enemies left, and the GO arrow.
 function levelHud() {
-  // a campaign run shows the biome you're in, and its stretch of the map
-  const sg = LV.segs && segAt(CAM.x + W / 2),
-    x0 = sg ? sg.x0 : 0,
-    x1 = sg ? sg.x1 : LV.len;
-  ctx.fillText(sg ? LV.def.name + ' · ' + BIOMES[sg.b].name : LV.def.name, W / 2, 26);
-  const bw = 230,
-    bx = W / 2 - bw / 2,
-    by = 38,
-    X = x => bx + bw * Math.max(0, Math.min(1, (x - x0) / (x1 - x0))),
-    lead = Math.max(...PL.map(p => p.x));
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(bx, by);
-  ctx.lineTo(bx + bw, by);
-  ctx.stroke();
-  for (const e of LV.encs) {
-    if (e.x < x0 || e.x > x1) continue;
-    ctx.fillStyle = e.st === 2 ? '#7a6e80' : e.st === 1 ? '#e8212b' : '#ff4fa3';
-    ctx.beginPath();
-    ctx.arc(X(e.x), by, 5, 0, 7);
-    ctx.fill();
-  }
-  for (const g of LV.gates) {
-    if (g.x < x0 || g.x > x1 + 10) continue;
-    ctx.fillStyle = g.hp > 0 ? '#a4794f' : '#d9d3c6';
-    ctx.fillRect(X(g.x) - 4, by - 4, 8, 8);
-  }
-  ctx.fillStyle = INK;
-  ctx.fillRect(bx + bw - 2, by - 10, 3, 10);
-  ctx.fillStyle = '#ff7a00';
-  ctx.beginPath();
-  ctx.arc(Math.min(bx + bw, X(lead)), by, 6, 0, 7);
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // enemies left in the fight, or GO → once it's won (the player bars are in render.js)
   const ae = LV.encs.find(e => e.st === 1);
   if (ae) {
     const n = ae.q.length + E.filter(e => !e.dying).length;

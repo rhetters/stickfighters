@@ -444,9 +444,8 @@ body:not(.padnav) :focus {
 #pausebtn {
   position: absolute;
   z-index: 4;
-  left: 50%;
-  top: 11%;
-  transform: translateX(-50%);
+  right: 1.2%;
+  top: 2.5%;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -1648,8 +1647,8 @@ body.padnav #ui select:focus {
 }
 .ontimg {
   display: block;
-  height: max(110px, min(calc(40vw - 190px), calc(100vh - 220px), 280px)); /* fits under ONLINE with BACK below */
-  aspect-ratio: 418 / 433;
+  height: max(100px, min(calc(var(--wh, 440px) - 210px), 300px)); /* fits the game frame (--wh) under ONLINE, with BACK below */
+  aspect-ratio: 420 / 436;
   background: center / contain no-repeat;
   filter: grayscale(1) contrast(0.7) brightness(1.08);
   transition:
@@ -2314,4 +2313,122 @@ body.padnav .thcard:focus {
 }
 #v-st {
   font-size: clamp(12px, 1.5vw, 15px);
+}
+/* The treasure chest (Character screen, bottom right) and its code screen */
+#ch-chest {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  width: 62px;
+  height: 56px;
+  padding: 4px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+#ch-chest svg {
+  width: 100%;
+  height: 100%;
+}
+@media (hover: hover) {
+  #ch-chest:hover {
+    transform: scale(1.1) rotate(-4deg);
+  }
+}
+#ch-chest:active,
+body.padnav #ch-chest:focus {
+  transform: scale(1.1) rotate(-4deg);
+  outline: 3px solid #ff7a00;
+  border-radius: 10px;
+}
+#cd-slots {
+  display: flex;
+  gap: clamp(10px, 2.5vw, 24px);
+  margin: 8px 0 14px;
+}
+.cdslot {
+  width: min(120px, 17vw, calc(var(--wh, 440px) * 0.3));
+  aspect-ratio: 1;
+  padding: 8px;
+  border: 4px solid #1c1626;
+  border-radius: 16px;
+  background: #fff8ee;
+  box-shadow: 0 5px 0 #1c1626;
+  cursor: pointer;
+}
+.cdslot canvas {
+  width: 100%;
+  height: 100%;
+}
+.cdslot:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #1c1626;
+}
+body.padnav .cdslot:focus {
+  outline: 4px solid #ff7a00;
+}
+#cd-slots.shake {
+  animation: cdshake 0.4s;
+}
+@keyframes cdshake {
+  20%,
+  60% {
+    transform: translateX(-10px);
+  }
+  40%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+.cdbtns {
+  display: flex;
+  gap: 12px;
+}
+.cdbtns .btn {
+  min-width: 0;
+  width: auto;
+}
+/* The item a code gave: a window over the code screen, BACK under it */
+#cd-pop {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(28, 22, 38, 0.55);
+}
+#cd-pop[hidden] {
+  display: none;
+}
+.cdwin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 34px 18px;
+  border: 5px solid #1c1626;
+  border-top: 16px solid #ffd400;
+  border-radius: 18px;
+  background: #fff8ee;
+  animation: cdpop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.cdwin canvas {
+  width: 200px;
+  height: 160px;
+}
+#cd-name {
+  font:
+    900 clamp(22px, 3.6vw, 34px) Impact,
+    'Arial Black',
+    sans-serif;
+  color: #1c1626;
+}
+@keyframes cdpop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
 }

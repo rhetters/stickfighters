@@ -112,6 +112,8 @@ const ITEMS = [
   { id: 'shirt-blue', sec: 'shirt', name: 'Blue Tee', c: '#2a55c9', k: 'tee', price: 30 },
   { id: 'shirt-stripe', sec: 'shirt', name: 'Striped Tee', c: '#ffffff', c2: '#2a55c9', k: 'tee', price: 60 },
   { id: 'shirt-tank', sec: 'shirt', name: 'Tank Top', c: '#3ccf6e', k: 'tank', price: 40 },
+  // secret: only from a code in the treasure chest, and not shown on the shelves until it's yours
+  { id: 'shirt-rhett', sec: 'shirt', name: "Rhett's Shirt", c: '#2fa84f', k: 'tee', how: { code: 1 } },
   { id: 'shirt-long', sec: 'shirt', name: 'Long Sleeves', c: '#2b2533', k: 'long', price: 50 },
   { id: 'shirt-jersey', sec: 'shirt', name: 'Jersey', c: '#ffd400', c2: '#2a55c9', k: 'tee', price: 90 },
   // jackets
@@ -315,6 +317,10 @@ const ITEMS = [
 for (const it of ITEMS) it.slot = SECS[it.sec].slot;
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 // Idle stances (cosmetic: only how you stand while waiting). Same pose format as moves.js.
+// The treasure chest's codes (Character screen, ui/codes.js): four icons, by their place in CODE_ICONS, and the
+// item each code gives. Four stars (what the chest starts on) gives Rhett's Shirt.
+const CODE_ICONS = ['star', 'shuriken', 'heart', 'crown', 'bolt', 'flame', 'moon', 'drop'];
+const CODES = [{ code: [0, 0, 0, 0], item: 'shirt-rhett' }];
 const STANCES = [
   { id: 'classic', name: 'Classic', p: [6, 35, 75, 20, 90, 18, 20, -18, 12, 0] },
   { id: 'boxer', name: 'Boxer', p: [10, 50, 110, 30, 125, 22, 26, -22, 18, 0] },

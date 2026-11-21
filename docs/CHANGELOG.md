@@ -2,6 +2,13 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M14 in progress: new player bars, the treasure chest (November 21, 2026)
+- **New player bars, from Rhett's concept art:** each player gets a bar across the top with their name, their fighter's head (hair and hat included) in a ring of their colour, five hearts for health (a heart empties as you're hit, and what you just lost fades out in pink), the Surge bar under the hearts, and the ultimate meter standing up to the left of the head. Works for 1 to 6 players. The level name and map line at the top, and the score, are gone; your ninja stars stay in the top right, and the pause button moved to the top right corner beside them. The wave, round and timer now sit under the bars.
+- **The treasure chest:** a chest in the bottom right of the Character screen opens a code screen: four squares (tap one to change its picture: star, ninja star, heart, crown, lightning, flame, moon, drop), REDEEM and BACK. A right code plays a cha-ching and shows its item in a window; a wrong one buzzes and the squares shake. The first code, four stars, gives **Rhett's Shirt** (a green tee). Secret items don't appear on the shelves until they're yours.
+- **Online screen fixes:** no scroll bar (the pictures now size to the game's frame), and the paper outside the pencil outlines is cut away.
+- Self-test fingerprints unchanged.
+- Version 48.
+
 ## M14 in progress: a new Online screen (November 21, 2026)
 - **HOST and JOIN are pictures now,** cut from Rhett's drawing: HOST is the orange fighter by his computer and house, JOIN is three friends following a runner through a door. Both stay grey, with grey names under them, until one is highlighted (the mouse over it, a controller's highlight, or your finger on it); then it's in colour.
 - **HOST** makes a room and goes straight to the room. **JOIN** opens its own Join screen: the room code picker, JOIN and BACK (back to the two pictures).

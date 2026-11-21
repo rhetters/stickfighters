@@ -75,10 +75,11 @@ function vsEnd(w) {
 }
 function vsHud() {
   const s = Math.max(0, Math.ceil(VS.time / 60));
-  ctx.fillText('ROUND ' + VS.round, W / 2, 26);
+  // under the player bars (render.js)
+  ctx.fillText('ROUND ' + VS.round, W / 2 + 30, HUD_Y);
   ctx.font = '900 30px Impact,"Arial Black",sans-serif';
   ctx.fillStyle = s <= 10 && VS.phase === 'fight' && (fr >> 3) % 2 ? '#e8212b' : INK;
-  ctx.fillText(String(s), W / 2 + 120, 30);
+  ctx.fillText(String(s), W / 2 - 70, HUD_Y + 3);
 }
 // Players push each other apart (unless phasing with Surge), so nobody stands inside an opponent.
 function vsSep() {

@@ -517,60 +517,165 @@ function drawFX(x) {
     ctx.globalAlpha = 1;
   }
 }
-// Multiplayer HUD: one compact row per player, in their color: health, Surge, blue meter, and round wins in versus.
-// Five or six players (online) get smaller rows, so they take no more room than four.
-function hudPlayers() {
-  const big = PL.length > 4;
-  PL.forEach((q, i) => {
-    const y = 10 + i * 30;
-    ctx.save();
-    if (big) ctx.scale(0.72, 0.72);
-    ctx.fillStyle = q.col;
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 3;
+// ===== PLAYER BARS =====
+// One bar per player (1 to 6) across the top, as in Rhett's concept art: the ultimate meter standing on the left,
+// the fighter's head in a ring (with their hair and hat), their name, five hearts for health and the Surge bar.
+// Drawing only.
+const HUD_Y = 104; // the line under the bars (and the touch POSE button) for the mode's own text: wave, round, a house's name
+const hudPanelW = () => Math.min(210, (W - 150) / PL.length);
+function hudBars() {
+  const pw = hudPanelW();
+  PL.forEach((q, i) => hudBar(q, 8 + i * pw, 6, pw));
+}
+function hudBar(q, x0, y0, pw) {
+  const sm = pw < 160,
+    R = sm ? 18 : 21,
+    cx = x0 + 11 + R,
+    cy = y0 + R + 3,
+    down = q.st === 'dead';
+  // ultimate meter: a standing bar that fills from the bottom, flashing when ready
+  const uh = R * 2,
+    um = q.bd && q.bd.ult ? Math.max(0, Math.min(1, q.meter / 100)) : 0;
+  ctx.fillStyle = INK;
+  ctx.fillRect(x0, cy - R, 7, uh);
+  ctx.fillStyle = '#d9e9f2';
+  ctx.fillRect(x0 + 2, cy - R + 2, 3, uh - 4);
+  if (um > 0) {
+    ctx.fillStyle = um >= 1 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
+    ctx.fillRect(x0 + 2, cy + R - 2 - (uh - 4) * um, 3, (uh - 4) * um);
+  }
+  // the head, in a ring of the player's colour
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, 7);
+  ctx.fillStyle = '#fff8ee';
+  ctx.fill();
+  ctx.clip();
+  if (down) ctx.globalAlpha = 0.4;
+  hudHead(q, cx, cy, R);
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, 7);
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = INK;
+  ctx.stroke();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = q.col;
+  ctx.stroke();
+  // name, hearts, Surge
+  const rx = cx + R + 6,
+    rw = Math.max(40, x0 + pw - rx - 6),
+    tm = MODE.team && MODE.team(q),
+    nm = (tm ? 'T' + tm + ' ' : '') + (q.name || 'P' + (q.slot + 1));
+  let fs = sm ? 13 : 15;
+  ctx.font = '900 ' + fs + 'px Impact,"Arial Black",sans-serif';
+  while (fs > 9 && ctx.measureText(nm).width > rw) ctx.font = '900 ' + --fs + 'px Impact,"Arial Black",sans-serif';
+  ctx.textAlign = 'left';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = INK;
+  ctx.strokeText(nm, rx, y0 + 14);
+  ctx.fillStyle = q.col;
+  ctx.fillText(nm, rx, y0 + 14);
+  const hs = Math.min(sm ? 11 : 13, (rw - 8) / 5),
+    hy = y0 + 18,
+    per = q.max / 5;
+  for (let k = 0; k < 5; k++) {
+    const hx = rx + k * (hs + 2),
+      f = Math.max(0, Math.min(1, (q.hp - k * per) / per)),
+      ft = Math.max(0, Math.min(1, ((q.hpT || 0) - k * per) / per));
+    hudHeart(hx, hy, hs, '#e5dfd2');
+    if (ft > f) hudHeart(hx, hy, hs, '#ffb3d1', ft); // what was just lost, fading out
+    if (f > 0) hudHeart(hx, hy, hs, down ? '#7a6e80' : '#e8212b', f);
+    hudHeartLine(hx, hy, hs);
+  }
+  // Surge: yellow, flashing when low, red while Winded (refilling)
+  const STM = q.stm,
+    sy = hy + hs + 4,
+    sw = 5 * (hs + 2) - 2,
+    sv = STM.v / q.smax,
+    bl = (fr >> 2) % 2;
+  ctx.fillStyle = INK;
+  ctx.fillRect(rx, sy, sw, 7);
+  ctx.fillStyle = STM.winded ? '#b8202c' : STM.flash > 0 && bl ? '#e8212b' : sv < 0.25 && bl ? '#fff3a0' : '#ffd400';
+  ctx.fillRect(
+    rx + 2,
+    sy + 2,
+    (sw - 4) * (STM.winded ? 1 - STM.winded / (SURGE.winded * 60 * (1 - modOf(q, 'wind'))) : sv),
+    3
+  );
+  if (down && MODE.revive) txt0(q.rv > 0 ? 'REVIVING' : 'DOWN', rx, sy + 19, '#e8212b');
+  if (MODE.wins) for (let w = 0; w < MODE.wins(q); w++) star5(rx + 6 + w * 16, sy + 16, 0.7);
+}
+// A heart for health: size s, filled with c (only the left part f of it, for a heart partly lost)
+function hudHeartPath(x, y, s) {
+  const w = s,
+    h = s * 0.92;
+  ctx.beginPath();
+  ctx.moveTo(x + w / 2, y + h);
+  ctx.bezierCurveTo(x - w * 0.15, y + h * 0.5, x, y - h * 0.15, x + w / 2, y + h * 0.28);
+  ctx.bezierCurveTo(x + w, y - h * 0.15, x + w * 1.15, y + h * 0.5, x + w / 2, y + h);
+  ctx.closePath();
+}
+function hudHeart(x, y, s, c, f = 1) {
+  ctx.save();
+  if (f < 1) {
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(12, y, 34, 24, 6);
-    else ctx.rect(12, y, 34, 24);
+    ctx.rect(x - 2, y - 2, (s + 4) * f, s + 4);
+    ctx.clip();
+  }
+  hudHeartPath(x, y, s);
+  ctx.fillStyle = c;
+  ctx.fill();
+  ctx.restore();
+}
+function hudHeartLine(x, y, s) {
+  hudHeartPath(x, y, s);
+  ctx.lineWidth = 1.8;
+  ctx.strokeStyle = INK;
+  ctx.stroke();
+}
+// The fighter's head with their look, drawn once into a canvas of its own and kept (redrawn if the look changes)
+const HUDHEAD = new WeakMap();
+function hudHead(q, cx, cy, R) {
+  const L = q.look;
+  if (!L) {
+    ctx.fillStyle = q.col;
+    ctx.beginPath();
+    ctx.arc(cx, cy + R * 0.1, R * 0.55, 0, 7);
     ctx.fill();
-    ctx.stroke();
-    ctx.font = '900 14px Impact,"Arial Black",sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('P' + (q.slot + 1), 29, y + 17);
-    if (MODE.team && MODE.team(q)) txt0('T' + MODE.team(q), 240, y + 22, INK);
-    ctx.textAlign = 'left';
-    ctx.fillStyle = INK;
-    ctx.fillRect(50, y, 184, 14);
-    ctx.fillStyle = '#ff4fa3';
-    ctx.fillRect(53, y + 3, (178 * Math.max(0, q.hpT)) / q.max, 8);
-    ctx.fillStyle = q.st === 'dead' ? '#7a6e80' : q.col;
-    ctx.fillRect(53, y + 3, (178 * Math.max(0, q.hp)) / q.max, 8);
-    ctx.fillStyle = INK;
-    ctx.fillRect(50, y + 16, 184, 8);
-    ctx.fillStyle = q.stm.winded ? '#b8202c' : '#ffd400';
-    ctx.fillRect(52, y + 18, (q.stm.winded ? 0.3 : q.stm.v / q.smax) * 120, 4);
-    if (q.bd && q.bd.ult) {
-      ctx.fillStyle = q.meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
-      ctx.fillRect(176, y + 18, (q.meter / 100) * 56, 4);
-    }
-    if (q.st === 'dead' && MODE.revive)
-      txt0(q.rv > 0 ? 'REVIVING' : big ? 'DOWN' : 'DOWN: stand next to them', 242, y + 13, '#e8212b');
-    if (MODE.wins) for (let w = 0; w < MODE.wins(q); w++) star5(250 + w * 20, y + 12);
-    ctx.restore();
-  });
+    return;
+  }
+  let c = HUDHEAD.get(q);
+  if (!c || c.L !== L) {
+    const cv2 = document.createElement('canvas'),
+      s = 3.2 / (L.head || 1),
+      S = (STANCES.find(t => t.id === L.stance) || STANCES[0]).p,
+      f = { look: L, face: 1, s, slot: q.slot, vx: 0 },
+      o = {};
+    cv2.width = 300;
+    cv2.height = 520;
+    withCtx(cv2.getContext('2d'), () => {
+      drawFig(150, 500, 1, S, s, L.col, L.d2, 0, 1, L.lw, o, L.head, lookLayers(f, { face: 1, s }, 1), L.hfull);
+      drawLook(f, { ...o, face: 1, s }, 1, 'front');
+    });
+    c = { L, cv: cv2, x: o.hd[0], y: o.hd[1] - o.hr * 0.3, h: o.hr * 2.3 }; // the head and hat, a bit of neck
+    HUDHEAD.set(q, c);
+  }
+  ctx.drawImage(c.cv, c.x - c.h, c.y - c.h, c.h * 2, c.h * 2, cx - R, cy - R, R * 2, R * 2);
 }
 function txt0(t, x, y, c) {
   ctx.font = '900 13px Impact,"Arial Black",sans-serif';
   ctx.fillStyle = c;
   ctx.fillText(t, x, y);
 }
-function star5(x, y) {
+function star5(x, y, k = 1) {
   ctx.fillStyle = '#ffd400';
   ctx.strokeStyle = INK;
   ctx.lineWidth = 2;
   ctx.beginPath();
   for (let i = 0; i < 10; i++) {
-    const r = i % 2 ? 4 : 9,
+    const r = (i % 2 ? 4 : 9) * k,
       a = -Math.PI / 2 + (i * Math.PI) / 5;
     ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
   }
@@ -581,69 +686,13 @@ function star5(x, y) {
 function hud() {
   ctx.save();
   ctx.textAlign = 'left';
-  if (PL.length > 1) hudPlayers();
-  else {
-    const P = PL[0],
-      STM = P.stm,
-      K = inputOf(P).K;
-    ctx.fillStyle = INK;
-    ctx.fillRect(14, 12, 264, 24);
-    ctx.fillStyle = '#ff4fa3';
-    ctx.fillRect(18, 16, (256 * Math.max(0, P.hpT)) / P.max, 16);
-    ctx.fillStyle = '#ff7a00';
-    ctx.fillRect(18, 16, (256 * Math.max(0, P.hp)) / P.max, 16);
-    // Surge bar (yellow): flashes when low, red when you can't afford a move, refills from red while Winded
-    const sv = STM.v / P.smax,
-      bl = (fr >> 2) % 2,
-      held = K.s && live();
-    ctx.fillStyle = INK;
-    ctx.fillRect(14, 40, 224, 16);
-    ctx.fillStyle = STM.winded
-      ? '#b8202c'
-      : STM.flash > 0 && bl
-        ? '#e8212b'
-        : sv < 0.25 && bl
-          ? '#fff3a0'
-          : '#ffd400';
-    ctx.fillRect(
-      17,
-      43,
-      STM.winded ? 218 * (1 - STM.winded / (SURGE.winded * 60 * (1 - modOf(P, 'wind')))) : 218 * sv,
-      10
-    );
-    if (held && !STM.winded) {
-      ctx.strokeStyle = '#ffd400';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(11, 37, 230, 22);
-    }
-    ctx.font = '900 15px Impact,"Arial Black",sans-serif';
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = INK;
-    const sl = STM.winded ? 'WINDED' : 'SURGE';
-    ctx.fillStyle = STM.winded ? '#e8212b' : held ? '#ffd400' : '#fff8ee';
-    ctx.strokeText(sl, 248, 54);
-    ctx.fillText(sl, 248, 54);
-    // Ultimate meter (blue), once the skill tree has given this fighter an ultimate
-    if (P.bd && P.bd.ult) {
-      ctx.fillStyle = INK;
-      ctx.fillRect(14, 60, 184, 12);
-      ctx.fillStyle = P.meter >= 100 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
-      ctx.fillRect(17, 63, (178 * P.meter) / 100, 6);
-      if (P.meter >= 100) {
-        const t = 'ULT: ' + P.bd.ult.nm.toUpperCase() + '!';
-        ctx.font = '900 14px Impact,"Arial Black",sans-serif';
-        ctx.fillStyle = '#3ec5ff';
-        ctx.strokeText(t, 206, 73);
-        ctx.fillText(t, 206, 73);
-      }
-    }
-  }
+  hudBars();
   {
     const B = E.find(e => e.T.boss && !e.dying && !e.gone);
     if (B) {
       const bw = 360,
         bx = W / 2 - bw / 2,
-        by = 108;
+        by = HUD_Y + 14;
       ctx.fillStyle = INK;
       ctx.fillRect(bx - 3, by - 3, bw + 6, 20);
       ctx.fillStyle = '#ff4fa3';
@@ -664,9 +713,7 @@ function hud() {
     }
   }
   ctx.textAlign = 'right';
-  ctx.font = '900 26px Impact,"Arial Black",sans-serif';
   ctx.fillStyle = INK;
-  if (state !== 'train' && !MODE.pvp) ctx.fillText(String(score).padStart(7, '0'), W - 16, 34);
   if (state !== 'train' && MODE.drops) starHud();
   if (NET.match) onlineHud();
   ctx.textAlign = 'center';
@@ -678,7 +725,7 @@ function hud() {
         ? 'TRAINING ROOM'
         : 'WAVE ' + wave + '  ·  ' + (queue.length + E.filter(e => !e.dying).length) + ' LEFT',
       W / 2,
-      30
+      HUD_Y
     );
   const CP = PL.reduce((a, b) => (b.combo > a.combo ? b : a), PL[0]),
     combo = CP.combo,

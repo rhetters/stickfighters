@@ -51,6 +51,7 @@ function howText(it) {
   if (h.wave) return 'Reach wave ' + h.wave + ' in Arcade to unlock';
   if (h.vs) return 'Win a Versus match to unlock';
   if (h.drop) return 'Found in gifts that Captains drop';
+  if (h.code) return 'A secret code';
   return it.price + ' stars';
 }
 // Fixed unlocks. Runs at boot (so older saves get what they already earned) and at the end of every run.
@@ -60,7 +61,7 @@ function checkUnlocks(extra) {
     got = [];
   for (const it of ITEMS) {
     const h = it.how;
-    if (!h || h.free || h.drop || owns(it.id)) continue;
+    if (!h || h.free || h.drop || h.code || owns(it.id)) continue;
     const ok =
       (h.lvl && PROG[h.lvl] && PROG[h.lvl].done) ||
       (h.combo && Math.max(BEST.combo || 0, x.combo || 0) >= h.combo) ||
