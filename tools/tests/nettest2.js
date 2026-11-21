@@ -12,7 +12,7 @@ for(const P of [A,B]){await P.evaluate(code=>{$('b-online').click();const [w,n]=
 ok(await H.evaluate(()=>NET.players.length===3),'three in the room');
 ok(await A.evaluate(()=>NET.players.find(p=>p.slot===1).cid!=='col-orange'),'second orange player gets a different color');
 await A.waitForTimeout(1500);await H.screenshot({path:'shots/on2.png'});await A.screenshot({path:'shots/on3.png'});
-await H.evaluate(()=>{NET.mode='arcade';netRoomChanged();$('on-start').click()});await H.waitForTimeout(800);
+await H.evaluate(()=>{NET.mode='arcade';netRoomChanged();netStart()});await H.waitForTimeout(800);
 ok(await B.evaluate(()=>state==='play'&&PL.length===3&&MODE===ARCADE),'arcade with three');
 await A.keyboard.down('d');await A.waitForTimeout(800);await A.keyboard.up('d');await A.waitForTimeout(500);await A.screenshot({path:'shots/on4.png'});
 // guest pause menu

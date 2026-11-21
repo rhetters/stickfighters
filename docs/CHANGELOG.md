@@ -2,6 +2,16 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M14 in progress: less text, Story, rooms of 6 (November 21, 2026)
+- **Victory screen:** each card shows just Damage Done and Damage Taken, in two rows under the name. The line of time, score and ready-up help is gone. A new button named after the theme (MOUNTAIN +1, +2…) lights up when everyone is ready; nothing starts by itself any more. STORY (solo) or BACK TO PLAYERS (local co-op) and MAIN MENU sit beside it.
+- **Campaign is now Story** everywhere: the title's SOLO → STORY, the Story screen, co-op and the online room.
+- **A ? story:** the last card on the Story screen (and a ? choice in the online room) picks a theme for you, and the run earns 10% more XP and ninja stars, its harder replays too.
+- **Online screen:** just HOST A GAME, the room code picker, JOIN and BACK (no explanation, no START before there's a room). "Making a room…" and the error messages stay.
+- **Online room:** no more "tell your friends" or "Listening on" lines. The modes are STORY, ARCADE, VERSUS and HOST'S HOUSE, with the mode's choice underneath: which story (or ?), or free-for-all / teams. START lights up only when everyone is ready (it no longer starts by itself), and when the host changes anything (mode, story, teams, room size, a team switch) everyone readies up again; changing your fighter un-readies you.
+- **Rooms of up to 6:** the host sets the room size with − and + next to the room code (2 to 6, 4 to start, never fewer than the players in it), and the room shows that many places. Five or six players get smaller health rows in the game so they take no more room than four.
+- New test: net6 (six devices in one room). Self-test fingerprints unchanged.
+- Version 46.
+
 ## M14 in progress: the final blow, the victory screen, ready up (November 21, 2026)
 - **The final blow is in slow motion:** the hit that beats a theme's last boss slows time for a few seconds, and every enemy still standing (the little ones too) is knocked flying with it. Only that blow slows down; the rest of the game keeps its speed.
 - **A victory screen after each theme:** every player's card shows them doing their victory pose, with their stats under it: damage dealt, damage taken, enemies beaten, best combo, and revives in co-op.

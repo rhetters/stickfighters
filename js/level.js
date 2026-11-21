@@ -41,7 +41,7 @@ function levelSim() {
   // platforms (a run's launch tower); none otherwise
   if (LV.terr) terrainSet(LV.terr.s, LV.terr.w);
   PL.forEach((p, i) => {
-    p.x = CAM.x + 200 - i * 60;
+    p.x = CAM.x + 200 - i * (PL.length > 4 ? 36 : 60); // five or six players stand closer, all on screen
     p.face = 1;
   });
   levelWalls();
@@ -267,7 +267,7 @@ function levelClear() {
   };
   save();
   grantStars(old.done ? STAR_BONUS.level : STAR_BONUS.levelFirst, 'level');
-  runEnd(LV.run ? 'v-st' : 'c-st', { combo: maxc, level: 1 });
+  runEnd(LV.run ? 'v-st' : 'c-st', { combo: maxc, level: 1, bonus: LV.run && LV.run.myst ? SURPRISE_BONUS : 0 });
   sfx(520, 0.5, 'square', 0.05, 500);
   $('c-l1').textContent =
     'Time ' + fmtT(LV.t) + ' · Score ' + score + ' (time bonus ' + tb + ') · Best combo ' + maxc;
@@ -285,7 +285,7 @@ function levelClear() {
 }
 function levelFail() {
   state = 'over';
-  if (!SELFTESTING) runEnd('o-st', { combo: maxc });
+  if (!SELFTESTING) runEnd('o-st', { combo: maxc, bonus: LV.run && LV.run.myst ? SURPRISE_BONUS : 0 });
   $('o-l1').textContent =
     LV.def.name +
     ' · Score ' +

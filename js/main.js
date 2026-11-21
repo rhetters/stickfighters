@@ -395,7 +395,7 @@ $('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? openHouse() : openTitle
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');
-$('b-level').onclick = () => openThemes(id => startRun(id), 's-title');
+$('b-level').onclick = () => openThemes((id, myst) => startRun(id, 0, myst), 's-title');
 $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : replayLevel()), 'again');
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(openTitle, 'room');
