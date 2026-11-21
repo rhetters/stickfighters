@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: no leash online (November 21, 2026)
+- **The leash is gone, for Rhett:** online, each screen still follows its own player, but now nothing pulls you along: you can stay behind as far as you like (back to the start of the run). When a fight starts, or a scene (catapult, rope, balloon and so on), anyone outside the group's screen warps in, with a ring, the same way a fight's walls bring everyone together.
+- Version 42.
+
 ## M13 in progress: house camera fix (November 21, 2026)
 - **The house camera follows again:** version 40 broke it. To let each online screen have its own view in a level, drawing put the game's camera back after every frame; but the house camera is set while drawing, so it got undone every frame and the view stuck in place, at home and visiting. Now that only happens in online levels. In the house, online, each screen follows its own player; at home it frames everyone as before.
 - Version 41.
