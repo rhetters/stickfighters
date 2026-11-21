@@ -126,10 +126,42 @@ function netRoomMsg() {
       cid: p.cid,
       team: p.team,
       rtt: p.rtt,
-      left: p.left
+      left: p.left,
+      ready: !!p.ready
     }))
   };
 }
+// ===== READY UP =====
+// Each player readies up (in the room, and on the victory screen after a campaign). The host keeps everyone's
+// ready and tells the others; when everyone is ready, the host starts the match (or the harder run).
+function netSetReady(on) {
+  const p = NET.players.find(q => q.slot === NET.mySlot);
+  if (!p) return;
+  if (NET.host) return netReadyApply(p, on);
+  p.ready = !!on;
+  netSend(NET.hostId, { t: 'ready', on: !!on });
+  netReadyUI();
+}
+function netReadyApply(p, on) {
+  p.ready = !!on;
+  if (NET.match) netAll({ t: 'vr', r: NET.players.map(q => [q.slot, !!q.ready]) });
+  else netRoomChanged();
+  netReadyUI();
+  const live = NET.players.filter(q => !q.left);
+  if (!live.length || !live.every(q => q.ready)) return;
+  clearTimeout(NET.readyT);
+  NET.readyT = setTimeout(() => {
+    if (!NET.on || !NET.players.filter(q => !q.left).every(q => q.ready)) return;
+    if (!NET.match) netStart();
+    else if (state === 'clear' && MODE === LEVEL && LV.run) netCmd('harder');
+  }, 1000);
+}
+const netReadyUI = () => {
+  if (typeof vicRefresh === 'function') vicRefresh();
+  if (typeof renderOnline === 'function' && !$('s-online').hidden) renderOnline();
+};
+// A match starting, or a new one from the results: nobody is ready any more
+const netUnready = () => NET.players.forEach(q => (q.ready = false));
 // Versus can start with 2 or more players, and in teams only when both teams have someone
 function netVsReady() {
   const live = NET.players.filter(p => !p.left),
@@ -315,6 +347,8 @@ function netHostMsg(id, m) {
   } else if (m.t === 'team' && !NET.match) {
     p.team = m.team ? 1 : 0;
     netRoomChanged();
+  } else if (m.t === 'ready') {
+    netReadyApply(p, m.on);
   } else if (m.t === 'ping') {
     netSend(id, { t: 'pong', ts: m.ts });
     if (typeof m.rtt === 'number') p.rtt = Math.round(m.rtt);
@@ -356,6 +390,12 @@ function netClientMsg(m) {
     if (THEMES[m.theme]) NET.theme = m.theme;
     netMesh();
     if (typeof renderOnline === 'function') renderOnline();
+  } else if (m.t === 'vr') {
+    for (const [s, r] of m.r) {
+      const q = NET.players.find(x => x.slot === s);
+      if (q) q.ready = r;
+    }
+    netReadyUI();
   } else if (m.t === 'pong') NET.rtt = performance.now() - m.ts;
   else if (m.t === 'start') netStartLocal(m);
   else if (m.t === 'i') netGotInput(m);
@@ -424,6 +464,7 @@ function netStartLocal(m) {
   // everyone plays with the host's feel settings, or the simulations would drift apart
   Object.assign(FEEL, m.feel);
   Object.assign(NET, { match: true, seed: m.seed, D: m.D });
+  netUnready();
   NET.mode = m.mode;
   NET.roster = m.players;
   netFresh(m.e);
@@ -455,7 +496,7 @@ function netStartLocal(m) {
 // Commands from the host after a match ends: play again, continue from the checkpoint, or back to the room
 function netCmd(c) {
   if (!NET.host) return;
-  if (c === 'again' || c === 'cont') {
+  if (c === 'again' || c === 'cont' || c === 'harder') {
     const m = { t: 'cmd', c, e: NET.epoch + 1, seed: (Math.random() * 4294967296) >>> 0, at: NET.simF };
     netAll(m);
     netCmdLocal(m);
@@ -467,6 +508,7 @@ function netCmd(c) {
 function netCmdLocal(m) {
   // a guest a few frames behind first plays up to where the host was, so everyone continues from the same spot
   if (!NET.host && m.at && NET.match) while (NET.simF < m.at && state === 'play' && netReady()) netStep();
+  netUnready();
   if (m.c === 'room') {
     netEndMatch();
     if (typeof openOnline === 'function') openOnline();
@@ -477,7 +519,7 @@ function netCmdLocal(m) {
   fr = 0;
   if (m.c === 'cont') continueLevel();
   else if (NET.mode === 'vs') startVersus();
-  else if (NET.mode === 'level') replayLevel();
+  else if (NET.mode === 'level') replayLevel(m.c === 'harder');
   else if (NET.mode === 'house') startHouse(HVIEW);
   else start();
   fr = 0;

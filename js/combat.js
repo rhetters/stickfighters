@@ -494,6 +494,7 @@ function hurtE(e, d, dr, src, by) {
     e.thrown = 0;
   }
   if (e.st === 'down') e.otgU = 1; // one hit on a downed enemy per knockdown
+  tally(ap, 'dealt', Math.min(dmg, Math.max(0, e.hp)));
   e.hp -= dmg;
   e.flash = 4;
   e.hs = WT[w].st;
@@ -503,6 +504,8 @@ function hurtE(e, d, dr, src, by) {
   if (e.hp <= 0) {
     e.dying = 1;
     e.ddir = dr;
+    tally(ap, 'kos', 1);
+    if (MODE.onKill) MODE.onKill(e, ap);
     e.dk = d.fold
       ? 'fold'
       : ef === 'launch' || ef === 'pop'
@@ -590,6 +593,7 @@ function hurtE(e, d, dr, src, by) {
   ap.comboT = 100;
   ap.meter = Math.min(100, ap.meter + 4 * meterK(ap, d));
   maxc = Math.max(maxc, ap.combo);
+  tally(ap, 'combo', ap.combo);
   const cw = { 5: 'NICE!', 10: 'GREAT!', 20: 'AMAZING!', 35: 'UNSTOPPABLE!', 50: 'GODLIKE!' }[ap.combo];
   if (cw) txt(ap.x, ap.y - 120, cw, '#ff7a00', 26);
   if (e.hp <= 0) {
@@ -597,7 +601,7 @@ function hurtE(e, d, dr, src, by) {
     score += sc;
     ap.meter = Math.min(100, ap.meter + 6);
     txt(e.x, e.y - 120 * e.s, '+' + sc, '#ff4fa3', 20);
-    if (!queue.length && E.every(x => x.dying)) slow = 55;
+    if (!queue.length && E.every(x => x.dying)) slow = Math.max(slow, 55);
   }
 }
 // Versus: a player's attack on another player. Light hits stagger briefly so strings connect; launches and
@@ -708,7 +712,9 @@ function hurtP(q, d, dr) {
     }
     q.gt = null;
   } // getting hit lets go
-  q.hp -= d.dmg * (1 - modOf(q, 'arm')); // Tough Skin, Thick Skin (skill tree)
+  const hd = d.dmg * (1 - modOf(q, 'arm')) * (1 + 0.2 * hardScale()); // Tough Skin, Thick Skin (skill tree)
+  tally(q, 'taken', Math.min(hd, Math.max(0, q.hp)));
+  q.hp -= hd;
   q.inv = 65;
   q.flash = 4;
   q.hs = 7;

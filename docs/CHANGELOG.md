@@ -2,6 +2,14 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M14 in progress: the final blow, the victory screen, ready up (November 21, 2026)
+- **The final blow is in slow motion:** the hit that beats a theme's last boss slows time for a few seconds, and every enemy still standing (the little ones too) is knocked flying with it. Only that blow slows down; the rest of the game keeps its speed.
+- **A victory screen after each theme:** every player's card shows them doing their victory pose, with their stats under it: damage dealt, damage taken, enemies beaten, best combo, and revives in co-op.
+- **Ready up:** each card has a ready button, a red ✘ NOT READY or a green ✔ READY. When everyone is ready, the same theme starts again, newly generated, and harder: one more enemy level, more enemies in each fight, more mini-bosses, 40% more health for enemies and 20% more damage to players each step. The theme's name shows how far you are (CASTLE SIEGE +1, +2…). Also BACK TO PLAYERS and MAIN MENU.
+- **Ready up in the online room too:** each player's card in the room has the same button (only your own works). When everyone is ready, the game starts by itself; the host can still press START.
+- New tests: the victory flow (m14test) and online ready-up (netready). Self-test fingerprints unchanged.
+- Version 45.
+
 ## M14 begins: every boss looks like itself (November 21, 2026)
 - M13 (themes and procedural runs) is done.
 - **Each theme's main boss has its own look**, built like a dressed-up player plus parts only it has:

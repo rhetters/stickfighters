@@ -22,7 +22,8 @@ const SCREENS = [
   's-binds',
   's-backup',
   's-over',
-  's-clear'
+  's-clear',
+  's-victory'
 ];
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;

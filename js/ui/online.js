@@ -66,8 +66,15 @@ function renderOnline() {
       (NET.mode === 'vs' && NET.teams
         ? '<button class="pteam">TEAM ' + ((p.team || 0) + 1) + '</button>'
         : '') +
-      '<small></small>';
+      '<button class="pready' +
+      (p.ready ? ' on' : '') +
+      '">' +
+      (p.ready ? '\u2714 READY' : '\u2718 NOT READY') +
+      '</button><small></small>';
     c.querySelector('.pname').textContent = L.name;
+    const rb = c.querySelector('.pready');
+    rb.disabled = !me;
+    rb.onclick = () => netSetReady(!p.ready);
     const tb = c.querySelector('.pteam');
     if (tb) {
       tb.disabled = !(NET.host || me);
@@ -99,11 +106,19 @@ function renderOnline() {
   $('on-teams').classList.toggle('on', NET.teams);
   $('on-start').hidden = !NET.host;
   $('on-start').disabled = NET.mode === 'vs' && !netVsReady();
-  $('on-wait').textContent = NET.host
-    ? live < 2
-      ? 'Tell your friends the room code. Co-op and Arcade also work alone; Versus needs 2 players.'
-      : ''
-    : 'Waiting for the host to start…';
+  const ready = NET.players.filter(p => !p.left && p.ready).length;
+  $('on-wait').textContent =
+    ready === live
+      ? 'Everyone is ready: starting\u2026'
+      : (NET.host && live < 2
+          ? 'Tell your friends the room code. Co-op and Arcade also work alone; Versus needs 2 players. '
+          : '') +
+        'Ready up: the game starts when everyone is ready (' +
+        ready +
+        ' of ' +
+        live +
+        ')' +
+        (NET.host ? ', or press START.' : '.');
 }
 // Change my fighter (my saved fighters, in order) and tell the room
 function onlineFighter(d) {

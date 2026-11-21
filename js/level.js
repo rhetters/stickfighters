@@ -267,7 +267,7 @@ function levelClear() {
   };
   save();
   grantStars(old.done ? STAR_BONUS.level : STAR_BONUS.levelFirst, 'level');
-  runEnd('c-st', { combo: maxc, level: 1 });
+  runEnd(LV.run ? 'v-st' : 'c-st', { combo: maxc, level: 1 });
   sfx(520, 0.5, 'square', 0.05, 500);
   $('c-l1').textContent =
     'Time ' + fmtT(LV.t) + ' · Score ' + score + ' (time bonus ' + tb + ') · Best combo ' + maxc;
@@ -277,10 +277,10 @@ function levelClear() {
   $('c-l3').textContent = 'Next: ' + LV.def.next;
   $('c-h1').textContent = LV.run ? LV.def.name + ' CLEAR!' : 'LEVEL CLEAR!';
   $('b-next').textContent = 'PLAY AGAIN';
-  // a moment to see your victory pose before the results
-  bn('LEVEL CLEAR!');
+  // a moment to see your victory pose before the results (a campaign run: the victory screen, victory.js)
+  bn(LV.run ? 'VICTORY!' : 'LEVEL CLEAR!');
   setTimeout(() => {
-    if (state === 'clear' && MODE === LEVEL) show('s-clear');
+    if (state === 'clear' && MODE === LEVEL) LV.run ? vicOpen() : show('s-clear');
   }, 1800);
 }
 function levelFail() {
@@ -360,7 +360,31 @@ const LEVEL = {
   fg: () => drawLevelFg(),
   hud: levelHud,
   world: () => (drawCine(), drawSay()),
-  revive: 1
+  revive: 1,
+  // each player's stats for the victory screen, kept on the run (so a continue keeps them)
+  tally(p, k, n) {
+    if (!LV.stats) return;
+    const s = LV.stats[p.slot] || (LV.stats[p.slot] = { dealt: 0, taken: 0, kos: 0, combo: 0, revives: 0 });
+    if (k === 'combo') s.combo = Math.max(s.combo, n);
+    else s[k] += n;
+  },
+  hard: () => (LV && LV.run && LV.run.ng) || 0,
+  // The final blow on a theme's main boss: everything else left standing falls with it, in slow motion
+  onKill(e, by) {
+    const ae = LV.run && !LV.fin && LV.encs.find(x => x.st === 1);
+    if (!ae || !ae.boss || e.tk !== ae.boss) return;
+    LV.fin = 1;
+    ae.q = [];
+    for (const o of E)
+      if (o !== e && !o.dying && !o.gone) {
+        o.hp = 1;
+        hurtE(o, { dmg: 1, kb: 7, lift: -9, ef: 'launch' }, o.x >= e.x ? 1 : -1, null, by || PL[0]);
+      }
+    slow = 150;
+    shake = Math.max(shake, 10);
+    ring(e.x, e.y - 50, 160);
+    sfx(90, 1, 'sawtooth', 0.1, -40);
+  }
 };
 
 // The camera near platforms (the launch tower). Drawing only: CAM.y raises the view and CAM.z zooms it out; the
