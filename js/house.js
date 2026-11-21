@@ -512,7 +512,10 @@ let HVIEW = null; // the house being visited
 // Everyone in the house stays on screen: the camera frames all players and zooms out as far as it must (down to
 // 8%, enough for the whole land), and back in to normal size when they're together. One player: just follows them.
 function houseCamera(snap) {
-  const ps = PL.filter(p => !p.left),
+  // online each screen follows its own player; locally the camera frames everyone
+  const all = PL.filter(p => !p.left),
+    mine = NET.match ? all.filter(p => p.slot === NET.mySlot) : [],
+    ps = mine.length ? mine : all,
     minX = Math.min(...ps.map(p => p.x)),
     maxX = Math.max(...ps.map(p => p.x)),
     top = Math.min(...ps.map(p => p.y - 130 * p.s)),
