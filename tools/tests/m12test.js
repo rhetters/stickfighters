@@ -6,6 +6,7 @@ const c=await b.newContext(devices['iPad (gen 7) landscape']);const p=await c.ne
 await p.goto(GAME);await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 ok(await ev("ROOM_WORDS.join()===[...ROOM_WORDS].sort().join()"),'room code words are in alphabetical order');
+ok(await ev("(async()=>{SET.vol=0.5;playSnd('levelup');const b=await SND_BUF.levelup;return b.duration>0.9&&b.duration<1.2})()"),'the level-up sound decodes (about 1 second) and plays');
 // levels and points
 ok(await ev("levelOf(0)===1&&XP_AT[2]===60&&levelOf(XP_AT[5])===5&&levelOf(XP_AT[5]-1)===4&&levelOf(XP_MAX)===30&&pointsAt(1)===0&&pointsAt(5)===5&&pointsAt(30)===35"),'levels: 60 XP for level 2, one point a level plus a bonus every fifth (35 at level 30)');
 ok(await ev("SKN.reduce((n,k)=>n+k.max,0)>60&&SKB.filter(b=>b.ult).length===4&&SKB.every(b=>!b.ult||b.ult.every(u=>A[u]&&A[u].nm))"),'the tree holds more points than level 30 gives; four branches have three ultimate steps each');

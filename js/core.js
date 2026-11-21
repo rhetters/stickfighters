@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 29;
+const GAME_VERSION = 30;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -256,12 +256,38 @@ function sfxHit(w) {
     sfx(70, 0.3, 'sine', 0.17, -40);
   }
 }
+// A recorded sound from data/sounds.js, decoded once, at volume v × the Volume setting
+const SND_BUF = {};
+function playSnd(name, v = 1) {
+  if (SET.vol <= 0 || !SND[name]) return;
+  try {
+    AC = AC || new AudioContext();
+    if (!SND_BUF[name]) {
+      const bin = atob(SND[name]),
+        u = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+      SND_BUF[name] = AC.decodeAudioData(u.buffer);
+    }
+    SND_BUF[name].then(
+      buf => {
+        const s = AC.createBufferSource(),
+          g = AC.createGain();
+        s.buffer = buf;
+        g.gain.value = v * SET.vol;
+        s.connect(g);
+        g.connect(AC.destination);
+        s.start();
+      },
+      () => {}
+    );
+  } catch (e) {}
+}
 let AC;
-function sfx(f, d, t = 'square', v = 0.05, s = 0, at = 0) {
+function sfx(f, d, t = 'square', v = 0.05, s = 0) {
   if (SET.vol <= 0) return;
   try {
     AC = AC || new AudioContext();
-    const n = AC.currentTime + at, // at = seconds from now, for little tunes
+    const n = AC.currentTime,
       o = AC.createOscillator(),
       g = AC.createGain();
     o.type = t;
