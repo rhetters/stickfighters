@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M12 done (November 20, 2026)
+- **M12 (XP, levels, skill tree) is done.** The level-up sound is a little quieter.
+- Version 31.
+
 ## M12 in progress: a real level-up sound (November 20, 2026)
 - Leveling up plays Ron's pick, "Level Up 2" by yodguard (Pixabay), instead of the four beeps. It follows the Volume setting and works offline and in the preview.
 - Version 30.
