@@ -4,49 +4,50 @@ How the code fits together: files, the simulation, and how each system works. Up
 
 ## Files and load order
 
-`index.html` holds the markup and loads one stylesheet and 39 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
+`index.html` holds the markup and loads one stylesheet and 40 classic scripts with `defer`, in this order. All scripts share one global scope (no modules), so top-level names must be unique across files, and top-level code may only use things defined in files loaded before it.
 
 | # | File | What's in it |
 |---|---|---|
-| 1 | `js/core.js` | `$`, save (`SAVE_KEY`, `SET`, `BEST`, `PROG`, `ECO`, `CHR`, `migrate`, `loadSave`, `saveData`, `save`), seeded `rnd()`/`reseed`, canvas, `ctx` and `withCtx`, constants (`W`, `H`, `G`, `D`, `INK`), `FEEL`, sound (`sfx`, `noise`, `sfxHit`) |
+| 1 | `js/core.js` | `$`, save (`SAVE_KEY`, `SET`, `BEST`, `PROG`, `ECO`, `CHR`, `migrate`, `loadSave`, `saveData`, `save`), seeded `rnd()`/`reseed`, canvas, `ctx` and `withCtx`, constants (`W`, `H`, `G`, `D`, `INK`), `FEEL`, sound (`sfx`, `noise`, `sfxHit`, `playSnd` for recorded sounds) |
 | 2 | `js/input.js` | Actions (`ACT`), input slots (`INP`, `mkSlot`), `setA`, the input buffer (`wantIn`/`eatIn`), keyboard, touch stick and buttons, touch watchdog, gamepad polling, controller menu navigation |
 | 3 | `js/data/moves.js` | Poses (`IDLE`, `HURT`…), `kf`/`lerpA`, player move table `A`, `ROUTE`, `SURGE`, `INFO` |
 | 4 | `js/data/enemies.js` | Enemy moves `EA`, enemy types `T`, `TNAME`, `TTIP`; the loop that decorates every move with its `INFO` |
 | 5 | `js/data/levels.js` | Level data: `CHUNKS` (width, props, encounter, gate, dusk, fireflies) and `LEVELS` (ordered chunk lists) |
 | 6 | `js/data/items.js` | Cosmetics data: `TABS` (Character screen tabs and their sections), `SECS` (section → slot), `EQ` (worn slots), `WHEEL_MAX`, `ITEMS`/`ITEM` (id, sec, slot, name, price, colors, `k` drawing style, `how` to unlock), `STANCES`, `FIGHTER0`, `FIGHTERS`, `HEAD_TYPES`, `STAR_DROP`, `STAR_BONUS` |
 | 7 | `js/data/skills.js` | Skill tree data: `XP_RULES` (level curve), `XP_KILL`, `XP_BONUS`, `ROW_NEEDS`, `ULT_LEVELS`, branches `SKB` (with each branch's three ultimate moves), nodes `SKN`/`SKNODE` (rank count, moves unlocked `un`, boosts per rank `mod`) |
-| 8 | `js/data/house.js` | House builder data: `HGRID` (squares of 45 px standing on the floor line `G`; the land is up to 240 x 60 squares and the editor shows 20 across at full size), barriers `HSOLIDS`/`HSOLID`, wall materials `HTILES`/`HTILE` (price per square), `HOUSE_MAX_ITEMS`. Backgrounds, furniture and decorations are store items in items.js (sections `hbg`, `hfurn`, `hdecor`, with `w`/`h` in squares and a drawing kind `k`) |
-| 9 | `js/progress.js` | Levels and points (`XP_AT`, `levelOf`, `pointsAt`), tree rules (`canAdd`, `canTake`, `rowOpen`), `normProg`, `buildOf` (a fighter's level, boosts `mod`, `locked` moves and `ult`), `FULL_BUILD` (the self-test's), `setBuild(p, even)`, `modOf`, `boost`, `meterK`, `xpScan`, `runXP`/`bankXP`, `skillOf` |
-| 10 | `js/economy.js` | The one gate for stars and items: `grantStars`, `spendStars`, `owns`, `grantItem`, `buyItem`, `checkUnlocks`, `openGift`, `runEnd`; fighters: `normFighter`, `fighter`, `curFighter`, `lookRaw`, `lookOf`, `saveFighter`, `deleteFighter`, `shade`; `giftPool` |
-| 11 | `js/player.js` | Game-state globals (`PL`, `E`, `FX`, `wave`, `score`…), Surge stamina (`canSurge`, `spend`, `wind`, `stamTick`, each taking the player), `pick`, `F`/`F0`, `mkPlayer`, `inputOf`, `tgt`, `init`, `updP(p)` |
-| 12 | `js/effects.js` | Effect spawners: `fxp`, `spark`, `ring`, `dust`, `txt`, `ghost` |
-| 13 | `js/combat.js` | Hitboxes, `startAtk`/`tickAtk`/`endAtk`, blocking, grab/pummel/throw, hit weights and `impact`, `hurtE`/`hurtP`, `bowl`, `sep`, `groundY`, physics, pose helpers |
-| 14 | `js/terrain.js` | One-way floors, stairs, walls and climbs any mode can switch on: `TERRAIN`, `terrainSet(list, walls, climbs)`, `surfY`, `surfAt`, `rampToTake`, `surfNext`, `surfCross`, `terrainRampDir`, `terrainLadder`, `terrainWalls`, `terrainStep(f, x0, y0)` (called by `phys`), `terrainDrop(f)` |
-| 15 | `js/enemies.js` | `updE`, AI director, `aiThink`, boss framework, `spawn`, `makeQueue`, `nextWave` |
-| 16 | `js/modes.js` | The mode interface and `ARCADE` (endless waves); `MODE` = the mode being played; co-op rules |
-| 17 | `js/level.js` | `LEVEL` mode: `buildLevel`, `startLevel`, `continueLevel`, camera and walls (`levelWalls`), encounters, gates, level clear/fail, level HUD |
-| 18 | `js/versus.js` | `VERSUS` mode: rounds, countdown, KO, timer, winner screen, player push-apart |
-| 19 | `js/pickups.js` | Star pickups and gifts: `PK`, `dropRoll`, `dropScan`, `pickTick`, `collect`, `collectAll`, drawing (`shuriken`, `giftBox`, `drawPickups`, `starHud`) |
-| 20 | `js/net/rtc.js` | Online connection: WebRTC data channels and the signaling-server talk (`NETCFG`, `RTC`, `rtcHost`, `rtcJoin`, `rtcSend`, `rtcClose`; callbacks `RTC.on.peer/msg/gone/err`). Knows nothing about the game. |
-| 21 | `js/net/session.js` | Online room and lockstep: `NET` state, `NETIN` slots, `maskOf`/`applyMask`, `simHash`, `netHost`/`netJoin`/`netLeave`, host and guest messages, `netStart`/`netStartLocal`, `netCmd` (again / continue / room), `netTick`/`netStep`, desync check |
-| 22 | `js/ragdoll.js` | Verlet ragdoll, death poses, corpse settle and confetti dissolve, `drawRag`, `drawTatsu` |
-| 23 | `js/scenery.js` | Level drawing only: parallax layers, props, the log gate, foreground grass, leaves and fireflies |
-| 24 | `js/looks.js` | Drawing a fighter's look: `drawLookUnder` (cape, hood), `drawLook` (legs, shoes, shirts, jackets, dresses, ties, gloves, scarf, hair, band, hat), `drawHat`, `drawHair`, `surgeCol`/`surgeExtra`, `VPOSE` poses, `lookPose` (stance, victory and pose-wheel blending), `cheering`, `drawWheel`, `drawItemIcon` |
-| 25 | `js/house.js` | Drawing a house (`drawHouse`, `houseBg`, `houseTile`, `houseThing`) and House mode (`HOUSE_MODE`, `startHouse(h)`, `HVIEW` = the house being visited) |
-| 26 | `js/render.js` | Gear, figures (`drawFig`, `figHead`), background, effects, HUD, `render()` |
-| 27 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
-| 28 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
-| 29 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
-| 30 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
-| 31 | `js/ui/online.js` | Online screen: Host / Join, room code picker, room cards, mode and Start (in a room the screen gets `.inroom`, a compact layout that fits without scrolling), online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
-| 32 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
-| 33 | `js/ui/character.js` | Character screen and store: four fighter slots, Body tab (height, head size, head type, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
-| 34 | `js/ui/skills.js` | Skills screen: branch tabs, the four rows of nodes (tap to see, tap again to spend), ADD / TAKE BACK / RESET, the ultimate picker |
-| 35 | `js/ui/house.js` | House screen: tabs (walls, barriers, furniture, decorations, background, erase), the palette (`housePal`, buying with the two-tap rule), one button per grid square (`houseCells`; drag paints), `houseAct`, zoom and panning (`houseZoom`, `housePan`), WALK AROUND |
-| 36 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
-| 37 | `js/devtools.js` | TEMPORARY: the TEST row on the Skills screen that sets a fighter's level. Nothing refers to it; remove the file, its script tag and `tools/tests/devtest.js` |
-| 38 | `js/selftest.js` | `selfTest()` determinism check and the fingerprints it expects (`SELFTEST_EXPECT`) |
-| 39 | `js/main.js` | Screens, the title menu (`splitOpen` swaps a button for its pair; `titlePoof` plays the orange poof), `playerPause()` (Esc / Start / II: pause, or straight back to the builder when walking around a house), settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
+| 8 | `js/data/sounds.js` | `SND`: recorded sounds as base64 MP3 (the level-up), played by `playSnd()` in core.js at the Volume setting |
+| 9 | `js/data/house.js` | House builder data: `HGRID` (squares of 45 px standing on the floor line `G`; the land is up to 240 x 60 squares and the editor shows 20 across at full size), barriers `HSOLIDS`/`HSOLID`, wall materials `HTILES`/`HTILE` (price per square), `HOUSE_MAX_ITEMS`. Backgrounds, furniture and decorations are store items in items.js (sections `hbg`, `hfurn`, `hdecor`, with `w`/`h` in squares and a drawing kind `k`) |
+| 10 | `js/progress.js` | Levels and points (`XP_AT`, `levelOf`, `pointsAt`), tree rules (`canAdd`, `canTake`, `rowOpen`), `normProg`, `buildOf` (a fighter's level, boosts `mod`, `locked` moves and `ult`), `FULL_BUILD` (the self-test's), `setBuild(p, even)`, `modOf`, `boost`, `meterK`, `xpScan`, `runXP`/`bankXP`, `skillOf` |
+| 11 | `js/economy.js` | The one gate for stars and items: `grantStars`, `spendStars`, `owns`, `grantItem`, `buyItem`, `checkUnlocks`, `openGift`, `runEnd`; fighters: `normFighter`, `fighter`, `curFighter`, `lookRaw`, `lookOf`, `saveFighter`, `deleteFighter`, `shade`; `giftPool` |
+| 12 | `js/player.js` | Game-state globals (`PL`, `E`, `FX`, `wave`, `score`…), Surge stamina (`canSurge`, `spend`, `wind`, `stamTick`, each taking the player), `pick`, `F`/`F0`, `mkPlayer`, `inputOf`, `tgt`, `init`, `updP(p)` |
+| 13 | `js/effects.js` | Effect spawners: `fxp`, `spark`, `ring`, `dust`, `txt`, `ghost` |
+| 14 | `js/combat.js` | Hitboxes, `startAtk`/`tickAtk`/`endAtk`, blocking, grab/pummel/throw, hit weights and `impact`, `hurtE`/`hurtP`, `bowl`, `sep`, `groundY`, physics, pose helpers |
+| 15 | `js/terrain.js` | One-way floors, stairs, walls and climbs any mode can switch on: `TERRAIN`, `terrainSet(list, walls, climbs)`, `surfY`, `surfAt`, `rampToTake`, `surfNext`, `surfCross`, `terrainRampDir`, `terrainLadder`, `terrainWalls`, `terrainStep(f, x0, y0)` (called by `phys`), `terrainDrop(f)` |
+| 16 | `js/enemies.js` | `updE`, AI director, `aiThink`, boss framework, `spawn`, `makeQueue`, `nextWave` |
+| 17 | `js/modes.js` | The mode interface and `ARCADE` (endless waves); `MODE` = the mode being played; co-op rules |
+| 18 | `js/level.js` | `LEVEL` mode: `buildLevel`, `startLevel`, `continueLevel`, camera and walls (`levelWalls`), encounters, gates, level clear/fail, level HUD |
+| 19 | `js/versus.js` | `VERSUS` mode: rounds, countdown, KO, timer, winner screen, player push-apart |
+| 20 | `js/pickups.js` | Star pickups and gifts: `PK`, `dropRoll`, `dropScan`, `pickTick`, `collect`, `collectAll`, drawing (`shuriken`, `giftBox`, `drawPickups`, `starHud`) |
+| 21 | `js/net/rtc.js` | Online connection: WebRTC data channels and the signaling-server talk (`NETCFG`, `RTC`, `rtcHost`, `rtcJoin`, `rtcSend`, `rtcClose`; callbacks `RTC.on.peer/msg/gone/err`). Knows nothing about the game. |
+| 22 | `js/net/session.js` | Online room and lockstep: `NET` state, `NETIN` slots, `maskOf`/`applyMask`, `simHash`, `netHost`/`netJoin`/`netLeave`, host and guest messages, `netStart`/`netStartLocal`, `netCmd` (again / continue / room), `netTick`/`netStep`, desync check |
+| 23 | `js/ragdoll.js` | Verlet ragdoll, death poses, corpse settle and confetti dissolve, `drawRag`, `drawTatsu` |
+| 24 | `js/scenery.js` | Level drawing only: parallax layers, props, the log gate, foreground grass, leaves and fireflies |
+| 25 | `js/looks.js` | Drawing a fighter's look: `drawLookUnder` (cape, hood), `drawLook` (legs, shoes, shirts, jackets, dresses, ties, gloves, scarf, hair, band, hat), `drawHat`, `drawHair`, `surgeCol`/`surgeExtra`, `VPOSE` poses, `lookPose` (stance, victory and pose-wheel blending), `cheering`, `drawWheel`, `drawItemIcon` |
+| 26 | `js/house.js` | Drawing a house (`drawHouse`, `houseBg`, `houseTile`, `houseThing`) and House mode (`HOUSE_MODE`, `startHouse(h)`, `HVIEW` = the house being visited) |
+| 27 | `js/render.js` | Gear, figures (`drawFig`, `figHead`), background, effects, HUD, `render()` |
+| 28 | `js/ui/panels.js` | Training panels: move list, fighter info, feel sliders |
+| 29 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
+| 30 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
+| 31 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
+| 32 | `js/ui/online.js` | Online screen: Host / Join, room code picker, room cards, mode and Start (in a room the screen gets `.inroom`, a compact layout that fits without scrolling), online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
+| 33 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
+| 34 | `js/ui/character.js` | Character screen and store: four fighter slots, Body tab (height, head size, head type, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
+| 35 | `js/ui/skills.js` | Skills screen: branch tabs, the four rows of nodes (tap to see, tap again to spend), ADD / TAKE BACK / RESET, the ultimate picker |
+| 36 | `js/ui/house.js` | House screen: tabs (walls, barriers, furniture, decorations, background, erase), the palette (`housePal`, buying with the two-tap rule), one button per grid square (`houseCells`; drag paints), `houseAct`, zoom and panning (`houseZoom`, `housePan`), WALK AROUND |
+| 37 | `js/ui/backup.js` | Settings > Save: Back up / Restore (code or file) |
+| 38 | `js/devtools.js` | TEMPORARY: the TEST row on the Skills screen that sets a fighter's level. Nothing refers to it; remove the file, its script tag and `tools/tests/devtest.js` |
+| 39 | `js/selftest.js` | `selfTest()` determinism check and the fingerprints it expects (`SELFTEST_EXPECT`) |
+| 40 | `js/main.js` | Screens, the title menu (`splitOpen` swaps a button for its pair; `titlePoof` plays the orange poof), `playerPause()` (Esc / Start / II: pause, or straight back to the builder when walking around a house), settings binding, screen fit, `update()` (one simulation step), `tick`/`loop`, boot. Loads last. |
 
 Nothing runs game code at load except data setup; boot (`checkUnlocks(); init(); applySet(); resize(); bindSettings(); syncTrain(); openTitle(); requestAnimationFrame(loop)`) is the last thing in `main.js`.
 
@@ -107,7 +108,7 @@ A fighter's `prog` (above) is checked by `normProg()` (progress.js): points beyo
 
 - **Locked moves:** `pick()` skips a locked move: the string starts over, then the plain (non-Surge) version. Throws: a locked Up Throw or Slam is a Forward Throw.
 - **Boosts** are read with `modOf(p, key)` where they act: `boost()` scales a player's hit damage (punch, kick or throw) and marks it `exact` so `hurtE` keeps the fraction; `meterK()` the ultimate meter; `hbox` kick reach; `pick` Surge move cost; `p.smax` the Surge bar; `stamTick` refill; `wind` Winded; `hurtP` damage taken and Second Wind (`swUsed`); the `down` state get-up speed. Zero boosts leave every number exactly as before.
-- **XP:** `xpScan()` (in `update()`, where stars drop) adds `XP_KILL` once per beaten enemy to `RUN.xp`; when that lifts a local player past a level it plays `levelUpFx()` (a chime and an entry in `LVFX`, which `drawLevelUps()` in render.js draws as a golden pillar, sparkles and LEVEL UP!; drawing only, outside the simulation). `runEnd()` calls `runXP(extra)`, which adds the level, wave or Versus bonus and `bankXP()` puts it (with the Fortune XP boost) into each local player's saved fighter; Fortune's star boost adds stars there too. Online, every device banks only its own fighter, and the tree travels in the fighter object sent with `hello`, so every device plays the same build.
+- **XP:** `xpScan()` (in `update()`, where stars drop) adds `XP_KILL` once per beaten enemy to `RUN.xp`; when that lifts a local player past a level it plays `levelUpFx()` (the level-up sound and an entry in `LVFX`, which `drawLevelUps()` in render.js draws as a golden pillar, sparkles and LEVEL UP!; drawing only, outside the simulation). `runEnd()` calls `runXP(extra)`, which adds the level, wave or Versus bonus and `bankXP()` puts it (with the Fortune XP boost) into each local player's saved fighter; Fortune's star boost adds stars there too. Online, every device banks only its own fighter, and the tree travels in the fighter object sent with `hello`, so every device plays the same build.
 - **Ultimates** are moves in `A` (data/moves.js). `ULT` with a full meter starts `p.bd.ult`; every one gets `ultBurst()` (branch-colour rings, more and bigger at each step, the third with a ground ring and zoom). An ultimate's hits don't trigger the global hit-stop (`impact(…, ult)`), so many hits at once never slow the game. Their fields: tatsu spins (`rise`, `riseF`, `tv`), `pass` (turn around and hit again every N frames of a dash), `boom` (`shockwave()` at given frames), `fxk` (`ultFx()`: fist sparks, lightning bolts `k: 'z'`, ground dust), `fdmg` (the launching last hit).
 
 ## Terrain (floors and stairs)
