@@ -2,6 +2,16 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M14 begins: every boss looks like itself (November 21, 2026)
+- M13 (themes and procedural runs) is done.
+- **Each theme's main boss has its own look**, built like a dressed-up player plus parts only it has:
+  - **The Pink General:** an officer's peaked cap with a gold band and star, a mustache, gold epaulettes, medals, a red cape, white gloves and black boots.
+  - **Captain Pinkbeard:** a long red coat, the black tricorn with a skull, a bushy beard, an eyepatch, a hook for a hand and a peg leg.
+  - **The Pink Yeti:** shaggy pink-white fur over its body and limbs, a fur mane around its face and horns.
+  - **The Pink Alien** (now purple-pink): a huge round head with big black eyes and antennae, a space suit collar and glowing belt, slime mitts.
+  The looks stay on when they're knocked flying. Mini-bosses keep their crowns. Looks are drawing only: self-test fingerprints unchanged.
+- Version 44.
+
 ## M13 in progress: air move fixes, a wall behind each scene (November 21, 2026)
 - **Stuck tilted after a flip:** a Surge hop (Surge + direction + Jump) in the middle of a double-jump flip left you frozen at the flip's angle until the next flip or attack. The hop now stands you upright.
 - **Dive Kick spam:** a Dive Kick that hits bounces you up to dive again, which could be repeated as fast as you pressed, sitting on top of an enemy (bosses included). Now three in a row at most: the third ends in a backflip away, and there are no more Dive Kicks until you land (Down + Kick in the air becomes a Flying Kick).
