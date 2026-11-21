@@ -157,7 +157,10 @@ function startRun(themeId) {
   paused = false;
   releaseAll();
   show(null);
-  bn(BIOMES[LV.segs[0].b].name);
+  // the run opens with every player being drawn in by the pencil
+  for (const p of PL) p.draw = 0;
+  cineStart('drawin');
+  bn(LV.def.name);
 }
 // Play the same level again: a campaign run gets a new run (new seed), a fixed level starts over
 function replayLevel() {
@@ -189,10 +192,13 @@ function cineStart(k, o) {
 function cineEnd() {
   const c = LV.cine;
   LV.cine = null;
+  // nobody keeps a pencil sketch once a scene is over
+  for (const f of [...PL, ...E]) f.draw = f.ink = undefined;
   for (const p of PL) {
     p.hide = 0;
     if (p.st === 'cine') p.st = 'free';
   }
+  if (c.k === 'drawin') bn(BIOMES[LV.segs[0].b].name);
   if (c.tr) {
     c.tr.done = 1;
     biomeDone(c.tr.from);
@@ -213,19 +219,42 @@ function cineTick() {
   const c = LV.cine,
     t = ++c.t,
     ps = PL.filter(p => p.st === 'cine');
-  if (c.k === 'catapult') {
+  if (c.k === 'drawin') {
+    // the run's opening: the pencil draws each player in turn, then they fill with colour
+    PL.forEach((p, i) => {
+      const s0 = 12 + i * 26;
+      if (p.draw === undefined) return;
+      p.draw = Math.max(0, Math.min(1, (t - s0) / 70));
+      p.ink = Math.max(0, Math.min(1, (t - s0 - 70) / 20));
+      if (t % 6 === 0 && p.draw > 0 && p.draw < 1) sfx(1800 + (t % 24) * 40, 0.03, 'triangle', 0.015);
+      if (p.ink >= 1) {
+        p.draw = p.ink = undefined;
+        ring(p.x, p.y - 45, 40);
+        sfx(520 + i * 80, 0.15, 'square', 0.05, 300);
+      }
+    });
+    if (t >= 12 + PL.length * 26 + 110) cineEnd();
+  } else if (c.k === 'catapult' || c.k === 'cannon') {
+    // the catapult flings everyone out of its bucket; the cannon is loaded with everyone and fires them
     const tr = c.tr,
-      bx = tr.x - 46;
+      can = c.k === 'cannon',
+      bx = can ? tr.x - 70 : tr.x - 46;
     ps.forEach((p, i) => {
       if (t <= 40) {
-        // climb into the bucket
+        // climb in
         const a = ease(t / 40);
         p.x = p.sx + (bx - 10 + i * 10 - p.sx) * a;
         p.y = p.sy + (G - 64 - p.sy) * a - Math.sin(a * Math.PI) * 40;
         p.pose = [...TUCK];
+        if (can && a >= 1) p.hide = 1;
       } else if (t === 62) {
-        p.vx = 7 + i * 0.6;
-        p.vy = -24 - i;
+        if (can) {
+          p.hide = 0;
+          p.x = tr.x + 60;
+          p.y = G - 90;
+        }
+        p.vx = (can ? 9 : 7) + i * 0.6;
+        p.vy = (can ? -20 : -24) - i;
       } else if (t > 62 && t < 100) {
         p.x += p.vx;
         p.y += p.vy;
@@ -234,9 +263,13 @@ function cineTick() {
       }
     });
     if (t === 62) {
-      sfx(120, 0.4, 'sawtooth', 0.08, 500);
-      noise(0.3, 0.1, 500);
-      shake = Math.max(shake, 6);
+      sfx(can ? 70 : 120, 0.4, 'sawtooth', 0.08, 500);
+      noise(can ? 0.5 : 0.3, can ? 0.16 : 0.1, can ? 200 : 500);
+      shake = Math.max(shake, can ? 12 : 6);
+      if (can) {
+        ring(tr.x + 70, G - 90, 60);
+        dust(tr.x + 70, G - 90, 10);
+      }
     }
     if (t === 100) {
       cineArrive(tr);
@@ -396,6 +429,7 @@ function bossArrive(ne) {
   e.face = -1;
   e.inv = 999; // can't be hit until the scene ends
   E.push(e);
+  banner = null; // the speech bubble owns the top of the screen now
   if (ne.intro === 'pencil') {
     e.y = G;
     e.draw = 0;

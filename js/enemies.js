@@ -266,6 +266,12 @@ BOSSPH.G = [
   { at: 0.66, cd: 0.75, enter: () => (bn('THE GENERAL IS ANGRY!'), bossCall(['g', 'g', 'r'])) },
   { at: 0.33, cd: 0.5, enter: () => (bn('THE GENERAL IS FURIOUS!'), bossCall(['u', 'f', 'g', 'g'])) }
 ];
+// Captain Pinkbeard: the same three phases, calling his crew
+BOSSPH.P = [
+  { at: 1, cd: 1 },
+  { at: 0.66, cd: 0.75, enter: () => (bn('PINKBEARD IS ANGRY!'), bossCall(['g', 'f', 'r'])) },
+  { at: 0.33, cd: 0.5, enter: () => (bn('PINKBEARD IS FURIOUS!'), bossCall(['b', 'f', 'g', 'g'])) }
+];
 function bossThink(e, Q, T_, spd) {
   const ph = BOSSPH[e.tk] || BOSSPH.c,
     hpf = e.hp / e.max;

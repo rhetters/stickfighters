@@ -10,7 +10,8 @@ const vis=id=>p.isVisible('#'+id),foc=()=>ev("document.activeElement&&(document.
 // title navigation with controller
 await tap(13);ok(await foc()==='b-multi','title: d-pad down moves the highlight (now on '+await foc()+')');
 await tap(12);ok(await foc()==='b-level','d-pad up moves back');
-await tap(0);await W(300);ok(await ev("state==='play'&&MODE===LEVEL"),'A on PLAY: WOODED TRAIL starts the level');
+await tap(0);await W(200);ok(await vis('s-themes'),'A on CAMPAIGN opens the Campaign screen');
+await tap(0);await W(300);ok(await ev("state==='play'&&MODE===LEVEL"),'A on the first theme card starts the run');await ev('cineEnd()'); // skip the opening draw-in
 // the reported bug: Start pauses, then the controller must still work
 await tap(9);await W(150);ok(await ev("paused")&&await vis('s-pause'),'Start pauses');
 ok(await foc()==='b-resume','RESUME is highlighted');

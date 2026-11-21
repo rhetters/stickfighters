@@ -2,6 +2,17 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: Pirate Cove, the Campaign screen, an opening scene (November 20, 2026)
+- **New theme, Pirate Cove:** the Sunny Beach (palms, the sea, a far island, seagulls), the Pirate Ship (its rail, masts and sails, cannons, a plank deck) and the Treasure Cave (stalactites, glowing crystals, treasure chests, drips). Captain Pinkbeard (tricorn hat, three phases, calls his crew) leaps in at the end and knocks everyone down. New mini-bosses: the Beach Bully, the First Mate and the Cave Brute.
+- **New transition:** the ship's cannon loads everyone in and fires them to the next biome (only next to the ship).
+- **The Campaign screen:** Campaign (solo) and Co-op now open a screen with one card per theme: its three biomes, its boss and your best clear. Online, the host picks the theme in the room.
+- **Every run opens with a scene:** the pencil draws each player in, one after another, and they come to life.
+- **The castle is now inside the keep:** a stone wall right behind you (so banners, torches and shields hang on it), tall windows looking out at the sky, a carpet down the floor. The suits of armour are gone: they were grey stick figures and looked like a ghost left behind by the General's pencil sketch. The sketch itself is now cleared for good when any scene ends.
+- **No line says "Orange"** any more (most players rename their fighter).
+- A boss's speech bubble no longer shares the top of the screen with the CLEAR! banner.
+- Self-test fingerprints unchanged.
+- Version 33.
+
 ## M13 in progress: Castle Siege, the first generated campaign (November 20, 2026)
 - **Campaign is now Castle Siege**, a new run every time from a random seed: the Wooded Trail, the Sewer Tunnels and the Castle Keep, about three minutes each, five fights per biome with a Captain at the end of the first two.
 - **Transitions** between biomes, picked at random: a catapult launches everyone into the next biome, a pipe slide (into or out of the sewer), a rope swing over a chasm, or smashing the castle gate. Where you walk through (gate, rope), one biome's background fades into the next.

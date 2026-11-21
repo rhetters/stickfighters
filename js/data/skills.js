@@ -4,7 +4,7 @@
 // 18, 15 in about 55, 30 in about 340 (roughly 40 hours). More levels and harder enemies will pay more XP.
 const XP_RULES = { base: 60, exp: 1.6, cap: 30, bonusEvery: 5 };
 // XP for each enemy beaten (by type, data/enemies.js keys); every player in the fight gets it
-const XP_KILL = { g: 8, r: 10, b: 20, u: 18, f: 15, c: 80, mw: 120, ms: 120, mc: 120, G: 400 };
+const XP_KILL = { g: 8, r: 10, b: 20, u: 18, f: 15, c: 80, mw: 120, ms: 120, mc: 120, mb: 120, mf: 120, mt: 120, G: 400, P: 400 };
 // XP for finishing things: a level, each Arcade wave reached, each Versus KO and a Versus win
 const XP_BONUS = { level: 100, wave: 10, vsKO: 15, vsWin: 40 };
 // Points needed in a branch's lower rows before each row opens

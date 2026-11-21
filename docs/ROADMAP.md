@@ -22,7 +22,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
 | M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
 | M12 | XP, levels, skill tree | Done | L | M3, M8, M10 | Level-ups, skill points, tree screen |
-| M13 | Themes and procedural runs | Next | XL | M8, M10, M12 | Castle Siege (woods, sewer, castle) generated from a seed, transitions, mini-bosses, the Pink General |
+| M13 | Themes and procedural runs | Next | XL | M8, M10, M12 | Castle Siege and Pirate Cove generated from a seed, a Campaign screen, transitions, mini-bosses, two main bosses |
 | M14 | Boss level | Planned | L | M13 | Multi-phase boss fight |
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
@@ -38,11 +38,13 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 **Goal:** the foundation for many themes and campaigns. Decided by Ron and Rhett (November 20): a theme is three biomes, about three minutes each; runs are generated from a seed; transitions between biomes are seamless and random (catapult, gate smash, pipe slide, rope swing); rare mini-bosses; main bosses arrive with an in-game scene (one leaps in and knocks everyone down and talks; another is drawn in by a pencil and comes to life). The first boss comes in M13; M14 builds more on it.
 
 - **Castle Siege** (first theme): Wooded Trail → Sewer Tunnels (slippery floor) → Castle Keep, then the Pink General (drawn in by a pencil; three phases, calls his army).
+- **Pirate Cove** (second theme): Sunny Beach → Pirate Ship → Treasure Cave, then Captain Pinkbeard (leaps in; three phases, calls his crew). Adds the cannon transition (only next to the ship).
+- **Choosing a campaign:** a Campaign screen with one card per theme (biomes, boss, best clear) for solo and local co-op; online, the host picks the theme in the room. Every run opens with the pencil drawing each player in.
 - **Data, not code:** biomes, transitions and themes are data (`js/data/themes.js`). A new theme is new data plus, for a new look, its scenery.
 - **Runs:** each biome is a sign, five fights from its own enemy mix (toughness rising, a Captain closing each biome but the last) and a transition. Scenery is scattered from the biome's props. The same seed always makes the same run.
-- **Mini-bosses:** one per biome type (Big Bruiser, Sludge Brute, Captain of the Guard), about one run in two meets one.
+- **Mini-bosses:** one per biome (Big Bruiser, Sludge Brute, Captain of the Guard, Beach Bully, First Mate, Cave Brute), about one run in two meets one.
 
-**Done when:** Castle Siege plays through alone and online with every transition and both boss intros, and the same seed always makes the same run.
+**Done when:** both themes play through alone and online with every transition and both boss intros, and the same seed always makes the same run.
 
 ### M14 · Boss level
 
@@ -92,4 +94,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-Finish M13 (Castle Siege) with Ron and Rhett's testing, then M14 (more bosses on the same foundation).
+Finish M13 (Castle Siege and Pirate Cove) with Ron and Rhett's testing, then M14 (more bosses on the same foundation).

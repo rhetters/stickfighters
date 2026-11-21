@@ -14,6 +14,7 @@ const SCREENS = [
   's-online',
   's-char',
   's-skills',
+  's-themes',
   's-house',
   's-lobby',
   's-pause',
@@ -353,8 +354,8 @@ addEventListener(
       e.stopImmediatePropagation();
     } else if (e.key === 'Escape' && !$('ui').hidden && !CAP) {
       if (!$('s-title').hidden) titleBack();
-      else if (!$('s-settings').hidden || !$('s-binds').hidden || !$('s-skills').hidden) {
-        // Esc backs out of Settings (and its Buttons page, also when opened from pause) and Skills, like their back buttons
+      else if (!$('s-settings').hidden || !$('s-binds').hidden || !$('s-skills').hidden || !$('s-themes').hidden) {
+        // Esc backs out of Settings (and its Buttons page, also when opened from pause) , Skills and Campaign, like their back buttons
         navBack();
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -393,7 +394,7 @@ $('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? openHouse() : openTitle
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');
-$('b-level').onclick = () => startRun('castle');
+$('b-level').onclick = () => openThemes(id => startRun(id), 's-title');
 $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : replayLevel()), 'again');
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(openTitle, 'room');
