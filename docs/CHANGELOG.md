@@ -2,6 +2,14 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: air move fixes, a wall behind each scene (November 21, 2026)
+- **Stuck tilted after a flip:** a Surge hop (Surge + direction + Jump) in the middle of a double-jump flip left you frozen at the flip's angle until the next flip or attack. The hop now stands you upright.
+- **Dive Kick spam:** a Dive Kick that hits bounces you up to dive again, which could be repeated as fast as you pressed, sitting on top of an enemy (bosses included). Now three in a row at most: the third ends in a backflip away, and there are no more Dive Kicks until you land (Down + Kick in the air becomes a Flying Kick).
+- **The Bicycle Kick (Scissor Kick, air K, K) is worth using:** you now hang in the air and drive forward while its hits land, instead of dropping.
+- **No walking back after a scene:** after a scene carries you into a new biome (the rocket landing on the moon, the catapult, the balloon…), an invisible wall at the start of the new biome keeps everyone out of the old one, online too.
+- Self-test fingerprints unchanged.
+- Version 43.
+
 ## M13 in progress: no leash online (November 21, 2026)
 - **The leash is gone, for Rhett:** online, each screen still follows its own player, but now nothing pulls you along: you can stay behind as far as you like (back to the start of the run). When a fight starts, or a scene (catapult, rope, balloon and so on), anyone outside the group's screen warps in, with a ring, the same way a fight's walls bring everyone together.
 - Version 42.
