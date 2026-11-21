@@ -103,12 +103,23 @@ function genRun(themeId, seed) {
     // the slopes of a climb: uphill from a screen into the biome to each fight's ledge, and on after it (drawing only;
     // starting a screen in keeps the slope out of view while the last biome's scenery still shows)
     if (B.climb) {
+      const up = [];
       let s0 = sign.x0 + 900;
       for (const e of encs.slice(-B.fights)) {
-        if (e.lock - 60 > s0) ramps.push({ x0: s0, x1: e.lock - 60, k: B.climb });
+        if (e.lock - 60 > s0) up.push([s0, e.lock - 60]);
         s0 = e.lock + W + 60;
       }
-      if (x > s0) ramps.push({ x0: s0, x1: x, k: B.climb });
+      if (x > s0) up.push([s0, x]);
+      // in pieces of up to 200 px, each a little steeper the farther into the biome, with a small wobble
+      const [k0, k1] = B.climb,
+        a = up[0][0],
+        b = up[up.length - 1][1];
+      for (const [u0, u1] of up)
+        for (let p = u0; p < u1; p += 200) {
+          const q = Math.min(u1, p + 200),
+            n = ramps.length;
+          ramps.push({ x0: p, x1: q, k: k0 + ((k1 - k0) * ((p + q) / 2 - a)) / (b - a) + ((n * 7) % 5 - 2) * 0.006 });
+        }
     }
     // 3. the main boss (last biome), or a transition into the next biome
     if (last) {

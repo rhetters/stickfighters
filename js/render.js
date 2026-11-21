@@ -307,7 +307,7 @@ function drawF(f) {
     );
     if (L) drawLook(f, { ...o, face: f.face, s: ds }, fa, 'front');
     ctx.restore();
-    if (f.pl) drawHelmet(f, o, ds * (L ? L.head : 1));
+    if (f.pl) drawHelmet(f, o);
     // the pose wheel shows only on the device of the player using it (online); everyone sees the pose
     if (f.wheel && L && (!NET.match || f.slot === NET.mySlot)) drawWheel(f);
   }
@@ -345,7 +345,7 @@ function drawF(f) {
     }
     if (f.broken > 0 && !f.dying && !RS(f) && f.st !== 'getup') stars(f.x, f.y - 88 * f.s);
     if (!(rOn && R.blend >= 1) && o.hd) drawGear(f, o, a);
-    if (!(rOn && R.blend >= 1)) drawHelmet(f, o, f.s);
+    if (!(rOn && R.blend >= 1)) drawHelmet(f, o);
     if (f.T.guard && !f.dying) {
       const w = 34 * f.s,
         y = f.y - 98 * f.s + (f.pmax ? 12 : 6);

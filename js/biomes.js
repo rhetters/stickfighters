@@ -22,7 +22,7 @@ const lookOfSeg = s => LOOKS[BIOMES[s.b].look];
 // (most of the screen is ahead of the players, so the hill goes up from there). render() turns it on per frame. =====
 let slopeOn = false,
   slopeRef = 0;
-const SLOPE_REF = 150;
+const SLOPE_REF = 200;
 function altAt(x) {
   let a = 0;
   for (const r of LV.ramps) a += r.k * Math.max(0, Math.min(x, r.x1) - r.x0);
@@ -2036,17 +2036,31 @@ function drawSpacePropDone(k, x, s) {
     ctx.fillStyle = '#cfe9fb';
     ctx.strokeStyle = INK;
     ctx.beginPath();
-    ctx.arc(x, gy - 104, 20, Math.PI, 0);
+    ctx.arc(x, gy - 90, 20, Math.PI, 0);
     ctx.fill();
     ctx.stroke();
   } else return false;
   return true;
 }
-// A glass bubble helmet around a fighter's head (on the moon)
-function drawHelmet(f, o, s) {
-  if (!helmOn || !o.hd || !BIOMES[segAt(f.x).b].helmet) return;
-  const [hx, hy] = o.hd,
-    r = 9 * s * 2;
+// A glass bubble helmet around a fighter's head (on the moon), big enough for the biggest hair and hats: centred a
+// little above and behind the head (o.hr = the head's radius from drawFig)
+// Hats that stand tall or wide get a bigger bubble: [how far up its centre moves, its radius], in head radii
+const HELM_FIT = {
+  'hat-party': [1.2, 3.1],
+  'hat-chef': [1.1, 3],
+  'hat-top': [1.1, 3],
+  'hat-wizard': [1.5, 3.5],
+  'hat-halo': [1, 2.9],
+  'hat-propeller': [0.9, 2.8],
+  'hat-cowboy': [0.6, 2.9],
+  'hat-viking': [0.7, 2.9]
+};
+function drawHelmet(f, o) {
+  if (!helmOn || !o.hd || !o.hr || !BIOMES[segAt(f.x).b].helmet) return;
+  const fit = HELM_FIT[f.look && f.look.hat && f.look.hat.id] || [0.55, 2.5],
+    hx = o.hd[0] - (f.face || 1) * 0.1 * o.hr,
+    hy = o.hd[1] - fit[0] * o.hr,
+    r = fit[1] * o.hr;
   ctx.save();
   ctx.fillStyle = 'rgba(200,230,255,0.22)';
   ctx.strokeStyle = 'rgba(70,110,150,0.9)';
