@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: Mountain, three new transitions, each theme its own transitions (November 20, 2026)
+- **New theme, Mountain:** the Alpine Meadow (green hills under snowy peaks, wildflowers, fences, hay bales), the Mountainside and the Snowy Peak (falling snow, snowy pines, a snowman, flags, ice; the snow is slippery). The Pink Yeti (shaggy white fur and little horns, three phases, calls his climbers) leaps down at the end. New mini-bosses: the Hilltop Hulk, the Rock Roller and the Ice Giant.
+- **Climbing the mountainside:** between fights the path goes diagonally uphill, and the far mountains sink below you as you climb. Each fight is on a flat ledge. The slope is only drawn: underneath, the game still plays on flat ground, so fighting works exactly as everywhere else.
+- **Three new transitions:** a hot-air balloon (everyone climbs into the basket, it floats away and lands in the next area), a gondola (a cable car up to the next station) and a cliff climb (up a rope ladder, one after another).
+- **Each theme has its own transitions:** Castle Siege: catapult, pipe, rope, gate. Pirate Cove: catapult, cannon, rope, balloon. Mountain: gondola, balloon, cliff climb, rope. Adding one to a theme is one word in its list.
+- The Campaign screen fits three themes in a row.
+- Self-test fingerprints unchanged.
+- Version 34.
+
 ## M13 in progress: Pirate Cove, the Campaign screen, an opening scene (November 20, 2026)
 - **New theme, Pirate Cove:** the Sunny Beach (palms, the sea, a far island, seagulls), the Pirate Ship (its rail, masts and sails, cannons, a plank deck) and the Treasure Cave (stalactites, glowing crystals, treasure chests, drips). Captain Pinkbeard (tricorn hat, three phases, calls his crew) leaps in at the end and knocks everyone down. New mini-bosses: the Beach Bully, the First Mate and the Cave Brute.
 - **New transition:** the ship's cannon loads everyone in and fires them to the next biome (only next to the ship).
