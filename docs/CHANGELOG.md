@@ -2,6 +2,13 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M12 in progress: turning mid-combo, three fixes (November 20, 2026)
+- **Turning mid-combo is instant again.** Why it felt locked: with Haymaker not yet unlocked, a third punch started the string over (Jab, Cross, Jab, Cross…), so mashing kept you chained, and a chained move never looked at the direction you held. Now a string ends at a move you haven't unlocked (like it used to end at Haymaker), and holding the other way ends any string: once a move's hits are over you turn at once and the next press faces the new way. Turning used to wait for the whole string; now it takes about a tenth of a second.
+- **Character preview** moves again after coming back from Skills.
+- **Room codes** step through their words in alphabetical order.
+- Gameplay change: self-test fingerprints are now Arcade 1b77eddf, Level 365c11ac.
+- Version 29.
+
 ## M12 in progress: ultimates bought with points, level-up celebration, no more slowdown (November 20, 2026)
 - **Level up mid-fight:** a golden pillar of light, rising sparkles, LEVEL UP! and a chime, the moment a kill lifts you to the next level.
 - **Ultimates cost points:** each fighting branch has an ULTIMATE row of three steps (level 5, 15, 30), each bought with a point. One branch's ultimate at a time; take the points back to switch. Skipping it never blocks that branch's moves.

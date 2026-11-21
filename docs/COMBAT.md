@@ -8,7 +8,7 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 - **N** is neutral (no direction) or **F** holding toward the way you face. They behave the same, as you described.
 - **U** and **D** are Up and Down held at the moment the attack is pressed. **P** is Punch, **K** is Kick, **J** is Jump, **S** is Surge held.
 - A comma means the next press within the chain window (about 30 frames after the previous move). A new press can cancel in about halfway through a move.
-- Changing direction mid-string starts that direction’s first move.
+- Changing direction mid-string starts that direction’s first move. Holding the other way (left/right) ends a string: once a move's hits are over its recovery is cut short and you turn, and the next press starts a fresh string facing that way. A string also ends at a move the skill tree hasn't unlocked yet.
 - **Effects:** Stagger (short flinch), Pop (small lift), Launch (airborne, juggle), Knockdown, Trip, Splat (bounces off a wall for extra damage), Bounce (ground bounce), Pushback.
 - **Unlock:** Start means every fighter has it. Otherwise it's the skill-tree node that unlocks it (branch: node; nodes above row 1 need points lower in that branch first). The tree itself is in `js/data/skills.js` and the M12 plan in ROADMAP.md.
 

@@ -12,6 +12,9 @@ function openSkills() {
 function closeSkills() {
   show('s-char');
   renderChar();
+  // the Character screen's preview stops while it's hidden; start it again
+  cancelAnimationFrame(CH.raf);
+  CH.raf = requestAnimationFrame(charAnim);
   $('ch-skills').focus({ preventScroll: true });
 }
 // Changes the current fighter's progress and saves it

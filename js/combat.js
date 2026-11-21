@@ -248,6 +248,15 @@ function tickAtk(f) {
     endAtk(f);
     return;
   } // air moves end when you land
+  // Turning cancels the recovery: once a plain ground move's hits are over, holding the other way ends it at once
+  if (f.pl && !d.cost && !d.air && d.ul !== 'Ult' && a.f > d.h[1] && f.y >= f.gy - 1) {
+    const m = (K.r ? 1 : 0) - (K.l ? 1 : 0);
+    if (m && m !== f.face) {
+      if (a.q) press[a.q] = fr;
+      endAtk(f);
+      return;
+    }
+  }
   // Chain queue: a press any time after the move connects is held until the move can follow up (never dropped).
   if (f.pl && !d.dive && !d.hover && a.f >= d.h[0] && !a.q) {
     const b = want('p') ? 'p' : want('k') ? 'k' : 0;
@@ -263,9 +272,17 @@ function tickAtk(f) {
     return;
   }
   if (a.q && (d.air || f.y >= f.gy - 1) && a.f >= d.d * d.cx) {
-    const b = a.q;
+    const b = a.q,
+      m = (K.r ? 1 : 0) - (K.l ? 1 : 0);
     if (d.turn) f.face *= -1;
-    const n = pick(f, b, true);
+    // holding the other way, or a string whose next move isn't unlocked: the chain ends here and the press starts a
+    // fresh move from standing (facing the way you hold), so turning mid-string is never locked out
+    const n = m && m !== f.face ? null : pick(f, b, true, false, true);
+    if (!n) {
+      press[b] = fr;
+      endAtk(f);
+      return;
+    }
     endAtk(f, 1);
     startAtk(f, n, b);
     f.att.chained = 1;

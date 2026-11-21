@@ -37,8 +37,25 @@ const NET = {
   pingT: 0
 };
 const NETIN = [mkSlot(), mkSlot(), mkSlot(), mkSlot()]; // what the simulation reads during an online match
-const ROOM_WORDS = ['TIGER', 'PANDA', 'ROCKET', 'MANGO', 'NINJA', 'COMET', 'PIXEL', 'TACO'];
-ROOM_WORDS.push('ZEBRA', 'LLAMA', 'WAFFLE', 'DRAGON', 'PICKLE', 'OTTER', 'BANANA', 'FALCON');
+// Room code words, in alphabetical order so the code picker steps through them A to Z
+const ROOM_WORDS = [
+  'BANANA',
+  'COMET',
+  'DRAGON',
+  'FALCON',
+  'LLAMA',
+  'MANGO',
+  'NINJA',
+  'OTTER',
+  'PANDA',
+  'PICKLE',
+  'PIXEL',
+  'ROCKET',
+  'TACO',
+  'TIGER',
+  'WAFFLE',
+  'ZEBRA'
+];
 const MAX_ONLINE = 4;
 // ===== FINGERPRINT =====
 function simHash() {

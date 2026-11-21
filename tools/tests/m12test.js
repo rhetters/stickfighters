@@ -5,6 +5,7 @@ const {chromium,devices}=require('playwright');const S=process.argv[2];let fails
 const c=await b.newContext(devices['iPad (gen 7) landscape']);const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
 await p.goto(GAME);await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
+ok(await ev("ROOM_WORDS.join()===[...ROOM_WORDS].sort().join()"),'room code words are in alphabetical order');
 // levels and points
 ok(await ev("levelOf(0)===1&&XP_AT[2]===60&&levelOf(XP_AT[5])===5&&levelOf(XP_AT[5]-1)===4&&levelOf(XP_MAX)===30&&pointsAt(1)===0&&pointsAt(5)===5&&pointsAt(30)===35"),'levels: 60 XP for level 2, one point a level plus a bonus every fifth (35 at level 30)');
 ok(await ev("SKN.reduce((n,k)=>n+k.max,0)>60&&SKB.filter(b=>b.ult).length===4&&SKB.every(b=>!b.ult||b.ult.every(u=>A[u]&&A[u].nm))"),'the tree holds more points than level 30 gives; four branches have three ultimate steps each');
@@ -17,6 +18,11 @@ for(const k of['j','j','j']){await p.keyboard.press(k);await W(200)}
 ok(await ev("SEEN.slice(0,3).join()==='jab,cross,jab'"),'P, P, P without Haymaker: the string starts over instead ('+await ev('SEEN.join()')+')');
 await ev("PL[0].meter=100");await p.keyboard.press('u');await W(100);
 ok(await ev("!PL[0].att||PL[0].att.d.n!=='tornado'"),'ULT does nothing without an ultimate');
+// turning mid-string: holding the other way ends the string, and the next press faces that way
+await ev("E.forEach(e=>e.gone=1);E=[];const e=F(PL[0].x+50,'g',0);e.y=G;e.hp=e.max=999;E.push(e);PL[0].face=1;PL[0].att=null;PL[0].st='free';SEEN=[]");
+for(let i=0;i<5;i++){await p.keyboard.press('j');await W(60)}
+await p.keyboard.down('a');const t0=Date.now();while(Date.now()-t0<1000&&!(await ev('PL[0].face<0')))await W(16);const tt=Date.now()-t0;await p.keyboard.up('a');
+ok(tt<250,'holding the other way mid-string turns you around in '+tt+' ms (moves: '+await ev('SEEN.join()')+')');
 await ev("pause(true);$('b-quit').click()");await W(200);
 // points: rows, take back, reset
 const P0=v=>ev(`(()=>{const f=fighter(0);${v}})()`);
@@ -71,5 +77,7 @@ await p.tap('#sk-reset');await W(150);ok(await P0("return !Object.keys(f.prog.sk
 ok(await ev("(()=>{const e=$('s-skills');return e.scrollHeight<=e.clientHeight+1})()"),'the Skills screen fits without scrolling');
 await p.screenshot({path:S+'/shots/m12-skills.png'});
 await p.keyboard.press('Escape');await W(150);ok(await ev("!$('s-char').hidden"),'Esc goes back to the Character screen');
+ok(await ev("CH.raf>0"),'back on the Character screen, the fighter preview is moving again');
+await p.click('#ch-skills');await W(150);await p.click('#sk-back');await W(150);ok(await ev("CH.raf>0"),'also after DONE');
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged');
 ok(errs.length===0,'no errors '+errs.join(' | '));console.log(fails?fails+' FAILED':'ALL PASS');await b.close()})();
