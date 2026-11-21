@@ -780,8 +780,10 @@ function hud() {
 // drawing, CAM.x is swapped for this screen's view and put back after, so the game itself never sees it
 const VIEW = { x: 0 };
 function render() {
+  // (other modes draw straight from CAM: the house camera, for one, is set while drawing and must stay set)
+  if (!leashOn()) return renderFrame();
   const simX = CAM.x;
-  if (leashOn()) CAM.x = viewFollow();
+  CAM.x = viewFollow();
   try {
     renderFrame();
   } finally {
