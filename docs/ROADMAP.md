@@ -21,8 +21,8 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M9 | Local multiplayer: co-op and versus | Done | XL | M8 | Join with controllers on the TV, Smash-style versus arena, two-to-four-player co-op |
 | M10 | Ninja stars, cosmetic store, character creation | Done | L | M8, M9 | Star drops, store by slot, create and dress your fighter (each player in local multiplayer), save backup |
 | M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
-| M12 | XP, levels, skill tree | Next | L | M3, M8, M10 | Level-ups, skill points, tree screen |
-| M13 | Levels 2–5, themes and procedural runs | Planned | XL | M8, M10, M12 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
+| M12 | XP, levels, skill tree | Done | L | M3, M8, M10 | Level-ups, skill points, tree screen |
+| M13 | Levels 2–5, themes and procedural runs | Next | XL | M8, M10, M12 | Sewer Entrance, Castle Stairs, Main Hall, Tower Top; runs assembled from a seed |
 | M14 | Boss level | Planned | L | M13 | Multi-phase boss fight |
 | M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
@@ -32,20 +32,6 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
 ## Upcoming milestones
-
-### M12 · XP, levels, skill tree (in progress)
-
-**Goal:** a reason to keep fighting. Each saved fighter earns XP, levels up to 30 and spends skill points in a tree. Decided by Ron and Rhett (November 19): moves beyond the basics are locked and earned back; respecs are free, one point at a time or all at once; each fighting branch has its own ultimate in three steps; in Versus your moves and ultimate count but stats are even; balance favors small boosts that add up over many levels, not sudden spikes; everything stays in the game's style.
-
-- **XP and levels** (per saved fighter): every player in the fight earns XP for each enemy beaten (by type, Captain most), plus a bonus for clearing a level or an Arcade wave and a small Versus reward. XP is banked when a run ends. XP for the next level = 60 × level^1.6 (about 2-3 Wooded Trail clears to level 5, 18 to 10, 55 to 15, 340 to 30, roughly 40 hours; the curve is in data/skills.js, and new levels in M13 will pay more). A level-up mid-fight plays a golden pillar of light with LEVEL UP! One skill point per level from level 2, plus a bonus point at 5, 10, 15, 20, 25 and 30 (35 points at level 30; the tree holds about 65, so builds differ).
-- **Tree:** five branches (Fists, Legs, Surge, Body, Fortune), four rows each. A row opens after 0 / 3 / 6 / 10 points in that branch's lower rows. Nodes either unlock moves (the old FST and LEG tiers, the Surge moves, Up Throw and Slam) or give small stat boosts with up to 3 ranks (+3% punch or kick damage, +3% kick reach, +6 Surge, faster Surge refill, cheaper Surge moves, 3% less damage taken, faster get-up, stronger throws, more XP or stars). Capstones: punches or kicks fill the ultimate meter faster, shorter Winded, Second Wind (get back up once per run), Lucky Streak.
-- **Respec:** tap a node to add or take back a point (taking back is refused only if a higher row would lose its requirement); RESET returns every point. Free.
-- **Ultimates** (ULT button, blue meter): each fighting branch has an ULTIMATE row of three steps, each bought with a point (level 5, 15, 30, in order). Buying one branch's ultimate closes the others' (one ultimate at a time; take the points back to switch); skipping it never blocks that branch's moves. Fists: Flurry → Hundred Fists → Comet Fist. Legs: Spin Kick → Twisting Kick → Tornado Kick. Surge: Surge Dash → Lightning Rush → Thunder Step. Body: Shoulder Charge → Quake Stomp → Earthshaker. Fortune has none.
-- **Basics everyone has:** Jab, Cross, Front Kick, High Kick, Flip Kick, Sky Jab, High Cross, Rising Uppercut, Sky Kick, Gut Punch, Leg Sweep, Air Jab, Air Cross, Flying Kick, Dive Kick, Flash Strike, Rush Kick, grab, pummel and the forward and back throws.
-- **Testing:** a temporary TEST row on the skills screen adds levels; it lives in one file so it can be removed cleanly.
-- Online, a fighter's tree travels with its looks, so every device plays the same build. The self-test plays with everything unlocked and no boosts, so its fingerprints don't change.
-
-**Done when:** level-ups give points, spending them changes your moves and stats visibly, each branch's ultimate works at all three steps, and everything saves.
 
 ### M13 · Levels 2–5, themes and procedural runs
 
@@ -110,4 +96,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-Finish M12, then M13 (Levels 2–5).
+M13: themes of three biomes, procedural runs, transitions and boss intros (plan being settled with Ron and Rhett).
