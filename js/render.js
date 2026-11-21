@@ -776,12 +776,12 @@ function hud() {
   }
   ctx.restore();
 }
-// Online in a level, each screen follows its own player (the leash in level.js keeps the group together): while
+// Online in a level, each screen follows its own player (level.js brings stragglers in for fights and scenes): while
 // drawing, CAM.x is swapped for this screen's view and put back after, so the game itself never sees it
 const VIEW = { x: 0 };
 function render() {
   // (other modes draw straight from CAM: the house camera, for one, is set while drawing and must stay set)
-  if (!leashOn()) return renderFrame();
+  if (!ownView()) return renderFrame();
   const simX = CAM.x;
   CAM.x = viewFollow();
   try {
@@ -791,11 +791,11 @@ function render() {
   }
 }
 // This screen's view: its own player a little left of the middle, smoothly; the fight arena (or the scene) while
-// one is on; never further left than the leash lets anyone be
+// one is on
 function viewFollow() {
   const me = PL.find(p => p.slot === NET.mySlot) || PL[0],
     still = LV.cine || LV.encs.some(e => e.st === 1),
-    t = still || !me ? CAM.x : Math.max(Math.max(0, CAM.x - LEASH), Math.min(CAM.x, me.x - W * 0.45));
+    t = still || !me ? CAM.x : Math.max(0, Math.min(CAM.x, me.x - W * 0.45));
   VIEW.x = Math.abs(t - VIEW.x) > W * 2 ? t : VIEW.x + (t - VIEW.x) * 0.15;
   return VIEW.x;
 }
