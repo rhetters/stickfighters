@@ -2,6 +2,14 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: Space, the launch tower's platforms, bubble helmets (November 20, 2026)
+- **New theme, Space:** the Launch Base (desert sky, far launch towers, radar dishes, fuel tanks), inside The Rocket (a metal corridor with round windows on streaming stars) and The Moon (craters, the Earth in the sky, a flag, a lander). On the moon everyone, players and enemies alike, wears a glass bubble helmet. The Pink Alien (antennae) is beamed down from a flying saucer at the end. New mini-bosses: the Launch Guard, the Space Brute and the Moon Mauler.
+- **Platforms up the launch tower:** at the end of the Launch Base you jump up girder platforms to the tower's top deck, and the camera rises with you. You can't walk in under the tower, so the only way up is jumping. Standing on the top deck starts the launch: everyone boards, a 3-2-1 countdown, lift-off, and the camera follows the rocket up.
+- **The landing:** at the end of the rocket, everyone goes through the Moon Lander hatch, and the rocket comes down on the moon.
+- The Campaign screen fits all four themes in a row.
+- **Self-test fix:** the self-test could give a different fingerprint after a lot of play in the same session, because it started its frame count over but still remembered when buttons were last pressed. It now forgets them first. The fingerprints themselves are unchanged.
+- Version 35.
+
 ## M13 in progress: Mountain, three new transitions, each theme its own transitions (November 20, 2026)
 - **New theme, Mountain:** the Alpine Meadow (green hills under snowy peaks, wildflowers, fences, hay bales), the Mountainside and the Snowy Peak (falling snow, snowy pines, a snowman, flags, ice; the snow is slippery). The Pink Yeti (shaggy white fur and little horns, three phases, calls his climbers) leaps down at the end. New mini-bosses: the Hilltop Hulk, the Rock Roller and the Ice Giant.
 - **Climbing the mountainside:** between fights the path goes diagonally uphill, and the far mountains sink below you as you climb. Each fight is on a flat ledge. The slope is only drawn: underneath, the game still plays on flat ground, so fighting works exactly as everywhere else.
