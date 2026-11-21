@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: the online leash, rope fix, calmer ADMIN hits (November 21, 2026)
+- **Online campaign on a leash (to try out):** each player's screen now follows their own fighter. The group still moves together: anyone can fall up to half a screen behind the lead player's camera before its edge pushes them along, and when a fight starts, anyone outside its arena is brought in (with a ring). Teammates off your screen show as an arrow at the edge. The online house follows your own player too. Local play is unchanged (one shared screen).
+- **Scenes with several players:** a player who finished their part early (the first one across the rope, out of the balloon, off the ladder…) made the next one skip theirs, so the second rope swinger froze in the air and then appeared on the far side. Each player now keeps their place in the scene.
+- **ADMIN hits look normal:** instead of 9999-damage hits (whose spark filled the screen yellow), an admin hit now drops the enemy to 1 health first, so the normal hit finishes it.
+- Version 40.
+
 ## M13 in progress: tower camera for co-op, short hair, helmets on flying bodies (November 21, 2026)
 - **Launch tower camera with several players:** the view now frames everyone, in the air too, zooming out like the house camera (down to 60%). If even that can't fit everyone, it keeps the highest player in view and anyone off screen gets an arrow in their colour at the edge pointing to them. The zoom and rise are drawing only; walls and fights don't change.
 - **The camera only moves over the platforms:** anywhere else it stays on the ground at full size, so jumping on flat ground no longer pans it up and down.
@@ -11,7 +17,7 @@ One short entry per release, newest first. Each finished milestone also has a br
 - Version 39.
 
 ## M13 in progress: ADMIN test mode (November 21, 2026)
-- **ADMIN (temporary, for testing levels):** a new ADMIN: OFF/ON button in the TEST ONLY row on the Skills screen. While it's on, every hit a player lands does 9999 damage, so one punch beats anything, bosses included; a small ADMIN tag shows at the bottom of the screen. It's remembered on this device (outside the save) and never works online. It lives entirely in js/devtools.js, to be removed with the rest of the test tools.
+- **ADMIN (temporary, for testing levels):** a new ADMIN: OFF/ON button in the TEST ONLY row on the Skills screen. While it's on, every hit a player lands finishes the enemy, so one punch beats anything, bosses included; a small ADMIN tag shows at the bottom of the screen. It's remembered on this device (outside the save) and never works online. It lives entirely in js/devtools.js, to be removed with the rest of the test tools.
 - A menu test sometimes failed at random: it checked PRESS START at an instant when its blink had it hidden. It now checks the text is on screen, blink or not.
 - Version 38.
 
