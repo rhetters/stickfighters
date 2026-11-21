@@ -951,6 +951,7 @@ function drawLook(f, J, a, ph) {
     if (body && L.jacket) drawJacket(L.jacket, J, 2);
     if (L.gloves) drawGlove(L.gloves, J, 0);
   }
+  if (L.extra) drawBossParts(f, J, L, r, w, ph); // a main boss's own parts (bosslooks.js)
   ctx.restore();
 }
 function lookScarf(f, J, L, r, w, wv) {
