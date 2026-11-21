@@ -52,4 +52,6 @@ linked from rhetters.github.io). Read docs/VISION.md before designing anything n
 - Preview for Ron: `python3 tools/bundle.py . <out.html>` makes the single-file preview.
 - Ron's roadmap doc in Claude Docs holds only a copy of the milestone table (by his choice). When a row in
   docs/ROADMAP.md's table changes, change the same row there; nothing else goes in that doc.
+- Ron's standing OK: when a change or milestone step is finished and the tests pass, merge, push and publish the preview
+  without asking, then tell him what was done. Still ask first about anything that can't be undone or could go either way.
 - Explain changes to Ron in plain language; he may not review code.

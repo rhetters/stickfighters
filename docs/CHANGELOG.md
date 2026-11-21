@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M12 in progress: ultimates bought with points, level-up celebration, no more slowdown (November 20, 2026)
+- **Level up mid-fight:** a golden pillar of light, rising sparkles, LEVEL UP! and a chime, the moment a kill lifts you to the next level.
+- **Ultimates cost points:** each fighting branch has an ULTIMATE row of three steps (level 5, 15, 30), each bought with a point. One branch's ultimate at a time; take the points back to switch. Skipping it never blocks that branch's moves.
+- **Slowdown fixed:** the slowdown with ultimates and big group hits was the game freezing for a moment on every hit (hit-stop) plus a slow-motion moment on ultimates. Ultimates no longer freeze the game, the slow-motion is gone, and hit-stop and screen shake now start off (bodies stay 1 second). Online they're always off and the Feel sliders are locked during a match.
+- **Ultimate look:** no big name banner; every ultimate starts with colored rings, more at each step, and the level-30 step adds a ground ring and zoom.
+- **Pace:** XP for the next level is now 60 × level^1.6 (about 2-3 Wooded Trail clears to level 5, 55 to 15, 340 to 30). Some fighters may drop a level; if a tree then has more points than allowed, its points come back to spend again.
+- Save version 13. Self-test fingerprints unchanged (it plays with the old feel).
+- Version 28.
+
 ## M12 in progress: XP, levels and the skill tree (November 19, 2026)
 - **M18 (house builder) is done.**
 - **XP and levels:** each saved fighter earns XP for every enemy beaten (shared by everyone in the fight), plus bonuses for clearing a level, Arcade waves and Versus rounds and wins. Levels go up to 30; XP shows on the results screen with any level-up.
