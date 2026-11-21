@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: cave torches, castle windows, a better catapult (November 21, 2026)
+- **Treasure Cave torches** now stand on wooden stakes in the ground instead of floating (the cave has no wall to hang them on).
+- **Castle hall:** the small windows are gone (they could land on top of the tall ones), and banners, torches and shields are no longer hung where a tall window is.
+- **The catapult:** its bucket now rests low so everyone hops into it one after another and sits inside; the arm is pulled down, then swings up and over, carrying the riders in the bucket until it stops at the top and lets them fly. Before, the arm swung the wrong way and the riders only stood near it.
+- Version 37.
+
 ## M13 in progress: moon gravity, a steeper mountain, tower camera, helmet fixes (November 20, 2026)
 - **Low gravity on the moon:** jumps, launches and knock-ups float about twice as long and go a little higher (about a fifth). Up-and-down motion simply runs slower there, so every move still reaches the same places, only floatier.
 - **The mountainside gets steeper as you climb:** it starts gentle and ends about twice as steep, with small changes along the way, and is steeper overall than before. The view now measures the slope from a little farther into the screen so the hill stays in view.
