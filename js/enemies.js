@@ -1,7 +1,10 @@
 // StickFighters: Enemies: per-frame update, AI director, boss framework, spawning and waves
 // ===== ENEMIES =====
+// Is the floor under this fighter slippery? (a campaign run's biome: data/themes.js slick)
+const slick = f => MODE === LEVEL && LV && LV.segs && BIOMES[segAt(f.x).b].slick;
 function updE(e) {
   e.t++;
+  if (e.st === 'cine') return; // a boss arriving (run.js) waits for its scene to end
   if (e.flash > 0) e.flash--;
   if (e.pmax) {
     if (e.broken > 0) {
@@ -102,7 +105,7 @@ function updE(e) {
   } else if (e.st === 'down') {
     tp = LIE;
     e.pose[9] = 90;
-    e.vx *= T_.fr;
+    e.vx *= slick(e) ? 0.95 : T_.fr; // a slippery floor (sewer) lets bodies slide on
     if (e.dying) {
       e.corpse = 1;
     } else if (--e.dt <= 0) {
@@ -120,7 +123,7 @@ function updE(e) {
     if (--e.stun <= 0) e.st = 'free';
   } else if (e.st === 'hurt') {
     tp = HURT;
-    e.vx *= Math.min(0.9, T_.fr + 0.04);
+    e.vx *= slick(e) ? 0.95 : Math.min(0.9, T_.fr + 0.04);
     if (--e.stun <= 0) e.st = 'free';
   } else if (e.st === 'atk') {
     tickAtk(e);
@@ -249,6 +252,20 @@ const BOSSPH = {
     }
   ]
 };
+// The Pink General: angrier and faster at two thirds and at one third of his health, calling his army each time
+const bossCall = list => {
+  if (state !== 'play') return;
+  list.forEach((t, i) => {
+    const m = F(i % 2 ? WB.l + 60 : WB.r - 60, t, 0);
+    m.y = -70;
+    E.push(m);
+  });
+};
+BOSSPH.G = [
+  { at: 1, cd: 1 },
+  { at: 0.66, cd: 0.75, enter: () => (bn('THE GENERAL IS ANGRY!'), bossCall(['g', 'g', 'r'])) },
+  { at: 0.33, cd: 0.5, enter: () => (bn('THE GENERAL IS FURIOUS!'), bossCall(['u', 'f', 'g', 'g'])) }
+];
 function bossThink(e, Q, T_, spd) {
   const ph = BOSSPH[e.tk] || BOSSPH.c,
     hpf = e.hp / e.max;

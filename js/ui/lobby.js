@@ -230,7 +230,7 @@ function startMulti(kind) {
   ROSTER = LOBBY.map(r => ({ ...r, team: kind === 'vs' && TEAMS ? r.team : undefined }));
   applyTouchVis();
   if (kind === 'vs') startVersus();
-  else if (kind === 'level') startLevel('woods1');
+  else if (kind === 'level') startRun('castle');
   else start();
 }
 $('b-multi').onclick = openLobby;

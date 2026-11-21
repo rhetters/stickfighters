@@ -242,6 +242,7 @@ function updP(f) {
     want = k => wantIn(I, k),
     eat = k => eatIn(I, k);
   f.t++;
+  if (f.st === 'cine') return; // a scene (run.js) is moving this fighter
   if (f.inv > 0) f.inv--;
   if (f.flash > 0) f.flash--;
   if (f.dcd > 0) f.dcd--;

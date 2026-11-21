@@ -34,7 +34,8 @@ function layer(f, sp, seed, draw) {
     i1 = Math.ceil((off + W + 200) / sp);
   for (let i = i0; i <= i1; i++) draw(i * sp + hh(i + seed) * sp * 0.6 - off, hh(i + seed * 3 + 7), i);
 }
-function drawWoods() {
+// noProps: a campaign run draws every chunk's props once itself (drawLevelBg in biomes.js)
+function drawWoods(noProps) {
   const cx = CAM.x,
     dk = chunkVal(cx + W / 2, 'dusk');
   ctx.fillStyle = '#fbfaf4';
@@ -139,6 +140,7 @@ function drawWoods() {
   ctx.moveTo(-30, G + 6);
   ctx.lineTo(W + 30, G + 6);
   ctx.stroke();
+  if (noProps) return;
   // props and gates live in the world, behind the fighters
   ctx.save();
   ctx.translate(-cx, 0);
@@ -330,10 +332,11 @@ function drawProp(p, x, dk) {
     ctx.textBaseline = 'middle';
     ctx.fillText(p.t + (arch ? '  →' : ''), x, top + 11);
     ctx.textBaseline = 'alphabetic';
-  }
+  } else drawBiomeProp(p, x); // sewer, castle and transition props (biomes.js)
 }
 // The fallen log: cracks show its damage, it shakes when hit, and it's gone once smashed.
 function drawGate(g) {
+  if (g.k === 'door') return drawDoor(g); // the castle gate (biomes.js)
   if (g.hp <= 0) return;
   const x = g.x + (g.hit > 0 ? Math.sin(g.hit * 2.2) * 3 : 0),
     gy = G + 6,

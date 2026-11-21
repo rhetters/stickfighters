@@ -440,7 +440,7 @@ function netStartLocal(m) {
   applyTouchVis();
   fr = 0;
   if (m.mode === 'vs') startVersus();
-  else if (m.mode === 'level') startLevel('woods1');
+  else if (m.mode === 'level') startRun('castle');
   else if (m.mode === 'house') {
     const host = m.players.find(p => p.slot === 0);
     startHouse({ ...normHouse(m.house, true), name: ((host && host.name) || 'HOST') + "'S HOUSE" });
@@ -472,7 +472,7 @@ function netCmdLocal(m) {
   fr = 0;
   if (m.c === 'cont') continueLevel();
   else if (NET.mode === 'vs') startVersus();
-  else if (NET.mode === 'level') startLevel('woods1');
+  else if (NET.mode === 'level') replayLevel();
   else if (NET.mode === 'house') startHouse(HVIEW);
   else start();
   fr = 0;

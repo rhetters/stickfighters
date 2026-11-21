@@ -71,6 +71,10 @@ function continueLevel() {
       e.q = [];
     }
   });
+  LV.cine = LV.say = null;
+  // transitions after the checkpoint play again
+  const cpE = LV.encs[LV.cp];
+  if (LV.trans) for (const t of LV.trans) if (!cpE || t.x > cpE.x) t.done = 0;
   levelSim();
   paused = false;
   releaseAll();
@@ -83,6 +87,9 @@ function levelWalls() {
   WB.r = CAM.x + W;
   const g = LV.gates.find(g => g.hp > 0);
   if (g && g.x - 44 < WB.r) WB.r = g.x - 44;
+  // before a scene: the catapult, the pipe or the chasm's edge stops you (the scene carries you on)
+  const tr = !LV.cine && LV.trans && nextTrans();
+  if (tr && TRANSITIONS[tr.k].cine) WB.r = Math.min(WB.r, tr.x + (tr.k === 'rope' ? -10 : 30));
 }
 function hurtGate(g, d) {
   g.hp -= d;
@@ -132,17 +139,26 @@ function levelTick() {
   LV.t++;
   reviveTick();
   if (LV.go > 0) LV.go--;
+  if (LV.cine) {
+    // a scene is playing (run.js): it moves the players; fights and the camera wait
+    cineTick();
+    levelWalls();
+    return;
+  }
   const alive = PL.filter(p => p.st !== 'dead'),
     lead = Math.max(...alive.map(p => p.x)),
     ae = LV.encs.find(e => e.st === 1),
     ne = LV.encs.find(e => e.st === 0),
-    g = LV.gates.find(g => g.hp > 0);
+    g = LV.gates.find(g => g.hp > 0),
+    tr = LV.trans ? nextTrans() : null,
+    trc = tr && TRANSITIONS[tr.k].cine && (!ne || ne.x > tr.x) ? tr : null; // a scene is next
   if (g && g.hit > 0) g.hit--;
   if (!ae) {
     // the camera only moves forward, and stops at the next fight or in front of the gate
     let mx = LV.len - W;
     if (ne) mx = Math.min(mx, ne.lock);
     if (g) mx = Math.min(mx, g.x - W + 140);
+    if (trc) mx = Math.min(mx, trc.x - W + 260);
     const d = Math.min(lead - W * 0.45, mx) - CAM.x;
     if (d > 0) CAM.x += Math.min(d, 1 + d * 0.08);
     if (ne && CAM.x >= ne.lock - 0.5) {
@@ -152,9 +168,21 @@ function levelTick() {
       wave = ne.lvl;
       spawnT = 30;
       LV.go = 0;
-      bn(ne.list.includes('c') ? 'CAPTAIN AMBUSH!' : 'AMBUSH!');
-      sfx(330, 0.25, 'square', 0.05, 200);
+      // a boss or rare mini-boss arrives with a scene (run.js); others drop in
+      if (ne.boss || ne.mini) bossArrive(ne);
+      else {
+        bn(ne.list.includes('c') ? 'CAPTAIN AMBUSH!' : 'AMBUSH!');
+        sfx(330, 0.25, 'square', 0.05, 200);
+      }
     }
+    // a smashed castle gate is a transition too: through it, the next biome begins
+    if (tr && tr.k === 'gate' && !LV.gates.some(x => x.to === tr.to && x.hp > 0) && lead > tr.x) {
+      tr.done = 1;
+      biomeDone(tr.from);
+      bn(BIOMES[tr.to].name);
+    }
+    // reaching a transition's scene (catapult, pipe, rope) starts it
+    if (trc && !LV.encs.some(e => e.st === 1) && lead >= trc.x - 150) cineStart(trc.k, { tr: trc });
   }
   levelWalls();
   if (ae) {
@@ -167,7 +195,7 @@ function levelTick() {
       LV.cp = LV.encs.indexOf(ae);
       for (const p of alive) p.hp = Math.min(p.max, p.hp + 25);
       score += 100 * ae.lvl;
-      bn(LV.encs.some(e => e.st === 0) ? 'CLEAR!' : 'TRAIL CLEAR!');
+      bn(LV.encs.some(e => e.st === 0) ? 'CLEAR!' : LV.run ? 'VICTORY!' : 'TRAIL CLEAR!');
       LV.go = 220;
       sfx(600, 0.3, 'square', 0.05, 400);
     }
@@ -220,7 +248,7 @@ function levelClear() {
     (nb ? 'New best score! ' : 'Best ' + PROG[id].score + '. ') +
     (nt ? 'New best time!' : 'Best time ' + fmtT(PROG[id].time) + '.');
   $('c-l3').textContent = 'Next: ' + LV.def.next;
-  $('c-h1').textContent = 'LEVEL CLEAR!';
+  $('c-h1').textContent = LV.run ? LV.def.name + ' CLEAR!' : 'LEVEL CLEAR!';
   $('b-next').textContent = 'PLAY AGAIN';
   // a moment to see your victory pose before the results
   bn('LEVEL CLEAR!');
@@ -244,11 +272,15 @@ function levelFail() {
 }
 // HUD: level name, a trail map with the fights, the gate and you, enemies left, and the GO arrow.
 function levelHud() {
-  ctx.fillText(LV.def.name, W / 2, 26);
+  // a campaign run shows the biome you're in, and its stretch of the map
+  const sg = LV.segs && segAt(CAM.x + W / 2),
+    x0 = sg ? sg.x0 : 0,
+    x1 = sg ? sg.x1 : LV.len;
+  ctx.fillText(sg ? LV.def.name + ' · ' + BIOMES[sg.b].name : LV.def.name, W / 2, 26);
   const bw = 230,
     bx = W / 2 - bw / 2,
     by = 38,
-    X = x => bx + (bw * x) / LV.len,
+    X = x => bx + bw * Math.max(0, Math.min(1, (x - x0) / (x1 - x0))),
     lead = Math.max(...PL.map(p => p.x));
   ctx.strokeStyle = INK;
   ctx.lineWidth = 3;
@@ -257,12 +289,14 @@ function levelHud() {
   ctx.lineTo(bx + bw, by);
   ctx.stroke();
   for (const e of LV.encs) {
+    if (e.x < x0 || e.x > x1) continue;
     ctx.fillStyle = e.st === 2 ? '#7a6e80' : e.st === 1 ? '#e8212b' : '#ff4fa3';
     ctx.beginPath();
     ctx.arc(X(e.x), by, 5, 0, 7);
     ctx.fill();
   }
   for (const g of LV.gates) {
+    if (g.x < x0 || g.x > x1 + 10) continue;
     ctx.fillStyle = g.hp > 0 ? '#a4794f' : '#d9d3c6';
     ctx.fillRect(X(g.x) - 4, by - 4, 8, 8);
   }
@@ -295,8 +329,9 @@ const LEVEL = {
   drops: 1,
   update: levelTick,
   over: levelFail,
-  bg: () => drawWoods(),
-  fg: () => drawWoodsFg(),
+  bg: () => drawLevelBg(),
+  fg: () => drawLevelFg(),
   hud: levelHud,
+  world: () => drawSay(),
   revive: 1
 };
