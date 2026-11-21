@@ -1,7 +1,7 @@
 // StickFighters: Online screen: host or join a room, pick your fighter, start a match.
 // Works with touch, mouse and controllers (the room code is picked with arrows, no typing needed).
 // ===== ONLINE SCREEN =====
-const ONC = { w: 0, a: 1, b: 0 }; // the room code being picked: word, first digit, second digit
+const ONC = { w: 0, a: 1, b: 0, join: false }; // the room code being picked: word, first digit, second digit; join = on the Join screen
 const ONLINE_WHY = {
   NOROOM: 'No room with that code answered. Check the code, and that the host is still on the room screen.',
   BLOCKED:
@@ -22,6 +22,7 @@ function openOnline(msg) {
   state = 'menu';
   paused = false;
   show('s-online');
+  ONC.join = false;
   onlineMsg(msg || '');
   renderOnline();
   const f = NET.on ? (NET.host ? $('on-start') : $('b-onlineback')) : $('on-host');
@@ -32,8 +33,11 @@ function onlineCode() {
 }
 function renderOnline() {
   $('s-online').classList.toggle('inroom', NET.on);
-  $('on-menu').hidden = NET.on;
+  // Host / Join tiles, the Join screen (the room code), or the room
+  $('on-menu').hidden = NET.on || ONC.join;
+  $('on-joinpane').hidden = NET.on || !ONC.join;
   $('on-room').hidden = !NET.on;
+  $('on-h2').textContent = ONC.join && !NET.on ? 'JOIN' : 'ONLINE';
   $('on-w').textContent = ROOM_WORDS[ONC.w];
   $('on-a').textContent = ONC.a;
   $('on-b').textContent = ONC.b;
@@ -235,6 +239,13 @@ $('on-host').onclick = async () => {
     onlineMsg((ONLINE_WHY[e] || ONLINE_WHY.offline) + (d ? ' (' + d + ')' : ''));
   }
 };
+// JOIN opens the Join screen: pick the room code, then JOIN (BACK returns to Host / Join)
+$('on-joinpick').onclick = () => {
+  ONC.join = true;
+  onlineMsg('');
+  renderOnline();
+  $('on-w+').focus({ preventScroll: true });
+};
 $('on-join').onclick = async () => {
   onlineMsg('Joining ' + onlineCode() + '…');
   try {
@@ -277,6 +288,13 @@ $('b-onlineback').onclick = () => {
   if (NET.on) {
     netLeave();
     openOnline();
+    return;
+  }
+  if (ONC.join) {
+    ONC.join = false;
+    onlineMsg('');
+    renderOnline();
+    $('on-joinpick').focus({ preventScroll: true });
     return;
   }
   show('s-title');

@@ -41,6 +41,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 - **Victory screen, ready-up and harder replays** (done in version 45): after a theme, each player's victory pose over their stats (damage dealt and taken, enemies beaten, best combo, revives), a ready button each (a red X or a green check, also in the online room), and when everyone is ready the THEME +1 button starts the same theme again, newly generated and one step harder. STORY (or BACK TO PLAYERS) and MAIN MENU buttons.
 - **Less text, and Story** (asked by Ron, November 21; done in version 46): the online screens and the victory screen lose their explanations, Campaign is called Story, the room shows the mode and under it the story (or ?) or free-for-all / teams, START lights up only when everyone is ready, and any option change means readying up again. A **?** story picks a theme for you and earns 10% more XP and stars.
 - **Online rooms up to 6 players** (done in version 46): the host sets the room size with − and +.
+- **A new Online screen** (asked by Ron, November 21; done in version 47): HOST and JOIN as two of Rhett's drawings, grey until highlighted; JOIN opens its own room-code screen.
 
 **Done when:** The boss is beatable with any build, alone or in co-op, and hard to beat without learning the combat.
 
