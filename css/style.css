@@ -1629,6 +1629,72 @@ body.padnav #ui select:focus {
 #s-online.inroom .pcard {
   min-height: 0;
 }
+/* Host / Join: two of Rhett's drawings, grey until highlighted (hover, a controller's highlight, or a tap) */
+.ontiles {
+  display: flex;
+  gap: clamp(16px, 5vw, 60px);
+  justify-content: center;
+}
+.ontile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ontimg {
+  display: block;
+  height: max(110px, min(calc(40vw - 190px), calc(100vh - 220px), 280px)); /* fits under ONLINE with BACK below */
+  aspect-ratio: 418 / 433;
+  background: center / contain no-repeat;
+  filter: grayscale(1) contrast(0.7) brightness(1.08);
+  transition:
+    filter 0.15s,
+    transform 0.15s;
+}
+.onhost {
+  background-image: url(../img/online-host.png);
+}
+.onjoin {
+  background-image: url(../img/online-join.png);
+}
+.ontile b {
+  font:
+    900 clamp(24px, 4.5vw, 40px) Impact,
+    'Arial Black',
+    sans-serif;
+  letter-spacing: 1px;
+  color: #a39aa8;
+  text-shadow:
+    0 0 6px #fbfaf4,
+    0 0 10px #fbfaf4; /* readable over the drawing behind */
+  transition: color 0.15s;
+}
+.ontile:focus {
+  outline: none;
+}
+.ontile:active .ontimg,
+body.padnav .ontile:focus .ontimg {
+  filter: none;
+  transform: scale(1.04);
+}
+.ontile:active b,
+body.padnav .ontile:focus b {
+  color: #1c1626;
+}
+@media (hover: hover) {
+  .ontile:hover .ontimg {
+    filter: none;
+    transform: scale(1.04);
+  }
+  .ontile:hover b {
+    color: #1c1626;
+  }
+}
 /* Under the modes: which story, or free-for-all / teams */
 .onsub:empty {
   display: none;

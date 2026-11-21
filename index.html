@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>StickFighters</title>
-<link rel="stylesheet" href="css/style.css?v=46">
+<link rel="stylesheet" href="css/style.css?v=47">
 </head>
 <body>
 <div id="wrap">
@@ -45,16 +45,18 @@
   </div>
  </div>
  <div class="screen" id="s-online" hidden>
-  <h2>ONLINE</h2>
+  <h2 id="on-h2">ONLINE</h2>
   <div id="on-menu" class="onpane">
-   <button class="btn" id="on-host">HOST A GAME</button>
+   <div class="ontiles"><button class="ontile" id="on-host"><span class="ontimg onhost"></span><b>HOST</b></button><button class="ontile" id="on-joinpick"><span class="ontimg onjoin"></span><b>JOIN</b></button></div>
+  </div>
+  <div id="on-joinpane" class="onpane" hidden>
    <div class="oncode">
     <button id="on-w-" aria-label="Previous word">&#9664;</button><b id="on-w">TIGER</b><button id="on-w+" aria-label="Next word">&#9654;</button>
     <span>-</span>
     <button id="on-a-" aria-label="First digit down">&#9664;</button><b id="on-a">1</b><button id="on-a+" aria-label="First digit up">&#9654;</button>
     <button id="on-b-" aria-label="Second digit down">&#9664;</button><b id="on-b">0</b><button id="on-b+" aria-label="Second digit up">&#9654;</button>
    </div>
-   <button class="btn alt" id="on-join">JOIN</button>
+   <button class="btn" id="on-join">JOIN</button>
   </div>
   <div id="on-room" class="onpane" hidden>
    <p class="onroomcode">ROOM CODE <b id="on-code"></b><span class="onsize"><button id="on-max-" aria-label="Fewer players">&minus;</button><b id="on-max">4</b> PLAYERS<button id="on-max+" aria-label="More players">+</button></span></p>
@@ -188,51 +190,51 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=46" defer></script>
-<script src="js/input.js?v=46" defer></script>
-<script src="js/data/moves.js?v=46" defer></script>
-<script src="js/data/enemies.js?v=46" defer></script>
-<script src="js/data/levels.js?v=46" defer></script>
-<script src="js/data/themes.js?v=46" defer></script>
-<script src="js/data/items.js?v=46" defer></script>
-<script src="js/data/skills.js?v=46" defer></script>
-<script src="js/data/sounds.js?v=46" defer></script>
-<script src="js/data/house.js?v=46" defer></script>
-<script src="js/progress.js?v=46" defer></script>
-<script src="js/economy.js?v=46" defer></script>
-<script src="js/player.js?v=46" defer></script>
-<script src="js/effects.js?v=46" defer></script>
-<script src="js/combat.js?v=46" defer></script>
-<script src="js/terrain.js?v=46" defer></script>
-<script src="js/enemies.js?v=46" defer></script>
-<script src="js/modes.js?v=46" defer></script>
-<script src="js/level.js?v=46" defer></script>
-<script src="js/run.js?v=46" defer></script>
-<script src="js/versus.js?v=46" defer></script>
-<script src="js/pickups.js?v=46" defer></script>
-<script src="js/net/rtc.js?v=46" defer></script>
-<script src="js/net/session.js?v=46" defer></script>
-<script src="js/ragdoll.js?v=46" defer></script>
-<script src="js/scenery.js?v=46" defer></script>
-<script src="js/biomes.js?v=46" defer></script>
-<script src="js/looks.js?v=46" defer></script>
-<script src="js/bosslooks.js?v=46" defer></script>
-<script src="js/house.js?v=46" defer></script>
-<script src="js/render.js?v=46" defer></script>
-<script src="js/ui/panels.js?v=46" defer></script>
-<script src="js/ui/training.js?v=46" defer></script>
-<script src="js/ui/touch-layout.js?v=46" defer></script>
-<script src="js/ui/lobby.js?v=46" defer></script>
-<script src="js/ui/online.js?v=46" defer></script>
-<script src="js/ui/bindings.js?v=46" defer></script>
-<script src="js/ui/character.js?v=46" defer></script>
-<script src="js/ui/skills.js?v=46" defer></script>
-<script src="js/ui/themes.js?v=46" defer></script>
-<script src="js/ui/victory.js?v=46" defer></script>
-<script src="js/ui/house.js?v=46" defer></script>
-<script src="js/ui/backup.js?v=46" defer></script>
-<script src="js/devtools.js?v=46" defer></script>
-<script src="js/selftest.js?v=46" defer></script>
-<script src="js/main.js?v=46" defer></script>
+<script src="js/core.js?v=47" defer></script>
+<script src="js/input.js?v=47" defer></script>
+<script src="js/data/moves.js?v=47" defer></script>
+<script src="js/data/enemies.js?v=47" defer></script>
+<script src="js/data/levels.js?v=47" defer></script>
+<script src="js/data/themes.js?v=47" defer></script>
+<script src="js/data/items.js?v=47" defer></script>
+<script src="js/data/skills.js?v=47" defer></script>
+<script src="js/data/sounds.js?v=47" defer></script>
+<script src="js/data/house.js?v=47" defer></script>
+<script src="js/progress.js?v=47" defer></script>
+<script src="js/economy.js?v=47" defer></script>
+<script src="js/player.js?v=47" defer></script>
+<script src="js/effects.js?v=47" defer></script>
+<script src="js/combat.js?v=47" defer></script>
+<script src="js/terrain.js?v=47" defer></script>
+<script src="js/enemies.js?v=47" defer></script>
+<script src="js/modes.js?v=47" defer></script>
+<script src="js/level.js?v=47" defer></script>
+<script src="js/run.js?v=47" defer></script>
+<script src="js/versus.js?v=47" defer></script>
+<script src="js/pickups.js?v=47" defer></script>
+<script src="js/net/rtc.js?v=47" defer></script>
+<script src="js/net/session.js?v=47" defer></script>
+<script src="js/ragdoll.js?v=47" defer></script>
+<script src="js/scenery.js?v=47" defer></script>
+<script src="js/biomes.js?v=47" defer></script>
+<script src="js/looks.js?v=47" defer></script>
+<script src="js/bosslooks.js?v=47" defer></script>
+<script src="js/house.js?v=47" defer></script>
+<script src="js/render.js?v=47" defer></script>
+<script src="js/ui/panels.js?v=47" defer></script>
+<script src="js/ui/training.js?v=47" defer></script>
+<script src="js/ui/touch-layout.js?v=47" defer></script>
+<script src="js/ui/lobby.js?v=47" defer></script>
+<script src="js/ui/online.js?v=47" defer></script>
+<script src="js/ui/bindings.js?v=47" defer></script>
+<script src="js/ui/character.js?v=47" defer></script>
+<script src="js/ui/skills.js?v=47" defer></script>
+<script src="js/ui/themes.js?v=47" defer></script>
+<script src="js/ui/victory.js?v=47" defer></script>
+<script src="js/ui/house.js?v=47" defer></script>
+<script src="js/ui/backup.js?v=47" defer></script>
+<script src="js/devtools.js?v=47" defer></script>
+<script src="js/selftest.js?v=47" defer></script>
+<script src="js/main.js?v=47" defer></script>
 </body>
 </html>

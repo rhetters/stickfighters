@@ -1,5 +1,5 @@
 const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // the game, opened from disk
-// Online rooms up to 6: the host's room size (- and +), a full room says FULL, six devices play a surprise story
+// The online screen's HOST / JOIN pictures and Join screen; online rooms up to 6: the host's room size (- and +), a full room says FULL, six devices play a surprise story
 // ('?') together in lockstep with no desync, and the HUD takes two columns
 const {chromium}=require('playwright');const {spawn}=require('child_process');let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const srv=spawn('node',[__dirname+'/sigserver.js','9321']);await new Promise(r=>setTimeout(r,400));
@@ -8,7 +8,12 @@ const errs=[];const mk=async(n)=>{const c=await b.newContext({viewport:{width:10
 const H=await mk('DAD');
 await H.evaluate(()=>{$('b-online').click()});
 if(process.env.SHOT)await H.screenshot({path:process.env.SHOT+'/online.png'});
-ok(await H.evaluate(()=>$('on-start').hidden&&!$('on-host').hidden&&!$('on-join').hidden&&!$('b-onlineback').hidden),'before hosting: HOST, JOIN and BACK, no START');
+ok(await H.evaluate(()=>$('on-start').hidden&&!$('on-menu').hidden&&$('on-joinpane').hidden&&!$('b-onlineback').hidden&&getComputedStyle(document.querySelector('.onhost .ontimg,.ontimg.onhost')).filter.includes('grayscale')),'before hosting: the HOST and JOIN pictures (grey until highlighted) and BACK, no START');
+ok(await H.evaluate(()=>new Promise(r=>{let n=0;for(const f of ['img/online-host.png','img/online-join.png']){const i=new Image();i.onload=()=>++n===2&&r(true);i.onerror=()=>r(false);i.src=f}})),'both pictures load');
+await H.evaluate(()=>$('on-joinpick').click());
+ok(await H.evaluate(()=>$('on-menu').hidden&&!$('on-joinpane').hidden&&$('on-h2').textContent==='JOIN'),'JOIN opens the Join screen: the room code, JOIN and BACK');
+await H.evaluate(()=>$('b-onlineback').click());
+ok(await H.evaluate(()=>!$('on-menu').hidden&&$('on-joinpane').hidden&&!$('s-online').hidden),'BACK on the Join screen returns to HOST / JOIN');
 await H.evaluate(()=>$('on-host').click());await H.waitForTimeout(3000);const code=await H.evaluate(()=>NET.code);
 ok(await H.evaluate(()=>NET.max===4&&$('on-cards').children.length===4&&!$('on-max+').hidden&&$('on-max-').disabled===false),'a room starts with 4 places; the host has - and +');
 await H.evaluate(()=>$('on-max-').click());await H.evaluate(()=>$('on-max-').click());await H.evaluate(()=>$('on-max-').click());
