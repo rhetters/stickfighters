@@ -2,6 +2,14 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M13 in progress: moon gravity, a steeper mountain, tower camera, helmet fixes (November 20, 2026)
+- **Low gravity on the moon:** jumps, launches and knock-ups float about twice as long and go a little higher (about a fifth). Up-and-down motion simply runs slower there, so every move still reaches the same places, only floatier.
+- **The mountainside gets steeper as you climb:** it starts gentle and ends about twice as steep, with small changes along the way, and is steeper overall than before. The view now measures the slope from a little farther into the screen so the hill stays in view.
+- **Launch tower camera:** the camera now follows you in mid-air too, instead of waiting until you land. It only moves when you get near the top or bottom of the screen, so small hops don't jiggle it.
+- **Bubble helmets fit everything:** the helmet sits a little higher and is bigger, so afros, buns and mohawks fit inside. Tall or wide hats (party, chef, top hat, wizard, halo, propeller, cowboy, viking) get a bigger bubble still.
+- The moon lander's glass dome sits on its body again.
+- Version 36.
+
 ## M13 in progress: Space, the launch tower's platforms, bubble helmets (November 20, 2026)
 - **New theme, Space:** the Launch Base (desert sky, far launch towers, radar dishes, fuel tanks), inside The Rocket (a metal corridor with round windows on streaming stars) and The Moon (craters, the Earth in the sky, a flag, a lander). On the moon everyone, players and enemies alike, wears a glass bubble helmet. The Pink Alien (antennae) is beamed down from a flying saucer at the end. New mini-bosses: the Launch Guard, the Space Brute and the Moon Mauler.
 - **Platforms up the launch tower:** at the end of the Launch Base you jump up girder platforms to the tower's top deck, and the camera rises with you. You can't walk in under the tower, so the only way up is jumping. Standing on the top deck starts the launch: everyone boards, a 3-2-1 countdown, lift-off, and the camera follows the rocket up.
