@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M14 in progress: a new Online screen (November 21, 2026)
+- **HOST and JOIN are pictures now,** cut from Rhett's drawing: HOST is the orange fighter by his computer and house, JOIN is three friends following a runner through a door. Both stay grey, with grey names under them, until one is highlighted (the mouse over it, a controller's highlight, or your finger on it); then it's in colour.
+- **HOST** makes a room and goes straight to the room. **JOIN** opens its own Join screen: the room code picker, JOIN and BACK (back to the two pictures).
+- Version 47.
+
 ## M14 in progress: less text, Story, rooms of 6 (November 21, 2026)
 - **Victory screen:** each card shows just Damage Done and Damage Taken, in two rows under the name. The line of time, score and ready-up help is gone. A new button named after the theme (MOUNTAIN +1, +2…) lights up when everyone is ready; nothing starts by itself any more. STORY (solo) or BACK TO PLAYERS (local co-op) and MAIN MENU sit beside it.
 - **Campaign is now Story** everywhere: the title's SOLO → STORY, the Story screen, co-op and the online room.

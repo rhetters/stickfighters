@@ -43,7 +43,7 @@ How the code fits together: files, the simulation, and how each system works. Up
 | 33 | `js/ui/training.js` | Training Room state (`TR`), dummies, hitbox and frame-data overlays, hotkeys |
 | 34 | `js/ui/touch-layout.js` | Touch layout profiles and the layout editor |
 | 35 | `js/ui/lobby.js` | Players screen: joining with controllers, touch, keyboard, keyboard 2; fighter picks (`lbLook`, `lbFighter`, `lbColor`, `lbHat`); `startMulti()` |
-| 36 | `js/ui/online.js` | Online screen: Host / Join, room code picker, room cards, mode and Start (in a room the screen gets `.inroom`, a compact layout that fits without scrolling), online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
+| 36 | `js/ui/online.js` | Online screen: the HOST / JOIN pictures (`img/online-host.png`, `img/online-join.png`, grey until highlighted, CSS only), the Join screen (`ONC.join`: room code picker), room cards, mode and Start (in a room the screen gets `.inroom`, a compact layout that fits without scrolling), online pause and results buttons (`onlineScreens`), YOU marker and waiting note (`onlineHud`) |
 | 37 | `js/ui/bindings.js` | Settings > Buttons: key and controller button bindings |
 | 38 | `js/ui/character.js` | Character screen and store: four fighter slots, Body tab (height, head size, head type, lines, stance, delete), tabbed shelves with sections and None cards, try-on and buying, pose wheel picks, animated preview (stance, Surge demo, poses) |
 | 39 | `js/ui/skills.js` | Skills screen: branch tabs, the four rows of nodes (tap to see, tap again to spend), ADD / TAKE BACK / RESET, the ultimate picker |
@@ -57,7 +57,7 @@ How the code fits together: files, the simulation, and how each system works. Up
 
 Nothing runs game code at load except data setup; boot (`checkUnlocks(); init(); applySet(); resize(); bindSettings(); syncTrain(); openTitle(); requestAnimationFrame(loop)`) is the last thing in `main.js`.
 
-Pictures live in `img/` and are used from the stylesheet: `img/title.jpg` (the title screen) and `img/multiplayer.jpg` (behind the Players and Online screens). `tools/bundle.py` inlines them for the preview.
+Pictures live in `img/` and are used from the stylesheet: `img/title.jpg` (the title screen), `img/multiplayer.jpg` (behind the Players and Online screens), and `img/online-host.png` / `img/online-join.png` (the Online screen's two buttons, cut from Rhett's drawing). `tools/bundle.py` inlines them for the preview.
 
 Outside the game: `tools/tests/` (browser tests, run with `node tools/tests/run.js`) and `tools/bundle.py` (the single-file preview). Nothing in `tools/` is loaded by `index.html`.
 
