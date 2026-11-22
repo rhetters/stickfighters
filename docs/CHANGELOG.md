@@ -2,6 +2,13 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M14 in progress: picture menus (November 22, 2026)
+- **The title menu is pictures now:** SOLO (Orange punching the pink army), MULTIPLAYER (four friends) and CUSTOMIZE (a dressing mirror, a hat and paint). They're grey until highlighted; tap one and it turns colour with its two choices on it (STORY | ARCADE, LOCAL | ONLINE, CHARACTER | HOUSE). TRAINING and SETTINGS are smaller buttons with a punching bag and a gear.
+- **The Story screen is pictures too:** a castle, a pirate ship, a mountain with a gondola and the Yeti, a rocket by the moon, and a mystery box for ?. The list of places and bosses is gone; a ★ CLEARED mark shows the ones you've beaten.
+- The pictures are hand-drawn vector drawings (img/menu-*.svg, img/story-*.svg) in the notebook style, from the menu concepts Ron reviewed.
+- A controller's highlight skips a title tile while its two choices are showing.
+- Version 49.
+
 ## M14 in progress: new player bars, the treasure chest (November 21, 2026)
 - **New player bars, from Rhett's concept art:** each player gets a bar across the top with their name, their fighter's head (hair and hat included) in a ring of their colour, five hearts for health (a heart empties as you're hit, and what you just lost fades out in pink), the Surge bar under the hearts, and the ultimate meter standing up to the left of the head. Works for 1 to 6 players. The level name and map line at the top, and the score, are gone; your ninja stars stay in the top right, and the pause button moved to the top right corner beside them. The wave, round and timer now sit under the bars.
 - **The treasure chest:** a chest in the bottom right of the Character screen opens a code screen: four squares (tap one to change its picture: star, ninja star, heart, crown, lightning, flame, moon, drop), REDEEM and BACK. A right code plays a cha-ching and shows its item in a window; a wrong one buzzes and the squares shake. The first code, four stars, gives **Rhett's Shirt** (a green tee). Secret items don't appear on the shelves until they're yours.
