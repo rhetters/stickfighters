@@ -48,7 +48,9 @@ function reviveTick() {
   if (PL.length < 2) return;
   for (const q of PL) {
     if (q.st !== 'dead' || q.left || (q.deadT || 0) < 40) continue;
-    const near = PL.some(p => p !== q && p.st !== 'dead' && Math.abs(p.x - q.x) < 70 && p.y >= p.gy - 4);
+    const near = PL.some(
+      p => p !== q && p.st !== 'dead' && Math.abs(p.x - q.x) < 70 && Math.abs(p.y - q.y) < 60 && p.y >= p.gy - 4
+    ); // beside them, on the same level
     q.rv = near ? (q.rv || 0) + 1 : Math.max(0, (q.rv || 0) - 2);
     if (q.rv >= 120) {
       Object.assign(q, {
@@ -64,7 +66,7 @@ function reviveTick() {
       });
       q.pose[9] = 0;
       txt(q.x, q.y - 110, 'REVIVED!', q.col, 22);
-      for (const p of PL) if (p !== q && p.st !== 'dead' && Math.abs(p.x - q.x) < 70) tally(p, 'revives', 1);
+      for (const p of PL) if (p !== q && p.st !== 'dead' && Math.abs(p.x - q.x) < 70 && Math.abs(p.y - q.y) < 60) tally(p, 'revives', 1);
       ring(q.x, q.y - 40, 60);
       sfx(600, 0.3, 'triangle', 0.06, 500);
     }

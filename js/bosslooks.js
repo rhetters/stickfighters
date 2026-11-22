@@ -2,7 +2,7 @@
 // drawn like a dressed-up player: store items it wears go through the player's look code (looks.js), and its
 // boss-only parts (`extra`) are drawn here, in the same layers: behind the body, over the body, on the head, in
 // front. Each main boss has its own silhouette: the General's cap, cape and medals; Pinkbeard's coat, beard, hook
-// and peg leg; the Yeti's fur; the Alien's big head and eyes.
+// and peg leg; the Yeti's fur; the Alien's big head and eyes; the Tiki's mask, flower necklace and grass skirt.
 
 // A boss's look object from its type's `look` data (the same shape as a player's: lookRaw in economy.js)
 function bossLook(T0) {
@@ -113,8 +113,25 @@ function drawBossParts(f, J, L, r, w, ph) {
         ctx.stroke();
       });
     }
+    // the Tiki's flower necklace
+    if (X.has('lei') && J.nk && J.sh) {
+      const c = mix(J.nk, J.sh, 0.55),
+        cols = ['#ff4f6e', '#ffd23f', '#fff8ee', '#ff9fcd'];
+      for (let i = 0; i < 9; i++) {
+        const a = Math.PI * (0.05 + (i / 8) * 0.9);
+        ctx.fillStyle = cols[i % 4];
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = Math.max(1, w * 0.45);
+        ctx.beginPath();
+        ctx.arc(c[0] + Math.cos(a) * r * 0.95, c[1] + Math.sin(a) * r * 0.55 - r * 0.25, r * 0.22, 0, 7);
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
     headFrame(J, J.hd, () => bossHead(X, r, w));
   } else if (ph === 'legs') {
+    // the Tiki's grass skirt, over both legs, swaying
+    if (X.has('grassskirt') && J.hp && J.kf && J.kb) skirt(J, r, w);
     // Pinkbeard's peg leg: the back leg below the knee is a wooden peg
     if (X.has('pegleg') && J.kb && J.fb) {
       inked([J.kb, J.fb], r * 0.42, '#a4794f');
@@ -151,8 +168,112 @@ function drawBossParts(f, J, L, r, w, ph) {
     }
   }
 }
+// The Tiki's grass skirt: a band at the hips and strands down past the knees
+function skirt(J, r, w) {
+  const hp = J.hp,
+    kn = [(J.kf[0] + J.kb[0]) / 2, Math.max(J.kf[1], J.kb[1])],
+    len = Math.max(r * 1.6, kn[1] - hp[1] + r * 0.5),
+    sw = Math.sin(fr * 0.15) * r * 0.15,
+    top = r * 0.95,
+    bot = r * 1.45;
+  ctx.fillStyle = '#d9c46a';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = w;
+  ctx.beginPath();
+  ctx.moveTo(hp[0] - top, hp[1] - r * 0.15);
+  ctx.lineTo(hp[0] + top, hp[1] - r * 0.15);
+  ctx.lineTo(hp[0] + bot + sw, hp[1] + len);
+  for (let i = 8; i >= 0; i--) ctx.lineTo(hp[0] - bot + ((2 * bot) * i) / 8 + sw, hp[1] + len - (i % 2) * r * 0.25);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = '#9a8434';
+  ctx.lineWidth = Math.max(1, w * 0.4);
+  ctx.beginPath();
+  for (let i = 1; i < 8; i++) {
+    const t = i / 8;
+    ctx.moveTo(hp[0] - top + 2 * top * t, hp[1] + r * 0.1);
+    ctx.lineTo(hp[0] - bot + 2 * bot * t + sw, hp[1] + len - r * 0.2);
+  }
+  ctx.stroke();
+  // the band
+  ctx.fillStyle = '#7fbf5c';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = w;
+  ctx.beginPath();
+  ctx.rect(hp[0] - top * 1.05, hp[1] - r * 0.3, top * 2.1, r * 0.38);
+  ctx.fill();
+  ctx.stroke();
+}
 // The bosses' head parts, in the head's own frame (x forward, y down, r = head radius)
 function bossHead(X, r, w) {
+  if (X.has('tikimask')) {
+    // a tall carved wooden mask with a crown of leaves: angry brows, round eyes and a wide grin full of teeth
+    for (let i = 0; i < 5; i++) {
+      const a = -Math.PI / 2 + (i - 2) * 0.38;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a - 0.12) * r * 1.1, -r * 0.9 + Math.sin(a - 0.12) * r * 0.5);
+      ctx.lineTo(Math.cos(a) * r * 1.7, -r * 1.25 + Math.sin(a) * r * 1.1);
+      ctx.lineTo(Math.cos(a + 0.12) * r * 1.1, -r * 0.9 + Math.sin(a + 0.12) * r * 0.5);
+      ctx.closePath();
+      shapeDo(i % 2 ? '#3ccf6e' : '#2fa84f', w);
+    }
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-r * 1.0, -r * 1.35, r * 2.25, r * 2.75, r * 0.45);
+    else ctx.rect(-r * 1.0, -r * 1.35, r * 2.25, r * 2.75);
+    shapeDo('#b9824a', w);
+    // carved grooves
+    ctx.strokeStyle = '#7a4f2a';
+    ctx.lineWidth = Math.max(1, w * 0.5);
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.9, -r * 0.95);
+    ctx.lineTo(r * 1.15, -r * 0.95);
+    ctx.moveTo(-r * 0.9, r * 1.2);
+    ctx.lineTo(r * 1.15, r * 1.2);
+    ctx.stroke();
+    // brows
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = w * 1.1;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.55, -r * 0.72);
+    ctx.lineTo(r * 0.05, -r * 0.42);
+    ctx.moveTo(r * 0.95, -r * 0.72);
+    ctx.lineTo(r * 0.35, -r * 0.42);
+    ctx.stroke();
+    // eyes
+    for (const ex of [-r * 0.25, r * 0.7]) {
+      ctx.beginPath();
+      ctx.arc(ex, -r * 0.15, r * 0.24, 0, 7);
+      shapeDo('#fff8ee', w * 0.7);
+      ctx.fillStyle = INK;
+      ctx.beginPath();
+      ctx.arc(ex + r * 0.07, -r * 0.13, r * 0.1, 0, 7);
+      ctx.fill();
+    }
+    // nose
+    ctx.beginPath();
+    ctx.moveTo(r * 0.22, -r * 0.1);
+    ctx.lineTo(r * 0.42, r * 0.3);
+    ctx.lineTo(r * 0.05, r * 0.3);
+    ctx.closePath();
+    shapeDo('#a4703e', w * 0.7);
+    // the grin
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-r * 0.55, r * 0.48, r * 1.55, r * 0.55, r * 0.2);
+    else ctx.rect(-r * 0.55, r * 0.48, r * 1.55, r * 0.55);
+    shapeDo('#fff8ee', w * 0.8);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1, w * 0.5);
+    ctx.beginPath();
+    for (let i = 1; i < 6; i++) {
+      ctx.moveTo(-r * 0.55 + (r * 1.55 * i) / 6, r * 0.5);
+      ctx.lineTo(-r * 0.55 + (r * 1.55 * i) / 6, r * 1.01);
+    }
+    ctx.moveTo(-r * 0.55, r * 0.76);
+    ctx.lineTo(r * 1.0, r * 0.76);
+    ctx.stroke();
+  }
   if (X.has('furhead')) {
     // a shaggy white mane around the face (a ring, so the face shows)
     ctx.beginPath();

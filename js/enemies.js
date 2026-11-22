@@ -51,6 +51,7 @@ function updE(e) {
         e.pose[9] = 0;
         if (!e.dying) {
           e.hp -= 4;
+          if (e.hp <= 0 && MODE.spare && MODE.spare(e)) e.hp = 1;
           if (e.hp <= 0) {
             e.dying = 1;
             e.dk = 'slump';
@@ -209,6 +210,13 @@ function aiThink(e, Q, T_) {
   if (e.cd > 0) e.cd--;
   const spd = T_.spd * (e.chase > 0 ? 1.6 : 1) * (e.bp > 1 ? 1.3 : 1),
     inRange = Math.abs(Q.x - e.x) <= T_.ar && Math.abs(Q.y - e.y) < 55;
+  // a boss waiting at the top (the volcano's rim) only fights whoever reaches his level
+  if (e.perch && Math.abs(Q.gy - e.gy) > 10) {
+    e.vx *= 0.7;
+    return;
+  }
+  // ledges: a target on another level is followed there (jump up to it, or drop down)
+  if (TERRAIN.n && !e.perch && followLevel(e, Q, spd)) return;
   if (T_.ai === 'boss') return bossThink(e, Q, T_, spd);
   if (T_.ai === 'flank') {
     // get behind the target: aim for the spot at its back; if it's facing us up close, leap over it
@@ -233,6 +241,56 @@ function aiThink(e, Q, T_) {
   const dist = Math.abs(Q.x - e.x),
     dir = dist > want + 6 ? side : dist < want - 6 ? -side : 0;
   e.vx += (dir * spd * (dir === -side ? 0.6 : 1) - e.vx) * 0.2;
+}
+// Platforms (terrain.js): an enemy whose target stands on another level goes after it. Below it: drop through the
+// ledge it's on (or walk off its end). Above it: walk under the nearest ledge on the way up (a jump's height above
+// it), then jump onto it; from there the next one, until it's on the target's level. Returns true when it moved.
+function followLevel(e, Q, spd) {
+  const wait = e.t < (e.jcd || 0); // a moment between jumps and drops (e.jcd: the step it may go again)
+  const dy = Q.gy - e.gy;
+  if (Math.abs(dy) < 40 || Q.st === 'dead') return false;
+  if (dy > 0) {
+    if (e.surf && Math.abs(Q.x - e.x) < 200 && !wait) {
+      terrainDrop(e);
+      e.jcd = e.t + 30;
+      return true;
+    }
+    return false; // walking toward the target takes it off the end of its ledge
+  }
+  // the ledge to jump up to: higher than here by at most a jump, as close as possible to the target
+  let best = null,
+    bd = 1e9;
+  const c0 = Math.floor((Math.min(e.x, Q.x) - 300) / TERRAIN.cell),
+    c1 = Math.floor((Math.max(e.x, Q.x) + 300) / TERRAIN.cell);
+  for (let c = c0; c <= c1; c++)
+    for (const s of TERRAIN.b.get(c) || []) {
+      const up = e.gy - Math.min(s.y1, s.y2);
+      if (up < 30 || up > 200 || s.y1 !== s.y2) continue;
+      const d = Math.abs(Math.max(s.x1 + 20, Math.min(s.x2 - 20, Q.x)) - e.x) + Math.abs(s.y1 - Q.gy) * 0.5;
+      if (d < bd) {
+        bd = d;
+        best = s;
+      }
+    }
+  if (!best) return false;
+  const tx = Math.max(best.x1 + 24, Math.min(best.x2 - 24, Q.x)),
+    side = Math.sign(tx - e.x) || 1;
+  e.face = side;
+  // jump when near enough below it, or at the end of the ledge we're on (rather than walking off)
+  const edge = e.surf && (side > 0 ? e.x > e.surf.x2 - 30 : e.x < e.surf.x1 + 30);
+  if ((e.x > best.x1 - 50 && e.x < best.x2 + 50) || edge) {
+    if (wait) {
+      e.vx *= 0.6; // wait at the edge, don't walk off it
+      return true;
+    }
+    // up and onto it (a little higher than needed, drifting toward the spot)
+    e.vy = -Math.sqrt(2 * 0.7 * FEEL.grav * (e.gy - best.y1 + 45));
+    e.vx = Math.max(-4, Math.min(4, (tx - e.x) / 22));
+    e.jcd = e.t + 45;
+    return true;
+  }
+  e.vx += (side * spd - e.vx) * 0.2;
+  return true;
 }
 // ===== BOSS FRAMEWORK: phases by health, health bar, scripted attack patterns =====
 const BOSSPH = {
@@ -281,6 +339,12 @@ BOSSPH.Y = [
   { at: 0.33, cd: 0.5, enter: () => (bn('THE YETI IS FURIOUS!'), bossCall(['b', 'u', 'g', 'r'])) }
 ];
 // The Pink Alien: the same three phases, beaming his army down
+// The Pink Tiki: the same three phases, calling his jungle army (his last stand is the lava escape, volcano.js)
+BOSSPH.K = [
+  { at: 1, cd: 1 },
+  { at: 0.66, cd: 0.75, enter: () => (bn('THE TIKI IS ANGRY!'), bossCall(['g', 'r', 'f'])) },
+  { at: 0.33, cd: 0.5, enter: () => (bn('THE TIKI IS FURIOUS!'), bossCall(['b', 'u', 'g', 'r'])) }
+];
 BOSSPH.Z = [
   { at: 1, cd: 1 },
   { at: 0.66, cd: 0.75, enter: () => (bn('THE ALIEN IS ANGRY!'), bossCall(['g', 'f', 'r'])) },

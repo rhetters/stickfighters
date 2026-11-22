@@ -120,6 +120,7 @@ function drawLevelBg() {
           lifted(x, () => drawProp(p, x, dk));
       }
   for (const g of LV.gates) lifted(g.x, () => drawGate(g));
+  if (LV.haz) drawVents();
   ctx.restore();
 }
 function drawLevelFg() {
@@ -543,6 +544,7 @@ function drawBiomeProp(p, x) {
   else if (drawPiratePropDone(k, x, s)) return;
   else if (drawMountainPropDone(k, x, s)) return;
   else if (drawSpacePropDone(k, x, s)) return;
+  else if (drawVolcanoProp(k, x, s)) return;
   else if (k === 'trans-pipe' || k === 'trans-pipeout') drawBigPipe(x, k === 'trans-pipeout');
   else if (k === 'trans-rope') drawChasm(x);
   else if (k === 'trans-gate') {
@@ -1792,9 +1794,14 @@ function drawMoon() {
   ctx.lineTo(W + 30, G + 6);
   ctx.stroke();
 }
-// The launch tower's platforms (terrain) as steel girders, and the tower's frame behind them
+// The launch tower's platforms (terrain) as steel girders, and the tower's frame behind them; the volcano's rock ledges
 function drawPlatforms() {
+  if (LV.esc && LV.esc.on) drawEscLedges();
   for (const s of LV.terr.s) {
+    if (s.st === 'rock') {
+      drawLedge(s, 0); // the volcano's rock ledges (volcano.js)
+      continue;
+    }
     const w = s.x2 - s.x1;
     inkRect(s.x1, s.y1, w, 12, '#ff9a3c', 3);
     ctx.strokeStyle = 'rgba(28,22,38,0.6)';

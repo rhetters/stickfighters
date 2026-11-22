@@ -1976,6 +1976,7 @@ body.padnav #ui select:focus {
 .th-pirate,
 .th-mountain,
 .th-space,
+.th-volcano,
 .th-q {
   background-color: transparent;
 }
@@ -1990,6 +1991,9 @@ body.padnav #ui select:focus {
 }
 .th-space {
   background-image: url(../img/story-space.svg);
+}
+.th-volcano {
+  background-image: url(../img/story-volcano.svg);
 }
 .th-q {
   background-image: url(../img/story-surprise.svg);
@@ -2381,6 +2385,7 @@ body.padnav .ptile:focus b {
 .i-pirate { background-image: url(../img/story-pirate.svg); }
 .i-mountain { background-image: url(../img/story-mountain.svg); }
 .i-space { background-image: url(../img/story-space.svg); }
+.i-volcano { background-image: url(../img/story-volcano.svg); }
 .i-q { background-image: url(../img/story-surprise.svg); }
 /* The title: three tiles, then Training and Settings smaller */
 #s-title .ttiles .ptile {

@@ -76,6 +76,8 @@ function continueLevel() {
     }
   });
   LV.cine = LV.say = null;
+  LV.esc = LV.rk = null; // the volcano's rising lava and falling rocks start over with the fight
+  LV.escPend = LV.fin = 0;
   // transitions after the checkpoint play again
   const cpE = LV.encs[LV.cp];
   if (LV.trans) for (const t of LV.trans) if (!cpE || t.x > cpE.x) t.done = 0;
@@ -175,6 +177,9 @@ function levelTick() {
     tr = LV.trans ? nextTrans() : null,
     trc = tr && TRANSITIONS[tr.k].cine && (!ne || ne.x > tr.x) ? tr : null; // a scene is next
   if (g && g.hit > 0) g.hit--;
+  // the volcano's hazards and its lava escape (volcano.js); the boss's last stand starts a scene
+  if (LV.escPend) return escapeStart(ae);
+  hazTick(ae);
   if (!ae) {
     // the camera only moves forward, and stops at the next fight or in front of the gate
     let mx = LV.len - W;
@@ -182,7 +187,7 @@ function levelTick() {
     if (g) mx = Math.min(mx, g.x - W + 140);
     if (trc) mx = Math.min(mx, trc.x - W + 260);
     const d = Math.min(lead - W * 0.45, mx) - CAM.x;
-    if (d > 0) CAM.x += Math.min(d, 1 + d * 0.08);
+    if (d > 0 && !LV.esc) CAM.x += Math.min(d, 1 + d * 0.08); // out of the volcano, the run ends at the rim
     if (ne && CAM.x >= ne.lock - 0.5) {
       ne.st = 1;
       // online, anyone left behind is brought into the arena
@@ -208,9 +213,9 @@ function levelTick() {
     // reaching a transition's scene (catapult, pipe, rope) starts it; the launch, once someone is on the top deck
     const there = trc && (trc.top ? alive.some(p => p.gy <= trc.top + 1 && p.x >= trc.deck) : lead >= trc.x - 150);
     if (there && !LV.encs.some(e => e.st === 1)) cineStart(trc.k, { tr: trc });
-    // online each screen frames only its own player (CAM.y and CAM.z are drawing only)
-    if (LV.terr) levelCamUp(ownView() ? alive.filter(p => p.slot === NET.mySlot) : alive);
   }
+  // online each screen frames only its own player (CAM.y and CAM.z are drawing only); fights on ledges too
+  if (LV.terr) levelCamUp(ownView() ? alive.filter(p => p.slot === NET.mySlot) : alive);
   levelWalls();
   if (ae) {
     if (ae.q.length && --spawnT <= 0 && E.filter(e => !e.dying).length < ae.max + PL.length - 1) {
@@ -244,7 +249,8 @@ function levelTick() {
       }
   }
   for (const e of E) if (e.x < CAM.x - 120) e.gone = 1; // bodies left behind as the trail scrolls on
-  if (!ne && !ae && lead > LV.len - 150) levelClear();
+  // the end of the level, or (the volcano) a moment after the boss falls at the rim
+  if (!ne && !ae && (lead > LV.len - 150 || (LV.esc && LV.fin && LV.go < 120))) levelClear();
 }
 function fmtT(fr_) {
   const s = Math.floor(fr_ / 60);
@@ -301,7 +307,18 @@ function levelFail() {
 function levelHud() {
   // enemies left in the fight, or GO → once it's won (the player bars are in render.js)
   const ae = LV.encs.find(e => e.st === 1);
-  if (ae) {
+  if (LV.esc && !LV.esc.said && !LV.fin && !LV.cine && state === 'play') {
+    // the lava escape: CLIMB! with an arrow up
+    if ((fr >> 4) % 2) {
+      ctx.textAlign = 'right';
+      ctx.font = '900 40px Impact,"Arial Black",sans-serif';
+      ctx.lineWidth = 7;
+      ctx.lineJoin = 'round';
+      ctx.strokeText('↑ CLIMB!', W - 24, 230);
+      ctx.fillStyle = '#ff5a1f';
+      ctx.fillText('↑ CLIMB!', W - 24, 230);
+    }
+  } else if (ae) {
     const n = ae.q.length + E.filter(e => !e.dying).length;
     ctx.textAlign = 'right';
     ctx.fillStyle = '#e8212b';
@@ -324,7 +341,7 @@ const LEVEL = {
   bg: () => drawLevelBg(),
   fg: () => drawLevelFg(),
   hud: levelHud,
-  world: () => (drawCine(), drawSay()),
+  world: () => (drawVolcanoFront(), drawCine(), drawSay()),
   revive: 1,
   // each player's stats for the victory screen, kept on the run (so a continue keeps them)
   tally(p, k, n) {
@@ -334,6 +351,14 @@ const LEVEL = {
     else s[k] += n;
   },
   hard: () => (LV && LV.run && LV.run.ng) || 0,
+  // The volcano's boss can't be beaten at the bottom of the crater: at his last bit of health he stays up, and his
+  // last stand (the lava escape, volcano.js) starts on the next step
+  spare(e) {
+    const ae = LV.run && !LV.esc && LV.encs.find(x => x.st === 1);
+    if (!ae || !ae.esc || e.tk !== ae.boss) return false;
+    LV.escPend = 1;
+    return true;
+  },
   // The final blow on a theme's main boss: everything else left standing falls with it, in slow motion
   onKill(e, by) {
     const ae = LV.run && !LV.fin && LV.encs.find(x => x.st === 1);
@@ -366,9 +391,12 @@ function levelCamUp(alive) {
     ty = 0,
     tz = 1;
   if (alive.length && CAM.x + W > x0 && CAM.x < x1) {
-    const top = Math.min(...alive.map(p => p.y)) - 110, // headroom above the highest player
-      bot = Math.max(...alive.map(p => p.y)) + 30,
-      sTop = 70, // keep heads below the scores
+    let top = Math.min(...alive.map(p => p.y)) - 110; // headroom above the highest player
+    // nearing the volcano's rim: the boss waiting up there (he's tall) comes into the picture
+    if (LV.esc && LV.esc.on && top < LV.esc.top + 300) top = Math.min(top, LV.esc.top - 300);
+    const bot = Math.max(...alive.map(p => p.y)) + 30,
+      // keep heads below the scores (and a boss's health bar)
+      sTop = LV.encs.some(e => e.st === 1 && (e.boss || e.mini)) ? 150 : 70,
       sBot = H - 10;
     tz = Math.max(CAM_ZMIN, Math.min(1, (sBot - sTop) / Math.max(1, bot - top)));
     // put the highest head at sTop on screen (screen y = G + (y - G - CAM.y) * z), never showing below the ground
