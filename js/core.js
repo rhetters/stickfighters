@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 52;
+const GAME_VERSION = 53;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,

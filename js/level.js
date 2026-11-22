@@ -384,6 +384,7 @@ const LEVEL = {
 // far as CAM_ZMIN like the house camera; past that, it keeps the highest player in view (the others show an arrow
 // at the screen's edge: drawOffArrows in render.js).
 const CAM_ZMIN = 0.6;
+const CAM_FOOT = []; // where each player last stood (drawing only)
 function levelCamUp(alive) {
   let s = LV.terr.s,
     x0 = Math.min(...s.map(q => q.x1)) - 200,
@@ -392,12 +393,20 @@ function levelCamUp(alive) {
     tz = 1;
   if (alive.length && CAM.x + W > x0 && CAM.x < x1) {
     let top = Math.min(...alive.map(p => p.y)) - 110; // headroom above the highest player
-    // nearing the volcano's rim: the boss waiting up there (he's tall) comes into the picture
-    if (LV.esc && LV.esc.on && top < LV.esc.top + 300) top = Math.min(top, LV.esc.top - 300);
-    const bot = Math.max(...alive.map(p => p.y)) + 30,
+    // the volcano's climb out: a jump doesn't lift the bottom of the view (it stays where you took off from)
+    const foot = p => {
+      if (!LV.esc || p.y >= p.gy - 1 || CAM_FOOT[p.slot] === undefined) CAM_FOOT[p.slot] = p.y;
+      return Math.max(p.y, CAM_FOOT[p.slot]);
+    };
+    const bot = Math.max(...alive.map(foot)) + 30,
       // keep heads below the scores (and a boss's health bar)
       sTop = LV.encs.some(e => e.st === 1 && (e.boss || e.mini)) ? 150 : 70,
       sBot = H - 10;
+    // nearing the volcano's rim: the boss waiting up there (he's tall) comes into the picture, but only as much of
+    // him as fits with room to spare under the lowest player (short of the farthest zoom, so the view keeps up with
+    // a jump)
+    if (LV.esc && LV.esc.on && top < LV.esc.top + 300)
+      top = Math.min(top, Math.max(LV.esc.top - 300, bot + 40 - (sBot - sTop) / (CAM_ZMIN + 0.1)));
     tz = Math.max(CAM_ZMIN, Math.min(1, (sBot - sTop) / Math.max(1, bot - top)));
     // put the highest head at sTop on screen (screen y = G + (y - G - CAM.y) * z), never showing below the ground
     ty = Math.min(0, top - G - (sTop - G) / tz);

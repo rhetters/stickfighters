@@ -699,6 +699,11 @@ function drawLedge(s, dx) {
   ctx.lineTo(x1 + w * 0.34, y + 30);
   ctx.stroke();
 }
+// The rock ledges, drawn in front of the scenery (a lava fall or a stone tiki never covers a ledge)
+function drawRockLedges() {
+  if (LV.esc && LV.esc.on) drawEscLedges();
+  for (const s of LV.terr.s) if (s.st === 'rock') drawLedge(s, 0);
+}
 // The escape's ledges: they slide out of the crater walls as the lava starts rising
 function drawEscLedges() {
   const L = LV.esc,

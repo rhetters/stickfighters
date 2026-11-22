@@ -58,6 +58,12 @@ const climb=await ev(`(()=>{const P=PL[0],L=LV.esc,S=[...L.s].sort((a,b)=>b.y1-a
  const B=E.find(e=>e.tk==='K');return {out,said:L.said,lava:L.y>L.top+100,cam:CAM.y<-600}})()`);
 ok(climb.out.every(x=>x)&&climb.lava,'the ledges can be climbed with ordinary jumps, all the way to the rim, ahead of the lava '+JSON.stringify(climb));
 ok(climb.said&&climb.cam,'at the rim he has something to say, and the view rose with you');
+// near the rim the view shows the boss but never loses you (on each of the top ledges and jumping between them)
+const cam=await ev(`(()=>{const P=PL[0],L=LV.esc,S=[...L.s].sort((a,b)=>b.y1-a.y1).slice(-4,-1),out=[];const on=p=>{const sx=(p.x-viewX())*CAM.z,sy=G+(p.y-G-CAM.y)*CAM.z,hy=G+(p.y-100-G-CAM.y)*CAM.z;return sx>0&&sx<W&&sy<H&&hy>0};
+ for(const s of S){let ok=true;const put=()=>{P.x=(s.x1+s.x2)/2;P.y=s.y1;P.gy=s.y1;P.surf=s;P.vy=0};put();for(let i=0;i<150;i++){L.y=G+40;fr++;update();P.hp=P.max;if(i>60&&!on(P))ok=false}
+  put();setA('kb','j',1);fr++;update();setA('kb','j',0);for(let i=0;i<40;i++){L.y=G+40;fr++;update();if(!on(P))ok=false}out.push(ok?1:0)}
+ return out})()`);
+ok(cam.every(x=>x),'near the rim the view never loses you: on each of the last ledges and jumping from them '+JSON.stringify(cam));
 const fin=await ev(`(()=>{const B=E.find(e=>e.tk==='K');PL[0].x=B.x-60;PL[0].face=1;hurtE(B,{dmg:5,kb:5,ef:'kd'},1,null,PL[0]);const d=!!B.dying;for(let i=0;i<600&&state==='play';i++){fr++;update()}return {d,fin:LV.fin,state}})()`);
 ok(fin.d&&fin.fin&&fin.state==='clear','one more hit at the rim finishes him (the slow-motion finale) and the run is won '+JSON.stringify(fin));
 // the lava: it bounces you up, never knocks you out, and brings back a knocked-out player

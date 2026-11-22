@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M15: Volcano fixes (November 22, 2026)
+- **The crater's rock ledges are drawn in front of the scenery,** so a lava fall or a stone tiki no longer shows in front of a ledge.
+- **The camera at the rim:** near the top of the climb out, the view showed the Pink Tiki and could lose you on the last jumps. Now it fits him in only as far as it can while keeping you on screen, and a jump no longer lifts the bottom of the view.
+- Version 53.
+
 ## M15: the Volcano (November 22, 2026)
 - **A new story, VOLCANO:** the Tiki Jungle, the Ashy Slopes and the Crater, with its own picture on the Story screen.
 - **New in the Tiki Jungle: steam vents.** Every few seconds a vent hisses, then blasts whoever is standing on it high into the air. For you it's a super jump; enemies get knocked flying (lure them onto one and juggle them). A giant vent (the geyser) can blast everyone over into the next place.
