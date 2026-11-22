@@ -120,6 +120,7 @@ function drawLevelBg() {
           lifted(x, () => drawProp(p, x, dk));
       }
   for (const g of LV.gates) lifted(g.x, () => drawGate(g));
+  if (LV.terr) drawRockLedges(); // the volcano's ledges, in front of the scenery (volcano.js)
   if (LV.haz) drawVents();
   ctx.restore();
 }
@@ -1794,14 +1795,10 @@ function drawMoon() {
   ctx.lineTo(W + 30, G + 6);
   ctx.stroke();
 }
-// The launch tower's platforms (terrain) as steel girders, and the tower's frame behind them; the volcano's rock ledges
+// The launch tower's platforms (terrain) as steel girders, and the tower's frame behind them
 function drawPlatforms() {
-  if (LV.esc && LV.esc.on) drawEscLedges();
   for (const s of LV.terr.s) {
-    if (s.st === 'rock') {
-      drawLedge(s, 0); // the volcano's rock ledges (volcano.js)
-      continue;
-    }
+    if (s.st === 'rock') continue; // the volcano's rock ledges are drawn after the props (drawRockLedges)
     const w = s.x2 - s.x1;
     inkRect(s.x1, s.y1, w, 12, '#ff9a3c', 3);
     ctx.strokeStyle = 'rgba(28,22,38,0.6)';
