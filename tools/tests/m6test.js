@@ -36,7 +36,7 @@ await p.tap('#le-save');await W(100);ok(await p.isVisible('#le-namebox'),'saving
 await p.locator('#le-name').fill('Rhett');await p.tap('#le-name-ok');await W(200);
 ok(!(await ev("EDITING()"))&&await p.isVisible('#s-settings')&&await ev("LAY.active")==='Rhett'&&await p.inputValue('#o-prof')==='Rhett','saved as profile "Rhett", now active, back in Settings');
 // play with it: the button is where it was placed and works by touch
-await p.tap('#b-back');await W(100);await p.tap('#b-start');await W(500);
+await p.tap('#b-back');await W(100);await p.evaluate('openSolo()');await p.tap('#b-start');await W(500);
 const gp=await bb('.tb[data-a=p]');ok(Math.abs(gp.x+gp.width/2-tx)<8&&Math.abs(gp.y+gp.height/2-ty)<8,'in the game, PUNCH sits where it was placed');
 const cdp=await c.newCDPSession(p);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:gp.x+gp.width/2,y:gp.y+gp.height/2,id:1}]});await W(60);
 const kp=await ev("INP[0].K.p");await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});ok(kp===1,'tapping the moved PUNCH button punches');

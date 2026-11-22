@@ -50,7 +50,7 @@ ok(await ev("HITS.length")===0,'Quake Leap misses a player who is in the air');
 const qs=await ev("[1,2,3,5,10].map(n=>makeQueue(n).join(''))");
 ok(!/[uf]/.test(qs[0]),'wave 1: only grunts');ok(/u/.test(qs[1]),'wave 2 adds Guards');ok(/f/.test(qs[2])&&/b/.test(qs[2]),'wave 3 adds Flankers and Brutes');ok(qs[3].endsWith('c')&&qs[4].endsWith('c')&&!qs[2].includes('c'),'Captain arrives on waves 5 and 10');
 // full play run
-await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.click('#b-start');await W(300);
+await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.evaluate('openSolo()');await p.click('#b-start');await W(300);
 await ev("wave=4;queue=[];E.forEach(e=>e.gone=1);E=[]");for(let i=0;i<60;i++){await p.keyboard.press(i%3?'j':'k');await W(100)}
 await p.screenshot({path:S+'/shots/m7-play.png'});ok(await ev("wave>=5"),'play mode reaches wave '+await ev("wave"));
 ok(errs.length===0,'no page errors '+errs.slice(0,3).join(' | '));

@@ -2,6 +2,14 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M14 in progress: every menu in pictures (November 22, 2026)
+- **The title's pictures open pages of their own:** SOLO (an open storybook for STORY, Orange against the pink army for ARCADE), MULTIPLAYER (Rhett's couch drawing for LOCAL, then HOST and JOIN) and CUSTOMIZE (CHARACTER and HOUSE, over Rhett's new shop-and-house drawing). No more orange poof or buttons popping up on the title. TRAINING and SETTINGS are small pictures too, with a lighter outline and pencil shading round the edge.
+- **The online room, redone from the concept:** the room code on a yellow sticky note with "room code" written in its corner, − and + for the room size, each player a polaroid (no tape) with a ready stamp, a little picture of what they play with (touch, keyboard or controller) in the corner, and TEAM badges in team Versus. The modes are pictures (STORY is the storybook) and, under them, the stories as their pictures, or free-for-all / teams pictures.
+- **The Players screen (local) looks the same:** a LOCAL sticky note with − and + (2 to 4 places), polaroids with what each player plays with, colour, hat and leave buttons, and the empty places show the hand and keyboard pictures to tap to join. Pick the mode and the story right there, then START (no separate story screen). Default teams are now P1 + P3 against P2 + P4, the same as online.
+- **The victory screen:** a ribbon title, polaroids (no tape) with the pose, damage done and taken as a fist and a cracked heart, and ready stamps. The buttons are pictures: the theme's picture with +1 written in its corner, STORY (PLAYERS in local co-op, ROOM online) and MENU (a notebook).
+- Back buttons and other word buttons still turn orange when highlighted.
+- Version 50.
+
 ## M14 in progress: picture menus (November 22, 2026)
 - **The title menu is pictures now:** SOLO (Orange punching the pink army), MULTIPLAYER (four friends) and CUSTOMIZE (a dressing mirror, a hat and paint). They're grey until highlighted; tap one and it turns colour with its two choices on it (STORY | ARCADE, LOCAL | ONLINE, CHARACTER | HOUSE). TRAINING and SETTINGS are smaller buttons with a punching bag and a gear.
 - **The Story screen is pictures too:** a castle, a pirate ship, a mountain with a gondola and the Yeti, a rocket by the moon, and a mystery box for ?. The list of places and bosses is gone; a ★ CLEARED mark shows the ones you've beaten.

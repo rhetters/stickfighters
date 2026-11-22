@@ -30,7 +30,7 @@ ok(await ev("normFighter({col:'col-slate',eq:{hat:'hat-wizard'}}).col==='col-ora
 await ev("charSlot(1)");ok(await ev("CHR.cur===1&&CHR.list[1].name==='FIGHTER 2'&&CHR.list[1].col!=='col-orange'"),'new fighter slot gets a fresh color');
 await ev("$('ch-name').value='rhett!!<b>';$('ch-name').dispatchEvent(new Event('input'))");ok(await ev("fighter(1).name==='RHETT!!B'"),'names cleaned and uppercased');
 // controller back closes
-await tap(1);await W(100);ok(await ev("$('s-char').hidden&&!$('s-title').hidden"),'controller B leaves Character');
+await tap(1);await W(100);ok(await ev("$('s-char').hidden&&!$('s-cust').hidden"),'controller B leaves Character (back to CUSTOMIZE)');
 await p.reload();await W(300);
 ok(await ev("ECO.stars===60&&owns('hat-cap')&&CHR.cur===1&&fighter(1).name==='RHETT!!B'"),'stars, items and fighters survive a reload');
 ok(await ev("JSON.parse(localStorage.getItem('orangeArmy.v1')).saveVersion===SAVE_VERSION"),'save version is current');

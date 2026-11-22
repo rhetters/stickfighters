@@ -2,7 +2,7 @@ const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // t
 const {chromium,devices}=require('playwright');
 let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const c=await b.newContext({...devices['iPad (gen 7) landscape']});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
-await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);await p.tap('#b-start');await p.waitForTimeout(400);
+await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);await p.evaluate('openSolo()');await p.tap('#b-start');await p.waitForTimeout(400);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 const bb=async s=>{const r=await p.locator(s).boundingBox();return{x:r.x+r.width/2,y:r.y+r.height/2,w:r.width}};
 const st=await bb('#stick'),btn={p:await bb('.tb[data-a=p]'),k:await bb('.tb[data-a=k]'),j:await bb('.tb[data-a=j]'),s:await bb('.tb[data-a=s]')};

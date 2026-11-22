@@ -5,8 +5,8 @@ await c.addInitScript(PADS(['Xbox Wireless Controller (Vendor: 045e)','Xbox Wire
 const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 const tap=async(pad,i,ms=90)=>{await ev(`__pads[${pad}].buttons[${i}].pressed=true`);await W(ms);await ev(`__pads[${pad}].buttons[${i}].pressed=false`);await W(90)};
-await p.click('#b-multi');await tap(0,0);await W(50);ok(!(await ev("$('lb-vs').disabled===false")),'Versus needs 2 players');
-await tap(1,0);await p.click('#lb-vs');await W(300);
+await p.evaluate('openOnline()');await p.click('#b-multi');await tap(0,0);await W(50);await ev("document.querySelector('#lb-modes [data-mode=\"vs\"]').click()");ok(await ev("$('lb-start').disabled"),'Versus needs 2 players');
+await tap(1,0);await p.click('#lb-start');await W(300);
 ok(await ev("MODE===VERSUS&&PL.length===2&&E.length===0&&VS.phase==='count'"),'Versus starts: 2 players, no enemies, countdown');
 const xa=await ev("PL[0].x");await ev("__pads[0].buttons[15].pressed=true");await W(500);await ev("__pads[0].buttons[15].pressed=false");
 ok(Math.abs(await ev("PL[0].x")-xa)<1,'players hold still during the countdown');
@@ -31,7 +31,7 @@ await p.click('#b-next');await W(300);ok(await ev("MODE===VERSUS&&VS.round===1&&
 // timer
 await W(1500);await ev("VS.time=2;PL[0].hp=80;PL[1].hp=50");await W(300);ok(await ev("VS.phase==='ko'&&VS.wins.P0===1"),'time up: most health wins the round');
 // co-op: revive
-await ev("pause(true)");await p.click('#b-quit');await W(150);await p.click('#b-multi');await W(100);await p.click('#lb-coop');await W(200);await p.click('.thcard');await W(300);await ev('cineEnd()');
+await ev("pause(true)");await p.click('#b-quit');await W(150);await p.evaluate('openOnline()');await p.click('#b-multi');await W(100);await ev("document.querySelector('#lb-modes [data-mode=\"level\"]').click()");await ev("document.querySelector('#lb-sub [data-theme=\"castle\"]').click()");await p.click('#lb-start');await W(300);await ev('cineEnd()');
 ok(await ev("MODE===LEVEL&&PL.length===2"),'co-op campaign with 2 players');
 await ev("hurtP(PL[1],{dmg:999,kb:5},-1)");await W(1500);
 ok(await ev("PL[1].st==='dead'&&state==='play'"),'one player down: the game goes on');

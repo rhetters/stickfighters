@@ -27,8 +27,9 @@ ok(fin.slow>=150&&fin.left===0,'the final blow slows time and beats every enemy 
 ok(fin.st[0].dealt>=7&&fin.st[1].taken>=12&&fin.st[1].kos>=1,'damage dealt, taken and enemies beaten are counted per player '+JSON.stringify(fin.st));
 for(let i=0;i<200&&await ev("state==='play'");i++)await ev("(()=>{setA('kb','r',1);for(let n=0;n<10;n++){fr++;update()}})()");
 await ev("setA('kb','r',0)");await p.waitForTimeout(2400);
-ok(await ev("!$('s-victory').hidden&&$('v-cards').children.length===2&&/RHETT/.test($('v-cards').textContent)&&$('v-cards').querySelectorAll('.vstats li').length===4&&/Damage Done/.test($('v-cards').textContent)&&/Damage Taken/.test($('v-cards').textContent)&&$('v-again').textContent==='CASTLE SIEGE +1'"),'the victory screen shows a card for each player with damage done and taken, and a CASTLE SIEGE +1 button');
+ok(await ev("!$('s-victory').hidden&&$('v-cards').children.length===2&&/RHETT/.test($('v-cards').textContent)&&$('v-cards').querySelectorAll('.vstats li').length===4&&/Damage Done/.test($('v-cards').textContent)&&/Damage Taken/.test($('v-cards').textContent)&&$('v-again').textContent.replace(/ /g,'')==='CASTLESIEGE+1'&&$('v-again').querySelector('.pimg').classList.contains('i-castle')"),'the victory screen shows a card for each player with damage done and taken, and a CASTLE SIEGE +1 button');
 ok(await ev("(()=>{const r=$('v-title').getBoundingClientRect(),f=$('s-victory').getBoundingClientRect();return r.bottom<=f.bottom+1&&r.height>30})()"),'the buttons fit on the screen');
+ok(await ev("$('v-lobby').querySelector('.pimg').classList.contains('i-local')&&$('v-lobby').textContent==='PLAYERS'&&$('v-title').querySelector('.i-home')&&$('v-title').textContent==='MENU'&&document.querySelectorAll('#v-cards .polar .pready').length===2"),'polaroids with ready stamps; picture buttons for PLAYERS and MENU');
 await ev("document.querySelectorAll('.vready')[0].click()");await p.waitForTimeout(1200);
 ok(await ev("!$('s-victory').hidden&&document.querySelector('.vready.on')&&state!=='play'&&$('v-again').disabled"),'one player ready is not enough: CASTLE SIEGE +1 stays off');
 const hp0=await ev("T[THEMES.castle.boss.t].hp");

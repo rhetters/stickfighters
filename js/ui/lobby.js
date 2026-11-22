@@ -1,5 +1,8 @@
-// StickFighters: Players screen. Up to 4 players join with a controller, the keyboard or touch,
-// then pick Versus or Co-op. The chosen players become the ROSTER the game is built from.
+// StickFighters: Players screen (local multiplayer), laid out like the online room (ui/rooms.js). Up to 4 players
+// join with a controller (any button), the keyboard or touch (tap its picture on an empty place); then pick the
+// mode (Story, Arcade or Versus) and its choice under it, and START. The players become the ROSTER the game is
+// built from. Controllers: B leaves, left/right picks your fighter, the top button colour, the left button hat;
+// a second keyboard player joins with 0 on the number pad.
 // ===== PLAYERS SCREEN =====
 const PCOL = [
   ['#ff7a00', '#d85f00', 'ORANGE'],
@@ -10,6 +13,7 @@ const PCOL = [
 const GUESTCOL = ['col-orange', 'col-sky', 'col-green', 'col-purple'];
 let LOBBY = [],
   TEAMS = false;
+const LB = { max: 4, mode: 'level', theme: 'castle' }; // the room size (2 to 4), the mode and the story picked
 // ===== FIGHTER PICKS =====
 // Like Mario Kart: each player picks a saved fighter (or plays as a guest) and can change the colour and hat for
 // this session, with their own controller (left/right = fighter, top button = colour, left button = hat) or by
@@ -108,13 +112,13 @@ function devLabel(dev) {
   return 'Controller' + (g ? ': ' + (g.id || '').replace(/\(.*\)/, '').trim() : '');
 }
 function lobbyJoin(dev) {
-  if (LOBBY.some(r => r.dev === dev) || LOBBY.length >= 4) return;
+  if (LOBBY.some(r => r.dev === dev) || LOBBY.length >= LB.max) return;
   let slot = 0;
   while (LOBBY.some(r => r.slot === slot)) slot++;
   const [col, d2, name] = PCOL[slot];
   // Player 1 starts as your current fighter; everyone else as a guest
   const pick = !LOBBY.length && CHR.list[CHR.cur] ? CHR.cur : -1;
-  LOBBY.push({ slot, dev, col, d2, name, team: slot < 2 ? 0 : 1, pick, ov: {} });
+  LOBBY.push({ slot, dev, col, d2, name, team: slot % 2, pick, ov: {} });
   LOBBY.sort((a, b) => a.slot - b.slot);
   LOBBY.forEach(lbLook);
   sfx(520 + slot * 80, 0.12, 'square', 0.05, 300);
@@ -125,57 +129,100 @@ function lobbyLeave(slot) {
   sfx(300, 0.1, 'square', 0.04, -150);
   lbRefresh();
 }
+const PAINT_SVG =
+  '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M15 3 q9 11 9 16 a9 9 0 0 1 -18 0 q0 -5 9 -16z" fill="#ff4fa3" stroke="#1c1626" stroke-width="2.4" stroke-linejoin="round"/></svg>';
+const HAT_SVG =
+  '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M5 20 q10 -18 20 0z" fill="#3ec5ff" stroke="#1c1626" stroke-width="2.4" stroke-linejoin="round"/><path d="M3 21 h24" stroke="#1c1626" stroke-width="3" stroke-linecap="round"/></svg>';
 function renderLobby() {
+  const n = LOBBY.length;
+  roomHead($('lb-head'), {
+    code: 'LOCAL',
+    size: LB.max,
+    host: true,
+    canLess: LB.max > lbMinSize(),
+    canMore: LB.max < 4,
+    onLess: () => lbSize(-1),
+    onMore: () => lbSize(1)
+  });
   const box = $('lb-cards');
   box.innerHTML = '';
-  for (let s = 0; s < 4; s++) {
-    const r = LOBBY.find(r => r.slot === s),
-      c = document.createElement('div');
-    c.className = 'pcard' + (r ? ' in' : '');
-    c.style.setProperty('--pc', r ? r.col : PCOL[s][0]);
-    c.innerHTML = r
-      ? '<b>P' +
-        (s + 1) +
-        ' · <span class="pname"></span></b><div class="ppick"><button class="pprev" aria-label="Previous fighter">&#9664;</button><canvas class="pcv" width="120" height="144"></canvas><button class="pnext" aria-label="Next fighter">&#9654;</button></div>' +
-        '<div class="pbtns"><button class="pcol">COLOR</button><button class="phat">HAT</button>' +
-        (TEAMS ? '<button class="pteam">TEAM ' + (r.team + 1) + '</button>' : '') +
-        '<button class="pleave" title="Leave">Leave</button></div><small></small>'
-      : '<b>P' +
-        (s + 1) +
-        '</b><span class="pfig off"></span><small>Press any button on a controller to join</small>';
-    if (r) {
-      c.querySelector('.pname').textContent = r.name;
-      c.querySelector('small').textContent = devLabel(r.dev) + (r.pick >= 0 ? '' : ' · guest');
-      c.querySelector('.pprev').onclick = () => lbFighter(r, -1);
-      c.querySelector('.pnext').onclick = () => lbFighter(r, 1);
-      c.querySelector('.pcol').onclick = () => lbColor(r);
-      c.querySelector('.phat').onclick = () => lbHat(r);
-      lbDraw(c.querySelector('.pcv'), r);
-      c.querySelector('.pleave').onclick = () => lobbyLeave(s);
-      if (TEAMS)
-        c.querySelector('.pteam').onclick = () => {
+  box.style.setProperty('--n', LB.max);
+  const vs = LB.mode === 'vs';
+  for (let s = 0; s < LB.max; s++) {
+    const r = LOBBY.find(r => r.slot === s);
+    if (!r) {
+      // an empty place: tap the touch or keyboard picture to join with it; a controller joins with any button
+      box.appendChild(
+        roomCard({
+          slot: s,
+          joins: [
+            ...(LOBBY.some(o => o.dev === 'touch') ? [] : [['touch', () => lobbyJoin('touch')]]),
+            ...(LOBBY.some(o => o.dev === 'kb') ? [] : [['kb', () => lobbyJoin('kb')]]),
+            ['pad', null]
+          ]
+        })
+      );
+      continue;
+    }
+    box.appendChild(
+      roomCard({
+        slot: s,
+        look: r.look,
+        col: r.col,
+        name: r.name,
+        dev: r.dev,
+        prev: () => lbFighter(r, -1),
+        next: () => lbFighter(r, 1),
+        team: vs && TEAMS ? r.team : undefined,
+        onTeam: () => {
           r.team = 1 - r.team;
           renderLobby();
-          const b = document.querySelectorAll('.pcard')[s].querySelector('.pteam');
+          const b = document.querySelectorAll('#lb-cards .pcard')[s].querySelector('.pteam');
           if (b) b.focus({ preventScroll: true });
-        };
-    }
-    box.appendChild(c);
+        },
+        tools: [
+          ['pcol', 'Change colour', PAINT_SVG, () => lbColor(r)],
+          ['phat', 'Change hat', HAT_SVG, () => lbHat(r)]
+        ],
+        leave: () => lobbyLeave(s)
+      })
+    );
   }
-  const n = LOBBY.length;
-  $('lb-touch').hidden = LOBBY.some(r => r.dev === 'touch') || n >= 4;
-  $('lb-kb').hidden = LOBBY.some(r => r.dev === 'kb') || n >= 4;
+  roomTiles(
+    $('lb-modes'),
+    [
+      ['level', 'i-story', 'STORY'],
+      ['arcade', 'i-arcade', 'ARCADE'],
+      ['vs', 'i-versus', 'VERSUS']
+    ].map(([m, img, label]) => ({
+      data: ['mode', m],
+      img,
+      label,
+      on: LB.mode === m,
+      pick: () => {
+        LB.mode = m;
+        renderLobby();
+      }
+    }))
+  );
+  roomTiles(
+    $('lb-sub'),
+    LB.mode === 'level'
+      ? storyTiles(LB.theme, v => ((LB.theme = v), renderLobby()))
+      : vs
+        ? teamTiles(TEAMS, v => ((TEAMS = v), renderLobby()))
+        : []
+  );
+  $('s-lobby').querySelector('.rmroom').classList.toggle('nosub', !$('lb-sub').children.length);
   const t0 = LOBBY.filter(r => r.team === 0).length,
     vsOk = n >= 2 && (!TEAMS || (t0 > 0 && t0 < n));
-  $('lb-vs').disabled = !vsOk;
-  $('lb-teams').textContent = TEAMS ? 'VERSUS: TEAMS' : 'VERSUS: FREE-FOR-ALL';
-  $('lb-coop').disabled = $('lb-arc').disabled = n < 1;
-  $('lb-msg').textContent =
-    n < 2
-      ? 'Versus needs 2 or more players.'
-      : !vsOk
-        ? 'Teams need at least one player on each team.'
-        : n + ' players ready.';
+  $('lb-start').disabled = n < 1 || (vs && !vsOk);
+}
+// The room size: 2 to 4 places, never cutting off a player already in
+const lbMinSize = () => Math.max(2, ...LOBBY.map(r => r.slot + 1));
+function lbSize(d) {
+  LB.max = Math.max(lbMinSize(), Math.min(4, LB.max + d));
+  renderLobby();
 }
 // Controllers on the Players screen: any face button or Start on a new controller joins; Back on a joined one leaves.
 function lobbyPad(g, now, down) {
@@ -224,23 +271,18 @@ function lobbyPad(g, now, down) {
 addEventListener('keydown', e => {
   if ($('s-lobby').hidden || $('ui').hidden || CAP) return;
   if (e.code === 'Numpad0') lobbyJoin('kb2');
-  else if (e.key === 'Escape') openTitle();
+  else if (e.key === 'Escape') $('lb-back').click();
 });
 function startMulti(kind) {
   ROSTER = LOBBY.map(r => ({ ...r, team: kind === 'vs' && TEAMS ? r.team : undefined }));
   applyTouchVis();
   if (kind === 'vs') startVersus();
-  else if (kind === 'level') openThemes((id, myst) => startRun(id, 0, myst), 's-lobby');
+  else if (kind === 'level') LB.theme === '?' ? startRun(surpriseTheme(), 0, true) : startRun(LB.theme);
   else start();
 }
 $('b-multi').onclick = openLobby;
-$('lb-touch').onclick = () => lobbyJoin('touch');
-$('lb-kb').onclick = () => lobbyJoin('kb');
-$('lb-vs').onclick = () => startMulti('vs');
-$('lb-teams').onclick = () => {
-  TEAMS = !TEAMS;
-  renderLobby();
+$('lb-start').onclick = () => startMulti(LB.mode);
+$('lb-back').onclick = () => {
+  openOnline();
+  $('b-multi').focus({ preventScroll: true });
 };
-$('lb-coop').onclick = () => startMulti('level');
-$('lb-arc').onclick = () => startMulti('arcade');
-$('lb-back').onclick = () => openTitle();

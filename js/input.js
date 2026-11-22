@@ -425,7 +425,7 @@ function navItems() {
   return [...sc.querySelectorAll('button, input, select')].filter(
     e =>
       !e.disabled &&
-      e.tabIndex >= 0 && // e.g. a title tile whose two choices sit on top of it
+      e.tabIndex >= 0 &&
       e.offsetParent !== null &&
       !e.closest('[hidden]') &&
       getComputedStyle(e).visibility !== 'hidden'
@@ -509,7 +509,8 @@ function navBack() {
   else if (sc.id === 's-skills') closeSkills();
   else if (sc.id === 's-themes') $('th-back').click();
   else if (sc.id === 's-house') $('b-houseback').click();
-  else if (sc.id === 's-lobby') openTitle();
+  else if (sc.id === 's-lobby') $('lb-back').click();
   else if (sc.id === 's-online') $('b-onlineback').click();
-  else if (sc.id === 's-title') titleBack();
+  else if (sc.id === 's-solo') $('b-soloback').click();
+  else if (sc.id === 's-cust') $('b-custback').click();
 }
