@@ -37,118 +37,87 @@ function renderOnline() {
   $('on-menu').hidden = NET.on || ONC.join;
   $('on-joinpane').hidden = NET.on || !ONC.join;
   $('on-room').hidden = !NET.on;
-  $('on-h2').textContent = ONC.join && !NET.on ? 'JOIN' : 'ONLINE';
+  $('on-h2').textContent = ONC.join && !NET.on ? 'JOIN' : 'MULTIPLAYER';
   $('on-w').textContent = ROOM_WORDS[ONC.w];
   $('on-a').textContent = ONC.a;
   $('on-b').textContent = ONC.b;
   $('b-onlineback').textContent = NET.on ? 'LEAVE ROOM' : 'BACK';
   $('on-start').hidden = !NET.on || !NET.host; // nothing to start until you host a room
   if (!NET.on) return;
-  $('on-code').textContent = NET.code;
   const live = NET.players.filter(p => !p.left).length;
-  // the room size: the host's - and +, never below the players already in
-  $('on-max').textContent = NET.max;
-  for (const [id, ok] of [
-    ['on-max-', NET.max > Math.max(2, live)],
-    ['on-max+', NET.max < MAX_ONLINE]
-  ]) {
-    $(id).hidden = !NET.host;
-    $(id).disabled = !ok;
-  }
+  // the sticky note: the room code, and the room size (the host's - and +, never below the players already in)
+  roomHead($('on-head'), {
+    code: NET.code,
+    label: true,
+    size: NET.max,
+    host: NET.host,
+    canLess: NET.max > Math.max(2, live),
+    canMore: NET.max < MAX_ONLINE,
+    onLess: () => netSetMax(-1),
+    onMore: () => netSetMax(1)
+  });
   const cards = $('on-cards');
   cards.innerHTML = '';
   cards.style.setProperty('--n', NET.max);
   for (let s = 0; s < NET.max; s++) {
-    const p = NET.players.find(q => q.slot === s && !q.left),
-      c = document.createElement('div');
-    c.className = 'pcard' + (p ? ' in' : '');
+    const p = NET.players.find(q => q.slot === s && !q.left);
     if (!p) {
-      c.innerHTML = '<b>P' + (s + 1) + '</b>';
-      cards.appendChild(c);
+      cards.appendChild(roomCard({ slot: s }));
       continue;
     }
     const L = netLook(p),
       me = s === NET.mySlot;
-    c.style.setProperty('--pc', L.col);
-    c.innerHTML =
-      '<b>P' +
-      (s + 1) +
-      ' · <span class="pname"></span></b><div class="ppick">' +
-      (me ? '<button class="pprev" aria-label="Previous fighter">&#9664;</button>' : '') +
-      '<canvas class="pcv" width="120" height="144"></canvas>' +
-      (me ? '<button class="pnext" aria-label="Next fighter">&#9654;</button>' : '') +
-      '</div>' +
-      (NET.mode === 'vs' && NET.teams
-        ? '<button class="pteam">TEAM ' + ((p.team || 0) + 1) + '</button>'
-        : '') +
-      '<button class="pready' +
-      (p.ready ? ' on' : '') +
-      '">' +
-      (p.ready ? '\u2714 READY' : '\u2718 NOT READY') +
-      '</button><small></small>';
-    c.querySelector('.pname').textContent = L.name;
-    const rb = c.querySelector('.pready');
-    rb.disabled = !me;
-    rb.onclick = () => netSetReady(!p.ready);
-    const tb = c.querySelector('.pteam');
-    if (tb) {
-      tb.disabled = !(NET.host || me);
-      tb.onclick = () => netSetTeam(s);
-    }
-    c.querySelector('small').textContent =
-      (p.id === 'host' ? 'HOST' : 'GUEST') +
-      (me ? ' · YOU' : '') +
-      (p.id !== 'host' && p.rtt ? ' · ' + p.rtt + ' ms' : '');
-    if (me) {
-      c.querySelector('.pprev').onclick = () => onlineFighter(-1);
-      c.querySelector('.pnext').onclick = () => onlineFighter(1);
-    }
-    lbDraw(c.querySelector('.pcv'), { look: L, slot: s });
-    cards.appendChild(c);
+    cards.appendChild(
+      roomCard({
+        slot: s,
+        look: L,
+        col: L.col,
+        name: L.name,
+        dev: p.dv,
+        prev: me && (() => onlineFighter(-1)),
+        next: me && (() => onlineFighter(1)),
+        ready: !!p.ready,
+        readyMine: me,
+        onReady: () => netSetReady(!p.ready),
+        team: NET.mode === 'vs' && NET.teams ? p.team || 0 : undefined,
+        onTeam: (NET.host || me) && (() => netSetTeam(s))
+      })
+    );
   }
-  for (const b of $('on-modes').querySelectorAll('[data-mode]')) {
-    b.classList.toggle('on', b.dataset.mode === NET.mode);
-    b.disabled = !NET.host;
-  }
-  onlineSub();
+  // the modes, then the mode's choice; the host picks
+  const pickMode = m => {
+    if (NET.mode === m) return;
+    NET.mode = m;
+    netOptChanged();
+  };
+  roomTiles(
+    $('on-modes'),
+    [
+      ['level', 'i-story', 'STORY'],
+      ['arcade', 'i-arcade', 'ARCADE'],
+      ['vs', 'i-versus', 'VERSUS'],
+      ['house', 'i-house', 'HOUSE']
+    ].map(([m, img, label]) => ({
+      data: ['mode', m],
+      img,
+      label,
+      aria: m === 'house' ? "The host's house" : label,
+      on: NET.mode === m,
+      disabled: !NET.host,
+      pick: () => pickMode(m)
+    }))
+  );
+  roomTiles(
+    $('on-sub'),
+    NET.mode === 'level'
+      ? storyTiles(NET.theme, v => ((NET.theme = v), netOptChanged()), !NET.host)
+      : NET.mode === 'vs'
+        ? teamTiles(NET.teams, v => ((NET.teams = v), netOptChanged()), !NET.host)
+        : []
+  );
+  $('on-room').classList.toggle('nosub', !$('on-sub').children.length);
   // START can be pressed once everyone is ready (and Versus has its players)
   $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady());
-}
-// Under the modes, the host picks the mode's option: which story ('?' = a surprise), or free-for-all / teams.
-// Rebuilt only when the choices change, so a controller's highlight stays put.
-function onlineSub() {
-  const box = $('on-sub'),
-    opts =
-      NET.mode === 'level'
-        ? [...Object.keys(THEMES).map(id => ['theme', id, THEMES[id].name]), ['theme', '?', '?']]
-        : NET.mode === 'vs'
-          ? [
-              ['teams', '0', 'FREE-FOR-ALL'],
-              ['teams', '1', 'TEAMS']
-            ]
-          : [],
-    key = opts.map(o => o[1]).join();
-  if (box.dataset.key !== key) {
-    box.dataset.key = key;
-    box.innerHTML = '';
-    for (const [k, v, t] of opts) {
-      const b = document.createElement('button');
-      b.dataset[k] = v;
-      b.textContent = t;
-      if (v === '?') b.setAttribute('aria-label', 'Surprise story: more XP and stars');
-      b.onclick = () => {
-        if (!NET.host) return;
-        if (k === 'theme') NET.theme = v;
-        else NET.teams = v === '1';
-        netOptChanged();
-      };
-      box.appendChild(b);
-    }
-  }
-  for (const b of box.children) {
-    b.classList.toggle('on', b.dataset.theme ? b.dataset.theme === NET.theme : (b.dataset.teams === '1') === NET.teams);
-    b.disabled = !NET.host;
-  }
 }
 // Change my fighter (my saved fighters, in order) and tell the room
 function onlineFighter(d) {
@@ -278,8 +247,6 @@ for (const b of $('on-modes').querySelectorAll('[data-mode]'))
     NET.mode = b.dataset.mode;
     netOptChanged();
   };
-$('on-max-').onclick = () => netSetMax(-1);
-$('on-max+').onclick = () => netSetMax(1);
 $('on-start').onclick = () => {
   if (!netStart())
     onlineMsg(NET.teams ? 'Each team needs at least one player.' : 'Versus needs at least 2 players.');
@@ -297,8 +264,5 @@ $('b-onlineback').onclick = () => {
     $('on-joinpick').focus({ preventScroll: true });
     return;
   }
-  show('s-title');
-  titleView();
-  splitOpen('mp');
-  $('b-online').focus({ preventScroll: true });
+  backToTitle('b-online');
 };

@@ -853,14 +853,6 @@ body.padnav #ui select:focus {
 }
 
 /* Players screen */
-#lb-cards {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  width: 100%;
-  max-width: 760px;
-  margin: 4px 0;
-}
 .pcard {
   border: 3px dashed #c9bfae;
   border-radius: 12px;
@@ -911,26 +903,11 @@ body.padnav #ui select:focus {
   background: #fff;
   cursor: pointer;
 }
-.lbrow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-.lbhelp {
-  color: #5a4e60;
-}
 .btn:disabled {
   opacity: 0.4;
   cursor: default;
 }
 
-.lbrow .btn {
-  font-size: clamp(13px, 2vw, 19px);
-  padding: 8px 14px;
-  min-width: 0;
-  margin: 2px 0;
-}
 
 /* Title: flashing PRESS START, then the menu */
 #press {
@@ -1044,132 +1021,9 @@ body.padnav #ui select:focus {
     margin: 0;
     min-height: min(44px, 11cqh); /* phones: still a big target, but the menu fits under the name */
   }
-  #s-title .split {
-    gap: 1.6cqh;
-  }
 }
 #tmenu .btn {
   margin: 2px 0;
-}
-/* The title's picture tiles: grey until highlighted; an open tile shows its two choices on top of its picture */
-.ttiles {
-  display: flex;
-  gap: clamp(14px, 4vw, 40px);
-  justify-content: center;
-}
-.tslot {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  --tt: max(90px, min(calc(var(--wh, 440px) * 0.36), 170px)); /* the picture's size, fitted to the game's frame */
-}
-.ttile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.ttile:focus {
-  outline: none;
-}
-.ttimg {
-  display: block;
-  width: var(--tt);
-  height: var(--tt);
-  background: center / contain no-repeat;
-  filter: grayscale(1) contrast(0.75) brightness(1.08);
-  transition:
-    filter 0.15s,
-    transform 0.15s;
-}
-.tsolo {
-  background-image: url(../img/menu-solo.svg);
-}
-.tmulti {
-  background-image: url(../img/menu-multi.svg);
-}
-.tcust {
-  background-image: url(../img/menu-custom.svg);
-}
-.ttile b {
-  font:
-    900 calc(var(--tt) * 0.15) Impact,
-    'Arial Black',
-    sans-serif;
-  letter-spacing: 1px;
-  color: #8f8697;
-  text-shadow:
-    0 0 6px #fbfaf4,
-    0 0 10px #fbfaf4;
-  transition: color 0.15s;
-}
-.ttile.open .ttimg,
-.ttile:active .ttimg,
-body.padnav .ttile:focus .ttimg {
-  filter: none;
-  transform: scale(1.04) rotate(-1.5deg);
-}
-.ttile.open b,
-.ttile:active b,
-body.padnav .ttile:focus b {
-  color: #1c1626;
-}
-@media (hover: hover) {
-  .ttile:hover .ttimg {
-    filter: none;
-    transform: scale(1.04) rotate(-1.5deg);
-  }
-  .ttile:hover b {
-    color: #1c1626;
-  }
-}
-/* An open tile's two choices: stacked on its picture */
-.split {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: var(--tt);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-#s-title .split .btn {
-  width: calc(var(--tt) * 0.9);
-  min-width: 0;
-  padding: 4px 6px;
-  font-size: calc(var(--tt) * 0.12);
-}
-/* Training room and Settings: smaller buttons with a picture */
-.tsmall {
-  display: flex;
-  gap: 16px;
-  margin-top: 6px;
-}
-#s-title .tsmall .btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  width: auto;
-  padding: 4px 18px 4px 8px;
-}
-.tsmall svg {
-  width: 30px;
-  height: 30px;
-}
-.split[hidden] {
-  display: none;
-}
-.split .btn {
-  min-width: 0;
 }
 
 /* Character & store */
@@ -1627,8 +1481,7 @@ body.padnav .ttile:focus b {
 #on-w {
   min-width: 4.6em;
 }
-.oncode button,
-.onmodes button {
+.oncode button {
   font:
     800 14px 'Trebuchet MS',
     sans-serif;
@@ -1639,67 +1492,6 @@ body.padnav .ttile:focus b {
   min-width: 38px;
   min-height: 38px;
   cursor: pointer;
-}
-.onmodes {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.onmodes button {
-  padding: 4px 14px;
-}
-.onmodes button.on {
-  background: #ff7a00;
-  color: #fff;
-}
-.onmodes button:disabled:not(.on) {
-  opacity: 0.45;
-}
-.onroomcode {
-  margin: 0;
-  font-weight: 800;
-}
-.onroomcode b {
-  font:
-    900 30px Impact,
-    'Arial Black',
-    sans-serif;
-  letter-spacing: 2px;
-  color: #ff7a00;
-  margin-left: 8px;
-}
-#on-cards {
-  display: grid;
-  grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
-  gap: 10px;
-  width: 100%;
-  max-width: calc(var(--n, 4) * 190px);
-}
-/* The room size beside the code: the host's - and + (guests see the number only) */
-.onsize {
-  margin-left: 18px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-.onroomcode .onsize b {
-  font-size: 22px;
-  color: #1c1626;
-  margin: 0 6px;
-}
-.onsize button {
-  font: 900 18px 'Trebuchet MS', sans-serif;
-  border: 3px solid #1c1626;
-  border-radius: 10px;
-  background: #fff8ee;
-  color: #1c1626;
-  min-width: 36px;
-  min-height: 36px;
-  margin: 0 4px;
-  cursor: pointer;
-}
-.onsize button:disabled {
-  opacity: 0.35;
 }
 #on-msg {
   font-weight: 800;
@@ -1715,95 +1507,18 @@ body.padnav .ttile:focus b {
 #s-online h2 {
   margin: 0;
 }
-#s-online .btn {
+#s-online .btn,
+#s-lobby .btn {
   min-height: 40px;
   padding: 4px 26px;
   margin: 2px 0;
 }
-/* In a room everything fits on one screen: the room code stands in for the title, the cards are shorter, the
-   mode's choices sit under the modes, and START sits beside LEAVE ROOM. */
+/* In a room the sticky note stands in for the title, and START sits beside LEAVE ROOM */
 #s-online.inroom h2 {
   display: none;
 }
 #s-online.inroom .pcard {
   min-height: 0;
-}
-/* Host / Join: two of Rhett's drawings, grey until highlighted (hover, a controller's highlight, or a tap) */
-.ontiles {
-  display: flex;
-  gap: clamp(16px, 5vw, 60px);
-  justify-content: center;
-}
-.ontile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.ontimg {
-  display: block;
-  height: max(100px, min(calc(var(--wh, 440px) - 210px), 300px)); /* fits the game frame (--wh) under ONLINE, with BACK below */
-  aspect-ratio: 420 / 436;
-  background: center / contain no-repeat;
-  filter: grayscale(1) contrast(0.7) brightness(1.08);
-  transition:
-    filter 0.15s,
-    transform 0.15s;
-}
-.onhost {
-  background-image: url(../img/online-host.png);
-}
-.onjoin {
-  background-image: url(../img/online-join.png);
-}
-.ontile b {
-  font:
-    900 clamp(24px, 4.5vw, 40px) Impact,
-    'Arial Black',
-    sans-serif;
-  letter-spacing: 1px;
-  color: #a39aa8;
-  text-shadow:
-    0 0 6px #fbfaf4,
-    0 0 10px #fbfaf4; /* readable over the drawing behind */
-  transition: color 0.15s;
-}
-.ontile:focus {
-  outline: none;
-}
-.ontile:active .ontimg,
-body.padnav .ontile:focus .ontimg {
-  filter: none;
-  transform: scale(1.04);
-}
-.ontile:active b,
-body.padnav .ontile:focus b {
-  color: #1c1626;
-}
-@media (hover: hover) {
-  .ontile:hover .ontimg {
-    filter: none;
-    transform: scale(1.04);
-  }
-  .ontile:hover b {
-    color: #1c1626;
-  }
-}
-/* Under the modes: which story, or free-for-all / teams */
-.onsub:empty {
-  display: none;
-}
-.onsub button {
-  border-style: dashed;
-  font-size: 13px;
-}
-.onsub button.on {
-  border-style: solid;
 }
 .onfoot {
   display: flex;
@@ -1811,7 +1526,8 @@ body.padnav .ontile:focus b {
   justify-content: center;
   flex-wrap: wrap;
 }
-#s-online .onfoot .btn {
+#s-online .onfoot .btn,
+#s-lobby .onfoot .btn {
   min-width: 180px;
 }
 /* House screen: the house fills the frame; everything else sits on top of it. The floor line is at 270 of 420
@@ -1980,66 +1696,12 @@ body.padnav .ontile:focus b {
 }
 /* short screens (phones): tighter online room */
 @media (max-height: 440px) {
-  #s-online.inroom .onroomcode b {
-    font-size: 22px;
-  }
   #s-online.inroom #on-msg:empty {
     min-height: 0;
     margin: 0;
   }
-  #s-online.inroom .onmodes button {
-    min-height: 30px;
-    padding: 2px 10px;
-  }
   #s-online.inroom .onfoot .btn {
     min-height: 34px;
-  }
-}
-/* The title's orange poof: puffs swell and fade where a button was, while its two buttons pop in */
-.poof {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 2;
-}
-.poof i {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffc27a 0 30%, #ff9a2e 55%, #ff7a00 100%);
-  box-shadow: 0 0 0 2px rgba(28, 22, 38, 0.35);
-  transform: translate(-50%, -50%) scale(0.2);
-  opacity: 0;
-  animation: poof 560ms ease-out forwards;
-}
-@keyframes poof {
-  0% {
-    transform: translate(-50%, -50%) scale(0.2);
-    opacity: 0.95;
-  }
-  45% {
-    opacity: 0.9;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.25);
-    opacity: 0;
-  }
-}
-.split.popin {
-  animation: popin 380ms 140ms ease-out backwards;
-}
-@keyframes popin {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.6);
-  }
-  70% {
-    opacity: 1;
-    transform: translateX(-50%) scale(1.06);
-  }
-  100% {
-    transform: translateX(-50%) scale(1);
   }
 }
 /* Multiplayer screens (Players and Online): Rhett's campaign / versus drawing behind a light paper wash */
@@ -2371,98 +2033,99 @@ body.padnav .thcard:focus small {
     color: #c25a00;
   }
 }
-/* Ready up: a red X or a green check (online room cards and the victory screen) */
-.pready,
-.vready {
-  margin-top: 4px;
-  padding: 6px 10px;
-  border: 3px solid #1c1626;
-  border-radius: 10px;
-  background: #ffd9db;
-  color: #b8202c;
-  font: 900 clamp(13px, 1.7vw, 17px) Impact, 'Arial Black', sans-serif;
-  cursor: pointer;
-}
-.pready.on,
-.vready.on {
-  background: #d9f5d6;
-  color: #1f7a2e;
-}
-.pready:disabled,
-.vready:disabled {
-  cursor: default;
-  opacity: 0.85;
-}
-/* Victory screen: one card a player, their victory pose over their stats */
+/* Victory screen: a ribbon, a polaroid a player (their victory pose over their stats, a ready stamp), then the
+   picture buttons: THEME +1 (the theme's picture, +1 written in its corner), STORY / PLAYERS / ROOM, MENU */
 #s-victory {
-  gap: 4px;
-  padding-top: 6px;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-top: 8px;
   padding-bottom: 8px;
+}
+#s-victory h1 {
+  margin: 0 0 4px;
+  padding: 2px 40px;
+  font-size: clamp(20px, 3vw, 32px);
+  color: #fff8ee;
+  -webkit-text-stroke: 1.5px #1c1626;
+  background: #ff7a00;
+  border-top: 4px solid #1c1626;
+  border-bottom: 4px solid #1c1626;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 18px) 50%, 100% 100%, 0 100%, 18px 50%);
+  filter: drop-shadow(0 3px 0 #1c1626);
 }
 #v-cards {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 18px;
   justify-content: center;
+  width: 100%;
 }
-.vcard {
-  display: flex;
-  flex-direction: column;
+#v-cards .vcard {
+  width: min(160px, calc((100% - (var(--n, 1) - 1) * 18px) / var(--n, 1)));
+}
+.vcard .pph {
   align-items: center;
-  width: min(190px, 22vw, calc(94vw / var(--n, 1) - 14px)); /* five or six players online fit in one row */
-  padding: 4px 10px 8px;
-  border: 4px solid #1c1626;
-  border-top: 10px solid var(--pc);
-  border-radius: 14px;
-  background: #fff8ee;
-  color: #1c1626;
 }
 .vcard canvas {
-  width: 96px;
-  height: 90px;
-}
-.vname {
-  font: 900 clamp(16px, 2.2vw, 22px) Impact, 'Arial Black', sans-serif;
-  color: var(--pc);
-  -webkit-text-stroke: 1px #1c1626;
+  width: auto;
+  height: 100%;
 }
 .vstats {
-  list-style: none;
-  margin: 2px 0;
+  display: flex;
+  gap: 12px;
+  margin: 0 0 4px;
   padding: 0;
-  width: 100%;
-  font: 700 clamp(11px, 1.4vw, 14px) 'Trebuchet MS', sans-serif;
+  list-style: none;
 }
 .vstats li {
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
+  align-items: center;
+  gap: 3px;
+  font:
+    900 16px Impact,
+    'Arial Black',
+    sans-serif;
 }
-.vbtns {
-  display: flex;
-  gap: 10px;
+.vstats svg {
+  width: 22px;
+  height: 22px;
 }
-.vbtns #v-again:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-#s-victory h1 {
-  margin: 0;
-  font-size: clamp(22px, 3.4vw, 38px);
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 #s-victory p {
   margin: 0;
 }
-.vbtns .btn {
-  width: auto;
-  min-width: 0;
-  margin: 0;
-  min-height: 40px;
-  padding: 4px 20px;
-  font-size: clamp(14px, 1.8vw, 20px);
-}
 #v-st {
   font-size: clamp(12px, 1.5vw, 15px);
+}
+.vbtns .ptile {
+  --ps: max(56px, min(calc(var(--wh, 440px) * 0.2), 96px));
+  position: relative;
+}
+.vbtns .ptile b {
+  font-size: max(11px, calc(var(--ps) * 0.17));
+}
+/* +1 written in the theme picture's corner, by hand */
+.vplus {
+  position: absolute;
+  right: 2px;
+  top: -6px;
+  font:
+    400 calc(var(--ps) * 0.3) 'Marker Felt',
+    'Chalkboard SE',
+    'Comic Sans MS',
+    cursive;
+  font-style: normal;
+  color: #1c1626;
+  transform: rotate(10deg);
+  text-shadow:
+    0 0 4px #fbfaf4,
+    0 0 6px #fbfaf4;
 }
 /* The treasure chest (Character screen, bottom right) and its code screen */
 #ch-chest {
@@ -2581,4 +2244,480 @@ body.padnav .cdslot:focus {
     transform: scale(0.4);
     opacity: 0;
   }
+}
+
+/* ===== Picture buttons =====
+   Every big choice is a picture with its name under it, grey until highlighted (a mouse over it, a tap, a
+   controller's highlight) or chosen (.on); then it's in colour with a little tilt. --ps = the picture's size. */
+.ptiles {
+  display: flex;
+  gap: clamp(14px, 4vw, 44px);
+  justify-content: center;
+  align-items: flex-start;
+}
+.ptile {
+  --ps: max(100px, min(calc(var(--wh, 440px) - 230px), 230px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+body.padnav #ui .ptile:focus,
+.ptile:focus {
+  outline: none;
+  box-shadow: none;
+}
+.pimg {
+  display: block;
+  width: var(--ps);
+  height: var(--ps);
+  background: center / contain no-repeat;
+  filter: grayscale(1) contrast(0.75) brightness(1.08);
+  transition:
+    filter 0.15s,
+    transform 0.15s;
+}
+.ptile b {
+  font:
+    900 max(12px, calc(var(--ps) * 0.15)) Impact,
+    'Arial Black',
+    sans-serif;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  color: #a39aa8;
+  text-shadow:
+    0 0 6px #fbfaf4,
+    0 0 10px #fbfaf4;
+  transition: color 0.15s;
+}
+.ptile.on .pimg,
+.ptile:active .pimg,
+body.padnav .ptile:focus .pimg {
+  filter: none;
+  transform: scale(1.05) rotate(-1.5deg);
+}
+.ptile.on b,
+.ptile:active b,
+body.padnav .ptile:focus b {
+  color: #1c1626;
+}
+@media (hover: hover) {
+  .ptile:hover:not(:disabled) .pimg {
+    filter: none;
+    transform: scale(1.05) rotate(-1.5deg);
+  }
+  .ptile:hover:not(:disabled) b {
+    color: #1c1626;
+  }
+}
+.ptile:disabled {
+  cursor: default;
+}
+.ptile:disabled .pimg {
+  opacity: 0.5;
+}
+.i-solo { background-image: url(../img/menu-solo.svg); }
+.i-multi { background-image: url(../img/menu-multi.svg); }
+.i-cust { background-image: url(../img/menu-custom.svg); }
+.i-train { background-image: url(../img/menu-training.svg); }
+.i-set { background-image: url(../img/menu-settings.svg); }
+.i-story { background-image: url(../img/menu-story.svg); }
+.i-arcade { background-image: url(../img/menu-arcade.svg); }
+.i-versus { background-image: url(../img/menu-versus.svg); }
+.i-house { background-image: url(../img/menu-house.svg); }
+.i-char { background-image: url(../img/menu-character.svg); }
+.i-ffa { background-image: url(../img/vs-ffa.svg); }
+.i-teams { background-image: url(../img/vs-teams.svg); }
+.i-home { background-image: url(../img/menu-home.svg); }
+.i-room { background-image: url(../img/menu-room.svg); }
+.i-local { background-image: url(../img/online-local.png); }
+.i-host { background-image: url(../img/online-host.png); }
+.i-join { background-image: url(../img/online-join.png); }
+.i-castle { background-image: url(../img/story-castle.svg); }
+.i-pirate { background-image: url(../img/story-pirate.svg); }
+.i-mountain { background-image: url(../img/story-mountain.svg); }
+.i-space { background-image: url(../img/story-space.svg); }
+.i-q { background-image: url(../img/story-surprise.svg); }
+/* The title: three tiles, then Training and Settings smaller */
+#s-title .ttiles .ptile {
+  --ps: max(84px, min(calc(var(--wh, 440px) * 0.36), 170px));
+}
+#s-title .tsmall {
+  margin-top: 4px;
+  gap: 26px;
+}
+#s-title .tsmall .ptile {
+  --ps: max(48px, min(calc(var(--wh, 440px) * 0.15), 72px));
+}
+#s-title .tsmall .ptile b {
+  font-size: max(11px, calc(var(--ps) * 0.24));
+}
+/* The SOLO, MULTIPLAYER and CUSTOMIZE scenes: their tiles, BACK under them */
+.screen.scene {
+  justify-content: flex-start;
+  gap: 8px;
+  padding-top: 10px;
+}
+.scene h2 {
+  margin: 0;
+}
+.scene .btn {
+  min-width: 0;
+  width: auto;
+  padding: 6px 44px;
+}
+#s-solo {
+  background: #fbfaf4 url(../img/title.jpg) center 20% / cover no-repeat;
+}
+#s-cust {
+  background: #fbfaf4 url(../img/customize.jpg) center / cover no-repeat;
+}
+#s-online #on-menu .ptile {
+  --ps: max(100px, min(calc(var(--wh, 440px) - 230px), 210px));
+}
+
+/* ===== Rooms: the Players screen and the online room (ui/rooms.js) ===== */
+.rmroom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+.rmtop {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+/* the sticky note: a room code with "room code" written small in its corner, or LOCAL */
+.rmnote {
+  position: relative;
+  padding: 3px 22px 1px 50px;
+  border: 3px solid #1c1626;
+  background: #fff3a0;
+  box-shadow: 3px 4px 0 rgba(28, 22, 38, 0.25);
+  transform: rotate(-2deg);
+}
+.rmnote.plain {
+  padding-left: 22px;
+}
+.rmnote i {
+  position: absolute;
+  left: 7px;
+  top: 5px;
+  font:
+    400 12px/0.95 'Marker Felt',
+    'Chalkboard SE',
+    'Comic Sans MS',
+    cursive;
+  color: #1c1626;
+  text-align: left;
+  transform: rotate(-14deg);
+}
+.rmnote b {
+  font:
+    900 30px Impact,
+    'Arial Black',
+    sans-serif;
+  letter-spacing: 2px;
+  color: #ff7a00;
+  -webkit-text-stroke: 1px #1c1626;
+}
+.rmsize {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rmsize svg {
+  width: 30px;
+  height: 30px;
+}
+.rmsize b {
+  font:
+    900 26px Impact,
+    'Arial Black',
+    sans-serif;
+  min-width: 0.8em;
+  text-align: center;
+}
+.rmsize button {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #1c1626;
+  border-radius: 12px;
+  background: #fff8ee;
+  color: #1c1626;
+  font:
+    900 22px Impact,
+    'Arial Black',
+    sans-serif;
+  cursor: pointer;
+}
+.rmsize button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.rmsize button[hidden] {
+  display: none;
+}
+/* the players: polaroids, a little tilted */
+.rmcards {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  width: 100%;
+}
+.pcard.polar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: min(150px, calc((100% - (var(--n, 4) - 1) * 18px) / var(--n, 4)));
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 8px 8px 4px;
+  border: 3px solid #1c1626;
+  border-radius: 2px;
+  background: #fffdf7;
+  box-shadow: 3px 5px 0 rgba(28, 22, 38, 0.25);
+  color: #1c1626;
+  transform: rotate(var(--tilt, 0deg));
+}
+.pcard.polar:not(.in) {
+  border: 3px dashed #a39aa8;
+  background: rgba(255, 253, 247, 0.6);
+  box-shadow: none;
+}
+.polar .pph {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  box-sizing: border-box;
+  border: 2px solid #1c1626;
+  background: #eef4fb;
+  overflow: hidden;
+}
+.polar:not(.in) .pph {
+  align-items: center;
+  gap: 8px;
+  border: 2px dashed #c9c3d1;
+  background: transparent;
+}
+.polar .pcv {
+  width: auto;
+  height: 94%;
+}
+.polar .pnmrow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+}
+.polar .pnm {
+  font:
+    900 17px Impact,
+    'Arial Black',
+    sans-serif;
+  color: var(--pc, #a39aa8);
+  -webkit-text-stroke: 0.6px #1c1626;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.polar:not(.in) .pnm {
+  -webkit-text-stroke: 0;
+}
+.polar .pprev,
+.polar .pnext {
+  flex: none;
+  min-width: 24px;
+  min-height: 26px;
+  padding: 0;
+  border: 2px solid #1c1626;
+  border-radius: 8px;
+  background: #fff8ee;
+  font-size: 11px;
+}
+/* what they play with: touch, keyboard or controller, bottom left */
+.polar .pdev {
+  position: absolute;
+  left: -16px;
+  bottom: -14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 3px solid #1c1626;
+  border-radius: 50%;
+  background: #fff8ee;
+  transform: rotate(-8deg);
+}
+.polar .pdev svg {
+  width: 26px;
+  height: 22px;
+}
+/* ready: a stamp, a green tick or a red cross */
+.polar .pready {
+  position: absolute;
+  right: -14px;
+  bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin: 0;
+  padding: 0;
+  border: 3px solid #1c1626;
+  border-radius: 50%;
+  background: #e8212b;
+  transform: rotate(-10deg);
+  cursor: pointer;
+}
+.polar .pready.on {
+  background: #2fa84f;
+}
+.polar .pready:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.polar .pready svg {
+  width: 28px;
+  height: 28px;
+}
+.polar .pteam {
+  position: absolute;
+  left: 8px;
+  top: -13px;
+  padding: 2px 8px;
+  border: 2px solid #1c1626;
+  border-radius: 8px;
+  font:
+    900 12px Impact,
+    'Arial Black',
+    sans-serif;
+  letter-spacing: 1px;
+  color: #fff;
+  cursor: pointer;
+}
+.polar .pteam.t0 {
+  background: #ff7a00 !important;
+}
+.polar .pteam.t1 {
+  background: #2fb5ff !important;
+}
+.polar .pteam:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.polar .ptools {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.polar .ptools button {
+  width: 28px;
+  height: 28px;
+  padding: 3px;
+  border: 2px solid #1c1626;
+  border-radius: 50%;
+  background: #fff8ee;
+  cursor: pointer;
+}
+.polar .ptools svg {
+  width: 100%;
+  height: 100%;
+}
+.polar .pleave {
+  position: absolute;
+  right: -11px;
+  top: -11px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid #1c1626;
+  border-radius: 50%;
+  background: #fff8ee;
+  font: 900 14px 'Trebuchet MS', sans-serif;
+  cursor: pointer;
+}
+/* an empty place: what you can join with (touch and keyboard tap to join; a controller presses any button) */
+.polar .pjoin {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 6px;
+  border: 2px solid #a39aa8;
+  border-radius: 12px;
+  background: #fff8ee;
+  filter: grayscale(1);
+  opacity: 0.75;
+}
+.polar span.pjoin {
+  border-style: dashed;
+}
+.polar button.pjoin {
+  cursor: pointer;
+}
+.polar .pjoin svg {
+  width: 100%;
+  height: 100%;
+}
+@media (hover: hover) {
+  .polar button.pjoin:hover {
+    filter: none;
+    opacity: 1;
+  }
+}
+.polar button.pjoin:active {
+  filter: none;
+  opacity: 1;
+}
+.polar .pplus {
+  font:
+    900 40px Impact,
+    'Arial Black',
+    sans-serif;
+  color: #c9c3d1;
+}
+/* the modes, a dotted line, then the mode's choice */
+.rmmodes {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 14px;
+}
+.rmrow {
+  display: flex;
+  gap: 10px;
+}
+.rmrow .ptile {
+  --ps: max(44px, min(calc(var(--wh, 440px) * 0.15), 70px));
+}
+.rmrow .ptile b {
+  font-size: max(10px, calc(var(--ps) * 0.2));
+}
+.rmdiv {
+  width: 3px;
+  align-self: stretch;
+  margin: 4px 0 18px;
+  background: repeating-linear-gradient(#1c1626 0 6px, transparent 6px 11px);
+}
+.nosub .rmdiv {
+  display: none;
 }

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>StickFighters</title>
-<link rel="stylesheet" href="css/style.css?v=49">
+<link rel="stylesheet" href="css/style.css?v=50">
 </head>
 <body>
 <div id="wrap">
@@ -37,18 +37,24 @@
   <h1>StickFighters</h1>
   <p id="press">PRESS START<small class="tapalso">or tap the screen</small></p>
   <div id="tmenu" hidden>
-   <div class="ttiles">
-   <div class="tslot"><button class="ttile" id="b-solo"><span class="ttimg tsolo"></span><b>SOLO</b></button><div class="split" id="solorow" hidden><button class="btn" id="b-level">STORY</button><button class="btn" id="b-start">ARCADE</button></div></div>
-   <div class="tslot"><button class="ttile" id="b-mp"><span class="ttimg tmulti"></span><b>MULTIPLAYER</b></button><div class="split" id="mprow" hidden><button class="btn" id="b-multi">LOCAL</button><button class="btn" id="b-online">ONLINE</button></div></div>
-   <div class="tslot"><button class="ttile" id="b-cust"><span class="ttimg tcust"></span><b>CUSTOMIZE</b></button><div class="split" id="custrow" hidden><button class="btn" id="b-char">CHARACTER</button><button class="btn" id="b-house">HOUSE</button></div></div>
-   </div>
-   <div class="tsmall"><button class="btn alt" id="b-train"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 v6" stroke="#1c1626" stroke-width="3"/><rect x="11" y="8" width="18" height="28" rx="9" fill="#e8212b" stroke="#1c1626" stroke-width="3"/><path d="M12 15 h16 M12 29 h16" stroke="#1c1626" stroke-width="2"/></svg>TRAINING</button><button class="btn alt" id="b-set1"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4 l3 5 6 -1 1 6 5 3 -3 5 3 5 -5 3 -1 6 -6 -1 -3 5 -3 -5 -6 1 -1 -6 -5 -3 3 -5 -3 -5 5 -3 1 -6 6 1z" fill="#c9c3d1" stroke="#1c1626" stroke-width="2.5" stroke-linejoin="round"/><circle cx="20" cy="20" r="6" fill="#fff8ee" stroke="#1c1626" stroke-width="2.5"/></svg>SETTINGS</button></div>
+   <div class="ptiles ttiles"><button class="ptile" id="b-solo"><span class="pimg i-solo"></span><b>SOLO</b></button><button class="ptile" id="b-online"><span class="pimg i-multi"></span><b>MULTIPLAYER</b></button><button class="ptile" id="b-cust"><span class="pimg i-cust"></span><b>CUSTOMIZE</b></button></div>
+   <div class="ptiles tsmall"><button class="ptile" id="b-train"><span class="pimg i-train"></span><b>TRAINING</b></button><button class="ptile" id="b-set1"><span class="pimg i-set"></span><b>SETTINGS</b></button></div>
   </div>
+ </div>
+ <div class="screen scene" id="s-solo" hidden>
+  <h2>SOLO</h2>
+  <div class="ptiles"><button class="ptile" id="b-level"><span class="pimg i-story"></span><b>STORY</b></button><button class="ptile" id="b-start"><span class="pimg i-arcade"></span><b>ARCADE</b></button></div>
+  <button class="btn alt" id="b-soloback">BACK</button>
+ </div>
+ <div class="screen scene" id="s-cust" hidden>
+  <h2>CUSTOMIZE</h2>
+  <div class="ptiles"><button class="ptile" id="b-char"><span class="pimg i-char"></span><b>CHARACTER</b></button><button class="ptile" id="b-house"><span class="pimg i-house"></span><b>HOUSE</b></button></div>
+  <button class="btn alt" id="b-custback">BACK</button>
  </div>
  <div class="screen" id="s-online" hidden>
   <h2 id="on-h2">ONLINE</h2>
   <div id="on-menu" class="onpane">
-   <div class="ontiles"><button class="ontile" id="on-host"><span class="ontimg onhost"></span><b>HOST</b></button><button class="ontile" id="on-joinpick"><span class="ontimg onjoin"></span><b>JOIN</b></button></div>
+   <div class="ptiles"><button class="ptile" id="b-multi"><span class="pimg i-local"></span><b>LOCAL</b></button><button class="ptile" id="on-host"><span class="pimg i-host"></span><b>HOST</b></button><button class="ptile" id="on-joinpick"><span class="pimg i-join"></span><b>JOIN</b></button></div>
   </div>
   <div id="on-joinpane" class="onpane" hidden>
    <div class="oncode">
@@ -59,11 +65,10 @@
    </div>
    <button class="btn" id="on-join">JOIN</button>
   </div>
-  <div id="on-room" class="onpane" hidden>
-   <p class="onroomcode">ROOM CODE <b id="on-code"></b><span class="onsize"><button id="on-max-" aria-label="Fewer players">&minus;</button><b id="on-max">4</b> PLAYERS<button id="on-max+" aria-label="More players">+</button></span></p>
-   <div id="on-cards"></div>
-   <div class="onmodes" id="on-modes"><button data-mode="level">STORY</button><button data-mode="arcade">ARCADE</button><button data-mode="vs">VERSUS</button><button data-mode="house">HOST'S HOUSE</button></div>
-   <div class="onmodes onsub" id="on-sub"></div>
+  <div id="on-room" class="onpane rmroom" hidden>
+   <div class="rmtop" id="on-head"></div>
+   <div class="rmcards" id="on-cards"></div>
+   <div class="rmmodes"><div class="rmrow" id="on-modes"></div><span class="rmdiv" aria-hidden="true"></span><div class="rmrow" id="on-sub"></div></div>
   </div>
   <p id="on-msg" aria-live="polite"></p>
   <div class="onfoot"><button class="btn" id="on-start" hidden>START</button><button class="btn alt" id="b-onlineback">BACK</button></div>
@@ -120,12 +125,12 @@
   <div class="hszoom"><button id="hs-zout" aria-label="Zoom out">&minus;</button><button id="hs-zin" aria-label="Zoom in">+</button></div>
  </div>
  <div class="screen" id="s-lobby" hidden>
-  <h2>PLAYERS</h2>
-  <div id="lb-cards"></div>
-  <p class="lbhelp">Controllers: any button joins, B leaves, left/right picks your fighter, the top button changes color, the left button changes hat. Keyboard 2: press 0 on the number pad.</p>
-  <div class="lbrow"><button class="btn alt" id="lb-touch">JOIN WITH TOUCH</button><button class="btn alt" id="lb-kb">JOIN WITH KEYBOARD</button><button class="btn alt" id="lb-back">BACK</button></div>
-  <p id="lb-msg"></p>
-  <div class="lbrow"><button class="btn alt" id="lb-teams">VERSUS: FREE-FOR-ALL</button><button class="btn" id="lb-vs">VERSUS</button><button class="btn" id="lb-coop">CO-OP: STORY</button><button class="btn" id="lb-arc">CO-OP: ARCADE</button></div>
+  <div class="rmroom">
+   <div class="rmtop" id="lb-head"></div>
+   <div class="rmcards" id="lb-cards"></div>
+   <div class="rmmodes"><div class="rmrow" id="lb-modes"></div><span class="rmdiv" aria-hidden="true"></span><div class="rmrow" id="lb-sub"></div></div>
+  </div>
+  <div class="onfoot"><button class="btn" id="lb-start">START</button><button class="btn alt" id="lb-back">BACK</button></div>
  </div>
  <div class="screen" id="s-pause" hidden>
   <h2>PAUSED</h2>
@@ -182,7 +187,7 @@
   <h1 id="v-h1">VICTORY!</h1>
   <div id="v-cards"></div>
   <p id="v-st" class="stl"></p>
-  <div class="vbtns"><button class="btn" id="v-again">PLAY AGAIN +1</button><button class="btn alt" id="v-lobby">BACK TO PLAYERS</button><button class="btn alt" id="v-title">MAIN MENU</button></div>
+  <div class="vbtns ptiles"><button class="ptile" id="v-again"><span class="pimg"></span><b></b><i class="vplus"></i></button><button class="ptile" id="v-lobby"><span class="pimg"></span><b></b></button><button class="ptile" id="v-title"><span class="pimg i-home"></span><b>MENU</b></button></div>
  </div>
  <div class="screen" id="s-clear" hidden>
   <h1 id="c-h1">LEVEL CLEAR!</h1>
@@ -198,52 +203,53 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=49" defer></script>
-<script src="js/input.js?v=49" defer></script>
-<script src="js/data/moves.js?v=49" defer></script>
-<script src="js/data/enemies.js?v=49" defer></script>
-<script src="js/data/levels.js?v=49" defer></script>
-<script src="js/data/themes.js?v=49" defer></script>
-<script src="js/data/items.js?v=49" defer></script>
-<script src="js/data/skills.js?v=49" defer></script>
-<script src="js/data/sounds.js?v=49" defer></script>
-<script src="js/data/house.js?v=49" defer></script>
-<script src="js/progress.js?v=49" defer></script>
-<script src="js/economy.js?v=49" defer></script>
-<script src="js/player.js?v=49" defer></script>
-<script src="js/effects.js?v=49" defer></script>
-<script src="js/combat.js?v=49" defer></script>
-<script src="js/terrain.js?v=49" defer></script>
-<script src="js/enemies.js?v=49" defer></script>
-<script src="js/modes.js?v=49" defer></script>
-<script src="js/level.js?v=49" defer></script>
-<script src="js/run.js?v=49" defer></script>
-<script src="js/versus.js?v=49" defer></script>
-<script src="js/pickups.js?v=49" defer></script>
-<script src="js/net/rtc.js?v=49" defer></script>
-<script src="js/net/session.js?v=49" defer></script>
-<script src="js/ragdoll.js?v=49" defer></script>
-<script src="js/scenery.js?v=49" defer></script>
-<script src="js/biomes.js?v=49" defer></script>
-<script src="js/looks.js?v=49" defer></script>
-<script src="js/bosslooks.js?v=49" defer></script>
-<script src="js/house.js?v=49" defer></script>
-<script src="js/render.js?v=49" defer></script>
-<script src="js/ui/panels.js?v=49" defer></script>
-<script src="js/ui/training.js?v=49" defer></script>
-<script src="js/ui/touch-layout.js?v=49" defer></script>
-<script src="js/ui/lobby.js?v=49" defer></script>
-<script src="js/ui/online.js?v=49" defer></script>
-<script src="js/ui/bindings.js?v=49" defer></script>
-<script src="js/ui/character.js?v=49" defer></script>
-<script src="js/ui/codes.js?v=49" defer></script>
-<script src="js/ui/skills.js?v=49" defer></script>
-<script src="js/ui/themes.js?v=49" defer></script>
-<script src="js/ui/victory.js?v=49" defer></script>
-<script src="js/ui/house.js?v=49" defer></script>
-<script src="js/ui/backup.js?v=49" defer></script>
-<script src="js/devtools.js?v=49" defer></script>
-<script src="js/selftest.js?v=49" defer></script>
-<script src="js/main.js?v=49" defer></script>
+<script src="js/core.js?v=50" defer></script>
+<script src="js/input.js?v=50" defer></script>
+<script src="js/data/moves.js?v=50" defer></script>
+<script src="js/data/enemies.js?v=50" defer></script>
+<script src="js/data/levels.js?v=50" defer></script>
+<script src="js/data/themes.js?v=50" defer></script>
+<script src="js/data/items.js?v=50" defer></script>
+<script src="js/data/skills.js?v=50" defer></script>
+<script src="js/data/sounds.js?v=50" defer></script>
+<script src="js/data/house.js?v=50" defer></script>
+<script src="js/progress.js?v=50" defer></script>
+<script src="js/economy.js?v=50" defer></script>
+<script src="js/player.js?v=50" defer></script>
+<script src="js/effects.js?v=50" defer></script>
+<script src="js/combat.js?v=50" defer></script>
+<script src="js/terrain.js?v=50" defer></script>
+<script src="js/enemies.js?v=50" defer></script>
+<script src="js/modes.js?v=50" defer></script>
+<script src="js/level.js?v=50" defer></script>
+<script src="js/run.js?v=50" defer></script>
+<script src="js/versus.js?v=50" defer></script>
+<script src="js/pickups.js?v=50" defer></script>
+<script src="js/net/rtc.js?v=50" defer></script>
+<script src="js/net/session.js?v=50" defer></script>
+<script src="js/ragdoll.js?v=50" defer></script>
+<script src="js/scenery.js?v=50" defer></script>
+<script src="js/biomes.js?v=50" defer></script>
+<script src="js/looks.js?v=50" defer></script>
+<script src="js/bosslooks.js?v=50" defer></script>
+<script src="js/house.js?v=50" defer></script>
+<script src="js/render.js?v=50" defer></script>
+<script src="js/ui/panels.js?v=50" defer></script>
+<script src="js/ui/training.js?v=50" defer></script>
+<script src="js/ui/touch-layout.js?v=50" defer></script>
+<script src="js/ui/rooms.js?v=50" defer></script>
+<script src="js/ui/lobby.js?v=50" defer></script>
+<script src="js/ui/online.js?v=50" defer></script>
+<script src="js/ui/bindings.js?v=50" defer></script>
+<script src="js/ui/character.js?v=50" defer></script>
+<script src="js/ui/codes.js?v=50" defer></script>
+<script src="js/ui/skills.js?v=50" defer></script>
+<script src="js/ui/themes.js?v=50" defer></script>
+<script src="js/ui/victory.js?v=50" defer></script>
+<script src="js/ui/house.js?v=50" defer></script>
+<script src="js/ui/backup.js?v=50" defer></script>
+<script src="js/devtools.js?v=50" defer></script>
+<script src="js/selftest.js?v=50" defer></script>
+<script src="js/main.js?v=50" defer></script>
 </body>
 </html>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs>
+<filter id="w" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+<pattern id="h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="5" stroke="#4a4452" stroke-width="1.3"/></pattern>
+<pattern id="g" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#b9cbe0" stroke-width="0.8"/></pattern>
+</defs>
+<g filter="url(#w)">
+<rect x="14" y="16" width="176" height="176" rx="22" fill="url(#h)"/>
+<rect x="8" y="8" width="176" height="176" rx="22" fill="#fbfaf4" stroke="#1c1626" stroke-width="4"/>
+<rect x="12" y="12" width="168" height="168" rx="19" fill="url(#g)"/><path d="M100 60 q-30 -14 -74 -6 v100 q44 -8 74 6z" fill="#fff8ee" stroke="#1c1626" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M100 60 q30 -14 74 -6 v100 q-44 -8 -74 6z" fill="#fff8ee" stroke="#1c1626" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M26 154 q44 -8 74 8 q30 -16 74 -8 v8 q-44 -8 -74 8 q-30 -16 -74 -8z" fill="#c4813c" stroke="#1c1626" stroke-width="3" stroke-linejoin="round"/>
+<path d="M100 60 v102" stroke="#1c1626" stroke-width="2.5"/>
+<path d="M40 76 q24 -6 46 2 M40 88 q24 -6 46 2 M40 100 q24 -6 46 2" stroke="#9aa3b5" stroke-width="2"/>
+<path d="M44 140 V118 h6 v-4 h4 v4 h8 v-4 h4 v4 h6 v22z" fill="#d8d2c6" stroke="#1c1626" stroke-width="2"/>
+<path d="M66 114 V104 h10 l-3 3 l3 3 h-10" fill="#ff4fa3" stroke="#1c1626" stroke-width="1.8"/>
+<g stroke="#ff7a00" stroke-width="4" stroke-linecap="round" fill="none"><circle cx="134" cy="86" r="7" fill="#fff8ee"/><path d="M134 93 v20 M134 113 l-7 18 M134 113 l7 18 M134 99 l12 -8 M134 99 l-12 4"/></g>
+<path d="M150 86 l6 -6 l2 8 l8 -2 l-5 6 l6 5 l-8 1" fill="#ffd400" stroke="#1c1626" stroke-width="1.8"/>
+<path d="M160 52 v34 l-6 -6 l-6 6 v-34" fill="#e8212b" stroke="#1c1626" stroke-width="2.5"/>
+<path d="M30 34 l3 6 6 1 -4 4 1 6 -6 -3 -5 3 1 -6 -4 -4 6 -1z" fill="#ffd400" stroke="#1c1626" stroke-width="2"/>
+</g>
+</svg>

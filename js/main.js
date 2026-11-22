@@ -11,6 +11,8 @@ const gridC = document.createElement('canvas'),
   portraitMQ = matchMedia('(orientation:portrait) and (pointer:coarse)');
 const SCREENS = [
   's-title',
+  's-solo',
+  's-cust',
   's-online',
   's-char',
   's-codes',
@@ -230,20 +232,14 @@ $('b-start').onclick = start;
 $('b-train').onclick = startTrain;
 // ===== TITLE MENU =====
 // First visit: a flashing PRESS START; any key, tap or controller button opens the menu.
-// SOLO, MULTIPLAYER and CUSTOMIZE are picture tiles (grey until highlighted). Tapping one opens its two choices
-// (STORY | ARCADE, LOCAL | ONLINE, CHARACTER | HOUSE) on top of its picture, which stays in colour, so the title
-// and the other tiles never move or resize. Back folds it up again.
-const TITLE = { ready: false, keepOpen: false };
-const SPLITS = {
-  solo: ['b-solo', 'solorow', 'b-level'],
-  mp: ['b-mp', 'mprow', 'b-multi'],
-  cust: ['b-cust', 'custrow', 'b-char']
-};
+// The menu is picture tiles (grey until highlighted): SOLO, MULTIPLAYER and CUSTOMIZE each open a scene of their
+// own (SOLO: Story | Arcade; MULTIPLAYER: Local | Host | Join, ui/online.js; CUSTOMIZE: Character | House), and
+// TRAINING and SETTINGS sit under them.
+const TITLE = { ready: false };
 function titleView() {
   $('press').hidden = TITLE.ready;
   $('tmenu').hidden = !TITLE.ready;
-  for (const k in SPLITS) splitShow(k, TITLE.keepOpen, true);
-  if (TITLE.ready) $(TITLE.keepOpen ? 'b-level' : 'b-solo').focus({ preventScroll: true });
+  if (TITLE.ready) $('b-solo').focus({ preventScroll: true });
 }
 function titleReveal() {
   if (TITLE.ready) return false;
@@ -252,83 +248,31 @@ function titleReveal() {
   titleView();
   return true;
 }
-function splitShow(k, open, quiet) {
-  const [btn, row, first] = SPLITS[k];
-  $(btn).classList.toggle('open', open);
-  $(btn).tabIndex = open ? -1 : 0; // its two choices take its place for a controller's highlight
-  $(row).hidden = !open;
-  if (!quiet) $(open ? first : btn).focus({ preventScroll: true });
+// Back to the title from one of its scenes, with that scene's tile highlighted
+function backToTitle(tile) {
+  show('s-title');
+  titleView();
+  $(tile).focus({ preventScroll: true });
 }
-function splitOpen(k, poof) {
-  for (const o in SPLITS) if (o !== k) splitShow(o, false, true);
-  splitShow(k, true);
-  if (poof) titlePoof(k);
+function openSolo() {
+  show('s-solo');
+  $('b-level').focus({ preventScroll: true });
 }
-// An orange puff of cloud where the button was, fading as its two buttons pop in (drawing only; skipped when the
-// device asks for reduced motion)
-const POOF = [
-  [0, 0, 1.15, 0],
-  [-0.62, 0.1, 0.8, 30],
-  [0.6, -0.08, 0.85, 20],
-  [-0.3, -0.38, 0.7, 50],
-  [0.32, 0.36, 0.72, 40],
-  [-0.95, -0.2, 0.5, 70],
-  [0.98, 0.22, 0.55, 60],
-  [0.05, 0.45, 0.6, 80]
-];
-function titlePoof(k) {
-  const [btn, row] = SPLITS[k],
-    slot = $(btn).parentElement;
-  $(row).classList.remove('popin');
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  void $(row).offsetWidth; // restart the pop-in animation
-  $(row).classList.add('popin');
-  const w = $(btn).offsetWidth,
-    h = $(btn).offsetHeight,
-    cloud = document.createElement('span');
-  cloud.className = 'poof';
-  cloud.setAttribute('aria-hidden', 'true');
-  for (const [x, y, r, d] of POOF) {
-    const p = document.createElement('i');
-    p.style.cssText =
-      'left:' +
-      (50 + x * 40) +
-      '%;top:' +
-      (50 + y * 50) +
-      '%;width:' +
-      h * r * 1.5 +
-      'px;height:' +
-      h * r * 1.5 +
-      'px;animation-delay:' +
-      d +
-      'ms';
-    cloud.appendChild(p);
-  }
-  cloud.style.width = w + 'px';
-  cloud.style.height = h + 'px';
-  slot.appendChild(cloud);
-  setTimeout(() => cloud.remove(), 700);
-}
-// Back on the title: fold whichever row is open. Returns true if something was folded.
-function titleBack() {
-  if (TITLE.keepOpen) return false;
-  for (const k in SPLITS)
-    if (!$(SPLITS[k][1]).hidden) {
-      splitShow(k, false);
-      return true;
-    }
-  return false;
+function openCust() {
+  show('s-cust');
+  $('b-char').focus({ preventScroll: true });
 }
 const pressMode = () => !$('s-title').hidden && !$('ui').hidden && !TITLE.ready;
-// Opens the whole title menu at once (used by the tests in tools/tests to skip PRESS START)
+// Skips PRESS START (used by the tests in tools/tests)
 function titleOpenAll() {
-  TITLE.ready = TITLE.keepOpen = true;
+  TITLE.ready = true;
   titleView();
 }
-$('b-solo').onclick = () => splitOpen('solo', true);
-$('b-mp').onclick = () => splitOpen('mp', true);
-$('b-cust').onclick = () => splitOpen('cust', true);
+$('b-solo').onclick = openSolo;
 $('b-online').onclick = () => openOnline();
+$('b-cust').onclick = openCust;
+$('b-soloback').onclick = () => backToTitle('b-solo');
+$('b-custback').onclick = () => backToTitle('b-cust');
 addEventListener('gamepadconnected', () => {
   if (pressMode()) titleReveal();
 });
@@ -357,7 +301,7 @@ addEventListener(
       e.preventDefault();
       e.stopImmediatePropagation();
     } else if (e.key === 'Escape' && !$('ui').hidden && !CAP) {
-      if (!$('s-title').hidden) titleBack();
+      if (!$('s-solo').hidden || !$('s-cust').hidden) navBack();
       else if (!$('s-settings').hidden || !$('s-binds').hidden || !$('s-skills').hidden || !$('s-themes').hidden) {
         // Esc backs out of Settings (and its Buttons page, also when opened from pause) , Skills and Campaign, like their back buttons
         navBack();
@@ -398,7 +342,7 @@ $('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? openHouse() : openTitle
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');
-$('b-level').onclick = () => openThemes((id, myst) => startRun(id, 0, myst), 's-title');
+$('b-level').onclick = () => openThemes((id, myst) => startRun(id, 0, myst), 's-solo');
 $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : replayLevel()), 'again');
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(openTitle, 'room');

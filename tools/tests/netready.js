@@ -31,7 +31,7 @@ ok(await H.evaluate(()=>!$('s-victory').hidden)&&await A.evaluate(()=>!$('s-vict
 await A.evaluate(()=>document.querySelector('.vready:not(:disabled)').click());await A.waitForTimeout(700);
 ok(await H.evaluate(()=>document.querySelectorAll('.vready.on').length===1),'the host’s screen shows the guest’s green check');
 await H.evaluate(()=>document.querySelector('.vready:not(:disabled)').click());await H.waitForTimeout(1500);
-ok(await H.evaluate(()=>!$('s-victory').hidden&&!$('v-again').disabled&&$('v-again').textContent==='CASTLE SIEGE +1')&&await A.evaluate(()=>!$('s-victory').hidden&&$('v-again').disabled),'everyone ready: the host can press CASTLE SIEGE +1 (nothing starts by itself)');
+ok(await H.evaluate(()=>!$('s-victory').hidden&&!$('v-again').disabled&&$('v-again').textContent.replace(/\s/g,'')==='CASTLESIEGE+1')&&await A.evaluate(()=>!$('s-victory').hidden&&$('v-again').disabled),'everyone ready: the host can press CASTLE SIEGE +1 (nothing starts by itself)');
 await H.evaluate(()=>$('v-again').click());await H.waitForTimeout(2000);
 const r=[await H.evaluate(()=>({state,ng:LV.run&&LV.run.ng,name:LV.def.name})),await A.evaluate(()=>({state,ng:LV.run&&LV.run.ng,name:LV.def.name}))];
 ok(r.every(x=>x.state==='play'&&x.ng===1)&&r[0].name===r[1].name,'everyone ready starts the harder run on both devices '+JSON.stringify(r));

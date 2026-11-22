@@ -129,7 +129,8 @@ function netRoomMsg() {
       team: p.team,
       rtt: p.rtt,
       left: p.left,
-      ready: !!p.ready
+      ready: !!p.ready,
+      dv: p.dv
     }))
   };
 }
@@ -157,6 +158,15 @@ const netReadyUI = () => {
   if (typeof renderOnline === 'function' && !$('s-online').hidden) renderOnline();
 };
 // A match starting, or a new one from the results: nobody is ready any more
+// What this device plays with, shown on its card in the room: a controller if one is connected, else touch on a
+// touch screen, else the keyboard
+const DEV_KINDS = ['touch', 'kb', 'pad'];
+const netDevKind = () =>
+  navigator.getGamepads && [...navigator.getGamepads()].some(Boolean)
+    ? 'pad'
+    : matchMedia('(pointer: coarse)').matches
+      ? 'touch'
+      : 'kb';
 const netUnready = () => NET.players.forEach(q => (q.ready = false));
 // The host changed a room option (mode, story, teams, room size): everyone readies up again
 function netOptChanged() {
@@ -220,7 +230,7 @@ async function netHost() {
       await rtcHost(code);
       Object.assign(NET, { on: true, host: true, code, mySlot: 0, mode: 'level' });
       const f = curFighter();
-      NET.players = [{ slot: 0, id: 'host', name: f.name, f, team: 0, rtt: 0 }];
+      NET.players = [{ slot: 0, id: 'host', name: f.name, f, team: 0, rtt: 0, dv: netDevKind() }];
       netColours();
       return code;
     } catch (e) {
@@ -263,7 +273,7 @@ RTC.on.peer = id => {
   if (NET.host) return; // guests introduce themselves with 'hello'
   if (id === NET.hostId) {
     // connected to the host: say hello with my fighter and game version
-    netSend(id, { t: 'hello', v: GAME_VERSION, f: curFighter() });
+    netSend(id, { t: 'hello', v: GAME_VERSION, f: curFighter(), dv: netDevKind() });
     clearInterval(NET.pingT);
     NET.pingT = setInterval(
       () => netSend(NET.hostId, { t: 'ping', ts: performance.now(), rtt: NET.rtt || 0 }),
@@ -345,7 +355,7 @@ function netHostMsg(id, m) {
     while (live.some(q => q.slot === slot)) slot++;
     const f = normFighter(m.f, true);
     NET.players = NET.players.filter(q => q.slot !== slot);
-    NET.players.push({ slot, id, name: f.name, f, team: slot % 2, rtt: 0, links: [] });
+    NET.players.push({ slot, id, name: f.name, f, team: slot % 2, rtt: 0, links: [], dv: DEV_KINDS.includes(m.dv) ? m.dv : 'kb' });
     NET.players.sort((a, b) => a.slot - b.slot);
     netSend(id, { t: 'welcome', slot });
     sfx(700, 0.12, 'square', 0.04, 300);

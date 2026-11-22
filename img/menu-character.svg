@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs>
+<filter id="w" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+<pattern id="h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="5" stroke="#4a4452" stroke-width="1.3"/></pattern>
+<pattern id="g" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#b9cbe0" stroke-width="0.8"/></pattern>
+</defs>
+<g filter="url(#w)">
+<rect x="14" y="16" width="176" height="176" rx="22" fill="url(#h)"/>
+<rect x="8" y="8" width="176" height="176" rx="22" fill="#fbfaf4" stroke="#1c1626" stroke-width="4"/>
+<rect x="12" y="12" width="168" height="168" rx="19" fill="url(#g)"/><path d="M14 160 H178" stroke="#1c1626" stroke-width="2.5"/>
+<ellipse cx="118" cy="98" rx="38" ry="56" fill="#d9f0ff" stroke="#1c1626" stroke-width="3.5"/>
+<path d="M98 66 l12 -10 M100 80 l20 -18" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+<path d="M118 154 v6 M100 160 h36" stroke="#1c1626" stroke-width="3.5" stroke-linecap="round"/><g transform="translate(56 96) scale(1.15)" stroke="#ff7a00" stroke-width="6" stroke-linecap="round" fill="none"><circle cx="0" cy="-10" r="9" fill="#fbfaf4"/><path d="M0 -1 v28 M0 27 l-9 26 M0 27 l9 26 M0 9 l-14 -16 M0 9 l14 8"/></g><path d="M40 82 q16 -22 32 0z" fill="#3ec5ff" stroke="#1c1626" stroke-width="2.5"/>
+<path d="M46 104 h20 v22 h-20z" fill="#3ccf6e" stroke="#1c1626" stroke-width="2.5"/>
+<g transform="translate(118 98) scale(-0.7 0.7)" opacity="0.75"><g transform="translate(0 0) scale(1.15)" stroke="#ff7a00" stroke-width="6" stroke-linecap="round" fill="none"><circle cx="0" cy="-10" r="9" fill="#fbfaf4"/><path d="M0 -1 v28 M0 27 l-9 26 M0 27 l9 26 M0 9 l-14 -16 M0 9 l14 8"/></g></g>
+<path d="M156 34 l3 6 6 1 -4 4 1 6 -6 -3 -5 3 1 -6 -4 -4 6 -1z" fill="#ffd400" stroke="#1c1626" stroke-width="2"/>
+</g>
+</svg>

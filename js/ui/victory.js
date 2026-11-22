@@ -4,30 +4,40 @@
 // readies its own player (NET.players[].ready, kept by the host; net/session.js) and the host presses THEME +1 for
 // everyone.
 const VIC = { ready: {}, raf: 0, t: 0, go: 0 };
+const VIC_FIST =
+  '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M6 14 q0 -6 6 -6 h10 q4 0 4 4 v6 q0 8 -8 8 h-4 q-8 0 -8 -8z" fill="#ffd9b0" stroke="#1c1626" stroke-width="2.5"/><path d="M12 8 v6 M17 8 v6 M22 9 v5" stroke="#1c1626" stroke-width="2"/><path d="M2 6 l4 3 M4 2 l3 5 M10 1 v5" stroke="#e8212b" stroke-width="2" stroke-linecap="round"/></svg>';
+const VIC_HEART =
+  '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M15 26 C2 18 2 6 9 5 c3 0 5 2 6 4 c1 -2 3 -4 6 -4 c7 1 7 13 -6 21z" fill="#e8212b" stroke="#1c1626" stroke-width="2.5"/><path d="M15 9 l-3 6 l5 3 l-3 6" stroke="#fff8ee" stroke-width="2" fill="none"/></svg>';
 function vicOpen() {
   VIC.ready = {};
   VIC.go = 0;
   const ng = LV.run.ng || 0,
     cards = $('v-cards');
   $('v-h1').textContent = LV.def.name + ' CLEAR!';
-  $('v-again').textContent = THEMES[LV.run.theme].name + ' +' + (ng + 1);
+  // THEME +1: the theme's picture with +1 (+2…) written in its corner
+  $('v-again').querySelector('.pimg').className = 'pimg i-' + LV.run.theme;
+  $('v-again').querySelector('b').textContent = THEMES[LV.run.theme].name;
+  $('v-again').querySelector('.vplus').textContent = '+' + (ng + 1);
+  $('v-again').setAttribute('aria-label', THEMES[LV.run.theme].name + ' +' + (ng + 1) + ', harder');
   cards.innerHTML = '';
   cards.style.setProperty('--n', PL.length);
   for (const p of [...PL].sort((a, b) => a.slot - b.slot)) {
     const s = (LV.stats && LV.stats[p.slot]) || { dealt: 0, taken: 0 },
       c = document.createElement('div'),
       mine = !NET.match || p.slot === NET.mySlot;
-    c.className = 'vcard';
+    // a polaroid: the pose, the name, and the stats as pictures (a fist for damage done, a cracked heart for taken)
+    c.className = 'pcard polar in vcard';
     c.style.setProperty('--pc', p.col);
+    c.style.setProperty('--tilt', [-2, 1.5, -1, 2, -1.5, 1][p.slot % 6] + 'deg');
     c.innerHTML =
-      '<canvas width="240" height="224"></canvas><b class="vname"></b><ul class="vstats">' +
+      '<div class="pph"><canvas width="240" height="224"></canvas></div><b class="pnm vname"></b><ul class="vstats">' +
       [
-        ['Damage Done', Math.round(s.dealt)],
-        ['Damage Taken', Math.round(s.taken)]
+        ['Damage Done', Math.round(s.dealt), VIC_FIST],
+        ['Damage Taken', Math.round(s.taken), VIC_HEART]
       ]
-        .map(([k, v]) => '<li>' + k + ' <b>' + v + '</b></li>')
+        .map(([k, v, svg]) => '<li><span class="vh">' + k + '</span>' + svg + '<b>' + v + '</b></li>')
         .join('') +
-      '</ul><button class="vready"></button>';
+      '</ul><button class="pready vready"></button>';
     c.querySelector('.vname').textContent = p.name || 'P' + (p.slot + 1);
     const b = c.querySelector('.vready');
     b.dataset.slot = p.slot;
@@ -37,9 +47,11 @@ function vicOpen() {
     cards.appendChild(c);
   }
   // back to the players (or the Story screen) and the title; online the host takes everyone back to the room
+  const [li, lt] = NET.match ? ['i-room', 'ROOM'] : ROSTER.length ? ['i-local', 'PLAYERS'] : ['i-story', 'STORY'];
   $('v-lobby').hidden = NET.match && !NET.host;
-  $('v-lobby').textContent = NET.match ? 'BACK TO THE ROOM' : ROSTER.length ? 'BACK TO PLAYERS' : 'STORY';
-  $('v-title').textContent = NET.match && !NET.host ? 'LEAVE' : 'MAIN MENU';
+  $('v-lobby').querySelector('.pimg').className = 'pimg ' + li;
+  $('v-lobby').querySelector('b').textContent = lt;
+  $('v-title').querySelector('b').textContent = NET.match && !NET.host ? 'LEAVE' : 'MENU';
   show('s-victory');
   vicRefresh();
   const me = cards.querySelector('.vready:not([disabled])');
@@ -71,7 +83,8 @@ function vicRefresh() {
   for (const b of $('v-cards').querySelectorAll('.vready')) {
     const on = vicIsReady(+b.dataset.slot);
     b.classList.toggle('on', on);
-    b.textContent = on ? '✔ READY' : '✘ NOT READY';
+    b.innerHTML = STAMP_SVG(on);
+    b.setAttribute('aria-label', on ? 'Ready' : 'Not ready');
   }
   const all = PL.every(p => p.left || vicIsReady(p.slot)),
     was = $('v-again').disabled;
@@ -135,7 +148,7 @@ $('v-lobby').onclick = () => {
   cancelAnimationFrame(VIC.raf);
   if (NET.match) return NET.host && netCmd('room');
   if (ROSTER.length) openLobby();
-  else openThemes((id, myst) => startRun(id, 0, myst), 's-title');
+  else openThemes((id, myst) => startRun(id, 0, myst), 's-solo');
 };
 $('v-title').onclick = () => {
   cancelAnimationFrame(VIC.raf);

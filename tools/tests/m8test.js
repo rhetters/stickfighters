@@ -5,7 +5,7 @@ const S=process.argv[2],URL=GAME;let fails=0;const ok=(c,m)=>{console.log((c?'ok
 const c=await b.newContext({viewport:{width:1280,height:800}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
 await p.goto(URL);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
-ok(await p.isVisible('#b-level')&&await p.isVisible('#b-start'),'title has PLAY: WOODED TRAIL and ARCADE');
+await p.click('#b-solo');ok(await p.isVisible('#b-level')&&await p.isVisible('#b-start'),'SOLO opens STORY and ARCADE');
 await p.evaluate(()=>startLevel('woods1'));await W(400); // the fixed Wooded Trail (CAMPAIGN now starts a generated run: m13test)
 ok(await ev("state==='play'&&MODE===LEVEL&&LV.len===6900"),'Wooded Trail starts (6,900 px long, 6 chunks)');
 await p.screenshot({path:S+'/shots/m8-start.png'});
@@ -48,7 +48,7 @@ const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))"),SV=await 
 ok(sv.saveVersion===SV&&sv.prog.woods1&&sv.prog.woods1.done===1,'progress saved with saveVersion 2 '+JSON.stringify(sv.prog));
 await p.click('#b-title2');await W(300);ok(await p.isVisible('#s-title'),'TITLE goes back to the title menu');
 // arcade still works
-await p.click('#b-start');await W(1500);ok(await ev("MODE===ARCADE&&state==='play'&&CAM.x===0&&WB.r===W&&wave===1"),'Arcade still plays on one screen');
+await p.evaluate('openSolo()');await p.click('#b-start');await W(1500);ok(await ev("MODE===ARCADE&&state==='play'&&CAM.x===0&&WB.r===W&&wave===1"),'Arcade still plays on one screen');
 await p.screenshot({path:S+'/shots/m8-arcade.png'});
 // migration from an old (v1) save
 await ev("localStorage.setItem('orangeArmy.v1',JSON.stringify({set:{vol:0.4,surge:'toggle'},best:{score:4321,wave:7,combo:22}}))");await p.reload();await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await W(400);
@@ -57,7 +57,7 @@ await ev("save()");ok(await ev("JSON.parse(localStorage.getItem('orangeArmy.v1')
 await c.close();
 // iPad
 const c2=await b.newContext({...devices['iPad (gen 7) landscape']});const q=await c2.newPage();q.on('pageerror',e=>errs.push(e.message));
-await q.goto(URL);await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);await q.tap('#b-level');await q.waitForTimeout(300);await q.tap('.thcard');await q.waitForTimeout(500);
+await q.goto(URL);await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);await q.evaluate('openSolo()');await q.tap('#b-level');await q.waitForTimeout(300);await q.tap('.thcard');await q.waitForTimeout(500);
 await q.evaluate("CAM.x=1500;PL[0].x=1900");await q.waitForTimeout(800);await q.screenshot({path:S+'/shots/m8-ipad.png'});
 ok(await q.evaluate("MODE===LEVEL"),'level runs on iPad');
 ok(errs.length===0,'no page errors '+errs.slice(0,3).join(' | '));

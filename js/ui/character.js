@@ -37,9 +37,7 @@ function closeChar() {
   cancelAnimationFrame(CH.raf);
   CH.raf = 0;
   CH.tryOn = {};
-  show('s-title');
-  titleView();
-  splitOpen('cust');
+  openCust();
   $('b-char').focus({ preventScroll: true });
 }
 function setChar(fn) {

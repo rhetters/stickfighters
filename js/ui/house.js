@@ -61,9 +61,7 @@ function openHouse() {
 }
 function closeHouse() {
   HS.arm = null;
-  show('s-title');
-  titleView();
-  splitOpen('cust');
+  openCust();
   $('b-house').focus({ preventScroll: true });
 }
 // How far the view can move: the land you've built on plus some room to grow

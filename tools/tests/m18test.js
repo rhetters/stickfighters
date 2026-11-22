@@ -11,12 +11,12 @@ const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto
 const ev=x=>p.evaluate(x);
 ok(await ev("HOUSE.bg==='hbg-paper'&&ECO.stars===500&&CHR.list[0].name==='RHETT'"),'a version 5 save loads: stars and fighter kept, empty house');
 await ev("titleReveal()");
-const orange=()=>ev("[...document.querySelectorAll('#s-title .btn')].filter(b=>b.offsetParent&&getComputedStyle(b).backgroundColor==='rgb(255, 122, 0)').map(b=>b.id)");
-ok((await orange()).length===0,'no menu button is lit up on its own '+JSON.stringify(await orange()));
-await ev("navMove('d')");const lit=await orange();ok(lit.length===1&&lit[0]===await ev('document.activeElement.id'),'moving with a controller lights up just the chosen button '+JSON.stringify(lit));
+const orange=()=>ev("[...document.querySelectorAll('#s-title .ptile')].filter(b=>b.offsetParent&&getComputedStyle(b.querySelector('.pimg')).filter==='none').map(b=>b.id)");
+ok((await orange()).length===0,'no menu picture is in colour on its own '+JSON.stringify(await orange()));
+await ev("navMove('d')");await p.waitForTimeout(300);const lit=await orange();ok(lit.length===1&&lit[0]===await ev('document.activeElement.id'),'moving with a controller colours just the chosen picture '+JSON.stringify(lit));
 await p.mouse.click(5,5);ok((await orange()).length===0,'touching the screen turns the highlight off');
 await ev("titleReveal()");await ev("$('b-cust').click()");
-ok(await ev("!$('custrow').hidden&&$('b-char').offsetParent&&$('b-house').offsetParent"),'CUSTOMIZE opens CHARACTER | HOUSE');
+ok(await ev("!$('s-cust').hidden&&$('b-char').offsetParent&&$('b-house').offsetParent"),'CUSTOMIZE opens its scene: CHARACTER | HOUSE');
 await ev("$('b-house').click()");ok(await p.isVisible('#s-house'),'HOUSE opens the house screen');
 const box=await p.locator('#hs-cells').boundingBox();const cw=box.width/20,ch=box.height/6;
 await p.mouse.move(box.x+cw*12.5,box.y+ch*5.5);await p.mouse.down();for(let i=12;i<17;i++)await p.mouse.move(box.x+cw*(i+.5),box.y+ch*5.5,{steps:2});await p.mouse.up();

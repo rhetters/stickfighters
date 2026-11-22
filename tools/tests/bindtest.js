@@ -8,8 +8,9 @@ const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 const tap=async(i,ms=90)=>{await ev(`__pad.buttons[${i}].pressed=true`);await W(ms);await ev(`__pad.buttons[${i}].pressed=false`);await W(90)};
 const vis=id=>p.isVisible('#'+id),foc=()=>ev("document.activeElement&&(document.activeElement.id||document.activeElement.textContent)");
 // title navigation with controller
-await tap(13);ok(await foc()==='b-start','title: d-pad down moves the highlight (STORY to ARCADE, now on '+await foc()+')');
-await tap(12);ok(await foc()==='b-level','d-pad up moves back');
+await tap(15);ok(await foc()==='b-online','title: d-pad right moves the highlight (SOLO to MULTIPLAYER, now on '+await foc()+')');
+await tap(14);ok(await foc()==='b-solo','d-pad left moves back');
+await tap(0);await W(200);ok(await vis('s-solo')&&await foc()==='b-level','A on SOLO opens its scene, STORY highlighted');
 await tap(0);await W(200);ok(await vis('s-themes'),'A on STORY opens the Story screen');
 await tap(0);await W(300);ok(await ev("state==='play'&&MODE===LEVEL"),'A on the first theme card starts the run');await ev('cineEnd()'); // skip the opening draw-in
 // the reported bug: Start pauses, then the controller must still work
@@ -52,7 +53,7 @@ await p.screenshot({path:S+'/shots/binds-title.png'});await c.close();
 const c2=await b.newContext({viewport:{width:1280,height:800}});await c2.addInitScript(PADJS('Pro Controller (STANDARD GAMEPAD Vendor: 057e Product: 2009)'));
 const q=await c2.newPage();q.on('pageerror',e=>errs.push(e.message));await q.goto(GAME);await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);
 const ev2=x=>q.evaluate(x);const tap2=async i=>{await ev2(`__pad.buttons[${i}].pressed=true`);await q.waitForTimeout(90);await ev2(`__pad.buttons[${i}].pressed=false`);await q.waitForTimeout(90)};
-await tap2(13);await tap2(13);await tap2(15);await tap2(1);await q.waitForTimeout(150);ok(await q.isVisible('#s-settings'),'Switch: A (right button) confirms');
+await tap2(13);await tap2(15);await tap2(1);await q.waitForTimeout(150);ok(await q.isVisible('#s-settings'),'Switch: A (right button) confirms');
 await tap2(0);await q.waitForTimeout(100);ok(await q.isVisible('#s-title'),'Switch: B (bottom button) goes back');
 await q.evaluate("show('s-binds');BD.dev='pad';renderBinds()");ok((await q.textContent('#bd-list')).includes('ZL'),'Switch buttons show Switch names (ZL, ZR, +)');
 await q.screenshot({path:S+'/shots/binds-switch.png'});
