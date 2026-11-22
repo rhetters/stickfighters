@@ -23,8 +23,8 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M11 | Online multiplayer (internet, cross-play) | Done | XL | M9, M10 | Host / Join with a room code; PC, iPad and phone together; co-op, Arcade and Versus |
 | M12 | XP, levels, skill tree | Done | L | M3, M8, M10 | Level-ups, skill points, tree screen |
 | M13 | Themes and procedural runs | Done | XL | M8, M10, M12 | Castle Siege, Pirate Cove, Mountain and Space generated from a seed, a Campaign screen, transitions per theme, platforms, mini-bosses, four main bosses |
-| M14 | Boss level | Next | L | M13 | A look of its own for every boss, a victory screen and harder replays, online rooms of 6, multi-phase boss fights |
-| M15 | Platforms and vertical layers (decision gate) | Optional | M–L | M8 | Optional: platforms and stairs |
+| M14 | Boss level | Done | L | M13 | A look of its own for every boss, a slow-motion finale, a victory screen and harder replays, online rooms of 6, picture menus |
+| M15 | Platforms, vertical layers and boss fights | Next | L | M13, M14 | A new theme built for climbing: platforms and stairs the pink army follows you up, and a multi-phase boss |
 | M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
 | M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
@@ -33,23 +33,18 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 
 ## Upcoming milestones
 
-### M14 · Boss level (in progress)
+### M15 · Platforms, vertical layers and boss fights
 
-- **A look of its own for every theme's boss** (asked by Ron and Rhett, November 21; done in version 44): the Pink General, Captain Pinkbeard, the Pink Yeti and the Pink Alien each wear their own outfit and parts.
-- Boss arena (working name: The Pink General), built on the boss framework the Captain uses: three phases, clear telegraphs, summons from the army, and a health bar.
-- **Finishing blow in slow motion** (done in version 45): the hit that beats a theme's boss slows time, and every enemy still standing is knocked out with it.
-- **Victory screen, ready-up and harder replays** (done in version 45): after a theme, each player's victory pose over their stats (damage dealt and taken, enemies beaten, best combo, revives), a ready button each (a red X or a green check, also in the online room), and when everyone is ready the THEME +1 button starts the same theme again, newly generated and one step harder. STORY (or BACK TO PLAYERS) and MAIN MENU buttons.
-- **Less text, and Story** (asked by Ron, November 21; done in version 46): the online screens and the victory screen lose their explanations, Campaign is called Story, the room shows the mode and under it the story (or ?) or free-for-all / teams, START lights up only when everyone is ready, and any option change means readying up again. A **?** story picks a theme for you and earns 10% more XP and stars.
-- **Online rooms up to 6 players** (done in version 46): the host sets the room size with − and +.
-- **A new Online screen** (asked by Ron, November 21; done in version 47): HOST and JOIN as two of Rhett's drawings, grey until highlighted; JOIN opens its own room-code screen.
-- **Picture menus** (asked by Ron, November 22; done in version 49): the title menu and the Story screen as picture tiles. The online room, the Players screen and the victory screen followed in version 50, and the title's pictures open pages of their own.
-- **Player bars from Rhett's concept art, and a treasure chest of codes** (asked by Ron, November 21; done in version 48): names, heads, hearts, Surge and an ultimate meter for 1 to 6 players; secret items from four-picture codes (the first: Rhett's Shirt).
+Decided by Ron (November 22): build a **new theme** whose levels are made for climbing, and use it to work out platforms, stairs and a full boss fight. What works there can then spread to the other themes and to the level creator (M17).
 
-**Done when:** The boss is beatable with any build, alone or in co-op, and hard to beat without learning the combat.
+- **The new theme** (name and look: Rhett's call; ideas: a jungle temple, city rooftops, a volcano): three biomes as usual, with a biome made mostly of platforms and stairs.
+- **Platforms and stairs as level data:** jump-through platforms (stand on them, jump up through them, hold down + jump to drop), stairs and raised areas, generated from the seed like the rest of a run, building on the Space launch tower's platforms and its camera that follows players up and zooms out to keep everyone in view.
+- **The pink army climbs too** (assumed; Ron to confirm): enemies jump up and drop down to reach you, so a platform is never a safe spot; ragdolls, grabs and throws work across levels.
+- **A multi-phase boss** (moved from M14): three phases, a clear warning before each big attack, the boss calling in its army, and a big health bar. Built for the new theme's boss first, then shared with the other bosses where it fits.
+- **Versus arenas with platforms** (assumed; Ron to confirm): only if combat on platforms stays easy to read in the new theme.
+- Online: everything stays in lockstep (platforms are part of the simulation); the self-test fingerprints will change, and that's expected.
 
-### M15 · Platforms and vertical layers (optional)
-
-A short prototype first: jump-through platforms, real stairs, and vertical camera movement. The test is whether it keeps combat readable. If yes, we add it to Levels 3–5 and to the chunk format. If no, we keep the stair look as scenery. `groundY()` (see ARCHITECTURE.md, "Still assuming a flat world") keeps either choice cheap.
+**Done when:** the new theme plays through alone, in local co-op and online; enemies follow players onto platforms; the boss has three phases you can learn; and fights on platforms are as readable as on the ground.
 
 ### M16 · Polish, audio, balance, v1.0 release
 
@@ -87,4 +82,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-M14: the bosses now look like themselves, and a theme ends with a slow-motion finishing blow, a victory screen and harder replays; next, decide with Ron and Rhett what else the boss fights need (the plan above).
+M15: Rhett picks the new theme (its name, its three places and its boss), then a short prototype of platforms the pink army can climb, before the full theme and its three-phase boss.
