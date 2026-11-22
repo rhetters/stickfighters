@@ -448,6 +448,79 @@ const T = {
     boss: 'MOON MAULER',
     ai: 'boss'
   },
+  mj: {
+    hp: 210,
+    s: 1.8,
+    spd: 1.1,
+    col: '#e0609a',
+    d2: '#a8406f',
+    atk: 'cslam',
+    cd: 70,
+    sc: 300,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'JUNGLE JUMBO',
+    ai: 'boss'
+  },
+  ma: {
+    hp: 230,
+    s: 1.85,
+    spd: 1.1,
+    col: '#c9558f',
+    d2: '#8a3563',
+    atk: 'cslam',
+    cd: 70,
+    sc: 320,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 105,
+    boss: 'ASH BRUTE',
+    ai: 'boss'
+  },
+  mv: {
+    hp: 240,
+    s: 1.9,
+    spd: 1.1,
+    col: '#e2457f',
+    d2: '#a32a58',
+    atk: 'cslam',
+    cd: 70,
+    sc: 340,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 110,
+    boss: 'MAGMA MUNCHER',
+    ai: 'boss'
+  },
+  K: {
+    hp: 600,
+    s: 2,
+    spd: 1.25,
+    col: '#ff3d8b',
+    d2: '#b8205e',
+    atk: 'cslam',
+    cd: 58,
+    sc: 1700,
+    ar: 100,
+    stop: 75,
+    m: 4.6,
+    fr: 0.62,
+    bnc: 0.15,
+    poise: 150,
+    boss: 'THE PINK TIKI',
+    look: { head: 1.25, stance: 'low', lw: 8, extra: ['tikimask', 'grassskirt', 'lei'] },
+    ai: 'boss'
+  },
   Z: {
     hp: 600,
     s: 1.95,
@@ -559,7 +632,11 @@ const TNAME = {
   mk: 'Launch Guard',
   mx: 'Space Brute',
   mn: 'Moon Mauler',
-  Z: 'The Pink Alien'
+  Z: 'The Pink Alien',
+  mj: 'Jungle Jumbo',
+  ma: 'Ash Brute',
+  mv: 'Magma Muncher',
+  K: 'The Pink Tiki'
 };
 // How to beat each type, shown in the training Info panel (I)
 const TTIP = {
@@ -584,7 +661,11 @@ const TTIP = {
   mk: 'LAUNCH GUARD (launch base mini-boss): break its poise, then juggle it',
   mx: 'SPACE BRUTE (rocket mini-boss): jump its quake leap and hit it from behind',
   mn: 'MOON MAULER (moon mini-boss): tough poise; heavy hits and throws',
-  Z: 'THE PINK ALIEN: beamed down from a flying saucer, three phases, calls the army. Break his poise'
+  Z: 'THE PINK ALIEN: beamed down from a flying saucer, three phases, calls the army. Break his poise',
+  mj: 'JUNGLE JUMBO (jungle mini-boss): lure it onto a steam vent, then juggle it',
+  ma: 'ASH BRUTE (slopes mini-boss): watch for falling lava rocks and let them hit it',
+  mv: 'MAGMA MUNCHER (crater mini-boss): it follows you up the ledges; knock it into the lava',
+  K: 'THE PINK TIKI: bursts out of the lava, three phases. At his last bit of health the lava rises: climb out and finish him at the rim'
 };
 for (const o of [A, EA])
   for (const k in o) {

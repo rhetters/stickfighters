@@ -37,7 +37,7 @@ ok(await H.evaluate(()=>!$('on-start').disabled),'all six ready: START');
 await H.evaluate(()=>$('on-start').click());await H.waitForTimeout(2500);
 const st=await Promise.all([H,...G].map(q=>q.evaluate(()=>({s:state,n:PL.length,th:LV.run&&LV.run.theme,m:LV.run&&LV.run.myst,sl:PL.map(p=>p.slot).join('')}))));
 ok(st.every(o=>o.s==='play'&&o.n===6&&o.m===true&&o.th===st[0].th&&THEMES_OK(o.th)&&o.sl==='012345'),'six devices start the same surprise story with six fighters '+JSON.stringify(st[0]));
-function THEMES_OK(t){return ['castle','pirate','mountain','space'].includes(t)}
+function THEMES_OK(t){return ['castle','pirate','mountain','space','volcano'].includes(t)}
 // everyone walks right and punches for a while
 for(let k=0;k<3;k++){await Promise.all([H,...G].map((q,i)=>q.evaluate(i=>{setA('kb','r',1);setA('kb','p',(i+Date.now())%2)},i)));await H.waitForTimeout(1500)}
 await Promise.all([H,...G].map(q=>q.evaluate(()=>{setA('kb','r',0);setA('kb','p',0)})));await H.waitForTimeout(2000);

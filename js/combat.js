@@ -496,6 +496,7 @@ function hurtE(e, d, dr, src, by) {
   if (e.st === 'down') e.otgU = 1; // one hit on a downed enemy per knockdown
   tally(ap, 'dealt', Math.min(dmg, Math.max(0, e.hp)));
   e.hp -= dmg;
+  if (e.hp <= 0 && MODE.spare && MODE.spare(e)) e.hp = 1; // a mode can keep someone standing (the volcano's last stand)
   e.flash = 4;
   e.hs = WT[w].st;
   let ef = d.ef || 'stagger';

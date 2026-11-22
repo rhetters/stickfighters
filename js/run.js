@@ -46,7 +46,8 @@ function genRun(themeId, seed, ng = 0) {
     segs = [],
     trans = [],
     ramps = [],
-    terr = { s: [], w: [] };
+    terr = { s: [], w: [] },
+    haz = { vents: [], pools: [] }; // the volcano's steam vents and lava pools (volcano.js)
   let x = 0;
   // scenery for a chunk: a few props spread across it
   const scatter = (B, w, n) => {
@@ -75,13 +76,28 @@ function genRun(themeId, seed, ng = 0) {
     const light = i => (B.dusk ? B.dusk[0] + ((B.dusk[1] - B.dusk[0]) * i) / (n - 1) : 0);
     // 1. the biome's sign (and the pipe you pop out of, after a pipe slide)
     const prev = trans[trans.length - 1],
-      sign = chunk(B, bi, B.climb ? 1400 : 900, [
-        { k: 'sign', x: 300, t: B.name },
-        ...scatter(B, 900, 3),
+      // a climb down (the crater) opens with ledges stepping down over lava; the sign stands at the bottom
+      dn = B.descent ? 1000 : 0,
+      sign = chunk(B, bi, B.climb ? 1400 : 900 + dn * 0.6, [
+        { k: 'sign', x: 300 + dn * 0.85, t: B.name },
+        ...scatter(B, 900 - dn * 0.4, 3).map(q => ({ ...q, x: q.x + dn })),
         // where the last scene lands you: the pipe you pop out of, the balloon or gondola station you arrive at
         ...(prev && OUTS[prev.k] ? [{ k: 'trans-' + prev.k + 'out', x: OUTS[prev.k] }] : [])
       ]);
     sign.dusk = light(0);
+    if (B.descent) {
+      const o = sign.x0;
+      for (let i = 0; i < 4; i++)
+        terr.s.push({
+          x1: o + 60 + i * 230,
+          x2: o + 320 + i * 230,
+          y1: G - 480 + i * 120,
+          y2: G - 480 + i * 120,
+          st: 'rock'
+        });
+      haz.pools.push({ x0: o + 10, x1: o + 990 });
+      if (prev) prev.land = terr.s.length - 4; // the rim scene lands everyone on the top ledge
+    }
     // 2. the fights
     for (let k = 0; k < B.fights; k++) {
       const w = ri(B.w[0], B.w[1]),
@@ -109,7 +125,37 @@ function genRun(themeId, seed, ng = 0) {
         e.mini = B.mini.t;
         e.line = B.mini.lines[ri(0, B.mini.lines.length - 1)];
       }
+      // steam vents in the fight (one or two, somewhere you will be fighting)
+      if (B.vents)
+        for (let v = ri(1, 2), i = 0; i < v; i++)
+          haz.vents.push({ x: Math.round(e.x + (i ? 1 : -1) * (90 + R() * 250)), o: ri(0, 239) });
+      // rock ledges over the fight: low ones at the sides and a higher one in between (two layouts)
+      if (B.ledges) {
+        const L = (a, b, h) => terr.s.push({ x1: e.x + a, x2: e.x + b, y1: G - h, y2: G - h, st: 'rock' });
+        if (R() < 0.5) {
+          L(-400, -220, 125);
+          L(220, 400, 125);
+          L(-90, 90, 245);
+        } else {
+          L(-330, -130, 125);
+          L(-60, 160, 245);
+          L(230, 400, 125);
+        }
+      }
       encs.push(e);
+    }
+    // pools of lava on the floor between the crater's fights (to jump over)
+    if (B.ledges) {
+      const es = encs.slice(-B.fights);
+      for (let i = 1; i < es.length; i++) {
+        const a = es[i - 1].lock + W + 60,
+          b = es[i].lock - 60;
+        if (b - a >= 200) {
+          const m = Math.round((a + b) / 2),
+            h = Math.min(85, Math.round((b - a) / 2 - 40));
+          haz.pools.push({ x0: m - h, x1: m + h });
+        }
+      }
     }
     // the slopes of a climb: uphill from a screen into the biome to each fight's ledge, and on after it (drawing only;
     // starting a screen in keeps the slope out of view while the last biome's scenery still shows)
@@ -149,13 +195,26 @@ function genRun(themeId, seed, ng = 0) {
         intro: bs.intro,
         line: bs.lines[ri(0, bs.lines.length - 1)]
       });
+      // the lava escape: at his last bit of health the boss stops the fight and the lava rises (volcano.js). Ledges at
+      // the sides are there for the fight; the rest come out of the crater walls when the lava starts rising.
+      if (bs.escape) {
+        const X = c.x0 + at,
+          ex = encs[encs.length - 1],
+          L = (a, b, h) => ({ x1: X + a, x2: X + b, y1: G - h, y2: G - h, st: 'rock' }),
+          s = [];
+        terr.s.push(L(-426, -250, 120), L(250, 426, 120));
+        s.push(L(-110, 110, 235));
+        for (let i = 0; i < 6; i++) s.push(i % 2 ? L(40, 300, 350 + i * 115) : L(-300, -40, 350 + i * 115));
+        s.push(L(-160, 160, 1040), L(-426, 426, 1155));
+        ex.esc = { s, top: G - 1155, cap: G - 990, perch: X + 300, pair: ri(0, bs.escape.lines.length - 1) };
+      }
       chunk(B, bi, 700, [{ k: 'arch', x: 420, t: th.name + ' CLEAR' }]);
       seg.x1 = x;
     } else {
       const nb = th.biomes[bi + 1],
         fits = (th.trans || Object.keys(TRANSITIONS)).filter(k => {
           const nd = TRANSITIONS[k].needs;
-          return !nd || nd.includes(bid) || nd.includes(nb);
+          return (!nd || nd.includes(bid) || nd.includes(nb)) && !(BIOMES[nb].enter && k !== BIOMES[nb].enter);
         }),
         k = fits[ri(0, fits.length - 1)],
         T_ = TRANSITIONS[k],
@@ -202,6 +261,7 @@ function genRun(themeId, seed, ng = 0) {
     trans,
     ramps: ramps.length ? ramps : null,
     terr: terr.s.length ? terr : null,
+    haz: haz.vents.length || haz.pools.length ? haz : null,
     run: { theme: themeId, seed, ng },
     len: x,
     cp: -1,
@@ -744,7 +804,7 @@ function cineTick() {
       LV.say = null;
       cineEnd();
     }
-  }
+  } else volcanoCine(c, t, ps); // the geyser, the jump into the crater, the Tiki's entrance and last stand
 }
 // A boss or mini-boss arrives as its fight starts (level.js calls this instead of dropping it in)
 function bossArrive(ne) {
@@ -759,6 +819,11 @@ function bossArrive(ne) {
     e.y = G;
     e.draw = 0;
     cineStart('pencil', { e, line: ne.line });
+  } else if (ne.intro === 'erupt') {
+    // under the lava until the scene throws him up out of it (volcano.js)
+    e.y = G;
+    e.hide = 1;
+    cineStart('erupt', { e, line: ne.line });
   } else if (ne.intro === 'beam') {
     e.y = G - 300;
     e.hide = 1;
@@ -779,6 +844,7 @@ function drawCine() {
   else if (c.k === 'landing' && c.lx !== undefined) drawRocket(c.lx, G + 6 + c.ly, c.ly < 0);
   else if (c.k === 'beam' && c.ux !== undefined) drawSaucer(c.ux, c.uy, c.beam ? c.e : null);
   else if (c.k === 'catapult' && c.t < 100) drawCatBowl(c.tr.x, c.t);
+  else drawVolcanoCine(c);
 }
 // Speech bubble over whoever is talking (world space, drawn by render.js after the fighters)
 function drawSay() {
@@ -786,9 +852,11 @@ function drawSay() {
   if (!s || !s.e || s.e.gone) return;
   const e = s.e,
     // beside the head, kept on screen (big bosses are taller than the screen allows above them)
-    x = Math.max(CAM.x + 230, Math.min(CAM.x + W - 230, e.x - 40)),
-    y = Math.max(168, e.y + upAt(e.x) - 80 * e.s - 70),
-    age = LV.cine ? LV.cine.t - s.t : 0;
+    vx = viewX(),
+    x = Math.max(vx + 230, Math.min(vx + W / CAM.z - 230, e.x - 40)),
+    // under the boss's health bar (in the view, which can be raised over ledges and zoomed out)
+    y = Math.max(G + CAM.y + (200 - G) / CAM.z, e.y + upAt(e.x) - 80 * e.s - 70),
+    age = s.lt !== undefined ? LV.t - s.lt : LV.cine ? LV.cine.t - s.t : 0; // lt: said outside a scene
   ctx.save();
   ctx.font = '900 20px "Trebuchet MS",sans-serif';
   const w = Math.min(420, ctx.measureText(s.txt).width + 34),

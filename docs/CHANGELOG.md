@@ -2,6 +2,17 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M15: the Volcano (November 22, 2026)
+- **A new story, VOLCANO:** the Tiki Jungle, the Ashy Slopes and the Crater, with its own picture on the Story screen.
+- **New in the Tiki Jungle: steam vents.** Every few seconds a vent hisses, then blasts whoever is standing on it high into the air. For you it's a super jump; enemies get knocked flying (lure them onto one and juggle them). A giant vent (the geyser) can blast everyone over into the next place.
+- **New on the Ashy Slopes: falling lava rocks.** During a fight a glowing mark shows where a rock will land; get out of the way (or knock an enemy onto it). The path climbs between fights, like the Mountainside.
+- **New in the Crater: you climb down into it.** You jump in from the rim onto rock ledges and go down them over a lava pool. Every fight in the Crater has rock ledges, and **the pink army follows you up and down them**: they jump up to the ledge you're on and drop down after you. Pools of lava sit between the fights. Lava bounces you back out with a little damage; it never knocks you out.
+- **The Pink Tiki:** a tiki mask, a grass skirt and a flower necklace. He bursts out of the lava, has three phases and calls his army. At his last bit of health he stops the fight (everyone is stunned and dizzy) and has his say ("TIME OUT! TIKI TIME OUT!"). Then rock ledges come out of the crater walls, the lava starts rising, and he rides a lava spout up to the rim. **Climb out ahead of the lava** (it speeds up if it falls far behind, more of his army comes down the ledges at you, and it brings a knocked-out player back up) and finish him at the rim for the slow-motion finale.
+- Enemies follow players onto ledges anywhere there are ledges, and reviving a teammate now needs you on the same level as them.
+- Mini-bosses for the new places: Jungle Jumbo, Ash Brute and Magma Muncher.
+- Self-test fingerprints unchanged.
+- Version 52.
+
 ## M14 in progress: XP on the victory screen and round each head (November 22, 2026)
 - **Victory screen:** the orange line of text is gone. What the run earned is now a ninja star with +stars, then a handwritten XP with +XP in purple (and a handwritten LEVEL n! when someone levels up).
 - **The ring round each player's head in the game is their XP:** it fills in their colour from just past a small badge at its bottom right (the level number) round the bottom, the left and the top, and reaches the badge again at the next level. It counts the XP the fight has earned so far.
