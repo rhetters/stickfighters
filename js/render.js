@@ -544,7 +544,7 @@ function hudBar(q, x0, y0, pw) {
     ctx.fillStyle = um >= 1 && (fr >> 3) % 2 ? '#fff' : '#3ec5ff';
     ctx.fillRect(x0 + 2, cy + R - 2 - (uh - 4) * um, 3, (uh - 4) * um);
   }
-  // the head, in a ring of the player's colour
+  // the head, in a ring that fills with XP towards the next level, from the level badge round to it again
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, R, 0, 7);
@@ -554,14 +554,7 @@ function hudBar(q, x0, y0, pw) {
   if (down) ctx.globalAlpha = 0.4;
   hudHead(q, cx, cy, R);
   ctx.restore();
-  ctx.beginPath();
-  ctx.arc(cx, cy, R, 0, 7);
-  ctx.lineWidth = 5;
-  ctx.strokeStyle = INK;
-  ctx.stroke();
-  ctx.lineWidth = 2.5;
-  ctx.strokeStyle = q.col;
-  ctx.stroke();
+  hudLevelRing(q, cx, cy, R);
   // name, hearts, Surge
   const rx = cx + R + 6,
     rw = Math.max(40, x0 + pw - rx - 6),
@@ -606,6 +599,52 @@ function hudBar(q, x0, y0, pw) {
   );
   if (down && MODE.revive) txt0(q.rv > 0 ? 'REVIVING' : 'DOWN', rx, sy + 19, '#e8212b');
   if (MODE.wins) for (let w = 0; w < MODE.wins(q); w++) star5(rx + 6 + w * 16, sy + 16, 0.7);
+}
+// The ring round a player's head: XP towards the next level, starting just past the level badge (bottom right),
+// going on round the bottom, the left and the top, and reaching the badge again at a level-up. For a fighter on
+// this device it counts the XP this fight has earned so far (banked when the run ends).
+function hudXP(q) {
+  const c = q.fi != null && CHR.list[q.fi];
+  const xp = c && c.prog ? c.prog.xp + Math.round(RUN.xp * (1 + modOf(q, 'xp'))) : q.prog ? q.prog.xp : null;
+  if (xp == null) return null;
+  const lv = levelOf(xp);
+  return { lv, f: lv >= XP_RULES.cap ? 1 : (xp - XP_AT[lv]) / (XP_AT[lv + 1] - XP_AT[lv]) };
+}
+function hudLevelRing(q, cx, cy, R) {
+  const x = hudXP(q),
+    a0 = Math.PI / 4, // the badge
+    gap = 0.42,
+    br = Math.max(7, R * 0.42),
+    bx = cx + Math.cos(a0) * R,
+    by = cy + Math.sin(a0) * R;
+  ctx.lineCap = 'butt';
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, 7);
+  ctx.lineWidth = 7;
+  ctx.strokeStyle = INK;
+  ctx.stroke();
+  ctx.lineWidth = 3.5;
+  ctx.strokeStyle = '#e5dfd2';
+  ctx.stroke();
+  if (x && x.f > 0) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, a0 + gap, a0 + gap + (Math.PI * 2 - gap * 2) * Math.min(1, x.f));
+    ctx.strokeStyle = q.col;
+    ctx.stroke();
+  }
+  if (!x) return;
+  // the level badge
+  ctx.beginPath();
+  ctx.arc(bx, by, br, 0, 7);
+  ctx.fillStyle = '#fff8ee';
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = INK;
+  ctx.stroke();
+  ctx.fillStyle = INK;
+  ctx.textAlign = 'center';
+  ctx.font = '900 ' + Math.round(br * (x.lv > 9 ? 1.15 : 1.4)) + 'px Impact,"Arial Black",sans-serif';
+  ctx.fillText(String(x.lv), bx, by + br * 0.5);
 }
 // A heart for health: size s, filled with c (only the left part f of it, for a heart partly lost)
 function hudHeartPath(x, y, s) {

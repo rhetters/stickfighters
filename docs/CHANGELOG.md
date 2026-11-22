@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M14 in progress: XP on the victory screen and round each head (November 22, 2026)
+- **Victory screen:** the orange line of text is gone. What the run earned is now a ninja star with +stars, then a handwritten XP with +XP in purple (and a handwritten LEVEL n! when someone levels up).
+- **The ring round each player's head in the game is their XP:** it fills in their colour from just past a small badge at its bottom right (the level number) round the bottom, the left and the top, and reaches the badge again at the next level. It counts the XP the fight has earned so far.
+- Version 51.
+
 ## M14 in progress: every menu in pictures (November 22, 2026)
 - **The title's pictures open pages of their own:** SOLO (an open storybook for STORY, Orange against the pink army for ARCADE), MULTIPLAYER (Rhett's couch drawing for LOCAL, then HOST and JOIN) and CUSTOMIZE (CHARACTER and HOUSE, over Rhett's new shop-and-house drawing). No more orange poof or buttons popping up on the title. TRAINING and SETTINGS are small pictures too, with a lighter outline and pencil shading round the edge.
 - **The online room, redone from the concept:** the room code on a yellow sticky note with "room code" written in its corner, − and + for the room size, each player a polaroid (no tape) with a ready stamp, a little picture of what they play with (touch, keyboard or controller) in the corner, and TEAM badges in team Versus. The modes are pictures (STORY is the storybook) and, under them, the stories as their pictures, or free-for-all / teams pictures.

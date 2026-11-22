@@ -52,6 +52,7 @@ function vicOpen() {
   $('v-lobby').querySelector('.pimg').className = 'pimg ' + li;
   $('v-lobby').querySelector('b').textContent = lt;
   $('v-title').querySelector('b').textContent = NET.match && !NET.host ? 'LEAVE' : 'MENU';
+  vicRewards();
   show('s-victory');
   vicRefresh();
   const me = cards.querySelector('.vready:not([disabled])');
@@ -65,6 +66,26 @@ function vicOpen() {
     VIC.raf = requestAnimationFrame(tick);
   };
   tick();
+}
+// What the run earned, as pictures: a ninja star and +stars, then a handwritten XP and +XP in purple (and LEVEL n!
+// for a level-up; new items by name)
+const VIC_STAR =
+  '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M15 2 l4 9 l9 4 l-9 4 l-4 9 l-4 -9 l-9 -4 l9 -4z" fill="#9aa3b5" stroke="#1c1626" stroke-width="2"/><circle cx="15" cy="15" r="2.5" fill="#fff8ee" stroke="#1c1626" stroke-width="1.5"/></svg>';
+function vicRewards() {
+  const box = $('v-st'),
+    xp = RUN.last.reduce((m, r) => Math.max(m, r.xp), 0),
+    up = RUN.last.reduce((m, r) => Math.max(m, r.to > r.from ? r.to : 0), 0),
+    items = [...new Set(RUN.items)].map(id => ITEM[id].name);
+  box.innerHTML =
+    '<span class="vgot" aria-label="Ninja stars earned">' +
+    VIC_STAR +
+    '<b>+' +
+    RUN.stars +
+    '</b></span>' +
+    (xp ? '<span class="vgot vxp" aria-label="XP earned"><i>XP</i><b>+' + xp + '</b></span>' : '') +
+    (up ? '<span class="vgot vlv"><i>LEVEL ' + up + '!</i></span>' : '') +
+    (items.length ? '<span class="vgot vnew"><i></i></span>' : '');
+  if (items.length) box.querySelector('.vnew i').textContent = 'NEW: ' + items.join(', ') + '!';
 }
 const vicIsReady = slot => (NET.match ? !!(NET.players.find(q => q.slot === slot) || {}).ready : !!VIC.ready[slot]);
 function vicReady(slot) {
