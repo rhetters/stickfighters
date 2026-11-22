@@ -1051,19 +1051,119 @@ body.padnav #ui select:focus {
 #tmenu .btn {
   margin: 2px 0;
 }
+/* The title's picture tiles: grey until highlighted; an open tile shows its two choices on top of its picture */
+.ttiles {
+  display: flex;
+  gap: clamp(14px, 4vw, 40px);
+  justify-content: center;
+}
 .tslot {
   position: relative;
   display: flex;
   justify-content: center;
+  --tt: max(90px, min(calc(var(--wh, 440px) * 0.36), 170px)); /* the picture's size, fitted to the game's frame */
 }
+.ttile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ttile:focus {
+  outline: none;
+}
+.ttimg {
+  display: block;
+  width: var(--tt);
+  height: var(--tt);
+  background: center / contain no-repeat;
+  filter: grayscale(1) contrast(0.75) brightness(1.08);
+  transition:
+    filter 0.15s,
+    transform 0.15s;
+}
+.tsolo {
+  background-image: url(../img/menu-solo.svg);
+}
+.tmulti {
+  background-image: url(../img/menu-multi.svg);
+}
+.tcust {
+  background-image: url(../img/menu-custom.svg);
+}
+.ttile b {
+  font:
+    900 calc(var(--tt) * 0.15) Impact,
+    'Arial Black',
+    sans-serif;
+  letter-spacing: 1px;
+  color: #8f8697;
+  text-shadow:
+    0 0 6px #fbfaf4,
+    0 0 10px #fbfaf4;
+  transition: color 0.15s;
+}
+.ttile.open .ttimg,
+.ttile:active .ttimg,
+body.padnav .ttile:focus .ttimg {
+  filter: none;
+  transform: scale(1.04) rotate(-1.5deg);
+}
+.ttile.open b,
+.ttile:active b,
+body.padnav .ttile:focus b {
+  color: #1c1626;
+}
+@media (hover: hover) {
+  .ttile:hover .ttimg {
+    filter: none;
+    transform: scale(1.04) rotate(-1.5deg);
+  }
+  .ttile:hover b {
+    color: #1c1626;
+  }
+}
+/* An open tile's two choices: stacked on its picture */
 .split {
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   top: 0;
-  transform: translateX(-50%);
+  height: var(--tt);
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
   white-space: nowrap;
+}
+#s-title .split .btn {
+  width: calc(var(--tt) * 0.9);
+  min-width: 0;
+  padding: 4px 6px;
+  font-size: calc(var(--tt) * 0.12);
+}
+/* Training room and Settings: smaller buttons with a picture */
+.tsmall {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+}
+#s-title .tsmall .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: auto;
+  padding: 4px 18px 4px 8px;
+}
+.tsmall svg {
+  width: 30px;
+  height: 30px;
 }
 .split[hidden] {
   display: none;
@@ -2182,44 +2282,94 @@ body.padnav .ontile:focus b {
 .thcard {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 2px;
   flex: 1 1 0;
   min-width: 0;
-  max-width: 200px;
-  padding: 10px;
-  border: 4px solid #1c1626;
-  border-top: 14px solid var(--tc);
-  border-radius: 14px;
-  background: #fff8ee;
+  max-width: 190px;
+  padding: 0;
+  border: 0;
+  background: none;
   color: #1c1626;
-  font: 700 clamp(11px, 1.4vw, 15px) 'Trebuchet MS', sans-serif;
   cursor: pointer;
-  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.thcard:focus {
+  outline: none;
+}
+/* Each story's picture (img/story-<theme>.svg), grey until highlighted; a theme with no picture yet shows its colour */
+.thpic {
+  display: block;
+  width: 100%;
+  max-width: min(170px, calc(var(--wh, 440px) * 0.42));
+  aspect-ratio: 1;
+  border-radius: 18px;
+  background: var(--tc, #8a7f96) center / contain no-repeat;
+  filter: grayscale(1) contrast(0.75) brightness(1.08);
+  transition:
+    filter 0.15s,
+    transform 0.15s;
+}
+.th-castle,
+.th-pirate,
+.th-mountain,
+.th-space,
+.th-q {
+  background-color: transparent;
+}
+.th-castle {
+  background-image: url(../img/story-castle.svg);
+}
+.th-pirate {
+  background-image: url(../img/story-pirate.svg);
+}
+.th-mountain {
+  background-image: url(../img/story-mountain.svg);
+}
+.th-space {
+  background-image: url(../img/story-space.svg);
+}
+.th-q {
+  background-image: url(../img/story-surprise.svg);
 }
 .thcard b {
-  font: 900 clamp(16px, 2.2vw, 28px) Impact, 'Arial Black', sans-serif;
-}
-.thq {
-  --tc: #8a7f96;
-  justify-content: center;
-  text-align: center;
-}
-.thq b {
-  font-size: clamp(40px, 6vw, 64px);
-  line-height: 1;
+  font:
+    900 clamp(13px, 1.8vw, 22px) Impact,
+    'Arial Black',
+    sans-serif;
+  color: #a39aa8;
+  white-space: nowrap;
+  transition: color 0.15s;
 }
 .thcard small {
-  color: #6a6070;
+  min-height: 1.2em;
+  font: 700 clamp(11px, 1.3vw, 14px) 'Trebuchet MS', sans-serif;
+  color: #b3abb8;
+}
+.thcard:active .thpic,
+body.padnav .thcard:focus .thpic {
+  filter: none;
+  transform: scale(1.05) rotate(-1.5deg);
+}
+.thcard:active b,
+body.padnav .thcard:focus b {
+  color: #1c1626;
+}
+.thcard:active small,
+body.padnav .thcard:focus small {
+  color: #c25a00;
 }
 @media (hover: hover) {
-  .thcard:hover {
-    background: #ffe0b8;
+  .thcard:hover .thpic {
+    filter: none;
+    transform: scale(1.05) rotate(-1.5deg);
   }
-}
-.thcard:active,
-body.padnav .thcard:focus {
-  background: #ffe0b8;
-  outline: 4px solid #ff7a00;
+  .thcard:hover b {
+    color: #1c1626;
+  }
+  .thcard:hover small {
+    color: #c25a00;
+  }
 }
 /* Ready up: a red X or a green check (online room cards and the victory screen) */
 .pready,

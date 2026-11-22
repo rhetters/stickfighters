@@ -10,7 +10,7 @@ await ev("navMove('l');navMove('l')");ok(/DAD/.test(await name()),'left twice go
 await ev("$('ch-tabs').querySelector('.on').focus();navMove('d')");ok(/Scarf/.test(await name()),'down from Neck tab goes into the shelf below it: '+await name());
 await ev("navMove('r')");ok(/Green Scarf/.test(await name()),'right goes along the shelf: '+await name());
 // title menu
-await ev("closeChar();titleOpenAll();$('b-start').focus();navMove('d')");ok(await ev("document.activeElement.id==='b-online'"),'title: down from ARCADE to ONLINE '+await ev('document.activeElement.id+" "+navItems().map(e=>e.id).join()'));
+await ev("closeChar();titleOpenAll();$('b-start').focus();navMove('r')");ok(await ev("document.activeElement.id==='b-online'"),'title: right from ARCADE to ONLINE '+await ev('document.activeElement.id+" "+navItems().map(e=>e.id).join()'));
 // scroll kept
 await ev("$('b-char').click();CH.tab='head';renderChar();$('ch-grid').scrollTop=200;itemTap('hair-pigtails')");
 ok(await ev("$('ch-grid').scrollTop")>150,'tapping an item keeps the shelf scroll position ('+await ev("$('ch-grid').scrollTop")+')');

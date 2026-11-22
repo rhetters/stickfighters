@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs>
+<filter id="w" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+<pattern id="h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="5" stroke="#4a4452" stroke-width="1.3"/></pattern>
+<pattern id="g" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#b9cbe0" stroke-width="0.8"/></pattern>
+</defs>
+<g filter="url(#w)">
+<rect x="14" y="16" width="176" height="176" rx="22" fill="url(#h)"/>
+<rect x="8" y="8" width="176" height="176" rx="22" fill="#2c2840" stroke="#1c1626" stroke-width="4"/>
+<path d="M150 30 a22 22 0 1 0 18 34 a18 18 0 1 1 -18 -34z" fill="#fff3a0" stroke="#1c1626" stroke-width="3"/>
+<g fill="#fff"><circle cx="34" cy="34" r="2"/><circle cx="70" cy="22" r="1.6"/><circle cx="118" cy="40" r="2"/><circle cx="168" cy="110" r="1.6"/><circle cx="28" cy="92" r="1.6"/></g>
+<path d="M12 168 q40 -14 88 -4 t80 -2 V176 q0 4 -4 4 H16 q-4 0 -4 -4z" fill="#cfcad8" stroke="#1c1626" stroke-width="2.5"/>
+<path d="M30 166 V64 M52 166 V64 M30 64 h22 M30 90 l22 20 M52 90 l-22 20 M30 120 l22 20 M52 120 l-22 20" stroke="#ff7a00" stroke-width="3" fill="none"/>
+<path d="M104 136 V82 q0 -34 18 -48 q18 14 18 48 v54z" fill="#fff8ee" stroke="#1c1626" stroke-width="3"/>
+<path d="M104 136 l-12 14 v-30 l12 -10 M140 136 l12 14 v-30 l-12 -10" fill="#ff4fa3" stroke="#1c1626" stroke-width="3"/>
+<circle cx="122" cy="80" r="9" fill="#7cc8f0" stroke="#1c1626" stroke-width="3"/>
+<path d="M110 136 q12 34 24 0z" fill="#ffd400" stroke="#1c1626" stroke-width="2.5"/>
+<path d="M116 138 q6 18 12 0z" fill="#ff7a00"/>
+<g stroke="#ff7a00" stroke-width="5" stroke-linecap="round" fill="none"><circle cx="72" cy="128" r="7" fill="#fbfaf4"/><path d="M72 135 v14 M72 149 l-6 12 M72 149 l7 12 M72 140 l10 -8 M72 140 l-10 4"/></g>
+<circle cx="72" cy="128" r="12" fill="#b4dcff" fill-opacity="0.35" stroke="#fff" stroke-width="2"/>
+</g>
+</svg>

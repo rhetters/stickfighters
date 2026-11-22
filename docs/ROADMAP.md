@@ -42,6 +42,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 - **Less text, and Story** (asked by Ron, November 21; done in version 46): the online screens and the victory screen lose their explanations, Campaign is called Story, the room shows the mode and under it the story (or ?) or free-for-all / teams, START lights up only when everyone is ready, and any option change means readying up again. A **?** story picks a theme for you and earns 10% more XP and stars.
 - **Online rooms up to 6 players** (done in version 46): the host sets the room size with − and +.
 - **A new Online screen** (asked by Ron, November 21; done in version 47): HOST and JOIN as two of Rhett's drawings, grey until highlighted; JOIN opens its own room-code screen.
+- **Picture menus** (asked by Ron, November 22; done in version 49): the title menu and the Story screen as picture tiles. Still to come from the concepts: the online room, the victory screen and the Players screen.
 - **Player bars from Rhett's concept art, and a treasure chest of codes** (asked by Ron, November 21; done in version 48): names, heads, hearts, Surge and an ultimate meter for 1 to 6 players; secret items from four-picture codes (the first: Rhett's Shirt).
 
 **Done when:** The boss is beatable with any build, alone or in co-op, and hard to beat without learning the combat.
