@@ -29,6 +29,7 @@ for(let i=0;i<200&&await ev("state==='play'");i++)await ev("(()=>{setA('kb','r',
 await ev("setA('kb','r',0)");await p.waitForTimeout(2400);
 ok(await ev("!$('s-victory').hidden&&$('v-cards').children.length===2&&/RHETT/.test($('v-cards').textContent)&&$('v-cards').querySelectorAll('.vstats li').length===4&&/Damage Done/.test($('v-cards').textContent)&&/Damage Taken/.test($('v-cards').textContent)&&$('v-again').textContent.replace(/ /g,'')==='CASTLESIEGE+1'&&$('v-again').querySelector('.pimg').classList.contains('i-castle')"),'the victory screen shows a card for each player with damage done and taken, and a CASTLE SIEGE +1 button');
 ok(await ev("(()=>{const r=$('v-title').getBoundingClientRect(),f=$('s-victory').getBoundingClientRect();return r.bottom<=f.bottom+1&&r.height>30})()"),'the buttons fit on the screen');
+ok(await ev("!!$('v-st').querySelector('.vgot svg')&&/^\\+\\d+$/.test($('v-st').querySelector('.vgot b').textContent)&&!/ninja stars/.test($('v-st').textContent)"),'the stars earned show as a ninja star and +stars (no line of text)');
 ok(await ev("$('v-lobby').querySelector('.pimg').classList.contains('i-local')&&$('v-lobby').textContent==='PLAYERS'&&$('v-title').querySelector('.i-home')&&$('v-title').textContent==='MENU'&&document.querySelectorAll('#v-cards .polar .pready').length===2"),'polaroids with ready stamps; picture buttons for PLAYERS and MENU');
 await ev("document.querySelectorAll('.vready')[0].click()");await p.waitForTimeout(1200);
 ok(await ev("!$('s-victory').hidden&&document.querySelector('.vready.on')&&state!=='play'&&$('v-again').disabled"),'one player ready is not enough: CASTLE SIEGE +1 stays off');
@@ -52,6 +53,7 @@ ok(await ev("(()=>{replayLevel(true);return LV.run.myst===true&&LV.run.ng===1})(
 // the player bars: name, head, hearts, Surge and the ultimate meter for 1 to 6 players, clear of the stars
 const hb=await ev(`(()=>{const out=[];for(const n of [1,2,4,6]){ROSTER.length=0;if(n>1)for(let i=0;i<n;i++){const L=lookRaw({...FIGHTER0,name:'P'+i,col:['col-orange','col-sky','col-green','col-purple','col-red','col-gold'][i],eq:{...FIGHTER0.eq,hair:'hair-afro'}});ROSTER.push({slot:i,dev:i?'pad:'+i:'kb',col:L.col,d2:L.d2,name:'P'+i,look:L})}
  startRun('castle');cineEnd();PL.forEach(q=>{q.hp=q.max*0.5;q.meter=60;q.bd={...(q.bd||{}),ult:{nm:'x'}}});render();out.push({n,right:8+n*hudPanelW(),W,heads:PL.every(q=>HUDHEAD.get(q))})}return out})()`);
+ok(await ev("(()=>{const q={fi:null,prog:{xp:XP_AT[12]+Math.round((XP_AT[13]-XP_AT[12])/2)}};const x=hudXP(q);return x.lv===12&&Math.abs(x.f-0.5)<0.02&&hudXP({fi:null,prog:null})===null})()"),'the ring round a head is the XP to the next level, with the level in its badge');
 ok(hb.every(o=>o.right<=o.W-140&&o.heads),'the player bars fit 1 to 6 players left of the stars, each with a head portrait '+JSON.stringify(hb));
 ok(await ev("typeof hudPlayers==='undefined'&&!/segAt|BIOMES/.test(levelHud.toString())"),'the old bars and the map line are gone');
 // the treasure chest: codes give secret items

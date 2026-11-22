@@ -2100,8 +2100,46 @@ body.padnav .thcard:focus small {
 #s-victory p {
   margin: 0;
 }
+/* what the run earned: a ninja star +stars, a handwritten XP +XP in purple */
 #v-st {
-  font-size: clamp(12px, 1.5vw, 15px);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 30px;
+}
+.vgot {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.vgot svg {
+  width: 28px;
+  height: 28px;
+}
+.vgot b {
+  font:
+    900 24px Impact,
+    'Arial Black',
+    sans-serif;
+  color: #1c1626;
+}
+.vgot i {
+  font:
+    400 22px 'Marker Felt',
+    'Chalkboard SE',
+    'Comic Sans MS',
+    cursive;
+  font-style: normal;
+  color: #1c1626;
+  transform: rotate(-6deg);
+}
+.vxp b {
+  color: #8a3ffc;
+}
+.vlv i,
+.vnew i {
+  color: #8a3ffc;
+  font-size: 18px;
 }
 .vbtns .ptile {
   --ps: max(56px, min(calc(var(--wh, 440px) * 0.2), 96px));
