@@ -1,6 +1,7 @@
-// StickFighters: Story screen: pick a theme (data/themes.js), see its three biomes, its boss and your best run, or
-// '?' for a surprise theme that earns more (SURPRISE_BONUS). Solo opens it from the title; local co-op from the
-// Players screen (online, the host picks in the room).
+// StickFighters: Story screen: a picture tile per theme (data/themes.js; the picture, img/story-<id>.svg, is set in
+// the stylesheet), grey until highlighted, with a mark once it's been cleared; and '?' for a surprise theme that
+// earns more (SURPRISE_BONUS). Solo opens it from the title; local co-op from the Players screen (online, the host
+// picks in the room).
 const THS = { go: null, back: 's-title' };
 // go(themeId, surprise) starts the run; back = the screen BACK returns to
 function openThemes(go, back) {
@@ -14,22 +15,17 @@ function openThemes(go, back) {
       b = document.createElement('button');
     b.className = 'thcard';
     b.style.setProperty('--tc', th.c);
+    b.setAttribute('aria-label', th.name + (best && best.done ? ', cleared' : ''));
+    // the theme's picture (css: .th-<id>), its name, and a mark once it's been cleared
     b.innerHTML =
-      '<b>' +
-      th.name +
-      '</b><span>' +
-      th.biomes.map(k => BIOMES[k].name).join(' → ') +
-      '</span><span>Boss: ' +
-      T[th.boss.t].boss +
-      '</span><small>' +
-      (best && best.done ? '★ CLEARED · best ' + fmtT(best.time) + ' · ' + best.score : 'Not cleared yet') +
-      '</small>';
+      '<span class="thpic th-' + id + '"></span><b>' + th.name + '</b><small>' + (best && best.done ? '★ CLEARED' : '') + '</small>';
     b.onclick = () => THS.go(id);
     box.appendChild(b);
   }
   const q = document.createElement('button');
   q.className = 'thcard thq';
-  q.innerHTML = '<b>?</b><span>A surprise story</span><span>+' + Math.round(SURPRISE_BONUS * 100) + '% XP and stars</span>';
+  q.setAttribute('aria-label', 'A surprise story: more XP and stars');
+  q.innerHTML = '<span class="thpic th-q"></span><b>?</b><small>+' + Math.round(SURPRISE_BONUS * 100) + '% XP & STARS</small>';
   q.onclick = () => THS.go(surpriseTheme(), true);
   box.appendChild(q);
   box.querySelector('button').focus({ preventScroll: true });

@@ -230,8 +230,9 @@ $('b-start').onclick = start;
 $('b-train').onclick = startTrain;
 // ===== TITLE MENU =====
 // First visit: a flashing PRESS START; any key, tap or controller button opens the menu.
-// SOLO splits into CAMPAIGN | ARCADE and MULTIPLAYER into LOCAL | ONLINE, in place: the split row sits on top of
-// the button it replaces, so the title and the other buttons never move or resize. Back folds it up again.
+// SOLO, MULTIPLAYER and CUSTOMIZE are picture tiles (grey until highlighted). Tapping one opens its two choices
+// (STORY | ARCADE, LOCAL | ONLINE, CHARACTER | HOUSE) on top of its picture, which stays in colour, so the title
+// and the other tiles never move or resize. Back folds it up again.
 const TITLE = { ready: false, keepOpen: false };
 const SPLITS = {
   solo: ['b-solo', 'solorow', 'b-level'],
@@ -253,7 +254,8 @@ function titleReveal() {
 }
 function splitShow(k, open, quiet) {
   const [btn, row, first] = SPLITS[k];
-  $(btn).style.visibility = open ? 'hidden' : '';
+  $(btn).classList.toggle('open', open);
+  $(btn).tabIndex = open ? -1 : 0; // its two choices take its place for a controller's highlight
   $(row).hidden = !open;
   if (!quiet) $(open ? first : btn).focus({ preventScroll: true });
 }

@@ -425,6 +425,7 @@ function navItems() {
   return [...sc.querySelectorAll('button, input, select')].filter(
     e =>
       !e.disabled &&
+      e.tabIndex >= 0 && // e.g. a title tile whose two choices sit on top of it
       e.offsetParent !== null &&
       !e.closest('[hidden]') &&
       getComputedStyle(e).visibility !== 'hidden'

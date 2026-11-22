@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs>
+<filter id="w" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+<pattern id="h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="5" stroke="#4a4452" stroke-width="1.3"/></pattern>
+<pattern id="g" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#b9cbe0" stroke-width="0.8"/></pattern>
+</defs>
+<g filter="url(#w)">
+<rect x="14" y="16" width="176" height="176" rx="22" fill="url(#h)"/>
+<rect x="8" y="8" width="176" height="176" rx="22" fill="#fbfaf4" stroke="#1c1626" stroke-width="4"/>
+<rect x="12" y="12" width="168" height="168" rx="19" fill="url(#g)"/><path d="M12 170 L70 58 L108 128 L136 80 L180 160 V176 q0 4 -4 4 H16 q-4 0 -4 -4z" fill="#b7b3d6" stroke="#1c1626" stroke-width="3"/>
+<path d="M58 82 L70 58 L84 84 L76 80 L70 88 L64 80z" fill="#fff" stroke="#1c1626" stroke-width="2.5"/>
+<path d="M128 94 L136 80 L146 98 L139 94 L134 100z" fill="#fff" stroke="#1c1626" stroke-width="2.5"/>
+<path d="M18 30 L182 96" stroke="#1c1626" stroke-width="2"/>
+<line x1="98" y1="62" x2="98" y2="72" stroke="#1c1626" stroke-width="2.5"/>
+<rect x="84" y="72" width="28" height="22" rx="4" fill="#ff7a00" stroke="#1c1626" stroke-width="3"/>
+<rect x="89" y="77" width="8" height="8" fill="#d9f0ff" stroke="#1c1626" stroke-width="1.5"/>
+<rect x="100" y="77" width="8" height="8" fill="#d9f0ff" stroke="#1c1626" stroke-width="1.5"/>
+<path d="M12 170 L60 120 L100 176 Q100 180 96 180 H16 q-4 0 -4 -4z" fill="#eef4fb" stroke="#1c1626" stroke-width="2.5"/>
+<g stroke="#ff7a00" stroke-width="5" stroke-linecap="round" fill="none"><circle cx="48" cy="118" r="7" fill="#fbfaf4"/><path d="M49 125 l3 14 M52 139 l-6 10 M52 139 l10 4 M50 129 l12 -8 M50 129 l-10 2"/></g>
+<g stroke="#1c1626" stroke-width="2.5" fill="#ff9fcd"><path d="M140 150 q-2 -22 14 -26 q18 2 16 26 l-4 16 h-22z"/><path d="M146 126 l-6 -8 M162 126 l6 -8" fill="none"/></g>
+<circle cx="150" cy="136" r="2" fill="#1c1626"/><circle cx="160" cy="136" r="2" fill="#1c1626"/>
+<g fill="#fff" stroke="#1c1626" stroke-width="1.5"><circle cx="36" cy="40" r="3"/><circle cx="160" cy="34" r="3"/><circle cx="118" cy="44" r="2.5"/></g>
+</g>
+</svg>
