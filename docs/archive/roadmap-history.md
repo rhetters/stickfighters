@@ -410,3 +410,19 @@ Reopened the same evening (version 17 work): the house builder is still in progr
 **Done when:** every theme plays through alone and online with every transition and both boss intros, and the same seed always makes the same run.
 
 **Status: done** (November 21, 2026, version 43). Four themes (Castle Siege, Pirate Cove, Mountain, Space), each with three biomes, its own transitions and its own main boss; a Campaign screen; the opening draw-in; slopes, the launch tower's platforms and low gravity on the moon; online, each screen follows its own player and stragglers warp in for fights and scenes; the ADMIN test mode.
+
+### M14 · Boss level
+
+- **A look of its own for every theme's boss** (asked by Ron and Rhett, November 21; done in version 44): the Pink General, Captain Pinkbeard, the Pink Yeti and the Pink Alien each wear their own outfit and parts.
+- Boss arena (working name: The Pink General), built on the boss framework the Captain uses: three phases, clear telegraphs, summons from the army, and a health bar. *Moved to M15 (November 22).*
+- **Finishing blow in slow motion** (done in version 45): the hit that beats a theme's boss slows time, and every enemy still standing is knocked out with it.
+- **Victory screen, ready-up and harder replays** (done in version 45): after a theme, each player's victory pose over their stats (damage dealt and taken, enemies beaten, best combo, revives), a ready button each (a red X or a green check, also in the online room), and when everyone is ready the THEME +1 button starts the same theme again, newly generated and one step harder. STORY (or BACK TO PLAYERS) and MAIN MENU buttons.
+- **Less text, and Story** (asked by Ron, November 21; done in version 46): the online screens and the victory screen lose their explanations, Campaign is called Story, the room shows the mode and under it the story (or ?) or free-for-all / teams, START lights up only when everyone is ready, and any option change means readying up again. A **?** story picks a theme for you and earns 10% more XP and stars.
+- **Online rooms up to 6 players** (done in version 46): the host sets the room size with − and +.
+- **A new Online screen** (asked by Ron, November 21; done in version 47): HOST and JOIN as two of Rhett's drawings, grey until highlighted; JOIN opens its own room-code screen.
+- **Picture menus** (asked by Ron, November 22; done in version 49): the title menu and the Story screen as picture tiles. The online room, the Players screen and the victory screen followed in version 50, and the title's pictures open pages of their own.
+- **Player bars from Rhett's concept art, and a treasure chest of codes** (asked by Ron, November 21; done in version 48): names, heads, hearts, Surge and an ultimate meter for 1 to 6 players; secret items from four-picture codes (the first: Rhett's Shirt).
+
+**Done when:** The boss is beatable with any build, alone or in co-op, and hard to beat without learning the combat.
+
+**Status: done** (November 22, 2026, version 51). Every boss has its own look; the last blow on a theme's boss plays in slow motion and beats every enemy left; a victory screen with each player's pose and stats, ready stamps and harder replays (THEME +1); Campaign became Story, with a surprise ? story; online rooms of up to 6 with ready-up; less text and picture menus everywhere (title pages, Story, the online room and the Players screen in one layout, the victory screen); new player bars from Rhett's concept art with an XP ring; the treasure chest of codes (Rhett's Shirt). The multi-phase boss fight moved to M15.
