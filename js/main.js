@@ -1,6 +1,7 @@
 // StickFighters: Game shell (screens, settings), screen fit, simulation step update(), main loop and boot. Loads last.
 // ===== GAME SHELL: title, pause, settings, save =====
 let paused = false,
+  SHOWN = null, // the screen showing (null = the game)
   back = 's-title',
   curSeed = 0,
   sawTouch = false,
@@ -29,6 +30,7 @@ const SCREENS = [
   's-victory'
 ];
 function show(id) {
+  SHOWN = id || null;
   for (const s of SCREENS) $(s).hidden = s !== id;
   $('ui').hidden = !id;
   if (id) {
@@ -170,6 +172,12 @@ function bindSettings() {
     save();
   };
   vol.onchange = () => sfx(260, 0.12, 'square', 0.06);
+  const mus = $('o-mus');
+  mus.value = Math.round(SET.mus * 100);
+  mus.oninput = () => {
+    SET.mus = mus.value / 100;
+    save();
+  };
   const sel = $('o-touch');
   sel.value = SET.touch;
   sel.onchange = () => {
@@ -587,6 +595,7 @@ function loop(now) {
     }
   }
   render();
+  audioTick(); // music and sound (audio.js), from what's on screen
   requestAnimationFrame(loop);
 }
 checkUnlocks(); // older saves get what they already earned
