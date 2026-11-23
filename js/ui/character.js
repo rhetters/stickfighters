@@ -1,9 +1,11 @@
 // StickFighters: Character screen: four saved fighters, their look, and the store.
-// Every shelf is also the store: tap an item you own to wear it (or None to take it off); tap one you don't own
-// to try it on, then tap again to buy it with ninja stars. Poses go on the pose wheel instead of being worn.
-// Everything here is cosmetic.
+// The fighter stands in a polaroid with their name under it and their skills on its corner. The store is picture
+// tiles: a part of the body (Head, Lower Body…), then a kind (Pants, Shorts…), then its shelf. Every shelf is also
+// the store: tap an item you own to wear it (or None to take it off); tap one you don't own to try it on, then tap
+// again to buy it with ninja stars. Poses go on the pose wheel instead of being worn. Everything here is cosmetic.
 // ===== CHARACTER & STORE =====
-const CH = { tab: 'body', tryOn: {}, pose: null, raf: 0, t: 0, msg: '', del: -1, hist: [] };
+// tab = the part of the body open (null = the picture tiles of every part), sec = the kind open in it
+const CH = { tab: null, sec: null, tryOn: {}, pose: null, raf: 0, t: 0, msg: '', del: -1, hist: [] };
 const NAMES = [
   'BLAZE',
   'ZIGZAG',
@@ -28,6 +30,7 @@ function openChar() {
   CH.tryOn = {};
   CH.msg = '';
   CH.del = -1;
+  CH.tab = CH.sec = null;
   show('s-char');
   renderChar();
   cancelAnimationFrame(CH.raf);
@@ -172,38 +175,153 @@ function renderChar() {
   });
   const nm = $('ch-name');
   if (document.activeElement !== nm) nm.value = c.name;
-  // tabs
-  const tb = $('ch-tabs');
-  tb.innerHTML = '';
-  for (const t of TABS) {
-    const b = document.createElement('button');
-    b.className = 'chtab' + (CH.tab === t.id ? ' on' : '');
-    const fresh = ITEMS.some(
-      i => t.secs.includes(i.sec) && ECO.own.includes(i.id) && !ECO.seen.includes(i.id)
+  // where you are: the parts of the body, a part's kinds, a shelf, or the body settings
+  const tab = TABS.find(t => t.id === CH.tab),
+    secs = tab ? (CH.sec ? [CH.sec] : tab.secs) : [],
+    view = !tab ? 'cats' : tab.id === 'body' ? 'body' : secs.length > 1 ? 'kinds' : 'items',
+    base = ITEM[c.col].c;
+  $('ch-nav').hidden = view === 'cats';
+  $('ch-path').textContent = tab
+    ? tab.name.toUpperCase() + (CH.sec && tab.secs.length > 1 ? ' \u203a ' + SECS[CH.sec].name.toUpperCase() : '')
+    : '';
+  $('ch-cats').hidden = view !== 'cats' && view !== 'kinds';
+  $('ch-body').hidden = view !== 'body';
+  $('ch-grid').hidden = view !== 'items';
+  const fresh = ss => ITEMS.some(i => ss.includes(i.sec) && ECO.own.includes(i.id) && !ECO.seen.includes(i.id));
+  if (view === 'cats' || view === 'kinds') {
+    const opts =
+      view === 'cats'
+        ? TABS.map(t => ({ k: 'tab-' + t.id, label: t.name, pick: () => chGo(t.id), pic: chTabPic(t), nw: fresh(t.secs) }))
+        : tab.secs.map(sec => ({
+            k: 'sec-' + sec,
+            label: SECS[sec].name,
+            pick: () => chGo(tab.id, sec),
+            pic: chSecPic(sec),
+            nw: fresh([sec])
+          })),
+      box = $('ch-cats');
+    roomTiles(
+      box,
+      opts.map(o => ({ data: ['k', o.k], img: 'chpic', label: o.label.toUpperCase(), aria: o.label, pick: o.pick }))
     );
-    b.innerHTML = t.name + (fresh ? ' <i>NEW</i>' : '');
-    b.onclick = () => {
-      if (CH.tab !== t.id) {
-        CH.tab = t.id;
-        CH.msg = '';
-        CH.hist = [];
-        $('ch-grid').scrollTop = 0;
-      }
-      renderChar();
-      $('ch-tabs').querySelector('.on').focus({ preventScroll: true });
-    };
-    tb.appendChild(b);
+    [...box.children].forEach((b, i) => {
+      b.querySelector('.pimg').style.setProperty('--ic', 'url(' + chPic(opts[i].k, base, opts[i].pic) + ')');
+      b.classList.toggle('fresh', opts[i].nw);
+    });
   }
-  $('ch-body').hidden = CH.tab !== 'body';
-  $('ch-grid').hidden = CH.tab === 'body';
-  if (CH.tab === 'body') renderBody(c);
-  else renderShelf(c);
+  if (view === 'body') renderBody(c);
+  if (view === 'items') renderShelf(c, secs);
   $('ch-msg').textContent = CH.msg;
+  // the polaroid: the name in the fighter's colour, and the skills badge on its corner (glowing with points to spend)
+  $('s-char').style.setProperty('--fc', base);
   const pr = c.prog,
     lv = levelOf(pr.xp),
     pts = pointsAt(lv) - spentOf(pr.sk);
-  $('ch-skills').textContent = 'SKILLS · LV ' + lv + (pts ? ' · ' + pts + ' NEW' : '');
+  $('ch-lv').textContent = lv;
+  $('ch-pts').textContent = '+' + pts;
+  $('ch-pts').hidden = pts <= 0;
   $('ch-skills').classList.toggle('has', pts > 0);
+  $('ch-skills').setAttribute('aria-label', 'Skills, level ' + lv + (pts > 0 ? ', ' + pts + ' points to spend' : ''));
+}
+// Open a part of the body (and a kind in it), or go back up one step
+function chGo(tab, sec) {
+  CH.tab = tab;
+  CH.sec = sec || null;
+  CH.msg = '';
+  CH.hist = [];
+  $('ch-grid').scrollTop = 0;
+  renderChar();
+  const f = document.querySelector(
+    '#ch-cats:not([hidden]) button, #ch-grid:not([hidden]) button, #ch-body:not([hidden]) button'
+  );
+  if (f) f.focus({ preventScroll: true });
+}
+function chUp() {
+  const tab = TABS.find(t => t.id === CH.tab),
+    kind = CH.sec && tab && tab.secs.length > 1,
+    from = kind ? 'sec-' + CH.sec : 'tab-' + CH.tab;
+  if (kind) CH.sec = null;
+  else CH.tab = CH.sec = null;
+  CH.msg = '';
+  renderChar();
+  const b = $('ch-cats').querySelector('[data-k="' + from + '"]');
+  if (b) b.focus({ preventScroll: true });
+}
+// The tiles' pictures, drawn by the game (so new items get one without new art) over an empty tile frame
+const CHPIC = {};
+function chPic(key, base, draw) {
+  const k = key + base;
+  if (!CHPIC[k]) {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 200;
+    withCtx(cv.getContext('2d'), () => {
+      // inside the frame only
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(17, 17, 160, 160, 16);
+      else ctx.rect(17, 17, 160, 160);
+      ctx.clip();
+      draw(base);
+    });
+    CHPIC[k] = cv.toDataURL();
+  }
+  return CHPIC[k];
+}
+// a kind: its first item (secret ones aside)
+const chSecPic = sec => base => {
+  const it = ITEMS.find(i => i.sec === sec && !(i.how && i.how.code));
+  if (it) drawItemIcon(it, 100, 104, 215, base);
+};
+function chTabPic(t) {
+  if (t.id === 'body')
+    return base => {
+      // you, with a ruler beside you
+      drawFig(116, 172, 1, STANCES[0].p, 1.5, base, shade(base, -0.22), 0, 1, 9);
+      ctx.strokeStyle = '#1c1626';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(52, 40);
+      ctx.lineTo(52, 168);
+      for (let y = 48; y < 168; y += 16) {
+        ctx.moveTo(52, y);
+        ctx.lineTo(y % 32 ? 60 : 66, y);
+      }
+      ctx.moveTo(44, 50);
+      ctx.lineTo(52, 40);
+      ctx.lineTo(60, 50);
+      ctx.moveTo(44, 158);
+      ctx.lineTo(52, 168);
+      ctx.lineTo(60, 158);
+      ctx.stroke();
+    };
+  if (t.id === 'colors')
+    return () => {
+      // a paint palette
+      ctx.fillStyle = '#e9c98f';
+      ctx.strokeStyle = '#1c1626';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.ellipse(100, 104, 70, 54, -0.2, 0, 7);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#fbfaf4';
+      ctx.beginPath();
+      ctx.arc(128, 126, 12, 0, 7);
+      ctx.fill();
+      ctx.stroke();
+      ITEMS.filter(i => i.sec === 'color')
+        .slice(0, 6)
+        .forEach((it, i) => {
+          const a = -2.6 + i * 0.62;
+          ctx.fillStyle = it.c;
+          ctx.beginPath();
+          ctx.arc(96 + Math.cos(a) * 44, 100 + Math.sin(a) * 32, 13, 0, 7);
+          ctx.fill();
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        });
+    };
+  return chSecPic(t.pic || t.secs[0]);
 }
 function renderBody(c) {
   $('ch-ht').textContent = Math.round(c.ht * 100) + '%';
@@ -250,9 +368,8 @@ function card(g, cls, label, status, draw, onTap, id) {
   withCtx(k, draw);
   return b;
 }
-function renderShelf(c) {
+function renderShelf(c, secs) {
   const g = $('ch-grid'),
-    tab = TABS.find(t => t.id === CH.tab),
     keep =
       document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.id : null,
     base = ITEM[c.col].c;
@@ -260,12 +377,14 @@ function renderShelf(c) {
   const top = g.scrollTop;
   g.innerHTML = '';
   let legsDone = false;
-  for (const sec of tab.secs) {
+  for (const sec of secs) {
     const S = SECS[sec],
-      slot = S.slot,
-      h = document.createElement('h4');
-    h.innerHTML = S.name + (S.note ? ' <small>' + S.note + '</small>' : '');
-    g.appendChild(h);
+      slot = S.slot;
+    if (S.note) {
+      const h = document.createElement('h4');
+      h.innerHTML = '<small>' + S.note + '</small>';
+      g.appendChild(h);
+    }
     const row = document.createElement('div');
     row.className = 'chshelf';
     g.appendChild(row);
@@ -329,7 +448,7 @@ function renderShelf(c) {
   // everything on these shelves has now been seen
   let seen = 0;
   for (const it of ITEMS)
-    if (tab.secs.includes(it.sec) && ECO.own.includes(it.id) && !ECO.seen.includes(it.id)) {
+    if (secs.includes(it.sec) && ECO.own.includes(it.id) && !ECO.seen.includes(it.id)) {
       ECO.seen.push(it.id);
       seen = 1;
     }
@@ -489,6 +608,7 @@ function charAnim() {
 }
 $('b-char').onclick = openChar;
 $('b-charback').onclick = closeChar;
+$('ch-up').onclick = chUp;
 $('ch-rnd').onclick = charRandom;
 $('ch-del').onclick = charDelete;
 $('ch-name').addEventListener('input', () => setChar(c => (c.name = $('ch-name').value)));
@@ -505,7 +625,7 @@ $('ch-lw-').onclick = () => chStep('lw', -1, 5, 10, 1);
 $('ch-lw+').onclick = () => chStep('lw', 1, 5, 10, 1);
 addEventListener('keydown', e => {
   if (e.key !== 'Escape' || $('ui').hidden || CAP) return;
-  if (!$('s-char').hidden && document.activeElement !== $('ch-name')) closeChar();
+  if (!$('s-char').hidden && document.activeElement !== $('ch-name')) CH.tab ? chUp() : closeChar();
   else if (!$('s-backup').hidden) $('bk-back').click();
   else if (!$('s-house').hidden) closeHouse();
 });

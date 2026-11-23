@@ -505,7 +505,7 @@ function navBack() {
   else if (sc.id === 's-settings') $('b-back').click();
   else if (sc.id === 's-binds') $('bd-back').click();
   else if (sc.id === 's-backup') $('bk-back').click();
-  else if (sc.id === 's-char') $('b-charback').click();
+  else if (sc.id === 's-char') CH.tab ? chUp() : $('b-charback').click(); // up a step in the store first
   else if (sc.id === 's-skills') closeSkills();
   else if (sc.id === 's-themes') $('th-back').click();
   else if (sc.id === 's-house') $('b-houseback').click();

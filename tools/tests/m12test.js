@@ -62,7 +62,7 @@ ok(await ev("(()=>{const m=migrate({saveVersion:12,set:{feel:{hitstop:1,shake:1,
 ok(await ev("FEEL.hitstop===0&&FEEL.shake===0&&FEEL.body===1&&NET_FEEL.hitstop===0"),'hit-stop and shake start off; online they stay off');
 // the Skills screen
 await ev("const f=fighter(0);f.prog={xp:XP_AT[6],sk:{}};saveFighter(0,f);titleOpenAll();$('b-char').click()");await W(200);
-ok(/LV 6/.test(await ev("$('ch-skills').textContent")),'the Character screen shows the level: '+await ev("$('ch-skills').textContent"));
+ok(await ev("$('ch-lv').textContent==='6'&&$('ch-skills').classList.contains('has')&&!$('ch-pts').hidden"),'the polaroid\'s skills badge shows the level and glows with points to spend: '+await ev("$('ch-skills').textContent"));
 await p.click('#ch-skills');await W(200);
 ok(await p.isVisible('#s-skills'),'SKILLS opens the Skills screen');
 const node=()=>p.locator('#sk-tree .sknode').first();

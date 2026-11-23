@@ -8,11 +8,12 @@
 //   how.lvl         = unlocked by clearing that level      how.combo = by landing a combo that long
 //   how.wave        = by reaching that Arcade wave         how.vs    = by winning a Versus match
 //   how.drop        = only from gifts that Captains drop (random, one you don't own yet)
-// Tabs on the Character screen, each with its shelf sections (patch: Head, Neck, Upper Body, Lower Body).
+// The character screen's parts of the body (picture tiles) and the kinds (sections) in each; pic = the kind whose
+// first item is the part's picture
 const TABS = [
   { id: 'body', name: 'Body', secs: [] },
   { id: 'colors', name: 'Colors', secs: ['color'] },
-  { id: 'head', name: 'Head', secs: ['hair', 'hat', 'band'] },
+  { id: 'head', name: 'Head', secs: ['hair', 'hat', 'band'], pic: 'hat' },
   { id: 'neck', name: 'Neck', secs: ['scarf', 'tie'] },
   { id: 'upper', name: 'Upper Body', secs: ['shirt', 'jacket', 'gloves'] },
   { id: 'lower', name: 'Lower Body', secs: ['pants', 'shorts', 'skirt', 'dress', 'shoes'] },
