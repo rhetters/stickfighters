@@ -24,8 +24,8 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M12 | XP, levels, skill tree | Done | L | M3, M8, M10 | Level-ups, skill points, tree screen |
 | M13 | Themes and procedural runs | Done | XL | M8, M10, M12 | Castle Siege, Pirate Cove, Mountain and Space generated from a seed, a Campaign screen, transitions per theme, platforms, mini-bosses, four main bosses |
 | M14 | Boss level | Done | L | M13 | A look of its own for every boss, a slow-motion finale, a victory screen and harder replays, online rooms of 6, picture menus |
-| M15 | Platforms, vertical layers and boss fights | Next | L | M13, M14 | The Volcano: steam vents, falling lava rocks, a climb down into the crater on ledges the pink army follows you up and down, and the Pink Tiki's lava escape |
-| M16 | Polish, audio, balance, v1.0 release | Planned | L | M8–M15 | Release candidate |
+| M15 | Platforms, vertical layers and boss fights | Done | L | M13, M14 | The Volcano: steam vents, falling lava rocks, a climb down into the crater on ledges the pink army follows you up and down, and the Pink Tiki's lava escape |
+| M16 | Polish, audio, balance, v1.0 release | Next | L | M8–M15 | Music for every theme and boss, a full sound pass, difficulty choices, a balance pass, a first-play tutorial; the game called 1.0 |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
 | M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
@@ -33,28 +33,20 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 
 ## Upcoming milestones
 
-### M15 · Platforms, vertical layers and boss fights
-
-Decided by Ron (November 22): build a **new theme** whose levels are made for climbing, and use it to work out platforms, stairs and a full boss fight. What works there can then spread to the other themes and to the level creator (M17). Ron picked a **Volcano**, with the boss "a tiki mask and grass skirt", a climb down to the bottom of the volcano and a lava escape back out.
-
-Built (version 52, see the CHANGELOG):
-- **The Volcano:** the Tiki Jungle (steam vents), the Ashy Slopes (falling lava rocks, an uphill path), the Crater (a climb down from the rim on rock ledges over lava, ledges in every fight, lava pools between fights). New scenes: the geyser and the jump in from the rim.
-- **The pink army climbs:** enemies jump up to the ledge you're on and drop down after you, anywhere a run has ledges.
-- **The Pink Tiki:** bursts out of the lava, three phases calling his army; at his last bit of health he stuns everyone, has his say, and the lava rises. Players climb out on ledges that come out of the walls and finish him at the rim.
-
-Still to do:
-- Ron and Rhett play it on the iPad, in local co-op and online; Rhett checks the boss's name and lines (in `js/data/themes.js`).
-- **Versus arenas with platforms** (assumed; Ron to confirm): only if combat on ledges reads well in the Crater.
-- Spreading ledges and the climbing army to other themes, if Rhett likes them.
-
-**Done when:** the new theme plays through alone, in local co-op and online; enemies follow players onto platforms; the boss has three phases you can learn; and fights on platforms are as readable as on the ground.
-
 ### M16 · Polish, audio, balance, v1.0 release
 
-- Music and ambient sound per level, full sound pass.
-- Difficulty settings, balance pass on XP, stars, and enemy health.
-- Accessibility: color-blind-safe hit flashes, a reduced screen shake option (button remapping is already done).
-- Performance pass on phones and iPads, final tutorial and move list screen.
+Proposed November 23 (waiting on Ron's answers to the questions under Open decisions). The goal: the game that's there feels finished, with no new modes.
+
+- **Music:** a loop for each theme (one per biome where it fits), the menus and the boss fights, plus a short victory tune. It changes with the action (quieter while walking, fuller in a fight, the boss's own track) and fades between them. Separate Music and Sound volumes in Settings (a save change, with a migration).
+- **A full sound pass:** footsteps, jumps and landings, every enemy type and boss having its own grunt, the hazards (vents, lava, falling rocks, the geyser), menu taps, ninja stars, the ready stamp; ambient sound per biome (birds, waves, wind, a hum in space, bubbling lava).
+- **Difficulty:** Easy, Normal and Hard for Story and Arcade (enemy health, damage and how many attack at once); online the host picks. Harder replays (+1) stack on top.
+- **Balance pass:** measured with test bots playing every theme: how long a run takes, how much damage players take, stars and XP per run, so each theme is a little harder than the one before it and levelling stays steady. The numbers go to Ron before anything changes.
+- **First-play tutorial:** a short guided start in the Training Room with picture prompts (move, jump, punch, kick, a combo, Surge, a grab), offered the first time someone plays; the move list also reachable from Pause.
+- **Accessibility:** hit flashes and team colours that work with colour blindness, bigger text option (reduced screen shake and button remapping already exist).
+- **Performance:** checked with 6 players and lots of enemies at iPad size; fewer effects automatically when the game slows down.
+- **Version 1.0:** the title screen and version say 1.0; release notes in the CHANGELOG; Ron can make a release tag on GitHub.
+
+**Done when:** every theme and boss has its music, the sound pass is in, the difficulty choices work alone, in co-op and online, the balance numbers have been reviewed with Ron, a new player can learn the basics from the tutorial, and 6 players run smoothly on the iPad.
 
 ### M17 · Level creator
 
@@ -79,10 +71,12 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 
 ## Open decisions
 
-1. **Back moves.** Add Back+P Backfist and Back+K Back Kick, which hit behind you? Not in the combat chart yet.
+1. **M16 music:** made by the game itself (synthesized chiptune, nothing to download, Rhett can pick moods) or recorded tracks Ron finds (like the level-up sound; each one adds to the download and needs a license that allows it)?
+2. **M16 difficulty:** Easy / Normal / Hard as proposed, and should Easy change anything else (more revives, slower enemies)?
+3. **Back moves.** Add Back+P Backfist and Back+K Back Kick, which hit behind you? Not in the combat chart yet.
 
 Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocking) are in the archive.
 
 ## Suggested next step
 
-M15: Ron and Rhett play the Volcano (alone, in co-op and online) and say what to change: the Tiki's name and lines, how fast the lava rises, whether lava should be able to knock you out, and whether Versus gets ledges too.
+M16: Ron answers the music and difficulty questions, then the music and sound pass first (the biggest change you'll hear), then difficulty and balance, the tutorial, and 1.0.
