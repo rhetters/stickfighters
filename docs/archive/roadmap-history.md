@@ -426,3 +426,21 @@ Reopened the same evening (version 17 work): the house builder is still in progr
 **Done when:** The boss is beatable with any build, alone or in co-op, and hard to beat without learning the combat.
 
 **Status: done** (November 22, 2026, version 51). Every boss has its own look; the last blow on a theme's boss plays in slow motion and beats every enemy left; a victory screen with each player's pose and stats, ready stamps and harder replays (THEME +1); Campaign became Story, with a surprise ? story; online rooms of up to 6 with ready-up; less text and picture menus everywhere (title pages, Story, the online room and the Players screen in one layout, the victory screen); new player bars from Rhett's concept art with an XP ring; the treasure chest of codes (Rhett's Shirt). The multi-phase boss fight moved to M15.
+
+### M15 · Platforms, vertical layers and boss fights
+
+Decided by Ron (November 22): build a **new theme** whose levels are made for climbing, and use it to work out platforms, stairs and a full boss fight. What works there can then spread to the other themes and to the level creator (M17). Ron picked a **Volcano**, with the boss "a tiki mask and grass skirt", a climb down to the bottom of the volcano and a lava escape back out.
+
+Built (version 52, see the CHANGELOG):
+- **The Volcano:** the Tiki Jungle (steam vents), the Ashy Slopes (falling lava rocks, an uphill path), the Crater (a climb down from the rim on rock ledges over lava, ledges in every fight, lava pools between fights). New scenes: the geyser and the jump in from the rim.
+- **The pink army climbs:** enemies jump up to the ledge you're on and drop down after you, anywhere a run has ledges.
+- **The Pink Tiki:** bursts out of the lava, three phases calling his army; at his last bit of health he stuns everyone, has his say, and the lava rises. Players climb out on ledges that come out of the walls and finish him at the rim.
+
+Still to do:
+- Ron and Rhett play it on the iPad, in local co-op and online; Rhett checks the boss's name and lines (in `js/data/themes.js`).
+- **Versus arenas with platforms** (assumed; Ron to confirm): only if combat on ledges reads well in the Crater.
+- Spreading ledges and the climbing army to other themes, if Rhett likes them.
+
+**Done when:** the new theme plays through alone, in local co-op and online; enemies follow players onto platforms; the boss has three phases you can learn; and fights on platforms are as readable as on the ground.
+
+**Status: done** (November 23, 2026, version 53). The Volcano: the Tiki Jungle's steam vents, the Ashy Slopes' falling lava rocks, a climb down into the Crater on rock ledges the pink army follows you up and down, and the Pink Tiki, whose last stand is a lava escape up to the rim. Versus ledges and ledges in other themes were left for later.
