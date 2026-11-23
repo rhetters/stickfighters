@@ -225,7 +225,7 @@ function levelTick() {
     if (!ae.q.length && !E.some(e => !e.dying)) {
       ae.st = 2;
       LV.cp = LV.encs.indexOf(ae);
-      for (const p of alive) p.hp = Math.min(p.max, p.hp + 25);
+      for (const p of alive) p.hp = Math.min(p.max, p.hp + diffOf().heal);
       score += 100 * ae.lvl;
       bn(LV.encs.some(e => e.st === 0) ? 'CLEAR!' : LV.run ? 'VICTORY!' : 'TRAIL CLEAR!');
       LV.go = 220;

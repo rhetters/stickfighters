@@ -37,6 +37,9 @@ let MODE = ARCADE;
 const coopScale = () => (MODE.pvp || PL.length < 2 ? 1 : 1 + 0.35 * (PL.length - 1));
 // Harder replays (a theme played again after beating it): enemies get 40% more health and hit 20% harder each time
 const hardScale = () => (MODE.hard ? MODE.hard() : 0);
+// The difficulty (data/difficulty.js): online everyone uses the host's choice; Versus and the house are Normal
+const diffOf = () =>
+  DIFFS[MODE.pvp || MODE.id === 'house' ? 1 : NET.match ? NET.diff : Math.max(0, Math.min(2, SET.diff | 0))] || DIFFS[1];
 const tally = (p, k, n) => MODE.tally && p && p.pl && MODE.tally(p, k, n);
 function coopExtra(q) {
   if (MODE.pvp || PL.length < 2) return;
@@ -52,7 +55,7 @@ function reviveTick() {
       p => p !== q && p.st !== 'dead' && Math.abs(p.x - q.x) < 70 && Math.abs(p.y - q.y) < 60 && p.y >= p.gy - 4
     ); // beside them, on the same level
     q.rv = near ? (q.rv || 0) + 1 : Math.max(0, (q.rv || 0) - 2);
-    if (q.rv >= 120) {
+    if (q.rv >= diffOf().rv) {
       Object.assign(q, {
         st: 'getup',
         dt: 20,

@@ -48,7 +48,7 @@ function endAtk(f, q) {
   f.pose[9] = 0;
   if (!q) f.st = 'free';
   f.last = fr;
-  if (!f.pl && !f.T.boss) f.cd = f.T.cd + rnd() * 40;
+  if (!f.pl && !f.T.boss) f.cd = (f.T.cd + rnd() * 40) * diffOf().cd;
   else if (f.inv > 100) f.inv = 45;
 } // grace after an ultimate so a swing that started during it can't land
 function tickAtk(f) {
@@ -713,7 +713,7 @@ function hurtP(q, d, dr) {
     }
     q.gt = null;
   } // getting hit lets go
-  const hd = d.dmg * (1 - modOf(q, 'arm')) * (1 + 0.2 * hardScale()); // Tough Skin, Thick Skin (skill tree)
+  const hd = d.dmg * (1 - modOf(q, 'arm')) * (1 + 0.2 * hardScale()) * diffOf().dmg; // Tough Skin, Thick Skin (skill tree)
   tally(q, 'taken', Math.min(hd, Math.max(0, q.hp)));
   q.hp -= hd;
   q.inv = 65;

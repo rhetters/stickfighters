@@ -44,6 +44,7 @@
  <div class="screen scene" id="s-solo" hidden>
   <h2>SOLO</h2>
   <div class="ptiles"><button class="ptile" id="b-level"><span class="pimg i-story"></span><b>STORY</b></button><button class="ptile" id="b-start"><span class="pimg i-arcade"></span><b>ARCADE</b></button></div>
+  <div class="rmrow rmdiff" id="solo-diff"></div>
   <button class="btn alt" id="b-soloback">BACK</button>
  </div>
  <div class="screen scene" id="s-cust" hidden>
@@ -66,7 +67,7 @@
    <button class="btn" id="on-join">JOIN</button>
   </div>
   <div id="on-room" class="onpane rmroom" hidden>
-   <div class="rmtop" id="on-head"></div>
+   <div class="rmtop"><div class="rmtop" id="on-head"></div><div class="rmrow rmdiff" id="on-diff"></div></div>
    <div class="rmcards" id="on-cards"></div>
    <div class="rmmodes"><div class="rmrow" id="on-modes"></div><span class="rmdiv" aria-hidden="true"></span><div class="rmrow" id="on-sub"></div></div>
   </div>
@@ -126,7 +127,7 @@
  </div>
  <div class="screen" id="s-lobby" hidden>
   <div class="rmroom">
-   <div class="rmtop" id="lb-head"></div>
+   <div class="rmtop"><div class="rmtop" id="lb-head"></div><div class="rmrow rmdiff" id="lb-diff"></div></div>
    <div class="rmcards" id="lb-cards"></div>
    <div class="rmmodes"><div class="rmrow" id="lb-modes"></div><span class="rmdiv" aria-hidden="true"></span><div class="rmrow" id="lb-sub"></div></div>
   </div>
@@ -214,6 +215,7 @@
 <script src="js/data/skills.js?v=53" defer></script>
 <script src="js/data/sounds.js?v=53" defer></script>
 <script src="js/data/music.js?v=53" defer></script>
+<script src="js/data/difficulty.js?v=53" defer></script>
 <script src="js/data/house.js?v=53" defer></script>
 <script src="js/progress.js?v=53" defer></script>
 <script src="js/economy.js?v=53" defer></script>

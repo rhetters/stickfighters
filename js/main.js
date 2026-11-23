@@ -264,7 +264,12 @@ function backToTitle(tile) {
 }
 function openSolo() {
   show('s-solo');
+  soloDiff();
   $('b-level').focus({ preventScroll: true });
+}
+// The difficulty on the Solo screen (for Story and Arcade)
+function soloDiff() {
+  roomTiles($('solo-diff'), diffTiles(SET.diff, v => ((SET.diff = v), save(), soloDiff())));
 }
 function openCust() {
   show('s-cust');

@@ -116,6 +116,13 @@ function renderOnline() {
         : []
   );
   $('on-room').classList.toggle('nosub', !$('on-sub').children.length);
+  // the difficulty for Story and Arcade (the host picks)
+  roomTiles(
+    $('on-diff'),
+    NET.mode === 'level' || NET.mode === 'arcade'
+      ? diffTiles(NET.diff, v => ((NET.diff = v), netOptChanged()), !NET.host)
+      : []
+  );
   // START can be pressed once everyone is ready (and Versus has its players)
   $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady());
 }
@@ -198,6 +205,7 @@ $('on-host').onclick = async () => {
   onlineMsg('Making a room…');
   try {
     await netHost();
+    NET.diff = SET.diff | 0; // the host's own choice to begin with
     onlineMsg('');
     renderOnline();
     $('on-start').focus({ preventScroll: true });

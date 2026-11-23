@@ -214,6 +214,11 @@ function renderLobby() {
         : []
   );
   $('s-lobby').querySelector('.rmroom').classList.toggle('nosub', !$('lb-sub').children.length);
+  // the difficulty, for Story and Arcade
+  roomTiles(
+    $('lb-diff'),
+    LB.mode === 'vs' ? [] : diffTiles(SET.diff, v => ((SET.diff = v), save(), renderLobby()))
+  );
   const t0 = LOBBY.filter(r => r.team === 0).length,
     vsOk = n >= 2 && (!TEAMS || (t0 > 0 && t0 < n));
   $('lb-start').disabled = n < 1 || (vs && !vsOk);

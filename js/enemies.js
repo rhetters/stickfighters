@@ -188,7 +188,7 @@ function director() {
     const mine = E.filter(
       e => !e.dying && !e.gone && !e.T.boss && tgt(e) === q && (e.st === 'free' || e.st === 'atk')
     );
-    const tokens = 2 + (wave > 5 ? 1 : 0) + (wave > 9 ? 1 : 0);
+    const tokens = Math.max(1, 2 + (wave > 5 ? 1 : 0) + (wave > 9 ? 1 : 0) + diffOf().tok);
     mine.sort((a, b) => (b.st === 'atk') - (a.st === 'atk') || Math.abs(a.x - q.x) - Math.abs(b.x - q.x));
     mine.forEach((e, i) => {
       e.tok = i < tokens ? 1 : 0;
@@ -208,7 +208,7 @@ function aiThink(e, Q, T_) {
   e.lastSide = side;
   e.face = side;
   if (e.cd > 0) e.cd--;
-  const spd = T_.spd * (e.chase > 0 ? 1.6 : 1) * (e.bp > 1 ? 1.3 : 1),
+  const spd = T_.spd * (e.chase > 0 ? 1.6 : 1) * (e.bp > 1 ? 1.3 : 1) * diffOf().spd,
     inRange = Math.abs(Q.x - e.x) <= T_.ar && Math.abs(Q.y - e.y) < 55;
   // a boss waiting at the top (the volcano's rim) only fights whoever reaches his level
   if (e.perch && Math.abs(Q.gy - e.gy) > 10) {
@@ -371,7 +371,7 @@ function bossThink(e, Q, T_, spd) {
     else if (dist > 190) mv = 'ccharge';
     else if (dist <= T_.ar) mv = 'cslam';
     if (mv) {
-      e.cd = (T_.cd + rnd() * 40) * ph[e.bp - 1].cd;
+      e.cd = (T_.cd + rnd() * 40) * ph[e.bp - 1].cd * diffOf().cd;
       e.bm = mv;
       return startAtk(e, EA[mv]);
     }

@@ -2371,6 +2371,9 @@ body.padnav .ptile:focus b {
 .i-set { background-image: url(../img/menu-settings.svg); }
 .i-story { background-image: url(../img/menu-story.svg); }
 .i-arcade { background-image: url(../img/menu-arcade.svg); }
+.i-diff-easy { background-image: url(../img/diff-easy.svg); }
+.i-diff-normal { background-image: url(../img/diff-normal.svg); }
+.i-diff-hard { background-image: url(../img/diff-hard.svg); }
 .i-versus { background-image: url(../img/menu-versus.svg); }
 .i-house { background-image: url(../img/menu-house.svg); }
 .i-char { background-image: url(../img/menu-character.svg); }
@@ -2754,6 +2757,20 @@ body.padnav .ptile:focus b {
 }
 .rmrow .ptile b {
   font-size: max(10px, calc(var(--ps) * 0.2));
+}
+/* the difficulty: three small tiles beside the room's sticky note, and under the Solo tiles */
+.rmtop > .rmdiff {
+  margin-left: auto;
+}
+.rmdiff .ptile {
+  --ps: max(38px, min(calc(var(--wh, 440px) * 0.1), 52px));
+}
+.rmdiff:empty {
+  display: none;
+}
+#solo-diff {
+  justify-content: center;
+  margin: 4px 0 2px;
 }
 .rmdiv {
   width: 3px;
