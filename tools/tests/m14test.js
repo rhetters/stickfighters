@@ -3,7 +3,7 @@ const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // t
 // the final blow, the victory screen, ready-up and harder replays
 const {chromium}=require('playwright');let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];const p=await (await b.newContext({viewport:{width:1080,height:810}})).newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
-await p.goto(GAME);await p.waitForTimeout(300);const ev=x=>p.evaluate(x);
+await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(300);const ev=x=>p.evaluate(x);
 const bosses=await ev("Object.values(THEMES).map(t=>t.boss.t)");
 ok(bosses.length===5&&await ev(`${JSON.stringify(bosses)}.every(t=>T[t].look&&T[t].look.extra.length)`),'every theme’s boss has its own look: '+bosses.join(', '));
 ok(await ev("(()=>{const s=Object.values(THEMES).map(t=>T[t.boss.t].look.extra.slice().sort().join());return new Set(s).size===s.length})()"),'no two bosses share their parts');
@@ -57,7 +57,7 @@ ok(await ev("(()=>{const q={fi:null,prog:{xp:XP_AT[12]+Math.round((XP_AT[13]-XP_
 ok(hb.every(o=>o.right<=o.W-140&&o.heads),'the player bars fit 1 to 6 players left of the stars, each with a head portrait '+JSON.stringify(hb));
 ok(await ev("typeof hudPlayers==='undefined'&&!/segAt|BIOMES/.test(levelHud.toString())"),'the old bars and the map line are gone');
 // the treasure chest: codes give secret items
-await ev("ECO.own=ECO.own.filter(i=>i!=='shirt-rhett');openTitle();CH.tab='upper';openChar();");
+await ev("ECO.own=ECO.own.filter(i=>i!=='shirt-rhett');openTitle();openChar();chGo('upper','shirt');");
 ok(await ev("!$('ch-chest').hidden&&!ITEMS.filter(i=>i.how&&i.how.code).some(i=>owns(i.id))"),'a chest on the Character screen; the secret shirt isn\'t yours yet');
 ok(await ev("!/Rhett/.test($('s-char').textContent)&&/White Tee/.test($('s-char').textContent)"),'Rhett\'s Shirt isn\'t on any shelf before it\'s redeemed');
 await ev("$('ch-chest').click()");
@@ -70,6 +70,6 @@ await ev("$('cd-redeem').click()");
 ok(await ev("owns('shirt-rhett')&&!$('cd-pop').hidden&&$('cd-name').textContent===\"Rhett's Shirt\""),'four stars give Rhett\'s Shirt, shown in a window');
 await ev("$('cd-popback').click();$('cd-back').click()");
 ok(await ev("!$('s-char').hidden&&$('cd-pop').hidden"),'BACK closes the window, then returns to the Character screen');
-ok(await ev("(()=>{CH.tab='upper';renderChar();return /Rhett/.test($('s-char').textContent)})()"),'the shirt is on its shelf now');
+ok(await ev("(()=>{chGo('upper','shirt');return /Rhett/.test($('s-char').textContent)})()"),'the shirt is on its shelf now');
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged (looks are drawing only)');
 ok(errs.length===0,'no errors '+errs.join(' | '));console.log(fails?fails+' FAILED':'ALL PASS');await b.close()})();

@@ -1,6 +1,7 @@
 // StickFighters: Game shell (screens, settings), screen fit, simulation step update(), main loop and boot. Loads last.
 // ===== GAME SHELL: title, pause, settings, save =====
 let paused = false,
+  SHOWN = null, // the screen showing (null = the game)
   back = 's-title',
   curSeed = 0,
   sawTouch = false,
@@ -26,9 +27,12 @@ const SCREENS = [
   's-backup',
   's-over',
   's-clear',
-  's-victory'
+  's-victory',
+  's-learn',
+  's-moves'
 ];
 function show(id) {
+  SHOWN = id || null;
   for (const s of SCREENS) $(s).hidden = s !== id;
   $('ui').hidden = !id;
   if (id) {
@@ -147,6 +151,7 @@ function applyTouchVis() {
 }
 function applySet() {
   const w = $('wrap');
+  document.body.classList.toggle('big', !!SET.big);
   w.style.setProperty('--ts', SET.tsize);
   w.style.setProperty('--to', SET.topac);
   applyTouchVis();
@@ -170,6 +175,12 @@ function bindSettings() {
     save();
   };
   vol.onchange = () => sfx(260, 0.12, 'square', 0.06);
+  const mus = $('o-mus');
+  mus.value = Math.round(SET.mus * 100);
+  mus.oninput = () => {
+    SET.mus = mus.value / 100;
+    save();
+  };
   const sel = $('o-touch');
   sel.value = SET.touch;
   sel.onchange = () => {
@@ -211,7 +222,9 @@ function bindSettings() {
   }
   for (const [id, key] of [
     ['o-hist', 'hist'],
-    ['o-calm', 'calm']
+    ['o-calm', 'calm'],
+    ['o-cb', 'cb'],
+    ['o-big', 'big']
   ]) {
     const el = $(id);
     el.checked = !!SET[key];
@@ -228,7 +241,7 @@ function bindSettings() {
     save();
   };
 }
-$('b-start').onclick = start;
+$('b-start').onclick = () => tutOffer(start);
 $('b-train').onclick = startTrain;
 // ===== TITLE MENU =====
 // First visit: a flashing PRESS START; any key, tap or controller button opens the menu.
@@ -256,7 +269,12 @@ function backToTitle(tile) {
 }
 function openSolo() {
   show('s-solo');
+  soloDiff();
   $('b-level').focus({ preventScroll: true });
+}
+// The difficulty on the Solo screen (for Story and Arcade)
+function soloDiff() {
+  roomTiles($('solo-diff'), diffTiles(SET.diff, v => ((SET.diff = v), save(), soloDiff())));
 }
 function openCust() {
   show('s-cust');
@@ -342,7 +360,7 @@ $('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? openHouse() : openTitle
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');
-$('b-level').onclick = () => openThemes((id, myst) => startRun(id, 0, myst), 's-solo');
+$('b-level').onclick = () => tutOffer(() => openThemes((id, myst) => startRun(id, 0, myst), 's-solo'));
 $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : replayLevel()), 'again');
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(openTitle, 'room');
@@ -540,7 +558,8 @@ function resize() {
     const tp = $('trainpanel');
     document.body.style.setProperty('--ph', tp.offsetHeight + 28 + 'px');
   }
-  const d = Math.max(1, Math.min(2, (cv.clientWidth / W) * (window.devicePixelRatio || 1)));
+  // a little less sharp when the device can't keep up (SLOWDRAW, set by the main loop)
+  const d = Math.max(1, Math.min(SLOWDRAW.low ? 1.25 : 2, (cv.clientWidth / W) * (window.devicePixelRatio || 1)));
   if (d !== gridDPR) {
     DPR = d;
     cv.width = Math.round(W * d);
@@ -567,9 +586,22 @@ function tick() {
   fr++;
   if (state === 'play' || state === 'train') update();
 }
+// Performance: if frames keep taking too long (about 40 per second or fewer for 3 seconds), draw at a lower
+// resolution for the rest of the visit. Drawing only.
+const SLOWDRAW = { low: false, slow: 0 };
+function perfWatch(dt) {
+  if (SLOWDRAW.low || document.hidden || !(state === 'play' || state === 'train')) return;
+  SLOWDRAW.slow = dt > 25 ? SLOWDRAW.slow + 1 : Math.max(0, SLOWDRAW.slow - 2);
+  if (SLOWDRAW.slow > 120) {
+    SLOWDRAW.low = true;
+    gridDPR = 0;
+    resize();
+  }
+}
 function loop(now) {
   const dt = Math.min(100, now - last);
   last = now;
+  perfWatch(dt);
   pollPad();
   if (portraitMQ.matches && live()) pause(true);
   if (NET.match) {
@@ -586,7 +618,9 @@ function loop(now) {
       tick();
     }
   }
+  tutTick(); // the tutorial watches the Training Room (ui/tutorial.js)
   render();
+  audioTick(); // music and sound (audio.js), from what's on screen
   requestAnimationFrame(loop);
 }
 checkUnlocks(); // older saves get what they already earned

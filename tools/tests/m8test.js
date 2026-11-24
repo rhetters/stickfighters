@@ -3,7 +3,7 @@ const {chromium,devices}=require('playwright');
 const S=process.argv[2],URL=GAME;let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];
 const c=await b.newContext({viewport:{width:1280,height:800}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
-await p.goto(URL);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);
+await p.goto(URL);await p.evaluate("SET.tut=1");await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 await p.click('#b-solo');ok(await p.isVisible('#b-level')&&await p.isVisible('#b-start'),'SOLO opens STORY and ARCADE');
 await p.evaluate(()=>startLevel('woods1'));await W(400); // the fixed Wooded Trail (CAMPAIGN now starts a generated run: m13test)
@@ -57,7 +57,7 @@ await ev("save()");ok(await ev("JSON.parse(localStorage.getItem('orangeArmy.v1')
 await c.close();
 // iPad
 const c2=await b.newContext({...devices['iPad (gen 7) landscape']});const q=await c2.newPage();q.on('pageerror',e=>errs.push(e.message));
-await q.goto(URL);await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);await q.evaluate('openSolo()');await q.tap('#b-level');await q.waitForTimeout(300);await q.tap('.thcard');await q.waitForTimeout(500);
+await q.goto(URL);await q.evaluate("SET.tut=1");await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);await q.evaluate('openSolo()');await q.tap('#b-level');await q.waitForTimeout(300);await q.tap('.thcard');await q.waitForTimeout(500);
 await q.evaluate("CAM.x=1500;PL[0].x=1900");await q.waitForTimeout(800);await q.screenshot({path:S+'/shots/m8-ipad.png'});
 ok(await q.evaluate("MODE===LEVEL"),'level runs on iPad');
 ok(errs.length===0,'no page errors '+errs.slice(0,3).join(' | '));

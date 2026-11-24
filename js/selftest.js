@@ -11,7 +11,8 @@ let SELFTESTING = false;
 function selfTest(n) {
   SELFTESTING = true;
   n = n || 3600;
-  const keep = { feel: { ...FEEL }, surge: SET.surge, vol: SET.vol };
+  const keep = { feel: { ...FEEL }, surge: SET.surge, vol: SET.vol, diff: SET.diff };
+  SET.diff = 1;
   Object.assign(FEEL, SELFTEST_FEEL);
   SET.surge = 'hold';
   SET.vol = 0;
@@ -109,6 +110,7 @@ function selfTest(n) {
   Object.assign(FEEL, keep.feel);
   SET.surge = keep.surge;
   SET.vol = keep.vol;
+  SET.diff = keep.diff;
   state = 'menu';
   init();
   return res;

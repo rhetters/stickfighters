@@ -3,7 +3,7 @@ const {chromium,devices}=require('playwright');
 const S=process.argv[2];let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];
 const c=await b.newContext({...devices['iPad (gen 7) landscape']});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
-await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(400);
+await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(400);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms),bb=sel=>p.locator(sel).boundingBox();
 // default layout = same spots as before (stick bottom-left, buttons bottom-right)
 const st0=await bb('#stick'),pk0=await bb('.tb[data-a=p]'),wr=await bb('#wrap');
@@ -56,7 +56,7 @@ ok(await p.locator('#le-del').isDisabled(),'built-in profiles can\'t be deleted'
 await p.tap('#le-cancel');await W(100);ok(await p.isVisible('#s-settings')&&!(await ev('EDITING()')),'Cancel closes the editor without saving');
 // phone: editor fits
 const c2=await b.newContext({...devices['iPhone 13 landscape']});const q=await c2.newPage();q.on('pageerror',e=>errs.push('phone '+e.message));
-await q.goto(GAME);await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);await q.tap('#b-set1');await q.waitForTimeout(150);await q.tap('#o-edit');await q.waitForTimeout(200);
+await q.goto(GAME);await q.evaluate("SET.tut=1");await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);await q.tap('#b-set1');await q.waitForTimeout(150);await q.tap('#o-edit');await q.waitForTimeout(200);
 await q.tap('.tb[data-a=j]');await q.waitForTimeout(100);await q.screenshot({path:S+'/shots/5-phone-editor.png'});
 const tb=await q.locator('#layed').boundingBox(),w2=await q.locator('#wrap').boundingBox();ok(tb.height<w2.height*.6,'phone: editor toolbar leaves room to arrange ('+Math.round(tb.height)+' of '+Math.round(w2.height)+' px)');
 console.log(fails?fails+' FAILURES':'ALL M6 CHECKS OK','| errors:',errs.length?errs:'none');await b.close()})();

@@ -103,7 +103,7 @@ function F(x, t, pl) {
 }
 function F0(x, t, pl) {
   const T0 = pl ? { s: 1, col: '#ff7a00', d2: '#d85f00', hp: 100, m: 1, fr: 0.8, bnc: 0.35 } : T[t],
-    hp = pl ? 100 : Math.round(T0.hp * (1 + wave * 0.08) * coopScale() * (1 + 0.4 * hardScale()));
+    hp = pl ? 100 : Math.round(T0.hp * (1 + wave * 0.08) * coopScale() * (1 + 0.4 * hardScale()) * diffOf().hp);
   return {
     x,
     y: G,

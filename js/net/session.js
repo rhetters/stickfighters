@@ -23,6 +23,7 @@ const NET = {
   teams: false, // Versus in two teams instead of free-for-all
   theme: 'castle', // the story a co-op run plays ('?' = a surprise theme, with a bonus)
   max: 4, // the room size the host picked (2 to MAX_ONLINE)
+  diff: 1, // the difficulty the host picked for Story and Arcade (data/difficulty.js)
   match: false, // a match is running
   epoch: 0, // which match (messages from an older match are ignored)
   seed: 0,
@@ -119,6 +120,7 @@ function netRoomMsg() {
     mode: NET.mode,
     teams: NET.teams,
     theme: NET.theme,
+    diff: NET.diff,
     max: NET.max,
     players: NET.players.map(p => ({
       slot: p.slot,
@@ -212,6 +214,7 @@ function netReset() {
     mySlot: 0,
     teams: false,
     theme: 'castle',
+    diff: 1,
     max: 4
   });
   NET.tab.clear();
@@ -411,6 +414,7 @@ function netClientMsg(m) {
     NET.teams = !!m.teams;
     if (THEMES[m.theme] || m.theme === '?') NET.theme = m.theme;
     NET.max = Math.max(2, Math.min(MAX_ONLINE, m.max || 4));
+    NET.diff = DIFFS[m.diff] ? m.diff : 1;
     netMesh();
     if (typeof renderOnline === 'function') renderOnline();
   } else if (m.t === 'vr') {
@@ -459,6 +463,7 @@ function netStart() {
       mode: NET.mode,
       theme: myst ? ids[Math.floor(Math.random() * ids.length)] : NET.theme,
       myst,
+      diff: NET.diff,
       D,
       feel: { ...FEEL, ...NET_FEEL, body: Math.min(1, FEEL.body) },
       players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid, team: p.team })),
@@ -489,7 +494,7 @@ function netStartLocal(m) {
   if (!NET.match) NET.feelKeep = { ...FEEL };
   // everyone plays with the host's feel settings, or the simulations would drift apart
   Object.assign(FEEL, m.feel);
-  Object.assign(NET, { match: true, seed: m.seed, D: m.D });
+  Object.assign(NET, { match: true, seed: m.seed, D: m.D, diff: DIFFS[m.diff] ? m.diff : 1 });
   netUnready();
   NET.mode = m.mode;
   NET.roster = m.players;

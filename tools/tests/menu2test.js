@@ -3,7 +3,7 @@ const {chromium,devices}=require('playwright');const {PADS}=require('./mp.js');c
 (async()=>{const b=await chromium.launch();const errs=[];
 for(const [nm,opt] of [['desk',{viewport:{width:1280,height:800}}],['ipad',devices['iPad (gen 7) landscape']]]){
 const c=await b.newContext(opt);await c.addInitScript(PADS(['Pro Controller (Vendor: 057e Product: 2009)']));const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
-await p.goto(GAME);await p.waitForTimeout(400);
+await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(400);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);const tap=async(i,ms=90)=>{await ev(`__pads[0].buttons[${i}].pressed=true`);await W(ms);await ev(`__pads[0].buttons[${i}].pressed=false`);await W(90)};
 // PRESS START blinks (its visibility flips), so check it's shown rather than visible this instant
 const shown=id=>ev(`(()=>{const e=$('${id}');return !!e&&!e.hidden&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0})()`);
@@ -24,7 +24,7 @@ await tap(1);await W(150);await tap(14);await tap(1);await W(150);ok(await p.isV
 await tap(0);await W(150);
 await c.close()}
 // gamepadconnected on PRESS START opens the menu too
-const c=await b.newContext({viewport:{width:1280,height:800}});const p=await c.newPage();await p.goto(GAME);await p.waitForTimeout(300);
+const c=await b.newContext({viewport:{width:1280,height:800}});const p=await c.newPage();await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(300);
 await p.evaluate("window.dispatchEvent(new Event('gamepadconnected'))");await p.waitForTimeout(100);ok(await p.isVisible('#tmenu'),'a controller connecting on PRESS START opens the menu');
 // the title art loads, and a tall Settings screen scrolls from its top (nothing cut off above)
 ok(await p.evaluate(()=>new Promise(r=>{const i=new Image();i.onload=()=>r(i.naturalWidth>1000);i.onerror=()=>r(false);i.src='img/title.jpg'})),'the title art loads');

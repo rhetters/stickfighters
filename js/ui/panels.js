@@ -87,8 +87,7 @@ function moveLock(k) {
   if (!P || !P.bd || !P.bd.locked.has(k)) return '';
   return skillOf(k);
 }
-function renderMoves() {
-  const el = $('moves');
+function renderMoves(el = $('moves')) {
   if (el.hidden) return;
   const tot = MOVELIST.reduce((n, s) => n + s[1].length, 0);
   let h =
@@ -271,3 +270,9 @@ function renderSetFeel() {
   };
   el.appendChild(r);
 }
+// The move list from the Pause screen
+$('b-moves').onclick = () => {
+  show('s-moves');
+  renderMoves($('pm-list'));
+};
+$('pm-back').onclick = () => show('s-pause');

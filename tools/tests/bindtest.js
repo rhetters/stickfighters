@@ -3,7 +3,7 @@ const {chromium}=require('playwright');const S=process.argv[2];let fails=0;const
 const PADJS=id=>`(()=>{const mk=()=>({id:${JSON.stringify(id)},index:0,connected:true,mapping:'standard',buttons:Array.from({length:17},()=>({pressed:false,value:0})),axes:[0,0,0,0]});window.__pad=mk();navigator.getGamepads=()=>[window.__pad];})()`;
 (async()=>{const b=await chromium.launch();const errs=[];
 const c=await b.newContext({viewport:{width:1280,height:800}});await c.addInitScript(PADJS('Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e Product: 0b13)'));
-const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);
+const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 const tap=async(i,ms=90)=>{await ev(`__pad.buttons[${i}].pressed=true`);await W(ms);await ev(`__pad.buttons[${i}].pressed=false`);await W(90)};
 const vis=id=>p.isVisible('#'+id),foc=()=>ev("document.activeElement&&(document.activeElement.id||document.activeElement.textContent)");
@@ -22,8 +22,8 @@ const x0=await ev("PL[0].x");await ev("__pad.buttons[15].pressed=true");await W(
 await tap(9);await W(100);await tap(9);await W(100);ok(await ev("!paused"),'Start again on the pause menu resumes');
 await tap(9);await W(100);await tap(1);await W(100);ok(await ev("!paused"),'B on the pause menu resumes');
 // settings via controller
-await tap(9);await W(100);await tap(13);await tap(13);await tap(0);await W(150);ok(await vis('s-settings'),'pause > SETTINGS opens with the controller');
-const v0=await ev("SET.vol");await tap(15);ok(await ev("SET.vol")>v0-1e-9&&await foc()==='o-vol','volume slider is highlighted; right changes it ('+v0+' to '+await ev("SET.vol")+')');
+await tap(9);await W(100);await tap(13);await tap(13);await tap(13);await tap(0);await W(150);ok(await vis('s-settings'),'pause > SETTINGS (under MOVES) opens with the controller');
+const v0=await ev("SET.mus");await tap(15);ok(await ev("SET.mus")>v0-1e-9&&await foc()==='o-mus','the music slider (first in Settings) is highlighted; right changes it ('+v0+' to '+await ev("SET.mus")+')');
 await tap(1);await W(100);ok(await vis('s-pause'),'B in Settings goes back to the pause menu');
 await tap(1);await W(100);
 // keyboard binding
@@ -51,7 +51,7 @@ ok(await ev("SET.vol===0.3&&BEST.score===77&&PROG.woods1.done===1&&KEYS.j==='p'"
 await p.screenshot({path:S+'/shots/binds-title.png'});await c.close();
 // Switch controller: A (right button) confirms, B (bottom) goes back; names use Switch labels
 const c2=await b.newContext({viewport:{width:1280,height:800}});await c2.addInitScript(PADJS('Pro Controller (STANDARD GAMEPAD Vendor: 057e Product: 2009)'));
-const q=await c2.newPage();q.on('pageerror',e=>errs.push(e.message));await q.goto(GAME);await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);
+const q=await c2.newPage();q.on('pageerror',e=>errs.push(e.message));await q.goto(GAME);await q.evaluate("SET.tut=1");await q.waitForTimeout(150);await q.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await q.waitForTimeout(300);
 const ev2=x=>q.evaluate(x);const tap2=async i=>{await ev2(`__pad.buttons[${i}].pressed=true`);await q.waitForTimeout(90);await ev2(`__pad.buttons[${i}].pressed=false`);await q.waitForTimeout(90)};
 await tap2(13);await tap2(15);await tap2(1);await q.waitForTimeout(150);ok(await q.isVisible('#s-settings'),'Switch: A (right button) confirms');
 await tap2(0);await q.waitForTimeout(100);ok(await q.isVisible('#s-title'),'Switch: B (bottom button) goes back');

@@ -147,6 +147,16 @@ const storyTiles = (cur, pick, disabled) => [
   })),
   { data: ['theme', '?'], img: 'i-q', label: '?', aria: 'Surprise story: more XP and stars', on: cur === '?', disabled, pick: () => pick('?') }
 ];
+// Easy, Normal, Hard (data/difficulty.js) as small tiles
+const diffTiles = (cur, pick, disabled) =>
+  DIFFS.map((d, i) => ({
+    data: ['diff', String(i)],
+    img: 'i-diff-' + d.id,
+    label: d.name,
+    on: cur === i,
+    disabled,
+    pick: () => pick(i)
+  }));
 const teamTiles = (teams, pick, disabled) => [
   { data: ['teams', '0'], img: 'i-ffa', label: 'FREE-FOR-ALL', on: !teams, disabled, pick: () => pick(false) },
   { data: ['teams', '1'], img: 'i-teams', label: 'TEAMS', on: teams, disabled, pick: () => pick(true) }

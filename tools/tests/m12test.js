@@ -3,7 +3,7 @@ const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // t
 const {chromium,devices}=require('playwright');const S=process.argv[2];let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];
 const c=await b.newContext(devices['iPad (gen 7) landscape']);const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
-await p.goto(GAME);await p.waitForTimeout(300);
+await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 ok(await ev("ROOM_WORDS.join()===[...ROOM_WORDS].sort().join()"),'room code words are in alphabetical order');
 ok(await ev("(async()=>{SET.vol=0.5;playSnd('levelup');const b=await SND_BUF.levelup;return b.duration>0.9&&b.duration<1.2})()"),'the level-up sound decodes (about 1 second) and plays');
@@ -62,7 +62,7 @@ ok(await ev("(()=>{const m=migrate({saveVersion:12,set:{feel:{hitstop:1,shake:1,
 ok(await ev("FEEL.hitstop===0&&FEEL.shake===0&&FEEL.body===1&&NET_FEEL.hitstop===0"),'hit-stop and shake start off; online they stay off');
 // the Skills screen
 await ev("const f=fighter(0);f.prog={xp:XP_AT[6],sk:{}};saveFighter(0,f);titleOpenAll();$('b-char').click()");await W(200);
-ok(/LV 6/.test(await ev("$('ch-skills').textContent")),'the Character screen shows the level: '+await ev("$('ch-skills').textContent"));
+ok(await ev("$('ch-lv').textContent==='6'&&$('ch-skills').classList.contains('has')&&!$('ch-pts').hidden"),'the polaroid\'s skills badge shows the level and glows with points to spend: '+await ev("$('ch-skills').textContent"));
 await p.click('#ch-skills');await W(200);
 ok(await p.isVisible('#s-skills'),'SKILLS opens the Skills screen');
 const node=()=>p.locator('#sk-tree .sknode').first();

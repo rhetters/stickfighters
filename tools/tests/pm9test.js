@@ -2,7 +2,7 @@ const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // t
 const {chromium,devices}=require('playwright');const {PADS}=require('./mp.js');const S=process.argv[2];let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];const c=await b.newContext({viewport:{width:1280,height:800}});
 await c.addInitScript(PADS(['Xbox Wireless Controller (Vendor: 045e)','Xbox Wireless Controller (Vendor: 045e)','Xbox Wireless Controller (Vendor: 045e)','Xbox Wireless Controller (Vendor: 045e)']));
-const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(GAME);await p.waitForTimeout(400);
+const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(400);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 const tap=async(pad,i,ms=90)=>{await ev(`__pads[${pad}].buttons[${i}].pressed=true`);await W(ms);await ev(`__pads[${pad}].buttons[${i}].pressed=false`);await W(90)};
 await ev("titleOpenAll()");

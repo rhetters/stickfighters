@@ -505,12 +505,14 @@ function navBack() {
   else if (sc.id === 's-settings') $('b-back').click();
   else if (sc.id === 's-binds') $('bd-back').click();
   else if (sc.id === 's-backup') $('bk-back').click();
-  else if (sc.id === 's-char') $('b-charback').click();
+  else if (sc.id === 's-char') CH.tab ? chUp() : $('b-charback').click(); // up a step in the store first
   else if (sc.id === 's-skills') closeSkills();
   else if (sc.id === 's-themes') $('th-back').click();
   else if (sc.id === 's-house') $('b-houseback').click();
   else if (sc.id === 's-lobby') $('lb-back').click();
   else if (sc.id === 's-online') $('b-onlineback').click();
   else if (sc.id === 's-solo') $('b-soloback').click();
+  else if (sc.id === 's-learn') openSolo();
+  else if (sc.id === 's-moves') $('pm-back').click();
   else if (sc.id === 's-cust') $('b-custback').click();
 }

@@ -25,7 +25,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M13 | Themes and procedural runs | Done | XL | M8, M10, M12 | Castle Siege, Pirate Cove, Mountain and Space generated from a seed, a Campaign screen, transitions per theme, platforms, mini-bosses, four main bosses |
 | M14 | Boss level | Done | L | M13 | A look of its own for every boss, a slow-motion finale, a victory screen and harder replays, online rooms of 6, picture menus |
 | M15 | Platforms, vertical layers and boss fights | Done | L | M13, M14 | The Volcano: steam vents, falling lava rocks, a climb down into the crater on ledges the pink army follows you up and down, and the Pink Tiki's lava escape |
-| M16 | Polish, audio, balance, v1.0 release | Next | L | M8–M15 | Music for every theme and boss, a full sound pass, difficulty choices, a balance pass, a first-play tutorial; the game called 1.0 |
+| M16 | Polish, audio, balance | Next | L | M8–M15 | Music for every theme and boss, a full sound pass, difficulty choices, a balance pass, a first-play tutorial, a picture-menu character screen |
 | M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
 | M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
@@ -33,20 +33,22 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 
 ## Upcoming milestones
 
-### M16 · Polish, audio, balance, v1.0 release
+### M16 · Polish, audio, balance
 
-Proposed November 23 (waiting on Ron's answers to the questions under Open decisions). The goal: the game that's there feels finished, with no new modes.
+Decided by Ron (November 23): all of the below; no "1.0" (this is just another milestone). Music and sounds are made by the game itself; recorded ones can replace them later.
 
-- **Music:** a loop for each theme (one per biome where it fits), the menus and the boss fights, plus a short victory tune. It changes with the action (quieter while walking, fuller in a fight, the boss's own track) and fades between them. Separate Music and Sound volumes in Settings (a save change, with a migration).
-- **A full sound pass:** footsteps, jumps and landings, every enemy type and boss having its own grunt, the hazards (vents, lava, falling rocks, the geyser), menu taps, ninja stars, the ready stamp; ambient sound per biome (birds, waves, wind, a hum in space, bubbling lava).
-- **Difficulty:** Easy, Normal and Hard for Story and Arcade (enemy health, damage and how many attack at once); online the host picks. Harder replays (+1) stack on top.
-- **Balance pass:** measured with test bots playing every theme: how long a run takes, how much damage players take, stars and XP per run, so each theme is a little harder than the one before it and levelling stays steady. The numbers go to Ron before anything changes.
-- **First-play tutorial:** a short guided start in the Training Room with picture prompts (move, jump, punch, kick, a combo, Surge, a grab), offered the first time someone plays; the move list also reachable from Pause.
-- **Accessibility:** hit flashes and team colours that work with colour blindness, bigger text option (reduced screen shake and button remapping already exist).
+- **Music:** a loop for each theme, the menus and the boss fights, plus a short victory tune. It follows the action (quieter while walking, fuller in a fight, the boss's own track) and fades between them. Separate Music and Sound volumes in Settings (a save change, with a migration).
+- **A full sound pass:** footsteps, jumps and landings, voices for enemies and bosses, the hazards, menu taps, ninja stars, the ready stamp; ambient sound per biome.
+- **Difficulty:** Easy, Normal and Hard for Story and Arcade, more than enemy strength (on Easy: slower, fewer attackers at once, quicker revives, more hearts); online the host picks. Harder replays (+1) stack on top.
+- **Balance pass:** test bots play every theme and measure run time, damage taken, stars and XP per run. The numbers go to Ron before anything changes.
+- **First-play tutorial:** a guided start in the Training Room with picture prompts (move, jump, punch, kick, a combo, Surge, a grab), offered the first time; the move list also opens from Pause.
+- **A new character screen** (asked by Ron): the fighter in a polaroid, a name box in the style of the rooms, the store as picture buttons (body part, then kind, then the items to buy), so lots more cosmetics stay tidy; skills on a corner of the frame, glowing when there are points to spend.
+- **Accessibility:** hit flashes and team colours that work with colour blindness, a bigger text option (reduced screen shake and button remapping already exist).
 - **Performance:** checked with 6 players and lots of enemies at iPad size; fewer effects automatically when the game slows down.
-- **Version 1.0:** the title screen and version say 1.0; release notes in the CHANGELOG; Ron can make a release tag on GitHub.
 
-**Done when:** every theme and boss has its music, the sound pass is in, the difficulty choices work alone, in co-op and online, the balance numbers have been reviewed with Ron, a new player can learn the basics from the tutorial, and 6 players run smoothly on the iPad.
+Built (version 54, see the CHANGELOG): the music and sound, the difficulty choices, the tutorial and MOVES on Pause, the new character screen, colour help and bigger text, the lower resolution for slow devices. Balance: test bots played every story on each difficulty; the numbers are with Ron, and nothing in the balance has changed yet.
+
+**Done when:** every theme and boss has its music, the sound pass is in, the difficulty choices work alone, in co-op and online, the balance numbers have been reviewed with Ron, a new player can learn the basics from the tutorial, the new character screen is in, and 6 players run smoothly on the iPad.
 
 ### M17 · Level creator
 
@@ -71,12 +73,10 @@ Kept possible, not planned: cloud saves; a desktop app on Steam with Steam Works
 
 ## Open decisions
 
-1. **M16 music:** made by the game itself (synthesized chiptune, nothing to download, Rhett can pick moods) or recorded tracks Ron finds (like the level-up sound; each one adds to the download and needs a license that allows it)?
-2. **M16 difficulty:** Easy / Normal / Hard as proposed, and should Easy change anything else (more revives, slower enemies)?
-3. **Back moves.** Add Back+P Backfist and Back+K Back Kick, which hit behind you? Not in the combat chart yet.
+1. **Back moves.** Add Back+P Backfist and Back+K Back Kick, which hit behind you? Not in the combat chart yet.
 
 Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocking) are in the archive.
 
 ## Suggested next step
 
-M16: Ron answers the music and difficulty questions, then the music and sound pass first (the biggest change you'll hear), then difficulty and balance, the tutorial, and 1.0.
+M16: Ron and Rhett try it on the iPad (the music, the tutorial, the character screen, Easy for the younger ones) and decide on the balance numbers.

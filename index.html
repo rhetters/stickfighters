@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>StickFighters</title>
-<link rel="stylesheet" href="css/style.css?v=53">
+<link rel="stylesheet" href="css/style.css?v=54">
 </head>
 <body>
 <div id="wrap">
@@ -43,8 +43,18 @@
  </div>
  <div class="screen scene" id="s-solo" hidden>
   <h2>SOLO</h2>
-  <div class="ptiles"><button class="ptile" id="b-level"><span class="pimg i-story"></span><b>STORY</b></button><button class="ptile" id="b-start"><span class="pimg i-arcade"></span><b>ARCADE</b></button></div>
+  <div class="ptiles"><button class="ptile" id="b-level"><span class="pimg i-story"></span><b>STORY</b></button><button class="ptile" id="b-start"><span class="pimg i-arcade"></span><b>ARCADE</b></button><button class="ptile" id="b-learn"><span class="pimg i-learn"></span><b>LEARN</b></button></div>
+  <div class="rmrow rmdiff" id="solo-diff"></div>
   <button class="btn alt" id="b-soloback">BACK</button>
+ </div>
+ <div class="screen scene" id="s-learn" hidden>
+  <h2>NEW HERE?</h2>
+  <div class="ptiles"><button class="ptile" id="ln-learn"><span class="pimg i-learn"></span><b>LEARN THE MOVES</b></button><button class="ptile" id="ln-play"><span class="pimg i-solo"></span><b>JUST PLAY</b></button></div>
+ </div>
+ <div class="screen" id="s-moves" hidden>
+  <h2>MOVES</h2>
+  <div id="pm-list"></div>
+  <button class="btn" id="pm-back">BACK</button>
  </div>
  <div class="screen scene" id="s-cust" hidden>
   <h2>CUSTOMIZE</h2>
@@ -66,7 +76,7 @@
    <button class="btn" id="on-join">JOIN</button>
   </div>
   <div id="on-room" class="onpane rmroom" hidden>
-   <div class="rmtop" id="on-head"></div>
+   <div class="rmtop"><div class="rmtop" id="on-head"></div><div class="rmrow rmdiff" id="on-diff"></div></div>
    <div class="rmcards" id="on-cards"></div>
    <div class="rmmodes"><div class="rmrow" id="on-modes"></div><span class="rmdiv" aria-hidden="true"></span><div class="rmrow" id="on-sub"></div></div>
   </div>
@@ -74,14 +84,20 @@
   <div class="onfoot"><button class="btn" id="on-start" hidden>START</button><button class="btn alt" id="b-onlineback">BACK</button></div>
  </div>
  <div class="screen wide" id="s-char" hidden>
-  <div class="chtop"><h2>CHARACTER</h2><div id="ch-slots"></div><button id="ch-skills" class="btn">SKILLS</button><div class="chstars"><span class="shk"></span><b id="ch-stars">0</b></div></div>
+  <div class="chtop"><h2>CHARACTER</h2><div id="ch-slots"></div><div class="chstars"><span class="shk"></span><b id="ch-stars">0</b></div></div>
   <div class="chmain">
    <div class="chleft">
-    <canvas id="ch-prev" aria-label="Your fighter"></canvas>
-    <div class="chname"><input id="ch-name" type="text" maxlength="10" aria-label="Fighter name" autocomplete="off" spellcheck="false"><button id="ch-rnd" title="Random look">RANDOM</button></div>
+    <div class="chpolar">
+     <div class="chphoto"><canvas id="ch-prev" aria-label="Your fighter"></canvas>
+      <button id="ch-rnd" aria-label="Random look"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="5" width="30" height="30" rx="7" fill="#fff8ee" stroke="#1c1626" stroke-width="3"/><g fill="#1c1626"><circle cx="13" cy="13" r="3"/><circle cx="27" cy="13" r="3"/><circle cx="20" cy="20" r="3"/><circle cx="13" cy="27" r="3"/><circle cx="27" cy="27" r="3"/></g></svg></button>
+     </div>
+     <div class="chname"><svg class="chpen" viewBox="0 0 30 30" aria-hidden="true"><path d="M5 25 l3 -9 l13 -13 l6 6 l-13 13z" fill="#ffd400" stroke="#1c1626" stroke-width="2.4" stroke-linejoin="round"/><path d="M5 25 l3 -9 l6 6z" fill="#ffd9b0" stroke="#1c1626" stroke-width="2.4" stroke-linejoin="round"/></svg><input id="ch-name" type="text" maxlength="10" aria-label="Fighter name" autocomplete="off" spellcheck="false"></div>
+     <button id="ch-skills" aria-label="Skills"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3 l5 11 l12 1 l-9 8 l3 12 l-11 -6 l-11 6 l3 -12 l-9 -8 l12 -1z" fill="#a35cff" stroke="#1c1626" stroke-width="2.6" stroke-linejoin="round"/></svg><b id="ch-lv">1</b><i id="ch-pts" hidden></i><span>SKILLS</span></button>
+    </div>
    </div>
    <div class="chright">
-    <div id="ch-tabs"></div>
+    <div class="chnav" id="ch-nav" hidden><button class="btn alt" id="ch-up">&#9664; BACK</button><h3 id="ch-path"></h3></div>
+    <div class="rmrow chcats" id="ch-cats"></div>
     <div id="ch-body">
      <div class="chrow"><span>Height</span><button id="ch-ht-" aria-label="Shorter">&minus;</button><b id="ch-ht"></b><button id="ch-ht+" aria-label="Taller">+</button></div>
      <div class="chrow"><span>Head size</span><button id="ch-head-" aria-label="Smaller head">&minus;</button><b id="ch-head"></b><button id="ch-head+" aria-label="Bigger head">+</button></div>
@@ -126,7 +142,7 @@
  </div>
  <div class="screen" id="s-lobby" hidden>
   <div class="rmroom">
-   <div class="rmtop" id="lb-head"></div>
+   <div class="rmtop"><div class="rmtop" id="lb-head"></div><div class="rmrow rmdiff" id="lb-diff"></div></div>
    <div class="rmcards" id="lb-cards"></div>
    <div class="rmmodes"><div class="rmrow" id="lb-modes"></div><span class="rmdiv" aria-hidden="true"></span><div class="rmrow" id="lb-sub"></div></div>
   </div>
@@ -137,13 +153,15 @@
   <p id="p-seed"></p>
   <button class="btn" id="b-resume">RESUME</button>
   <button class="btn alt" id="b-restart">RESTART</button>
+  <button class="btn alt" id="b-moves">MOVES</button>
   <button class="btn alt" id="b-set2">SETTINGS</button>
   <button class="btn alt" id="b-quit">QUIT TO TITLE</button>
  </div>
  <div class="screen" id="s-settings" hidden>
   <h2>SETTINGS</h2>
   <div class="set">
-   <label for="o-vol">Volume</label><input id="o-vol" type="range" min="0" max="100">
+   <label for="o-mus">Music</label><input id="o-mus" type="range" min="0" max="100">
+   <label for="o-vol">Sound</label><input id="o-vol" type="range" min="0" max="100">
    <label for="o-touch">Touch controls</label><select id="o-touch"><option value="auto">Auto</option><option value="on">Always on</option><option value="off">Off</option></select>
    <label for="o-tsize">Touch size</label><input id="o-tsize" type="range" min="0.8" max="1.5" step="0.1">
    <label for="o-topac">Touch opacity</label><input id="o-topac" type="range" min="0.3" max="1" step="0.05">
@@ -152,6 +170,8 @@
    <label for="o-surge">Surge button</label><select id="o-surge"><option value="hold">Hold (push and hold)</option><option value="toggle">Toggle (tap on, tap off)</option></select>
    <label for="o-hist">Input display</label><input id="o-hist" type="checkbox">
    <label for="o-calm">Reduce screen shake</label><input id="o-calm" type="checkbox">
+   <label for="o-cb">Colour help</label><input id="o-cb" type="checkbox">
+   <label for="o-big">Bigger text</label><input id="o-big" type="checkbox">
    <label for="o-seed">Seed (blank = random)</label><input id="o-seed" type="text" maxlength="12">
    <label for="o-backup">Save</label><div class="layrow"><button id="o-backup">Back up or restore your save</button></div>
    <div id="o-feel" class="setfeel"></div>
@@ -203,54 +223,58 @@
  <div class="grp"><b>Speed</b><button class="alt" data-ts="1">1x</button><button class="alt" data-ts="0.5">1/2x</button><button class="alt" data-ts="0.25">1/4x</button><button class="alt" id="t-freeze">Freeze (\)</button><button class="alt" id="t-step">Step (.)</button><button class="alt" id="t-exit">Exit</button></div>
 </div>
 <div id="rot">Rotate your device to landscape to play</div>
-<script src="js/core.js?v=53" defer></script>
-<script src="js/input.js?v=53" defer></script>
-<script src="js/data/moves.js?v=53" defer></script>
-<script src="js/data/enemies.js?v=53" defer></script>
-<script src="js/data/levels.js?v=53" defer></script>
-<script src="js/data/themes.js?v=53" defer></script>
-<script src="js/data/items.js?v=53" defer></script>
-<script src="js/data/skills.js?v=53" defer></script>
-<script src="js/data/sounds.js?v=53" defer></script>
-<script src="js/data/house.js?v=53" defer></script>
-<script src="js/progress.js?v=53" defer></script>
-<script src="js/economy.js?v=53" defer></script>
-<script src="js/player.js?v=53" defer></script>
-<script src="js/effects.js?v=53" defer></script>
-<script src="js/combat.js?v=53" defer></script>
-<script src="js/terrain.js?v=53" defer></script>
-<script src="js/enemies.js?v=53" defer></script>
-<script src="js/modes.js?v=53" defer></script>
-<script src="js/level.js?v=53" defer></script>
-<script src="js/run.js?v=53" defer></script>
-<script src="js/versus.js?v=53" defer></script>
-<script src="js/pickups.js?v=53" defer></script>
-<script src="js/net/rtc.js?v=53" defer></script>
-<script src="js/net/session.js?v=53" defer></script>
-<script src="js/ragdoll.js?v=53" defer></script>
-<script src="js/scenery.js?v=53" defer></script>
-<script src="js/biomes.js?v=53" defer></script>
-<script src="js/looks.js?v=53" defer></script>
-<script src="js/bosslooks.js?v=53" defer></script>
-<script src="js/volcano.js?v=53" defer></script>
-<script src="js/house.js?v=53" defer></script>
-<script src="js/render.js?v=53" defer></script>
-<script src="js/ui/panels.js?v=53" defer></script>
-<script src="js/ui/training.js?v=53" defer></script>
-<script src="js/ui/touch-layout.js?v=53" defer></script>
-<script src="js/ui/rooms.js?v=53" defer></script>
-<script src="js/ui/lobby.js?v=53" defer></script>
-<script src="js/ui/online.js?v=53" defer></script>
-<script src="js/ui/bindings.js?v=53" defer></script>
-<script src="js/ui/character.js?v=53" defer></script>
-<script src="js/ui/codes.js?v=53" defer></script>
-<script src="js/ui/skills.js?v=53" defer></script>
-<script src="js/ui/themes.js?v=53" defer></script>
-<script src="js/ui/victory.js?v=53" defer></script>
-<script src="js/ui/house.js?v=53" defer></script>
-<script src="js/ui/backup.js?v=53" defer></script>
-<script src="js/devtools.js?v=53" defer></script>
-<script src="js/selftest.js?v=53" defer></script>
-<script src="js/main.js?v=53" defer></script>
+<script src="js/core.js?v=54" defer></script>
+<script src="js/input.js?v=54" defer></script>
+<script src="js/data/moves.js?v=54" defer></script>
+<script src="js/data/enemies.js?v=54" defer></script>
+<script src="js/data/levels.js?v=54" defer></script>
+<script src="js/data/themes.js?v=54" defer></script>
+<script src="js/data/items.js?v=54" defer></script>
+<script src="js/data/skills.js?v=54" defer></script>
+<script src="js/data/sounds.js?v=54" defer></script>
+<script src="js/data/music.js?v=54" defer></script>
+<script src="js/data/difficulty.js?v=54" defer></script>
+<script src="js/data/house.js?v=54" defer></script>
+<script src="js/progress.js?v=54" defer></script>
+<script src="js/economy.js?v=54" defer></script>
+<script src="js/player.js?v=54" defer></script>
+<script src="js/effects.js?v=54" defer></script>
+<script src="js/combat.js?v=54" defer></script>
+<script src="js/terrain.js?v=54" defer></script>
+<script src="js/enemies.js?v=54" defer></script>
+<script src="js/modes.js?v=54" defer></script>
+<script src="js/level.js?v=54" defer></script>
+<script src="js/run.js?v=54" defer></script>
+<script src="js/versus.js?v=54" defer></script>
+<script src="js/pickups.js?v=54" defer></script>
+<script src="js/net/rtc.js?v=54" defer></script>
+<script src="js/net/session.js?v=54" defer></script>
+<script src="js/ragdoll.js?v=54" defer></script>
+<script src="js/scenery.js?v=54" defer></script>
+<script src="js/biomes.js?v=54" defer></script>
+<script src="js/looks.js?v=54" defer></script>
+<script src="js/bosslooks.js?v=54" defer></script>
+<script src="js/volcano.js?v=54" defer></script>
+<script src="js/house.js?v=54" defer></script>
+<script src="js/render.js?v=54" defer></script>
+<script src="js/audio.js?v=54" defer></script>
+<script src="js/ui/panels.js?v=54" defer></script>
+<script src="js/ui/training.js?v=54" defer></script>
+<script src="js/ui/touch-layout.js?v=54" defer></script>
+<script src="js/ui/rooms.js?v=54" defer></script>
+<script src="js/ui/lobby.js?v=54" defer></script>
+<script src="js/ui/online.js?v=54" defer></script>
+<script src="js/ui/bindings.js?v=54" defer></script>
+<script src="js/ui/character.js?v=54" defer></script>
+<script src="js/ui/codes.js?v=54" defer></script>
+<script src="js/ui/skills.js?v=54" defer></script>
+<script src="js/ui/themes.js?v=54" defer></script>
+<script src="js/ui/victory.js?v=54" defer></script>
+<script src="js/ui/tutorial.js?v=54" defer></script>
+<script src="js/ui/house.js?v=54" defer></script>
+<script src="js/ui/backup.js?v=54" defer></script>
+<script src="js/devtools.js?v=54" defer></script>
+<script src="js/selftest.js?v=54" defer></script>
+<script src="js/main.js?v=54" defer></script>
 </body>
 </html>
