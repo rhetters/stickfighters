@@ -247,7 +247,10 @@ function musWant() {
     if (MODE.id === 'level' && LV) {
       const ae = LV.encs.find(e => e.st === 1);
       if ((ae && ae.boss) || (LV.esc && !LV.fin)) return ['boss', 2];
-      return [LV.run ? LV.run.theme : 'castle', ae ? 1 : 0];
+      // the song of the biome you're in (the Wooded Trail outside a story)
+      const sg = LV.run && segAt(CAM.x + W / 2),
+        b = sg ? sg.b : 'woods';
+      return [MUSIC[b] ? b : THEMES[LV.run ? LV.run.theme : 'castle'].biomes[0], ae ? 1 : 0];
     }
   }
   return ['menu', 0];
