@@ -13,7 +13,7 @@
 const TABS = [
   { id: 'body', name: 'Body', secs: [] },
   { id: 'colors', name: 'Colors', secs: ['color'] },
-  { id: 'head', name: 'Head', secs: ['hair', 'hat', 'band'], pic: 'hat' },
+  { id: 'head', name: 'Head', secs: ['hair', 'hat', 'band', 'face'], pic: 'hat' },
   { id: 'neck', name: 'Neck', secs: ['scarf', 'tie'] },
   { id: 'upper', name: 'Upper Body', secs: ['shirt', 'jacket', 'gloves'] },
   { id: 'lower', name: 'Lower Body', secs: ['pants', 'shorts', 'skirt', 'dress', 'shoes'] },
@@ -26,6 +26,7 @@ const SECS = {
   hair: { name: 'Hair', slot: 'hair' },
   hat: { name: 'Hats', slot: 'hat' },
   band: { name: 'Headbands', slot: 'band' },
+  face: { name: 'Face', slot: 'face', note: 'glasses, shades, masks and more' },
   scarf: { name: 'Scarves', slot: 'scarf' },
   tie: { name: 'Ties', slot: 'tie' },
   shirt: { name: 'Shirts', slot: 'shirt' },
@@ -44,7 +45,7 @@ const SECS = {
   hdecor: { name: 'Decorations', slot: 'house' }
 };
 // The slots a fighter wears (colour and the pose wheel are kept separately)
-const EQ = ['hair', 'hat', 'band', 'scarf', 'tie', 'shirt', 'jacket', 'gloves', 'legs', 'shoes', 'surge'];
+const EQ = ['hair', 'hat', 'band', 'face', 'scarf', 'tie', 'shirt', 'jacket', 'gloves', 'legs', 'shoes', 'surge'];
 const WHEEL_MAX = 8;
 const ITEMS = [
   // body colors: all of them stand out against the pink army
@@ -93,6 +94,23 @@ const ITEMS = [
   { id: 'band-black', sec: 'band', name: 'Ninja Band', c: '#2b2533', price: 50 },
   { id: 'band-gold', sec: 'band', name: 'Gold Band', c: '#ffd400', how: { combo: 20 } },
   { id: 'band-rainbow', sec: 'band', name: 'Rainbow Band', c: 'rainbow', how: { drop: 1 } },
+  // face (k = the style, looks.js drawFace)
+  { id: 'face-glasses', sec: 'face', name: 'Round Glasses', c: '#ffffff', c2: '#6b4420', k: 'round', price: 30 },
+  { id: 'face-nerd', sec: 'face', name: 'Nerd Glasses', c: '#ffffff', c2: '#1c1626', k: 'nerd', price: 40 },
+  { id: 'face-shades', sec: 'face', name: 'Shades', c: '#1c1626', c2: '#1c1626', k: 'shades', price: 60 },
+  { id: 'face-pinkshades', sec: 'face', name: 'Pink Shades', c: '#ff4fa3', c2: '#ffffff', k: 'shades', price: 70 },
+  { id: 'face-3d', sec: 'face', name: '3D Glasses', c: '#ffffff', c2: '#f4ead2', k: 'threed', price: 80 },
+  { id: 'face-aviators', sec: 'face', name: 'Aviators', c: '#3f6f5a', c2: '#d9a400', k: 'aviator', price: 120 },
+  { id: 'face-starshades', sec: 'face', name: 'Star Shades', c: '#ffd400', c2: '#e8212b', k: 'star', price: 150 },
+  { id: 'face-heartshades', sec: 'face', name: 'Heart Shades', c: '#ff4fa3', c2: '#1c1626', k: 'heart', price: 150 },
+  { id: 'face-monocle', sec: 'face', name: 'Monocle', c: '#d9a400', k: 'monocle', price: 120 },
+  { id: 'face-goggles', sec: 'face', name: 'Ski Goggles', c: '#ff7a00', c2: '#2a55c9', k: 'goggles', price: 90 },
+  { id: 'face-visor', sec: 'face', name: 'Cyber Visor', c: '#00e5ff', k: 'visor', price: 200 },
+  { id: 'face-patch', sec: 'face', name: 'Eye Patch', c: '#1c1626', k: 'patch', price: 50 },
+  { id: 'face-stache', sec: 'face', name: 'Mustache', c: '#4a2e1a', k: 'stache', price: 50 },
+  { id: 'face-nose', sec: 'face', name: 'Clown Nose', c: '#e8212b', k: 'nose', price: 30 },
+  // secret: only from a code in the treasure chest (four ninja stars)
+  { id: 'face-ninja', sec: 'face', name: 'Ninja Mask', c: '#2b2533', k: 'ninja', how: { code: 1 } },
   // scarves
   { id: 'scarf-red', sec: 'scarf', name: 'Red Scarf', c: '#e8212b', price: 50 },
   { id: 'scarf-blue', sec: 'scarf', name: 'Blue Scarf', c: '#2a55c9', price: 50 },
@@ -319,9 +337,12 @@ for (const it of ITEMS) it.slot = SECS[it.sec].slot;
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 // Idle stances (cosmetic: only how you stand while waiting). Same pose format as moves.js.
 // The treasure chest's codes (Character screen, ui/codes.js): four icons, by their place in CODE_ICONS, and the
-// item each code gives. Four stars (what the chest starts on) gives Rhett's Shirt.
+// item each code gives. Four stars (what the chest starts on) gives Rhett's Shirt; four ninja stars, the Ninja Mask.
 const CODE_ICONS = ['star', 'shuriken', 'heart', 'crown', 'bolt', 'flame', 'moon', 'drop'];
-const CODES = [{ code: [0, 0, 0, 0], item: 'shirt-rhett' }];
+const CODES = [
+  { code: [0, 0, 0, 0], item: 'shirt-rhett' },
+  { code: [1, 1, 1, 1], item: 'face-ninja' }
+];
 const STANCES = [
   { id: 'classic', name: 'Classic', p: [6, 35, 75, 20, 90, 18, 20, -18, 12, 0] },
   { id: 'boxer', name: 'Boxer', p: [10, 50, 110, 30, 125, 22, 26, -22, 18, 0] },

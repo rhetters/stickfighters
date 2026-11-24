@@ -1,4 +1,4 @@
-// StickFighters: Drawing a fighter's look: hair, hats, headbands, scarves, ties, shirts, jackets,
+// StickFighters: Drawing a fighter's look: hair, hats, headbands, face (glasses, masks…), scarves, ties, shirts, jackets,
 // gloves, pants, skirts, dresses, shoes, Surge styles, idle stances, poses and the pose wheel.
 // Drawing only: nothing here changes the game, and it never calls rnd().
 // ===== LOOKS =====
@@ -1009,8 +1009,183 @@ function lookHead(f, J, L, r, w, wv) {
           L.band.c
         );
     }
+    if (L.face) drawFace(L.face, r, w, wv, L.col);
     if (L.hat) drawHat(L.hat, r, w);
   });
+}
+// ===== FACE: glasses, shades, a monocle, goggles, masks… =====
+// Drawn in the head's frame (x = the way you face, y = down), seen from the front like the headbands and hats: two
+// lenses across the head, nudged a little the way you face. Over the hair and headband, under the hat.
+function drawFace(it, r, w, wv, col) {
+  const c = it.c,
+    c2 = it.c2 || INK,
+    k = it.k,
+    nx = 0.1 * r, // the middle of the face, nudged the way you face
+    ex = 0.46 * r, // each eye's distance from the middle
+    ey = -0.08 * r,
+    eyes = [nx - ex, nx + ex];
+  const glint = (x, y, s) => {
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.lineWidth = w * 0.7;
+    ctx.beginPath();
+    ctx.moveTo(x - s * 0.6, y + s * 0.2);
+    ctx.lineTo(x - s * 0.1, y - s * 0.5);
+    ctx.stroke();
+  };
+  // a pair of lenses of one shape: the arms to the ears, the bridge, then each lens
+  const pair = (shape, fill, armc) => {
+    seg([[eyes[0] - 0.3 * r, ey], [-1.0 * r, ey - 0.06 * r]], w * 1.3, armc || c2);
+    seg([[eyes[1] + 0.3 * r, ey], [1.0 * r, ey - 0.06 * r]], w * 1.3, armc || c2);
+    seg([[eyes[0] + 0.2 * r, ey - 0.06 * r], [nx, ey - 0.12 * r], [eyes[1] - 0.2 * r, ey - 0.06 * r]], w * 1.2, c2);
+    for (const x of eyes) {
+      ctx.save();
+      ctx.translate(x, ey);
+      shape();
+      ctx.restore();
+      ctx.fillStyle = typeof fill === 'function' ? fill(x) : fill;
+      ctx.fill();
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = w * (c2 !== INK ? 1.5 : 1.1);
+      ctx.stroke();
+      if (c2 !== INK) {
+        ctx.strokeStyle = c2;
+        ctx.lineWidth = w * 0.6;
+        ctx.stroke();
+      }
+    }
+  };
+  const circ = rr => () => (ctx.beginPath(), ctx.arc(0, 0, rr, 0, 7));
+  const rrect = (wd, ht, rad) => () => (ctx.beginPath(), ctx.roundRect(-wd / 2, -ht / 2, wd, ht, rad));
+  const clear = 'rgba(220,240,255,0.6)';
+  if (k === 'round') pair(circ(0.3 * r), clear);
+  else if (k === 'nerd') pair(rrect(0.66 * r, 0.5 * r, 0.08 * r), clear);
+  else if (k === 'shades') pair(rrect(0.7 * r, 0.42 * r, 0.16 * r), c);
+  else if (k === 'threed') pair(rrect(0.68 * r, 0.44 * r, 0.06 * r), x => (x < nx ? '#2fb5ff' : '#e8212b'));
+  else if (k === 'aviator')
+    pair(() => {
+      ctx.beginPath();
+      ctx.moveTo(-0.34 * r, -0.2 * r);
+      ctx.lineTo(0.34 * r, -0.2 * r);
+      ctx.quadraticCurveTo(0.36 * r, 0.36 * r, 0, 0.3 * r);
+      ctx.quadraticCurveTo(-0.36 * r, 0.28 * r, -0.34 * r, -0.2 * r);
+    }, c);
+  else if (k === 'star')
+    pair(() => {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const a = -Math.PI / 2 + (i * Math.PI) / 5,
+          q = (i % 2 ? 0.17 : 0.4) * r;
+        ctx.lineTo(Math.cos(a) * q, Math.sin(a) * q);
+      }
+      ctx.closePath();
+    }, c);
+  else if (k === 'heart')
+    pair(() => {
+      const q = 0.34 * r;
+      ctx.beginPath();
+      ctx.moveTo(0, q * 0.9);
+      ctx.bezierCurveTo(-q * 1.6, -q * 0.2, -q * 0.6, -q * 1.3, 0, -q * 0.4);
+      ctx.bezierCurveTo(q * 0.6, -q * 1.3, q * 1.6, -q * 0.2, 0, q * 0.9);
+    }, c);
+  if (k === 'shades' || k === 'aviator' || k === 'star' || k === 'heart' || k === 'threed')
+    for (const x of eyes) glint(x + 0.08 * r, ey - 0.02 * r, 0.22 * r);
+  if (k === 'monocle') {
+    // a gold ring over one eye on a chain
+    const x = eyes[1];
+    ctx.strokeStyle = c;
+    ctx.lineWidth = w * 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x - 0.1 * r, ey + 0.34 * r);
+    ctx.quadraticCurveTo(x - 0.1 * r, 0.95 * r + wv * 0.3 * r, -0.3 * r, 0.8 * r);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, ey, 0.34 * r, 0, 7);
+    ctx.fillStyle = clear;
+    ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = w * 1.6;
+    ctx.stroke();
+    ctx.strokeStyle = c;
+    ctx.lineWidth = w * 0.8;
+    ctx.stroke();
+    glint(x + 0.08 * r, ey - 0.02 * r, 0.2 * r);
+  } else if (k === 'goggles') {
+    // a strap round the head and one wide lens
+    inked([[-1.02 * r, -0.1 * r], [1.02 * r, -0.14 * r]], 0.24 * r, c2);
+    ctx.beginPath();
+    ctx.roundRect(nx - 0.92 * r, ey - 0.3 * r, 1.84 * r, 0.56 * r, 0.26 * r);
+    shapeDo('#9aa3b5', w * 1.4);
+    ctx.beginPath();
+    ctx.roundRect(nx - 0.8 * r, ey - 0.21 * r, 1.6 * r, 0.38 * r, 0.18 * r);
+    ctx.fillStyle = c;
+    ctx.fill();
+    glint(nx + 0.4 * r, ey - 0.02 * r, 0.22 * r);
+  } else if (k === 'visor') {
+    // a see-through band across the eyes, glowing
+    ctx.beginPath();
+    ctx.roundRect(-1.02 * r, ey - 0.24 * r, 2.06 * r, 0.42 * r, 0.2 * r);
+    ctx.save();
+    ctx.globalAlpha *= 0.8;
+    ctx.shadowColor = c;
+    ctx.shadowBlur = 0.5 * r;
+    ctx.fillStyle = c;
+    ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = w * 1.4;
+    ctx.stroke();
+    seg([[-0.7 * r, ey - 0.03 * r], [0.8 * r, ey - 0.03 * r]], w * 1.1, 'rgba(255,255,255,0.85)');
+  } else if (k === 'patch') {
+    seg([[-1.0 * r, -0.62 * r], [1.0 * r, 0.25 * r]], w * 1.8, INK);
+    ctx.beginPath();
+    ctx.ellipse(eyes[1], ey, 0.32 * r, 0.27 * r, 0, 0, 7);
+    shapeDo(c, w);
+  } else if (k === 'stache') {
+    // a curly mustache under the nose
+    const y = 0.36 * r;
+    ctx.beginPath();
+    ctx.moveTo(nx, y - 0.06 * r);
+    ctx.bezierCurveTo(nx - 0.2 * r, y - 0.22 * r, nx - 0.5 * r, y - 0.12 * r, nx - 0.58 * r, y - 0.2 * r);
+    ctx.bezierCurveTo(nx - 0.6 * r, y + 0.12 * r, nx - 0.25 * r, y + 0.14 * r, nx, y + 0.04 * r);
+    ctx.bezierCurveTo(nx + 0.25 * r, y + 0.14 * r, nx + 0.6 * r, y + 0.12 * r, nx + 0.58 * r, y - 0.2 * r);
+    ctx.bezierCurveTo(nx + 0.5 * r, y - 0.12 * r, nx + 0.2 * r, y - 0.22 * r, nx, y - 0.06 * r);
+    shapeDo(c, w);
+  } else if (k === 'nose') {
+    ctx.beginPath();
+    ctx.arc(nx, 0.14 * r, 0.3 * r, 0, 7);
+    shapeDo(c, w * 1.2);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    ctx.arc(nx - 0.08 * r, 0.05 * r, 0.09 * r, 0, 7);
+    ctx.fill();
+  } else if (k === 'ninja') {
+    // a hood over the whole head with an eye slit, and tails tied at the back
+    for (const t of [0, 1])
+      inked(
+        [
+          [-0.85 * r, -0.2 * r],
+          [-1.6 * r, (-0.1 + t * 0.45 + wv) * r, -2.3 * r, (0.15 + t * 0.6 + wv * 1.5) * r]
+        ],
+        0.26 * r,
+        c
+      );
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 1.02, 0, 7);
+    shapeDo(c, w * 1.2);
+    ctx.beginPath();
+    ctx.roundRect(nx - 0.8 * r, ey - 0.2 * r, 1.6 * r, 0.36 * r, 0.18 * r);
+    ctx.fillStyle = col || '#ffd9b0';
+    ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = w;
+    ctx.stroke();
+    ctx.fillStyle = INK;
+    for (const x of eyes) {
+      ctx.beginPath();
+      ctx.ellipse(x + 0.06 * r, ey - 0.02 * r, 0.07 * r, 0.1 * r, 0, 0, 7);
+      ctx.fill();
+    }
+  }
 }
 // ===== SURGE STYLES =====
 // The colour of Surge for a look (the glow, afterimages and sparkles); classic yellow without a style.
@@ -1206,7 +1381,7 @@ function drawItemIcon(it, cx, cy, sz, baseCol) {
   const f = { look: L, face: 1, s: 1, slot: 0, vx: it.slot === 'surge' ? 5 : 0, col };
   ctx.save();
   ctx.lineCap = 'round';
-  if (it.slot === 'hair' || it.slot === 'hat' || it.slot === 'band') {
+  if (it.slot === 'hair' || it.slot === 'hat' || it.slot === 'band' || it.slot === 'face') {
     const r = sz * 0.17,
       hy = cy + sz * 0.08,
       J = { hd: [cx, hy], nk: [cx, hy + r * 1.5], hr: r, face: 1, s: r / 9 };
