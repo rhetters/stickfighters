@@ -2,6 +2,14 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: music hand-overs, wind and the Snowy Peak's gusts (November 23, 2026)
+- **Music hand-overs** (asked by Ron): songs no longer switch instantly. Starting a game plays a short "here we go" tune first; a boss arrives with a dark drum roll; beating him plays a "ta-da"; walking into a new place fades the old song out, leaves a moment of quiet, and brings the new one in slowly; going back to the menus fades out with a pause. A place's song also rests for a few seconds every other time round while you're walking.
+- **Wind** comes in puffs now and then instead of a steady hiss.
+- **Gusts on the Snowy Peak:** every so often the wind picks up ("GUST!"), then blows everyone (but the boss) back the way they came for about three seconds, with snow streaking sideways across the screen and the wind howling. Walking still gets you forward, slowly. Not during the boss fight.
+- **The sunset in the woods** no longer turns back into morning just before the end of the Wooded Trail.
+- Self-test fingerprints unchanged.
+- Version 56.
+
 ## M16: music for every place (November 23, 2026)
 - **Every biome has its own song** (asked by Ron), changing as you travel through a story:
   - Castle Siege: a folksy walk (Wooded Trail), a sneaky tiptoe (Sewer Tunnels), a march (Castle Keep).

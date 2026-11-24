@@ -10,6 +10,7 @@
 //   mix      [{ at: toughness from, w: { enemy type: weight } }]: which enemies a fight draws, by toughness
 //   mini     a rare mini-boss: enemy type, chance per fight, the lines it may say when it lands
 //   slick    1 = slippery floor: knocked-back bodies slide farther
+//   gust     1 = big gusts of wind now and then blow everyone back for a few seconds (weather.js)
 //   lowg     low gravity: up-and-down motion runs at this speed (jumps float and go a little higher)
 //   helmet   1 = everyone wears a glass bubble helmet here (drawing only)
 //   climb    [start, end]: how much the ground rises per pixel between fights, getting steeper from the start of
@@ -204,6 +205,7 @@ const BIOMES = {
     w: [1050, 1300],
     fights: 5,
     slick: 1,
+    gust: 1,
     mix: [
       { at: 5, w: { g: 3, u: 2, f: 2, b: 2, r: 1 } },
       { at: 6, w: { g: 2, u: 3, f: 2, b: 2, r: 1 } }
