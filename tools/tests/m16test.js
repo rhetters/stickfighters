@@ -1,0 +1,78 @@
+const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // the game, opened from disk
+// M16: music and sound, difficulty, the tutorial, the new character screen, colour help, bigger text, the save
+const {chromium,devices}=require('playwright');let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
+(async()=>{const b=await chromium.launch({args:['--autoplay-policy=no-user-gesture-required']});const errs=[];
+const c=await b.newContext(devices['iPad (gen 7) landscape']);const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
+await p.goto(GAME);await p.waitForTimeout(300);
+const ev=x=>p.evaluate(x),W=t=>p.waitForTimeout(t);
+// the save
+ok(await ev("(()=>{const m=migrate({saveVersion:13,set:{vol:0.4}});return m.saveVersion===SAVE_VERSION&&m.set.mus===0.6&&m.set.diff===1&&m.set.tut===1&&m.set.vol===0.4})()"),'save version 14: Music volume, Normal difficulty, and an older save never gets the tutorial offer');
+ok(await ev("SET.tut===0&&SET.diff===1&&SET.mus===0.6"),'a new player: Normal, music on, the tutorial not offered yet');
+// music: every song is well formed, and the right one plays for what's on screen
+ok(await ev("Object.values(MUSIC).every(s=>{const bar=(s.beats||4)*(s.div||4);return s.parts.every(q=>(q.mel||q.pat.split('|')).every(x=>x.trim().split(/\\s+/).length===bar)&&(!q.mel||q.mel.length===s.prog.length))})"),'every song: each bar has the right number of steps, each tune one bar per chord');
+ok(await ev("['castle','pirate','mountain','space','volcano'].every(t=>MUSIC[t])&&!!(MUSIC.menu&&MUSIC.boss&&MUSIC.victory&&MUSIC.arcade&&MUSIC.training&&MUSIC.over)"),'a song for every story, the menus, bosses, Arcade and Versus, training, victory and game over');
+await p.mouse.click(600,400);await W(400);
+ok(await ev("AUD.on&&AC.state==='running'&&MUS.cur&&MUS.cur.id==='menu'"),'the first tap starts the sound; the menu tune plays');
+await ev("SET.tut=1;titleOpenAll();startRun('pirate');cineEnd()");await W(500);
+ok(await ev("MUS.cur.id==='pirate'&&MUS.lvl===0&&AMBS.look==='beach'"),'a story plays its own song (calm while walking) and its place\'s background sound');
+await ev("const ae=LV.encs[0];CAM.x=ae.lock;PL[0].x=ae.x;for(let i=0;i<5;i++){fr++;update()}");await W(300);
+ok(await ev("LV.encs.some(e=>e.st===1)&&MUS.lvl===1"),'a fight turns the music up');
+await ev("const bi=LV.encs.length-1;LV.encs.forEach((e,i)=>{if(i<bi)e.st=2});LV.trans.forEach(t=>t.done=1);CAM.x=LV.encs[bi].lock;PL[0].x=LV.encs[bi].x-200;for(let i=0;i<10;i++){fr++;update()}");await W(400);
+ok(await ev("MUS.cur.id==='boss'&&MUS.lvl===2"),'the boss has his own music');
+await ev("show('s-victory')");await W(300);ok(await ev("MUS.cur.id==='victory'"),'the victory fanfare');
+await ev("pause(false);openTitle()");await W(300);
+ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged with sound on (sound only watches the game)');
+// difficulty
+const d=await ev("(()=>{const r=[];for(const v of [0,1,2]){SET.diff=v;init();MODE=ARCADE;const e=F(300,'g',0);r.push(e.hp)}SET.diff=1;return r})()");
+ok(d[0]<d[1]&&d[1]<d[2],'Easy, Normal, Hard: enemy health '+d.join(' / '));
+ok(await ev("DIFFS[0].dmg<1&&DIFFS[0].rv<DIFFS[1].rv&&DIFFS[0].heal>DIFFS[1].heal&&DIFFS[0].tok<0&&DIFFS[2].dmg>1&&JSON.stringify(DIFFS[1])==JSON.stringify({id:'normal',name:'NORMAL',hp:1,dmg:1,cd:1,spd:1,tok:0,rv:120,heal:25})"),'Easy is more than weaker enemies (less damage, fewer attackers, quicker revives, more health back); Normal is the game as before');
+await ev("openSolo()");await W(150);
+ok(await ev("$('solo-diff').children.length===3&&$('solo-diff').querySelector('.on').dataset.diff==='1'"),'the Solo screen has EASY / NORMAL / HARD tiles');
+await ev("$('solo-diff').children[0].click()");ok(await ev("SET.diff===0&&$('solo-diff').querySelector('.on').dataset.diff==='0'"),'tapping EASY picks it (and keeps it)');
+ok(await ev("(()=>{MODE=VERSUS;const v=diffOf().id;MODE=ARCADE;return v==='normal'&&diffOf().id==='easy'})()"),'Versus is always Normal');
+ok(await ev("(()=>{NET.diff=2;const r=netRoomMsg().diff===2;NET.diff=1;return r})()"),'the room tells everyone the host\'s difficulty');
+ok(await ev("(()=>{NET.match=true;NET.diff=2;const v=diffOf().id;NET.match=false;NET.diff=1;return v==='hard'})()"),'online, everyone plays the host\'s difficulty');
+await ev("SET.diff=1;openLobby();LB.mode='level';renderLobby()");await W(150);
+ok(await ev("$('lb-diff').children.length===3"),'the local room has the difficulty tiles for Story');
+await ev("LB.mode='vs';renderLobby()");ok(await ev("$('lb-diff').children.length===0"),'and none for Versus');
+// the tutorial
+await ev("SET.tut=0;openSolo();$('b-start').click()");await W(150);
+ok(await ev("!$('s-learn').hidden&&SET.tut===1"),'the first time Story or Arcade is started, it offers to learn the moves first');
+await ev("$('ln-learn').click()");await W(300);
+ok(await ev("TUT.on&&state==='train'&&document.body.classList.contains('tut')"),'LEARN THE MOVES opens the tutorial in the Training Room');
+const tap=async(k,n=70)=>{await ev(`setA('kb','${k}',1)`);await W(n);await ev(`setA('kb','${k}',0)`);await W(110)};
+const near="PL[0].x=E[0].x-50;PL[0].face=1;PL[0].y=G";
+await ev("setA('kb','r',1)");await W(1400);await ev("setA('kb','r',0)");await W(1100);
+ok(await ev("TUT.i===1"),'moving does the first step');
+await tap('j',120);await W(1200);ok(await ev("TUT.i===2"),'jumping the next');
+for(let i=0;i<4;i++){await ev(near);await tap('p')}await W(1200);ok(await ev("TUT.i===3"),'punching the dummy');
+for(let i=0;i<3;i++){await ev(near);await tap('k')}await W(1300);ok(await ev("TUT.i===4"),'kicking it (and a combo isn\'t counted before its step)');
+for(let i=0;i<6;i++){await ev(near);await tap('p',50)}await W(1300);ok(await ev("TUT.i===5"),'a combo');
+await ev("PL[0].x=200;setA('kb','s',1);setA('kb','r',1)");await W(1300);await ev("setA('kb','s',0);setA('kb','r',0)");await W(1300);ok(await ev("TUT.i===6"),'a Surge run');
+await ev(near);await ev("setA('kb','p',1);setA('kb','k',1)");await W(100);await ev("setA('kb','p',0);setA('kb','k',0)");await W(1400);
+ok(await ev("TUT.i===7"),'and a grab: YOU\'RE READY!');
+ok(await ev("tutDev()==='touch'&&tutKey('p')==='PUNCH'&&(()=>{$('wrap').classList.remove('touch-on');const k=tutKey('p')==='J'&&tutKey('j')==='Space';applyTouchVis();return k})()"),'the card names the buttons you play with (touch buttons on the iPad, your keys on a keyboard)');
+await ev("pause(true)");ok(await ev("!!$('b-moves')"),'Pause has MOVES');await ev("$('b-moves').click()");await W(150);
+ok(await ev("!$('s-moves').hidden&&$('pm-list').querySelectorAll('tr').length>20"),'MOVES shows the move list');
+await ev("$('pm-back').click()");ok(await ev("!$('s-pause').hidden"),'and BACK returns to Pause');
+await ev("pause(false);openTitle()");await W(200);ok(await ev("!TUT.on&&!document.body.classList.contains('tut')"),'leaving the Training Room ends the tutorial');
+// the character screen
+await ev("saveFighter(0,{...FIGHTER0});CHR.cur=0;openChar()");await W(200);
+ok(await ev("!!document.querySelector('#s-char .chpolar #ch-prev')&&!!document.querySelector('.chpolar #ch-name')&&!!document.querySelector('.chpolar #ch-skills')"),'the fighter, their name and the skills badge are on a polaroid');
+ok(await ev("$('ch-cats').children.length===TABS.length&&[...$('ch-cats').querySelectorAll('.pimg')].every(i=>/url\\(data:image/.test(i.style.getPropertyValue('--ic')))"),'the store opens on a picture tile for every part of the body, each with its picture');
+await ev("document.querySelector('[data-k=tab-lower]').click()");
+ok(await ev("CH.tab==='lower'&&!CH.sec&&$('ch-cats').children.length===5&&/LOWER BODY/.test($('ch-path').textContent)&&!$('ch-nav').hidden"),'LOWER BODY opens its kinds: pants, shorts, skirts, dresses, shoes');
+await ev("document.querySelector('[data-k=sec-shorts]').click()");
+ok(await ev("CH.sec==='shorts'&&!$('ch-grid').hidden&&$('ch-grid').querySelectorAll('.chitem').length===ITEMS.filter(i=>i.sec==='shorts').length+1"),'SHORTS opens a shelf of every pair of shorts (and None)');
+await ev("chUp()");ok(await ev("CH.tab==='lower'&&!CH.sec"),'BACK goes up to the kinds');await ev("chUp()");ok(await ev("!CH.tab&&!$('ch-nav').hidden===false"),'and up to the parts of the body');
+await ev("chGo('colors')");ok(await ev("!$('ch-grid').hidden&&$('ch-grid').querySelectorAll('.chitem').length===ITEMS.filter(i=>i.sec==='color').length"),'a part with only one kind (Colors) goes straight to its shelf');
+await ev("chGo('body')");ok(await ev("!$('ch-body').hidden&&$('ch-grid').hidden"),'BODY opens the body settings');
+ok(await ev("(()=>{const c=fighterNow();c.prog.xp=0;saveFighter(0,c);renderChar();const a=!$('ch-skills').classList.contains('has');c.prog.xp=5000;saveFighter(0,c);renderChar();return a&&$('ch-skills').classList.contains('has')&&!$('ch-pts').hidden&&getComputedStyle($('ch-skills')).animationName==='skglow'})()"),'the skills badge glows when there are points to spend');
+await ev("$('ch-skills').click()");await W(150);ok(await ev("!$('s-skills').hidden"),'and opens the skills');
+// colour help and bigger text
+await ev("SET.cb=1;SET.big=1;applySet();ROSTER.length=0;ROSTER.push({slot:0,dev:'kb',col:'#ff7a00',d2:'#c25a00',team:0},{slot:1,dev:'pad0',col:'#3ec5ff',d2:'#1f8fc0',team:1});TEAMS=true;startVersus()");await W(600);
+ok(await ev("document.body.classList.contains('big')"),'Bigger text');
+ok(await ev("(()=>{let n=0;const k=drawTag;drawTag=q=>{n++;k(q)};render();drawTag=k;return n===2})()"),'Colour help: a number tag over each player');
+await ev("SET.cb=0;SET.big=0;applySet();ROSTER.length=0;openTitle()");
+ok(!errs.length,'no errors: '+errs.slice(0,3).join(' | '));
+console.log(fails?fails+' FAILED':'ALL PASS');await b.close();process.exit(fails?1:0)})();
