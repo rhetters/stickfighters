@@ -10,13 +10,15 @@ ok(await ev("(()=>{const m=migrate({saveVersion:13,set:{vol:0.4}});return m.save
 ok(await ev("SET.tut===0&&SET.diff===1&&SET.mus===0.6"),'a new player: Normal, music on, the tutorial not offered yet');
 // music: every song is well formed, and the right one plays for what's on screen
 ok(await ev("Object.values(MUSIC).every(s=>{const bar=(s.beats||4)*(s.div||4);return s.parts.every(q=>(q.mel||q.pat.split('|')).every(x=>x.trim().split(/\\s+/).length===bar)&&(!q.mel||q.mel.length===s.prog.length))})"),'every song: each bar has the right number of steps, each tune one bar per chord');
-ok(await ev("['castle','pirate','mountain','space','volcano'].every(t=>MUSIC[t])&&!!(MUSIC.menu&&MUSIC.boss&&MUSIC.victory&&MUSIC.arcade&&MUSIC.training&&MUSIC.over)"),'a song for every story, the menus, bosses, Arcade and Versus, training, victory and game over');
+ok(await ev("Object.keys(BIOMES).every(b=>MUSIC[b])&&new Set(Object.keys(BIOMES).map(b=>JSON.stringify(MUSIC[b].prog)+MUSIC[b].bpm)).size===Object.keys(BIOMES).length&&!!(MUSIC.menu&&MUSIC.boss&&MUSIC.victory&&MUSIC.arcade&&MUSIC.training&&MUSIC.over)"),'a different song for every biome (all 15), the menus, bosses, Arcade and Versus, training, victory and game over');
 await p.mouse.click(600,400);await W(400);
 ok(await ev("AUD.on&&AC.state==='running'&&MUS.cur&&MUS.cur.id==='menu'"),'the first tap starts the sound; the menu tune plays');
 await ev("SET.tut=1;titleOpenAll();startRun('pirate');cineEnd()");await W(500);
-ok(await ev("MUS.cur.id==='pirate'&&MUS.lvl===0&&AMBS.look==='beach'"),'a story plays its own song (calm while walking) and its place\'s background sound');
+ok(await ev("MUS.cur.id==='beach'&&MUS.lvl===0&&AMBS.look==='beach'"),'the Sunny Beach plays its own song (calm while walking) and its background sound');
 await ev("const ae=LV.encs[0];CAM.x=ae.lock;PL[0].x=ae.x;for(let i=0;i<5;i++){fr++;update()}");await W(300);
 ok(await ev("LV.encs.some(e=>e.st===1)&&MUS.lvl===1"),'a fight turns the music up');
+await ev("const sg=LV.segs[1];LV.encs.forEach(e=>{if(e.x<sg.x0+1500)e.st=2});LV.trans[0].done=1;CAM.x=sg.x0+300;PL[0].x=CAM.x+300;for(let i=0;i<3;i++){fr++;update()}");await W(300);
+ok(await ev("MUS.cur.id==='ship'"),'on to the Pirate Ship: its own song');
 await ev("const bi=LV.encs.length-1;LV.encs.forEach((e,i)=>{if(i<bi)e.st=2});LV.trans.forEach(t=>t.done=1);CAM.x=LV.encs[bi].lock;PL[0].x=LV.encs[bi].x-200;for(let i=0;i<10;i++){fr++;update()}");await W(400);
 ok(await ev("MUS.cur.id==='boss'&&MUS.lvl===2"),'the boss has his own music');
 await ev("show('s-victory')");await W(300);ok(await ev("MUS.cur.id==='victory'"),'the victory fanfare');

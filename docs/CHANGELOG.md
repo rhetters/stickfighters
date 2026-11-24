@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: music for every place (November 23, 2026)
+- **Every biome has its own song** (asked by Ron), changing as you travel through a story:
+  - Castle Siege: a folksy walk (Wooded Trail), a sneaky tiptoe (Sewer Tunnels), a march (Castle Keep).
+  - Pirate Cove: a calypso with bongos (Sunny Beach), a sea shanty (Pirate Ship), an echoing mystery (Treasure Cave).
+  - Mountain: an alpine waltz (Alpine Meadow), a determined climb (Mountainside), icy sparkles (Snowy Peak).
+  - Space: a funky countdown (Launch Base), a fast race (The Rocket), a mysterious drift (The Moon).
+  - Volcano: tiki drums (Tiki Jungle), a dark rumble (Ashy Slopes), hot brass over lava (The Crater).
+- Version 55.
+
 ## M16: music and sound, difficulty, a tutorial and a new character screen (November 23, 2026)
 - **Music:** the game makes its own music, a tune for every story (a march for the castle, a sea shanty for the pirates, an alpine waltz for the mountain, space arpeggios, tiki drums and marimba for the volcano), the menus, Arcade and Versus, the Training Room, every boss, a victory fanfare and a game-over tune. It's calm while you walk, fuller in a fight, and fades between songs.
 - **Sound:** background sound for every place (birds, waves, wind, drips, a hum on the rocket, bubbling lava), footsteps, landings, a little "oof" when an enemy is knocked out, gibberish voices for speech bubbles, and taps and clicks in the menus. **Music** and **Sound** have their own sliders in Settings.
