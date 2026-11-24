@@ -2,6 +2,17 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: music and sound, difficulty, a tutorial and a new character screen (November 23, 2026)
+- **Music:** the game makes its own music, a tune for every story (a march for the castle, a sea shanty for the pirates, an alpine waltz for the mountain, space arpeggios, tiki drums and marimba for the volcano), the menus, Arcade and Versus, the Training Room, every boss, a victory fanfare and a game-over tune. It's calm while you walk, fuller in a fight, and fades between songs.
+- **Sound:** background sound for every place (birds, waves, wind, drips, a hum on the rocket, bubbling lava), footsteps, landings, a little "oof" when an enemy is knocked out, gibberish voices for speech bubbles, and taps and clicks in the menus. **Music** and **Sound** have their own sliders in Settings.
+- **Difficulty:** EASY, NORMAL and HARD tiles on the Solo screen and in the rooms (the host picks online) for Story and Arcade. Easy is more than weaker enemies: they hit softer and less often, walk slower, fewer attack at once, revives are twice as quick and you get more health back after each fight. Normal plays exactly as before.
+- **Tutorial:** a LEARN tile on the Solo screen, also offered the first time someone starts Story or Arcade (not to anyone who has played before). A card in the Training Room shows what to do and the button to press on what you play with: move, jump, punch, kick, a combo, a Surge run and a grab. Pause has MOVES.
+- **A new character screen:** your fighter in a polaroid with the name written under the photo, a dice for a random look, and Skills as a star on the corner that glows when there are points to spend. The store is picture tiles: a part of the body, then a kind, then the items.
+- **Colour help** (each player's number over their head, with a team shape in team Versus) and **Bigger text** in Settings. If a device can't keep up, the game draws a little less sharply to stay smooth.
+- Save version 14 (Music volume, difficulty, the tutorial offer, colour help, bigger text).
+- Self-test fingerprints unchanged.
+- Version 54.
+
 ## M15: Volcano fixes (November 22, 2026)
 - **The crater's rock ledges are drawn in front of the scenery,** so a lava fall or a stone tiki no longer shows in front of a ledge.
 - **The camera at the rim:** near the top of the climb out, the view showed the Pink Tiki and could lose you on the last jumps. Now it fits him in only as far as it can while keeping you on screen, and a jump no longer lifts the bottom of the view.

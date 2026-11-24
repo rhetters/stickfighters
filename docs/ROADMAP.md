@@ -46,6 +46,8 @@ Decided by Ron (November 23): all of the below; no "1.0" (this is just another m
 - **Accessibility:** hit flashes and team colours that work with colour blindness, a bigger text option (reduced screen shake and button remapping already exist).
 - **Performance:** checked with 6 players and lots of enemies at iPad size; fewer effects automatically when the game slows down.
 
+Built (version 54, see the CHANGELOG): the music and sound, the difficulty choices, the tutorial and MOVES on Pause, the new character screen, colour help and bigger text, the lower resolution for slow devices. Balance: test bots played every story on each difficulty; the numbers are with Ron, and nothing in the balance has changed yet.
+
 **Done when:** every theme and boss has its music, the sound pass is in, the difficulty choices work alone, in co-op and online, the balance numbers have been reviewed with Ron, a new player can learn the basics from the tutorial, the new character screen is in, and 6 players run smoothly on the iPad.
 
 ### M17 · Level creator
@@ -77,4 +79,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-M16 is under way: music and sound, difficulty, the balance numbers, the tutorial and the new character screen.
+M16: Ron and Rhett try it on the iPad (the music, the tutorial, the character screen, Easy for the younger ones) and decide on the balance numbers.
