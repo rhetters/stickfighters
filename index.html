@@ -43,9 +43,18 @@
  </div>
  <div class="screen scene" id="s-solo" hidden>
   <h2>SOLO</h2>
-  <div class="ptiles"><button class="ptile" id="b-level"><span class="pimg i-story"></span><b>STORY</b></button><button class="ptile" id="b-start"><span class="pimg i-arcade"></span><b>ARCADE</b></button></div>
+  <div class="ptiles"><button class="ptile" id="b-level"><span class="pimg i-story"></span><b>STORY</b></button><button class="ptile" id="b-start"><span class="pimg i-arcade"></span><b>ARCADE</b></button><button class="ptile" id="b-learn"><span class="pimg i-learn"></span><b>LEARN</b></button></div>
   <div class="rmrow rmdiff" id="solo-diff"></div>
   <button class="btn alt" id="b-soloback">BACK</button>
+ </div>
+ <div class="screen scene" id="s-learn" hidden>
+  <h2>NEW HERE?</h2>
+  <div class="ptiles"><button class="ptile" id="ln-learn"><span class="pimg i-learn"></span><b>LEARN THE MOVES</b></button><button class="ptile" id="ln-play"><span class="pimg i-solo"></span><b>JUST PLAY</b></button></div>
+ </div>
+ <div class="screen" id="s-moves" hidden>
+  <h2>MOVES</h2>
+  <div id="pm-list"></div>
+  <button class="btn" id="pm-back">BACK</button>
  </div>
  <div class="screen scene" id="s-cust" hidden>
   <h2>CUSTOMIZE</h2>
@@ -144,6 +153,7 @@
   <p id="p-seed"></p>
   <button class="btn" id="b-resume">RESUME</button>
   <button class="btn alt" id="b-restart">RESTART</button>
+  <button class="btn alt" id="b-moves">MOVES</button>
   <button class="btn alt" id="b-set2">SETTINGS</button>
   <button class="btn alt" id="b-quit">QUIT TO TITLE</button>
  </div>
@@ -258,6 +268,7 @@
 <script src="js/ui/skills.js?v=53" defer></script>
 <script src="js/ui/themes.js?v=53" defer></script>
 <script src="js/ui/victory.js?v=53" defer></script>
+<script src="js/ui/tutorial.js?v=53" defer></script>
 <script src="js/ui/house.js?v=53" defer></script>
 <script src="js/ui/backup.js?v=53" defer></script>
 <script src="js/devtools.js?v=53" defer></script>

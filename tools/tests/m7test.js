@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 const S=process.argv[2];let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];
 const p=await b.newPage({viewport:{width:1280,height:800}});p.on('pageerror',e=>errs.push(e.message));
-await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.click('#b-train');await p.waitForTimeout(300);
+await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.click('#b-train');await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x),W=ms=>p.waitForTimeout(ms);
 const one=async(t,x,face,extra='')=>{await ev(`releaseAll();combo=0;PL[0].x=400;PL[0].y=G;PL[0].face=1;PL[0].st='free';PL[0].att=null;PL[0].vx=0;E.forEach(e=>e.gone=1);E=[];spawnDummy('${t}');Object.assign(E[0],{x:${x},y:G,vx:0,face:${face}});${extra}`);await W(150)};
 // spawns
@@ -50,7 +50,7 @@ ok(await ev("HITS.length")===0,'Quake Leap misses a player who is in the air');
 const qs=await ev("[1,2,3,5,10].map(n=>makeQueue(n).join(''))");
 ok(!/[uf]/.test(qs[0]),'wave 1: only grunts');ok(/u/.test(qs[1]),'wave 2 adds Guards');ok(/f/.test(qs[2])&&/b/.test(qs[2]),'wave 3 adds Flankers and Brutes');ok(qs[3].endsWith('c')&&qs[4].endsWith('c')&&!qs[2].includes('c'),'Captain arrives on waves 5 and 10');
 // full play run
-await p.goto(GAME);await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.evaluate('openSolo()');await p.click('#b-start');await W(300);
+await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await p.evaluate('openSolo()');await p.click('#b-start');await W(300);
 await ev("wave=4;queue=[];E.forEach(e=>e.gone=1);E=[]");for(let i=0;i<60;i++){await p.keyboard.press(i%3?'j':'k');await W(100)}
 await p.screenshot({path:S+'/shots/m7-play.png'});ok(await ev("wave>=5"),'play mode reaches wave '+await ev("wave"));
 ok(errs.length===0,'no page errors '+errs.slice(0,3).join(' | '));

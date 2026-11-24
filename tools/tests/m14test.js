@@ -3,7 +3,7 @@ const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // t
 // the final blow, the victory screen, ready-up and harder replays
 const {chromium}=require('playwright');let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];const p=await (await b.newContext({viewport:{width:1080,height:810}})).newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
-await p.goto(GAME);await p.waitForTimeout(300);const ev=x=>p.evaluate(x);
+await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(300);const ev=x=>p.evaluate(x);
 const bosses=await ev("Object.values(THEMES).map(t=>t.boss.t)");
 ok(bosses.length===5&&await ev(`${JSON.stringify(bosses)}.every(t=>T[t].look&&T[t].look.extra.length)`),'every theme’s boss has its own look: '+bosses.join(', '));
 ok(await ev("(()=>{const s=Object.values(THEMES).map(t=>T[t.boss.t].look.extra.slice().sort().join());return new Set(s).size===s.length})()"),'no two bosses share their parts');

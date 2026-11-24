@@ -9,6 +9,7 @@ const DEF = {
   vol: 1,
   mus: 0.6,
   diff: 1, // Easy, Normal, Hard (data/difficulty.js), for Story and Arcade
+  tut: 0, // 1 once the tutorial has been offered
   tsize: 1,
   topac: 0.75,
   lay: null,
@@ -54,7 +55,8 @@ const HOUSE = {
 //   v11: fighters gain headType ('donut' = the ring head they always had, or 'full')
 //   v12: fighters gain prog = { xp, sk (skill points by node id), ult (the branch whose ultimate they use) }
 //   v13: ultimates are bought as skill-tree nodes, so prog.ult goes; hit-stop and screen shake off, bodies stay 1 s
-//   v14: settings gain mus (the Music volume; vol is now the Sound volume) and diff (the difficulty, 1 = Normal)
+//   v14: settings gain mus (the Music volume; vol is now the Sound volume), diff (the difficulty, 1 = Normal) and
+//        tut (the tutorial was offered; a save from before has played already, so it starts at 1)
 const SAVE_VERSION = 14;
 function migrate(s) {
   if (!s.saveVersion) {
@@ -130,6 +132,7 @@ function migrate(s) {
   if (s.saveVersion === 13) {
     if (s.set && typeof s.set.mus !== 'number') s.set.mus = 0.6;
     if (s.set && typeof s.set.diff !== 'number') s.set.diff = 1;
+    if (s.set) s.set.tut = 1;
     s.saveVersion = 14;
   }
   return s;

@@ -886,14 +886,15 @@ function renderFrame() {
       ctx.stroke();
       ctx.restore();
     }
-  if (state === 'train' && TR.boxes) drawBoxes();
+  if (state === 'train' && TR.boxes && !TUT.on) drawBoxes();
   ctx.restore();
   if (MODE.fg) MODE.fg();
   ctx.restore();
   slopeOn = false;
   if (state === 'play' && MODE === LEVEL) drawOffArrows();
   if (state !== 'menu') hud();
-  debugUI();
+  if (TUT.on) drawTutorial();
+  else debugUI();
   shake *= 0.85;
   if (shake < 0.3) shake = 0;
   zoom *= 0.88;

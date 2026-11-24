@@ -3,7 +3,7 @@ const GAME='file://'+require('path').resolve(__dirname,'../../index.html'); // t
 const {chromium,devices}=require('playwright');const S=process.argv[2];let fails=0;const ok=(c,m)=>{console.log((c?'ok  ':'FAIL')+' '+m);if(!c)fails++};
 (async()=>{const b=await chromium.launch();const errs=[];
 const c=await b.newContext(devices['iPad (gen 7) landscape']);const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
-await p.goto(GAME);await p.waitForTimeout(300);
+await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(300);
 const ev=x=>p.evaluate(x);
 // the generator
 ok(await ev("JSON.stringify(genRun('castle',42))===JSON.stringify(genRun('castle',42))&&JSON.stringify(genRun('castle',42))!==JSON.stringify(genRun('castle',43))"),'the same seed always makes the same run; another seed makes another');

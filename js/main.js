@@ -27,7 +27,9 @@ const SCREENS = [
   's-backup',
   's-over',
   's-clear',
-  's-victory'
+  's-victory',
+  's-learn',
+  's-moves'
 ];
 function show(id) {
   SHOWN = id || null;
@@ -236,7 +238,7 @@ function bindSettings() {
     save();
   };
 }
-$('b-start').onclick = start;
+$('b-start').onclick = () => tutOffer(start);
 $('b-train').onclick = startTrain;
 // ===== TITLE MENU =====
 // First visit: a flashing PRESS START; any key, tap or controller button opens the menu.
@@ -355,7 +357,7 @@ $('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? openHouse() : openTitle
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');
-$('b-level').onclick = () => openThemes((id, myst) => startRun(id, 0, myst), 's-solo');
+$('b-level').onclick = () => tutOffer(() => openThemes((id, myst) => startRun(id, 0, myst), 's-solo'));
 $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : replayLevel()), 'again');
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(openTitle, 'room');
@@ -599,6 +601,7 @@ function loop(now) {
       tick();
     }
   }
+  tutTick(); // the tutorial watches the Training Room (ui/tutorial.js)
   render();
   audioTick(); // music and sound (audio.js), from what's on screen
   requestAnimationFrame(loop);

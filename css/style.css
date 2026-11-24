@@ -2371,6 +2371,7 @@ body.padnav .ptile:focus b {
 .i-set { background-image: url(../img/menu-settings.svg); }
 .i-story { background-image: url(../img/menu-story.svg); }
 .i-arcade { background-image: url(../img/menu-arcade.svg); }
+.i-learn { background-image: url(../img/menu-learn.svg); }
 .i-diff-easy { background-image: url(../img/diff-easy.svg); }
 .i-diff-normal { background-image: url(../img/diff-normal.svg); }
 .i-diff-hard { background-image: url(../img/diff-hard.svg); }
@@ -3023,4 +3024,31 @@ body.padnav #s-char #ch-skills:focus {
   font:
     900 11px Impact,
     sans-serif;
+}
+/* the tutorial: the Training Room's panels and buttons stay out of the way */
+body.tut #trainpanel,
+body.tut #tbtns,
+body.tut #moves,
+body.tut #info,
+body.tut #posebtn {
+  display: none !important;
+}
+/* the move list from Pause */
+#pm-list {
+  max-width: 640px;
+  max-height: calc(var(--wh, 440px) - 150px);
+  overflow-y: auto;
+  text-align: left;
+  font: 700 14px 'Trebuchet MS', sans-serif;
+}
+#pm-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+#pm-list td {
+  padding: 2px 6px;
+  border-bottom: 1px solid #e3dccf;
+}
+#pm-list h3 {
+  margin: 8px 0 2px;
 }

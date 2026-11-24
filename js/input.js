@@ -512,5 +512,7 @@ function navBack() {
   else if (sc.id === 's-lobby') $('lb-back').click();
   else if (sc.id === 's-online') $('b-onlineback').click();
   else if (sc.id === 's-solo') $('b-soloback').click();
+  else if (sc.id === 's-learn') openSolo();
+  else if (sc.id === 's-moves') $('pm-back').click();
   else if (sc.id === 's-cust') $('b-custback').click();
 }
