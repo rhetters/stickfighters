@@ -27,6 +27,9 @@ ok(await ev("MUS.cur.id==='bossin'&&MUS.next==='boss'"),'a boss arrives: a dark 
 await W(5600);ok(await ev("MUS.cur.id==='boss'&&MUS.lvl===2"),'then the boss has his own music');
 await ev("show('s-victory')");await W(1600);ok(await ev("MUS.cur.id==='victory'"),'the victory fanfare');
 ok(await ev("musTrans('boss','beach').sting===null&&(()=>{LV.encs[LV.encs.length-1].st=2;return musTrans('boss','beach').sting==='bosswin'})()"),'after a boss: a "ta-da" when he was beaten, none when you were knocked out');
+await ev("openChar()");await W(3200);ok(await ev("MUS.want==='dressup'&&MUS.cur&&MUS.cur.id==='dressup'"),'the Character screen has its own song');
+await ev("closeChar();openHouse()");await W(2000);ok(await ev("MUS.want==='house'&&MUS.cur&&MUS.cur.id==='house'&&musWant()[0]==='house'"),'and so does the house builder');
+await ev("closeHouse()");
 ok(await ev("(()=>{const t=musTrans('beach','menu');return !t.sting&&t.gap>=1&&musTrans('menu','arcade').sting==='go'})()"),'back to the menus: a slow fade and a pause; Arcade starts with the "here we go" tune');
 await ev("pause(false);openTitle()");await W(300);
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged with sound on (sound only watches the game)');
