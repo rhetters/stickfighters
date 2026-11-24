@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: songs for the Character screen and the house (November 23, 2026)
+- **The Character screen** (and Skills) has its own laid-back, stylish song with a flute (asked by Ron).
+- **The house builder** (and walking around your house) has a bouncy, catchy song with marimba and bells.
+- Moving between the menus, the Character screen and the house swaps songs with a short fade.
+- Version 57.
+
 ## M16: music hand-overs, wind and the Snowy Peak's gusts (November 23, 2026)
 - **Music hand-overs** (asked by Ron): songs no longer switch instantly. Starting a game plays a short "here we go" tune first; a boss arrives with a dark drum roll; beating him plays a "ta-da"; walking into a new place fades the old song out, leaves a moment of quiet, and brings the new one in slowly; going back to the menus fades out with a pause. A place's song also rests for a few seconds every other time round while you're walking.
 - **Wind** comes in puffs now and then instead of a steady hiss.

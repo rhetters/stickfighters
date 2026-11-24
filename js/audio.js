@@ -238,7 +238,8 @@ function musPlay(id, at, fin) {
 }
 // How one song hands over to the next: a short tune in between (sting), how long the old one fades (out), the quiet
 // before the new one (gap) and how slowly it comes in (fin)
-const IN_GAME = id => !!id && (!!BIOMES[id] || id === 'boss' || id === 'arcade' || id === 'training');
+const IN_GAME = id => !!id && (!!BIOMES[id] || id === 'boss' || id === 'arcade' || id === 'training'),
+  CALM = id => id === 'menu' || id === 'dressup' || id === 'house'; // the menus, the Character screen, the house
 function musTrans(from, to) {
   if (to === 'boss') return { sting: 'bossin', out: 0.5, gap: 0.2, fin: 0.3 };
   if (from === 'boss' && IN_GAME(to)) {
@@ -246,6 +247,7 @@ function musTrans(from, to) {
     return { sting: won ? 'bosswin' : null, out: won ? 0.5 : 1.5, gap: 1.2, fin: 2.5 };
   }
   if (IN_GAME(to) && !IN_GAME(from)) return { sting: to === 'training' ? null : 'go', out: 0.8, gap: 0.4, fin: 1.5 };
+  if (CALM(from) && CALM(to)) return { out: 1, gap: 0.5, fin: 1.5 }; // between the menus' own songs
   if (BIOMES[from] && BIOMES[to]) return { out: 2.5, gap: 1.2, fin: 3 }; // walking on into the next place
   if (to === 'victory' || to === 'over') return { out: 0.8, gap: 0.5, fin: 0.05 };
   if (from === undefined) return { out: 0, gap: 0, fin: 1 };
@@ -270,9 +272,11 @@ function musWant() {
   const sc = SHOWN;
   if (sc === 's-victory' || sc === 's-clear') return ['victory', 0];
   if (sc === 's-over') return ['over', 0];
+  if (sc === 's-house') return ['house', 0];
+  if (sc === 's-char' || sc === 's-skills') return ['dressup', 0];
   if (state === 'train') return ['training', 0];
   if ((state === 'play' || state === 'over' || state === 'clear') && MODE) {
-    if (MODE.id === 'house') return ['training', 0];
+    if (MODE.id === 'house') return ['house', 0];
     if (MODE.id === 'arcade') return ['arcade', 1];
     if (MODE.id === 'versus') return ['arcade', 2];
     if (MODE.id === 'level' && LV) {

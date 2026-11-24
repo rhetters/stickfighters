@@ -493,6 +493,57 @@ const MUSIC = {
       }
     ]
   },
+  // The Character screen (and Skills): laid-back and stylish, for taking your time over a look
+  dressup: {
+    bpm: 96,
+    prog: ['Cmaj7', 'Am7', 'Dm7', 'G7', 'Em7', 'A7', 'Dm7', 'G7'],
+    parts: [
+      { ins: 'bass', pat: 'R . . . . . 5 . R . . . 8 . 5 .' },
+      { ins: 'pluck', o: 4, v: 0.45, pat: '. . c . . c . . . . c . . . c .' },
+      { ins: 'drums', v: 0.45, pat: 'k . h . s . h h k . h . s . h .' },
+      { ins: 'pad', o: 3, v: 0.3, pat: 'c - - - - - - - - - - - - - - -' },
+      {
+        ins: 'flute',
+        v: 0.75,
+        mel: [
+          'E5 - - - G5 - B5 - - - A5 - G5 - - -',
+          'C5 - - - E5 - G5 - - - - - . . . .',
+          'F5 - - - A5 - C6 - - - B5 - A5 - - -',
+          'G5 - - - - - - - F5 - E5 - D5 - . .',
+          'G5 - - - B5 - D6 - - - C6 - B5 - - -',
+          'C#6 - - - A5 - - - E5 - - - G5 - - -',
+          'F5 - A5 - C6 - A5 - F5 - D5 - E5 - F5 -',
+          'D5 - - - - - - - . . . . G4 - B4 -'
+        ]
+      }
+    ]
+  },
+  // The house builder (and walking around your house): bouncy and catchy, marimba and bells over a jazzy
+  // turnaround, to hum along to while you build
+  house: {
+    bpm: 112,
+    prog: ['Fmaj7', 'Dm7', 'Gm7', 'C7', 'Am7', 'D7', 'Gm7', 'C7'],
+    parts: [
+      { ins: 'bass', pat: 'R . . . 5 . . . 3 . . . 5 . 7 .' },
+      { ins: 'pluck', o: 4, v: 0.4, pat: '. . c . . c . . . . c . . c . .' },
+      { ins: 'drums', v: 0.5, pat: 'k . h b . h k h . b h . k h b h' },
+      {
+        ins: 'marimba',
+        v: 0.9,
+        mel: [
+          'C6 . A5 . . F5 . G5 A5 - - - . . . .',
+          'C6 . A5 . . D5 . E5 F5 - - - . . . .',
+          'Bb5 . G5 . . D5 . E5 F5 - G5 - A5 - Bb5 -',
+          'C6 - - - Bb5 - A5 - G5 - - - . . . .',
+          'E6 . C6 . . A5 . B5 C6 - - - . . . .',
+          'D6 . A5 . . F#5 . G5 A5 - - - C6 - . .',
+          'Bb5 - A5 - G5 - F5 - E5 - D5 - . . . .',
+          'E5 - G5 - Bb5 - D6 - C6 - - - . . . .'
+        ]
+      },
+      { ins: 'bell', o: 5, v: 0.35, pat: '. . . . . . . . . . . . . . 8 .|. . . . . . . . . . . . 5 . 8 .' }
+    ]
+  },
   // ===== STINGS: short tunes between two songs =====
   // Into a game: a drum roll and a rising "here we go"
   go: {
