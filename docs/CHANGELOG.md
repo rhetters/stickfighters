@@ -2,6 +2,13 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: Face items and a squashed victory photo (November 23, 2026)
+- **A new Face kind under Head** (asked by Ron): Round Glasses, Nerd Glasses, Shades, Pink Shades, 3D Glasses, Aviators, Star Shades, Heart Shades, a Monocle, Ski Goggles, a Cyber Visor, an Eye Patch, a Mustache and a Clown Nose, from 30 to 200 ninja stars.
+- **The Ninja Mask** is secret: enter four ninja stars in the treasure chest.
+- **The victory photo** ("MOUNTAIN CLEAR!") no longer squashes the fighters flat (spotted by Rhett).
+- Save version 15 (fighters gain a face slot).
+- Version 59.
+
 ## M16: transition jingles and the story burst (November 23, 2026)
 - **No more silent gaps** between songs (asked by Ron): a jingle leads straight into the next song, and everything else cross-fades. The songs no longer stop to rest.
 - **Every transition has its own little jingle:** the catapult, cannon, pipe, rope, smashed gate, balloon, gondola, cliff climb, rocket launch, moon landing, geyser and the jump into the crater. The next place's song follows straight on.

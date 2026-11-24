@@ -2069,9 +2069,16 @@ body.padnav .thcard:focus small {
 .vcard .pph {
   align-items: center;
 }
-.vcard canvas {
+/* the victory pose fills the photo's height at its own proportions (never squashed) */
+.vcard .pph canvas {
+  position: absolute;
+  inset: 0;
+  margin: auto;
   width: auto;
   height: 100%;
+  max-width: 100%;
+  aspect-ratio: 240 / 224;
+  object-fit: contain;
 }
 .vstats {
   display: flex;

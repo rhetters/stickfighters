@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 58;
+const GAME_VERSION = 59;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -60,7 +60,8 @@ const HOUSE = {
 //   v14: settings gain mus (the Music volume; vol is now the Sound volume), diff (the difficulty, 1 = Normal) and
 //        tut (the tutorial was offered; a save from before has played already, so it starts at 1), cb (colour
 //        help) and big (bigger text); cb and big start off from the defaults
-const SAVE_VERSION = 14;
+//   v15: fighters gain eq.face (glasses, shades, masks…; nothing worn to start)
+const SAVE_VERSION = 15;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -137,6 +138,11 @@ function migrate(s) {
     if (s.set && typeof s.set.diff !== 'number') s.set.diff = 1;
     if (s.set) s.set.tut = 1;
     s.saveVersion = 14;
+  }
+  if (s.saveVersion === 14) {
+    if (s.chr && Array.isArray(s.chr.list))
+      for (const f of s.chr.list) if (f && f.eq && typeof f.eq === 'object' && !('face' in f.eq)) f.eq.face = null;
+    s.saveVersion = 15;
   }
   return s;
 }

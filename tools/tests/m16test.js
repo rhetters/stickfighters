@@ -105,5 +105,17 @@ await W(700);ok(await ev("!document.querySelector('.burst')&&!BURST"),'and the b
 await ev("openTitle();openLobby();LB.mode='level';LB.theme='pirate';renderLobby()");await W(200);
 ok(await ev("!!$('s-lobby').querySelector('[data-theme=\"pirate\"] .pimg')"),'the Players screen has the story tile to burst');
 await ev("openTitle()");
+// the Face kind on the Head: glasses, shades and masks; the Ninja Mask only from the chest (four ninja stars)
+ok(await ev("(()=>{const m=migrate({saveVersion:14,chr:{cur:0,list:[{name:'A',eq:{hat:'hat-cap'}},null]}});return m.saveVersion===15&&m.chr.list[0].eq.face===null&&m.chr.list[0].eq.hat==='hat-cap'})()"),'save version 15: fighters gain a face slot, nothing else changes');
+ok(await ev("TABS.find(t=>t.id==='head').secs.includes('face')&&EQ.includes('face')&&ITEMS.filter(i=>i.slot==='face'&&!i.how).length>=12&&ITEM['face-ninja'].how.code"),'HEAD has a FACE kind with a dozen or more things to buy, and the Ninja Mask is secret');
+ok(await ev("(()=>{let n=0;for(const it of ITEMS.filter(i=>i.slot==='face')){const L=lookRaw(normFighter(FIGHTER0));L.face=it;const f={look:L,face:1,s:1,slot:0,vx:0},o={};drawFig(300,300,1,STANCES[0].p,1,L.col,L.d2,0,1,7,o,1,lookLayers(f,{face:1,s:1},1));drawItemIcon(it,100,100,100,'#ff7a00');n++}return n>=15})()"),'every face item draws, on a fighter and as a shelf picture');
+ok(await ev("(()=>{openChar();chGo('head');return [...$('ch-cats').querySelectorAll('button')].some(b=>/FACE/i.test(b.textContent))})()"),'the Head part opens onto a FACE tile');
+ok(await ev("(()=>{openCodes();CD.code=[1,1,1,1];const had=owns('face-ninja');const ok=redeemCode();return !had&&ok&&owns('face-ninja')&&$('cd-name').textContent==='Ninja Mask'})()"),'four ninja stars in the treasure chest give the Ninja Mask');
+ok(await ev("(()=>{const c=fighterNow();c.eq.face='face-ninja';saveFighter(CHR.cur,c);return normFighter(fighterNow()).eq.face==='face-ninja'})()"),'and you can wear it');
+await ev("openTitle()");
+// the victory photo keeps the fighter's proportions (it was squashed flat)
+await ev("startRun('mountain');cineEnd();LV.encs.forEach(e=>e.st=2);LV.trans.forEach(t=>t.done=1);levelClear()");await W(3500);
+ok(await ev("(()=>{const c=document.querySelector('#s-victory canvas'),r=c.getBoundingClientRect();return !$('s-victory').hidden&&Math.abs(r.width/r.height-c.width/c.height)<0.03})()"),'the victory photo is not squashed');
+await ev("openTitle()");
 ok(!errs.length,'no errors: '+errs.slice(0,3).join(' | '));
 console.log(fails?fails+' FAILED':'ALL PASS');await b.close();process.exit(fails?1:0)})();
