@@ -282,11 +282,14 @@ function startMulti(kind) {
   ROSTER = LOBBY.map(r => ({ ...r, team: kind === 'vs' && TEAMS ? r.team : undefined }));
   applyTouchVis();
   if (kind === 'vs') startVersus();
-  else if (kind === 'level') LB.theme === '?' ? startRun(surpriseTheme(), 0, true) : startRun(LB.theme);
+  else if (kind === 'level')
+    themeBurst($('s-lobby').querySelector('[data-theme="' + LB.theme + '"]'), () =>
+      LB.theme === '?' ? startRun(surpriseTheme(), 0, true) : startRun(LB.theme)
+    );
   else start();
 }
 $('b-multi').onclick = openLobby;
-$('lb-start').onclick = () => startMulti(LB.mode);
+$('lb-start').onclick = () => BURST || startMulti(LB.mode);
 $('lb-back').onclick = () => {
   openOnline();
   $('b-multi').focus({ preventScroll: true });

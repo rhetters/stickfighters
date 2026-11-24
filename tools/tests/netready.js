@@ -22,8 +22,12 @@ await A.evaluate(()=>onlineFighter(1));await A.waitForTimeout(300);
 await A.evaluate(()=>document.querySelector('.pready:not(:disabled)').click());await H.evaluate(()=>document.querySelector('.pready:not(:disabled)').click());await H.waitForTimeout(700);
 await H.evaluate(()=>document.querySelector('#on-sub [data-theme="castle"]').click());await H.waitForTimeout(400);
 await A.evaluate(()=>document.querySelector('.pready:not(:disabled)').click());await H.evaluate(()=>document.querySelector('.pready:not(:disabled)').click());await H.waitForTimeout(700);
-await H.evaluate(()=>$('on-start').click());await H.waitForTimeout(1500);
+await Promise.all([H,A].map(q=>q.evaluate(()=>{BURST_MS.on=true})));
+await H.evaluate(()=>$('on-start').click());await H.waitForTimeout(700);
+ok(await A.evaluate(()=>!!document.querySelector('.burst')&&state!=='play')&&await H.evaluate(()=>!!document.querySelector('.burst')&&state!=='play'),'START: the story tile bursts open on both devices first');
+await H.waitForTimeout(2500);
 ok(await A.evaluate(()=>state==='play'&&MODE===LEVEL)&&await H.evaluate(()=>state==='play'&&MODE===LEVEL),'START starts the game on both devices');
+ok(await A.evaluate(()=>NET.match&&fr>30)&&await H.evaluate(()=>NET.match&&fr>30),'and the match runs on both');
 ok(await H.evaluate(()=>NET.players.every(q=>!q.ready)),'nobody is ready any more once it starts');
 // jump to the end of the run on both devices (a shortcut for the test): the victory screen
 await Promise.all([H,A].map(q=>q.evaluate(()=>{LV.encs.forEach(e=>e.st=2);LV.trans.forEach(t=>t.done=1);levelClear()})));await H.waitForTimeout(3000);
