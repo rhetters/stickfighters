@@ -2,6 +2,13 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: transition jingles and the story burst (November 23, 2026)
+- **No more silent gaps** between songs (asked by Ron): a jingle leads straight into the next song, and everything else cross-fades. The songs no longer stop to rest.
+- **Every transition has its own little jingle:** the catapult, cannon, pipe, rope, smashed gate, balloon, gondola, cliff climb, rocket launch, moon landing, geyser and the jump into the crater. The next place's song follows straight on.
+- **A new "here we go" jingle** as a story or Arcade starts, replacing the noisy drum roll that played as the first ambush began.
+- **Picking a story bursts it open:** everything else fades, the story's picture flies to the middle, grows, shakes and bursts into the game. It's the same from the Story screen, the Players screen and an online room (on every device).
+- Version 58.
+
 ## M16: songs for the Character screen and the house (November 23, 2026)
 - **The Character screen** (and Skills) has its own laid-back, stylish song with a flute (asked by Ron).
 - **The house builder** (and walking around your house) has a bouncy, catchy song with marimba and bells.

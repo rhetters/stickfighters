@@ -14,23 +14,25 @@ ok(await ev("Object.keys(BIOMES).every(b=>MUSIC[b])&&new Set(Object.keys(BIOMES)
 await p.mouse.click(600,400);await W(400);
 ok(await ev("AUD.on&&AC.state==='running'&&MUS.cur&&MUS.cur.id==='menu'"),'the first tap starts the sound; the menu tune plays');
 await ev("SET.tut=1;titleOpenAll();startRun('pirate');cineEnd()");await W(500);
-ok(await ev("MUS.cur&&MUS.cur.id==='go'&&MUS.next==='beach'"),'starting a game: a short "here we go" tune first, the place\'s song waits for it');
-await W(5200);
+ok(await ev("MUS.cur&&MUS.cur.id==='go'&&MUS.cur.then==='beach'"),'starting a game: the "here we go" jingle, then straight into the place\'s song');
+await W(3000);
 ok(await ev("MUS.cur.id==='beach'&&MUS.lvl===0&&AMBS.look==='beach'"),'then the Sunny Beach plays its own song (calm while walking) and its background sound');
 await ev("const ae=LV.encs[0];CAM.x=ae.lock;PL[0].x=ae.x;for(let i=0;i<5;i++){fr++;update()}");await W(300);
 ok(await ev("LV.encs.some(e=>e.st===1)&&MUS.lvl===1"),'a fight turns the music up');
-await ev("const sg=LV.segs[1];LV.encs.forEach(e=>{if(e.x<sg.x0+1500)e.st=2});LV.trans[0].done=1;CAM.x=sg.x0+300;PL[0].x=CAM.x+300;for(let i=0;i<3;i++){fr++;update()}");await W(300);
-ok(await ev("MUS.want==='ship'&&!MUS.cur"),'on to the Pirate Ship: the beach song fades out, a moment of quiet');
-await W(4500);ok(await ev("MUS.cur.id==='ship'"),'then the Pirate Ship\'s own song comes in');
+await ev("const sg=LV.segs[1];LV.encs.forEach(e=>{if(e.x<sg.x0+1500)e.st=2});const tr=LV.trans[0];window._tk=tr.k;cineStart(tr.k,{tr})");await W(300);
+ok(await ev("MUS.cur.id==='tr-'+_tk&&MUS.cur.then==='ship'"),'the scene to the Pirate Ship plays its own little jingle');
+await ev("cineEnd();LV.trans[0].done=1;const sg=LV.segs[1];CAM.x=sg.x0+300;PL[0].x=CAM.x+300;for(let i=0;i<3;i++){fr++;update()}");await W(3200);
+ok(await ev("MUS.cur.id==='ship'&&MUS.want==='ship'"),'then straight into the Pirate Ship\'s own song');
+ok(await ev("Object.keys(TRANSITIONS).every(k=>MUSIC['tr-'+k]&&MUSIC['tr-'+k].sting&&MUSIC['tr-'+k].end*60/MUSIC['tr-'+k].bpm/(MUSIC['tr-'+k].div||4)<3.6)&&new Set(Object.keys(TRANSITIONS).map(k=>JSON.stringify(MUSIC['tr-'+k].parts[0].mel))).size===Object.keys(TRANSITIONS).length"),'every transition (catapult, pipe, rope…) has its own short jingle');
 await ev("const bi=LV.encs.length-1;LV.encs.forEach((e,i)=>{if(i<bi)e.st=2});LV.trans.forEach(t=>t.done=1);CAM.x=LV.encs[bi].lock;PL[0].x=LV.encs[bi].x-200;for(let i=0;i<10;i++){fr++;update()}");await W(400);
-ok(await ev("MUS.cur.id==='bossin'&&MUS.next==='boss'"),'a boss arrives: a dark drum roll first');
+ok(await ev("MUS.cur.id==='bossin'&&MUS.cur.then==='boss'"),'a boss arrives: a dark drum roll first');
 await W(5600);ok(await ev("MUS.cur.id==='boss'&&MUS.lvl===2"),'then the boss has his own music');
 await ev("show('s-victory')");await W(1600);ok(await ev("MUS.cur.id==='victory'"),'the victory fanfare');
-ok(await ev("musTrans('boss','beach').sting===null&&(()=>{LV.encs[LV.encs.length-1].st=2;return musTrans('boss','beach').sting==='bosswin'})()"),'after a boss: a "ta-da" when he was beaten, none when you were knocked out');
+ok(await ev("!musTrans('boss','beach').sting&&(()=>{LV.encs[LV.encs.length-1].st=2;return musTrans('boss','beach').sting==='bosswin'})()"),'after a boss: a "ta-da" when he was beaten, none when you were knocked out');
 await ev("openChar()");await W(3200);ok(await ev("MUS.want==='dressup'&&MUS.cur&&MUS.cur.id==='dressup'"),'the Character screen has its own song');
 await ev("closeChar();openHouse()");await W(2000);ok(await ev("MUS.want==='house'&&MUS.cur&&MUS.cur.id==='house'&&musWant()[0]==='house'"),'and so does the house builder');
 await ev("closeHouse()");
-ok(await ev("(()=>{const t=musTrans('beach','menu');return !t.sting&&t.gap>=1&&musTrans('menu','arcade').sting==='go'})()"),'back to the menus: a slow fade and a pause; Arcade starts with the "here we go" tune');
+ok(await ev("(()=>{const t=['beach','menu','dressup','arcade','over'].flatMap(a=>['menu','house','beach','arcade'].map(b=>musTrans(a,b)));return t.every(x=>!('gap' in x))&&musTrans('menu','arcade').sting==='go'&&musTrans('beach','ship').sting==='tr-gate'})()"),'never a silent gap between songs; Arcade starts with the "here we go" jingle; a smashed gate has its own');
 await ev("pause(false);openTitle()");await W(300);
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged with sound on (sound only watches the game)');
 // difficulty
@@ -92,6 +94,16 @@ ok(await ev("['woods','meadow','slope','peak','ash'].every(k=>AMB_LOOK[k].puff)"
 // the Snowy Peak's gusts: a warning, then everyone is blown back for a few seconds; rnd() only there
 ok(await ev("(()=>{startRun('mountain');cineEnd();for(let i=0;i<5;i++){fr++;update()}const a=!LV.gu;startRun('mountain');cineEnd();const sg=LV.segs[2];LV.encs.forEach(e=>{if(e.x<sg.x0+2000)e.st=2});LV.trans.forEach(t=>t.done=1);CAM.x=sg.x0+1200;PL[0].x=CAM.x+W*0.6;PL[0].y=PL[0].gy=G;for(let i=0;i<3;i++){fr++;update()}CAM.x=PL[0].x-W*0.6;LV.gu.next=LV.t+1;fr++;update();const x0=PL[0].x;for(let i=0;i<GUST_WARN;i++){fr++;update()}const warn=Math.abs(PL[0].x-x0)<1&&gustAmt()>0.3;for(let i=0;i<100;i++){fr++;update()}const push=x0-PL[0].x;for(let i=0;i<GUST_LEN;i++){fr++;update()}return a&&warn&&push>150&&gustAmt()===0&&LV.gu.next>LV.t})()"),'the Snowy Peak: a gust warns first, then blows you back, then dies down (and not in the meadow)');
 ok(await ev("(()=>{const n=AMB.filter(q=>q.k==='gust').length;LV.gu.next=LV.t+1;for(let i=0;i<GUST_WARN+40;i++){fr++;update()}render();render();return n>=0&&AMB.some(q=>q.k==='gust')})()"),'snow streaks sideways in a gust');
+await ev("openTitle()");
+// a story's tile bursts open as it starts (the Story screen; the rooms use the same burst)
+await ev("BURST_MS.on=true;openTitle();openThemes((id,m)=>startRun(id,0,m),'s-solo')");await W(200);
+await p.click('.thcard');await W(900);
+ok(await ev("!!document.querySelector('.burst.on .burst-mv.shake')&&state!=='play'&&MUS.cur&&MUS.cur.id==='go'"),'picking a story: the tile flies to the middle and shakes, with the jingle; the game waits');
+if(process.env.SHOT)await p.screenshot({path:process.env.SHOT});
+await W(1100);ok(await ev("state==='play'&&LV.run&&LV.run.theme==='castle'"),'then it bursts into the story');
+await W(700);ok(await ev("!document.querySelector('.burst')&&!BURST"),'and the burst clears away');
+await ev("openTitle();openLobby();LB.mode='level';LB.theme='pirate';renderLobby()");await W(200);
+ok(await ev("!!$('s-lobby').querySelector('[data-theme=\"pirate\"] .pimg')"),'the Players screen has the story tile to burst');
 await ev("openTitle()");
 ok(!errs.length,'no errors: '+errs.slice(0,3).join(' | '));
 console.log(fails?fails+' FAILED':'ALL PASS');await b.close();process.exit(fails?1:0)})();

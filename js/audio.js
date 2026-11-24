@@ -215,11 +215,11 @@ function playStep(P, lvl) {
     for (const m of ms) if (m !== null && !isNaN(m)) INS[p.ins](t, hz(m), d, v, P.g);
   }
 }
-const MUS = { cur: null, want: undefined, old: [], lvl: 0, next: undefined, at: null, gap: 0, fin: 1 };
+const MUS = { cur: null, want: undefined, old: [], lvl: 0 };
 // Fade out what's playing over `out` seconds
 function musFade(out) {
   if (!MUS.cur) return;
-  const t = AC.currentTime + 0.03,
+  const t = AC.currentTime + 0.02,
     g = MUS.cur.g.gain;
   g.cancelScheduledValues(t);
   g.setValueAtTime(g.value, t);
@@ -227,47 +227,56 @@ function musFade(out) {
   MUS.old.push({ g: MUS.cur.g, end: t + out + 3 });
   MUS.cur = null;
 }
-// Start a song at time `at`, fading in over `fin` seconds
-function musPlay(id, at, fin) {
+// Start a song now, fading in over `fin` seconds; `then` = what follows a jingle
+function musPlay(id, fin, then) {
   if (!id || !MUSIC[id]) return;
-  const g = AC.createGain();
-  g.gain.setValueAtTime(0, at);
-  g.gain.linearRampToValueAtTime(1, at + fin);
+  const at = AC.currentTime + 0.03,
+    g = AC.createGain();
+  g.gain.setValueAtTime(fin > 0.05 ? 0 : 1, at);
+  if (fin > 0.05) g.gain.linearRampToValueAtTime(1, at + fin);
   g.connect(AUD.mus);
-  MUS.cur = { id, song: MUSIC[id], g, t: at, step: 0, done: false, loops: 0, rest: 0 };
+  MUS.cur = { id, song: MUSIC[id], g, t: at, step: 0, done: false, then };
 }
-// How one song hands over to the next: a short tune in between (sting), how long the old one fades (out), the quiet
-// before the new one (gap) and how slowly it comes in (fin)
+// How one song hands over to the next: a jingle first (sting), how long the old one fades (out) and how quickly the
+// new one comes in (fin). Never a silent gap: songs cross-fade, or a jingle leads straight into the next song.
 const IN_GAME = id => !!id && (!!BIOMES[id] || id === 'boss' || id === 'arcade' || id === 'training'),
   CALM = id => id === 'menu' || id === 'dressup' || id === 'house'; // the menus, the Character screen, the house
 function musTrans(from, to) {
-  if (to === 'boss') return { sting: 'bossin', out: 0.5, gap: 0.2, fin: 0.3 };
+  if (to === 'boss') return { sting: 'bossin', out: 0.4 };
   if (from === 'boss' && IN_GAME(to)) {
     const won = MODE === LEVEL && LV && LV.encs.some(e => e.boss && e.st === 2); // not when you were knocked out
-    return { sting: won ? 'bosswin' : null, out: won ? 0.5 : 1.5, gap: 1.2, fin: 2.5 };
+    return won ? { sting: 'bosswin', out: 0.4 } : { out: 1, fin: 0.5 };
   }
-  if (IN_GAME(to) && !IN_GAME(from)) return { sting: to === 'training' ? null : 'go', out: 0.8, gap: 0.4, fin: 1.5 };
-  if (CALM(from) && CALM(to)) return { out: 1, gap: 0.5, fin: 1.5 }; // between the menus' own songs
-  if (BIOMES[from] && BIOMES[to]) return { out: 2.5, gap: 1.2, fin: 3 }; // walking on into the next place
-  if (to === 'victory' || to === 'over') return { out: 0.8, gap: 0.5, fin: 0.05 };
-  if (from === undefined) return { out: 0, gap: 0, fin: 1 };
-  return { out: 1.5, gap: 1.2, fin: 2 }; // back to the menus
+  if (IN_GAME(to) && to !== 'training' && CALM(from)) return { sting: 'go', out: 0.3 };
+  const bs = MODE === LEVEL && LV && LV.run && THEMES[LV.run.theme].biomes;
+  if (bs && bs.indexOf(to) > 0 && bs.indexOf(to) === bs.indexOf(from) + 1) return { sting: 'tr-gate', out: 0.3 }; // through a smashed gate
+  if (from === undefined) return { out: 0, fin: 1 };
+  return { out: 1, fin: 0.6 };
 }
-function musGo(from, to) {
-  const now = AC.currentTime,
-    playing = MUS.cur && MUS.cur.song.sting && !MUS.cur.done;
-  MUS.next = to;
-  if (playing) return; // a sting is playing: the new song still waits for it to finish
+function musGo(from, to, then) {
+  const P = MUS.cur,
+    ts = musTrans(from, to).sting;
+  // a jingle that's playing finishes first, then hands on to the new song (unless another jingle is wanted)
+  if (P && P.song.sting && !P.done && !(MUSIC[to] && MUSIC[to].sting) && (!ts || ts === P.id)) {
+    P.then = to;
+    return;
+  }
+  if (MUSIC[to] && MUSIC[to].sting) {
+    musFade(0.3);
+    return musPlay(to, 0, then);
+  }
   const tr = musTrans(from, to);
   musFade(tr.out);
-  MUS.gap = tr.gap;
-  MUS.fin = tr.fin;
-  if (tr.sting && MUSIC[tr.sting]) {
-    musPlay(tr.sting, now + tr.out * 0.4 + 0.05, 0.05);
-    MUS.at = null; // once the sting has played
-  } else MUS.at = now + tr.out + tr.gap;
+  if (tr.sting && MUSIC[tr.sting]) musPlay(tr.sting, 0, to);
+  else musPlay(to, tr.fin);
 }
-// What should be playing: [song, intensity]
+// A jingle right now, from the menus (the story tile bursting open, ui/themes.js)
+function musCue(id) {
+  if (!AUD.on || !AC || AC.state !== 'running' || !MUSIC[id]) return;
+  musFade(0.3);
+  musPlay(id, 0);
+}
+// What should be playing: [song, intensity, then (what follows a jingle)]
 function musWant() {
   const sc = SHOWN;
   if (sc === 's-victory' || sc === 's-clear') return ['victory', 0];
@@ -280,8 +289,11 @@ function musWant() {
     if (MODE.id === 'arcade') return ['arcade', 1];
     if (MODE.id === 'versus') return ['arcade', 2];
     if (MODE.id === 'level' && LV) {
-      const ae = LV.encs.find(e => e.st === 1);
+      const ae = LV.encs.find(e => e.st === 1),
+        cn = LV.cine;
       if ((ae && ae.boss) || (LV.esc && !LV.fin)) return ['boss', 2];
+      // a scene that takes you to the next place (catapult, pipe…) plays its own jingle, then the next place's song
+      if (cn && cn.tr && MUSIC['tr-' + cn.k]) return ['tr-' + cn.k, 0, cn.tr.to];
       // the song of the biome you're in (the Wooded Trail outside a story)
       const sg = LV.run && segAt(CAM.x + W / 2),
         b = sg ? sg.b : 'woods';
@@ -291,21 +303,21 @@ function musWant() {
   return ['menu', 0];
 }
 function musicTick() {
-  const [id, lvl] = musWant(),
+  const [id, lvl, then] = musWant(),
     now = AC.currentTime;
   if (id !== MUS.want) {
     const from = MUS.want;
     MUS.want = id;
-    musGo(from, id);
-  } else if (MUS.next === undefined && MUS.cur && MUS.cur.done && MUS.cur.song.then) musGo(MUS.cur.id, MUS.cur.song.then);
-  // the next song, after the sting (and its last notes ringing) or the quiet gap
-  if (MUS.next !== undefined) {
-    if (MUS.at === null && (!MUS.cur || MUS.cur.done)) MUS.at = (MUS.cur ? MUS.cur.t : now) + MUS.gap;
-    if (MUS.at !== null && now >= MUS.at) {
-      const n = MUS.next;
-      MUS.next = undefined;
-      if (MUS.cur && MUS.cur.done) musFade(0.3);
-      musPlay(n, now + 0.02, MUS.fin);
+    // already playing it, or a jingle is about to hand on to it: nothing to change
+    if (!(MUS.cur && (MUS.cur.id === id || (MUS.cur.then === id && !MUS.cur.done)))) musGo(from, id, then);
+  }
+  // a jingle has played through: what follows it (straight away, no gap)
+  if (MUS.cur && MUS.cur.done && now >= MUS.cur.t - 0.05) {
+    const P = MUS.cur,
+      n = P.then || P.song.then || MUS.want;
+    if (n && n !== P.id && MUSIC[n] && !MUSIC[n].sting) {
+      musFade(0.6);
+      musPlay(n, 0.05);
     }
   }
   MUS.lvl = lvl;
@@ -316,22 +328,13 @@ function musicTick() {
   AUD.mus.gain.setTargetAtTime(want, now, 0.1);
   if (!P || !P.song) return;
   if (P.t < now - 0.1) P.t = now + 0.02; // after the page was in the background
-  // a breather: a place's song (and the menu's) rests a few seconds every other time round, while it's calm;
-  // a fight brings it straight back
-  if (P.rest > now && lvl > 0) P.t = now + 0.02;
   const sd = 60 / P.song.bpm / (P.song.div || 4),
-    len = P.song.prog.length * (P.song.beats || 4) * (P.song.div || 4);
+    len = P.song.end || P.song.prog.length * (P.song.beats || 4) * (P.song.div || 4);
   while (P.t < now + 0.2 && !P.done) {
-    playStep(P, lvl);
+    playStep(P, P.song.sting ? 0 : lvl);
     P.t += sd;
     P.step++;
-    if (P.step % len === 0) {
-      if (P.song.once) P.done = true;
-      else if (++P.loops % 2 === 0 && lvl === 0 && (BIOMES[P.id] || P.id === 'menu')) {
-        P.t += 4;
-        P.rest = P.t;
-      }
-    }
+    if (P.song.once && P.step >= len) P.done = true;
   }
 }
 // ===== BACKGROUND SOUND (per place) =====

@@ -3,7 +3,8 @@
 //   bpm      beats per minute; beats = beats per bar (4, or 3 for a waltz); div = steps per beat (4, or 3 for a lilt)
 //   prog     one chord per bar ('Dm', 'C', 'A7', 'Bbmaj7', 'Gsus4'); the song loops after the last
 //   once     play it one time only (a jingle), then the song named by then (or silence)
-//   sting    a short tune between two songs (audio.js musTrans picks which); the next song waits for it
+//   sting    a short tune between two songs (audio.js musTrans picks which); the next song follows straight on
+//   end      stop a jingle after this many steps (so the next song comes in as its last note rings)
 //   parts    the instruments, each playing a pattern:
 //     ins    bass, pluck, lead, flute, brass, organ, accordion, marimba, bell, arp, pad, drums
 //     lvl    the least intensity it plays at: 0 = always (walking, menus), 1 = in a fight, 2 = a boss (default 0)
@@ -545,18 +546,174 @@ const MUSIC = {
     ]
   },
   // ===== STINGS: short tunes between two songs =====
-  // Into a game: a drum roll and a rising "here we go"
-  go: {
+  // Into a game (the story tile bursting open): a little pick-up, then a bright chord
+  'go': {
+    bpm: 150,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['G', 'C'],
+    parts: [
+      { ins: 'lead', v: 0.9, mel: ['G4 . . G4 C5 . . E5 . . G5 . . . . .', 'C6 - - - - - - - . . . . . . . .'] },
+      { ins: 'pluck', o: 4, v: 0.6, pat: 'c . . c c . . c . . c . . . . .|. . . . . . . . . . . . . . . .' },
+      { ins: 'brass', o: 4, v: 0.55, pat: '. . . . . . . . . . . . . . . .|c - - - - - - - . . . . . . . .' },
+      { ins: 'bass', pat: 'R . . R . . . R . . R . . . . .|R - - - - - - - . . . . . . . .' },
+      { ins: 'drums', v: 0.8, pat: '. . . . . . . . . . . . t . t t|k . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // ===== TRANSITION JINGLES: each scene that takes you to the next place has its own little tune =====
+  // The catapult: wind up... and fling!
+  'tr-catapult': {
+    bpm: 140,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['C', 'C'],
+    parts: [
+      { ins: 'lead', v: 0.85, mel: ['G4 . G4 . C5 - E5 - G5 - - - C6 - - -', 'B5 . C6 - - - . . . . . . . . . .'] },
+      { ins: 'bass', pat: 'R . . . R . . . R . . . R . . .|R - - - . . . . . . . . . . . .' },
+      { ins: 'drums', v: 0.8, pat: 'k . . . k . . . k . k . k k k k|k . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // The cannon: BOOM, and over the waves
+  'tr-cannon': {
+    bpm: 132,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['F', 'C'],
+    parts: [
+      { ins: 'brass', v: 0.75, mel: ['. . . . F4 . A4 . C5 . F5 - - - E5 .', 'D5 . E5 . C5 - - - . . . . . . . .'] },
+      { ins: 'bass', pat: 'R - - - . . . . R . . . R . . .|R - - - . . . . . . . . . . . .' },
+      { ins: 'drums', pat: 'k . . . t . . . . . . . . . . .|k . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // The pipe: sliding down and down, then plop
+  'tr-pipe': {
+    bpm: 150,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['C', 'C'],
+    parts: [
+      { ins: 'arp', v: 1.8, mel: ['C6 . B5 . Bb5 . A5 . Ab5 . G5 . F#5 . F5 .', 'C5 - - - . . . . . . . . . . . .'] },
+      { ins: 'bass', pat: '. . . . . . . . . . . . . . . .|R - - - . . . . . . . . . . . .' },
+      { ins: 'drums', pat: '. . . . . . . . . . . . . . . .|B . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // The rope: a swing across the chasm, in three
+  'tr-rope': {
+    bpm: 120,
+    beats: 3,
+    once: 1,
+    sting: 1,
+    end: 20,
+    prog: ['C', 'G'],
+    parts: [
+      { ins: 'flute', mel: ['E5 - - G5 - - C6 - - - - -', 'B5 - D6 - G5 - - - - - . .'] },
+      { ins: 'bass', pat: 'R . . 5 . . R . . 5 . .|R - - - . . . . . . . .' },
+      { ins: 'drums', v: 0.6, pat: 'k . . h . . k . . h . .|k . . . . . . . . . . .' }
+    ]
+  },
+  // Through a smashed gate: bom, bom, bom, ta-da
+  'tr-gate': {
+    bpm: 132,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['C', 'C'],
+    parts: [
+      { ins: 'brass', v: 0.8, mel: ['C5 . C5 . C5 . . . Eb5 - - - F5 - - -', 'G5 - - - - - - - . . . . . . . .'] },
+      { ins: 'bass', pat: 'R . R . R . . . . . . . . . . .|R - - - - - - - . . . . . . . .' },
+      { ins: 'drums', v: 0.8, pat: 'k . k . k . . . t . . . t . . .|k . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // The balloon: floating up, up and away
+  'tr-balloon': {
+    bpm: 104,
+    once: 1,
+    sting: 1,
+    end: 24,
+    prog: ['C', 'F'],
+    parts: [
+      { ins: 'bell', v: 1.1, mel: ['C5 - E5 - G5 - - - A5 - G5 - E5 - - -', 'F5 - A5 - C6 - - - . . . . . . . .'] },
+      { ins: 'pad', o: 3, v: 0.3, pat: 'c - - - - - - - - - - - - - - -|c - - - - - - - . . . . . . . .' }
+    ]
+  },
+  // The gondola: an oom-pah ride up the cable
+  'tr-gondola': {
     bpm: 120,
     once: 1,
     sting: 1,
-    prog: ['G', 'C'],
+    end: 28,
+    prog: ['C', 'C'],
     parts: [
-      { ins: 'drums', pat: 's . . . s . . . s . s . s s s s|k . . . . . . . . . . . . . . .' },
-      { ins: 'arp', o: 4, v: 0.45, pat: 'R 3 5 8 R 3 5 8 3 5 8 9 5 8 9 8|. . . . . . . . . . . . . . . .' },
-      { ins: 'brass', o: 4, v: 0.6, pat: '. . . . . . . . . . . . . . . .|c - - - - - - - . . . . . . . .' },
-      { ins: 'bass', pat: 'R . . . . . . . R . . . R . R .|R - - - - - - - . . . . . . . .' },
-      { ins: 'lead', v: 0.8, mel: ['G4 - - - B4 - - - D5 - - - G5 - - -', 'C6 - - - - - - - . . . . . . . .'] }
+      { ins: 'accordion', v: 1, mel: ['G4 . C5 . E5 - - - G4 . C5 . E5 - - -', 'F5 . E5 . D5 . C5 - - - . . . . . .'] },
+      { ins: 'bass', pat: 'R . 5 . R . 5 . R . 5 . R . 5 .|R - - - . . . . . . . . . . . .' }
+    ]
+  },
+  // The cliff: one hand over the other, to the top
+  'tr-climb': {
+    bpm: 126,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['C', 'C'],
+    parts: [
+      { ins: 'marimba', mel: ['C5 . D5 . . . E5 . F5 . . . G5 . A5 .', 'B5 . C6 - - - . . . . . . . . . .'] },
+      { ins: 'bass', pat: 'R . . . R . . . R . . . R . . .|R - - - . . . . . . . . . . . .' },
+      { ins: 'drums', v: 0.7, pat: 'k . . . k . . . k . . . k . . .|k . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // The launch: beep, beep, beep... blast off!
+  'tr-launch': {
+    bpm: 120,
+    once: 1,
+    sting: 1,
+    end: 28,
+    prog: ['C', 'C'],
+    parts: [
+      { ins: 'lead', v: 0.85, mel: ['C6 . . . C6 . . . C6 . . . G6 - - -', 'C5 . E5 . G5 . C6 - - - . . . . . .'] },
+      { ins: 'bass', pat: '. . . . . . . . . . . . . . . .|R . R . R . R - - - . . . . . .' },
+      { ins: 'drums', v: 0.8, pat: '. . . . . . . . . . . . . . . .|k . k . k . k . . . . . . . . .' }
+    ]
+  },
+  // The landing: touching down softly on the moon
+  'tr-landing': {
+    bpm: 96,
+    once: 1,
+    sting: 1,
+    end: 22,
+    prog: ['Am', 'C'],
+    parts: [
+      { ins: 'bell', v: 1.1, mel: ['E5 - - - C5 - - - A4 - - - B4 - C5 -', 'E5 - - - - - - - . . . . . . . .'] },
+      { ins: 'pad', o: 3, v: 0.3, pat: 'c - - - - - - - - - - - - - - -|c - - - - - - - . . . . . . . .' }
+    ]
+  },
+  // The geyser: whoosh, up on the steam
+  'tr-geyser': {
+    bpm: 144,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['C', 'C'],
+    parts: [
+      { ins: 'marimba', mel: ['C5 C5 . . E5 . . G5 . . C6 . . . . .', 'B5 . C6 . E6 - - - . . . . . . . .'] },
+      { ins: 'bass', pat: 'R . . . . . . R . . R . . . . .|R - - - . . . . . . . . . . . .' },
+      { ins: 'drums', pat: 'B . b . B . b b B . b . B b b b|B . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // The rim: a deep breath, and jump into the crater
+  'tr-rim': {
+    bpm: 116,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['Am', 'Am'],
+    parts: [
+      { ins: 'brass', v: 0.8, mel: ['A4 . . C5 . . E5 . . A5 - - - - - -', 'G#5 . A5 - - - . . . . . . . . . .'] },
+      { ins: 'bass', pat: 'R . . R . . R . . R - - - - - -|R - - - . . . . . . . . . . . .' },
+      { ins: 'drums', pat: 't . . t . . t . . k . . . . . .|k . . . . . . . . . . . . . . .' }
     ]
   },
   // A boss arrives: low toms rolling in, a dark brass chord

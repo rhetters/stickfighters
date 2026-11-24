@@ -448,7 +448,7 @@ function netLost(why) {
 // ===== MATCHES =====
 // Host: start a match for everyone. The input delay covers one trip between the two slowest players.
 function netStart() {
-  if (!NET.host || NET.match) return;
+  if (!NET.host || NET.match || BURST) return BURST ? true : undefined;
   const live = NET.players.filter(p => !p.left);
   if (NET.mode === 'vs' && !netVsReady()) return false;
   const ids = Object.keys(THEMES),
@@ -491,6 +491,11 @@ function netFresh(e) {
   for (const q of early) if (!(NET.stop[q.s] !== undefined && q.f >= NET.stop[q.s])) netStore(q.f, q.s, q.m);
 }
 function netStartLocal(m) {
+  // from the room, a story's tile bursts open first (ui/themes.js); the match starts when it's done
+  if (m.mode === 'level' && SHOWN === 's-online' && !m.shown) {
+    const t = $('s-online').querySelector('[data-theme="' + (m.myst ? '?' : m.theme) + '"]');
+    return themeBurst(t, () => netStartLocal({ ...m, shown: 1 }));
+  }
   if (!NET.match) NET.feelKeep = { ...FEEL };
   // everyone plays with the host's feel settings, or the simulations would drift apart
   Object.assign(FEEL, m.feel);

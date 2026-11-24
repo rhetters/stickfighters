@@ -3066,3 +3066,112 @@ body.big #ch-msg,
 body.big .screen p {
   font-size: 118%;
 }
+/* A story tile bursting open as the story starts (ui/themes.js themeBurst) */
+.burst {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: all;
+  background: rgba(251, 250, 244, 0);
+  transition: background 0.4s;
+}
+.burst.on {
+  background: rgba(251, 250, 244, 0.97);
+}
+.burst.out {
+  background: rgba(251, 250, 244, 0);
+  transition: background 0.45s;
+}
+.burst-mv {
+  position: fixed;
+  transition: transform 0.45s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.burst-pic {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  filter: none !important;
+  transition:
+    transform 0.15s,
+    opacity 0.15s;
+}
+.burst-mv.shake .burst-pic {
+  animation: bshake 1.05s linear forwards;
+}
+@keyframes bshake {
+  0% {
+    transform: none;
+  }
+  20% {
+    transform: translate(-2px, 1px) rotate(-2deg);
+  }
+  30% {
+    transform: translate(3px, -2px) rotate(2deg) scale(1.02);
+  }
+  40% {
+    transform: translate(-3px, 2px) rotate(-3deg) scale(1.03);
+  }
+  50% {
+    transform: translate(4px, -1px) rotate(3deg) scale(1.04);
+  }
+  60% {
+    transform: translate(-5px, 3px) rotate(-4deg) scale(1.06);
+  }
+  70% {
+    transform: translate(5px, -3px) rotate(5deg) scale(1.08);
+  }
+  80% {
+    transform: translate(-6px, 2px) rotate(-6deg) scale(1.1);
+  }
+  90% {
+    transform: translate(7px, -4px) rotate(6deg) scale(1.13);
+  }
+  100% {
+    transform: translate(-7px, 4px) rotate(-7deg) scale(1.16);
+  }
+}
+.burst.boom .burst-pic {
+  animation: bboom 0.3s ease-out forwards;
+}
+@keyframes bboom {
+  0% {
+    transform: scale(1.16);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.burst-mv i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 10px;
+  margin: -5px -7px;
+  border: 2px solid #1c1626;
+  border-radius: 2px;
+  opacity: 0;
+}
+.burst.boom .burst-mv i {
+  animation: bbit 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+@keyframes bbit {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(0.6);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--r)) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .burst-mv.shake .burst-pic {
+    animation: none;
+  }
+}
