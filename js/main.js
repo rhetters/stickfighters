@@ -151,6 +151,7 @@ function applyTouchVis() {
 }
 function applySet() {
   const w = $('wrap');
+  document.body.classList.toggle('big', !!SET.big);
   w.style.setProperty('--ts', SET.tsize);
   w.style.setProperty('--to', SET.topac);
   applyTouchVis();
@@ -221,7 +222,9 @@ function bindSettings() {
   }
   for (const [id, key] of [
     ['o-hist', 'hist'],
-    ['o-calm', 'calm']
+    ['o-calm', 'calm'],
+    ['o-cb', 'cb'],
+    ['o-big', 'big']
   ]) {
     const el = $(id);
     el.checked = !!SET[key];
@@ -555,7 +558,8 @@ function resize() {
     const tp = $('trainpanel');
     document.body.style.setProperty('--ph', tp.offsetHeight + 28 + 'px');
   }
-  const d = Math.max(1, Math.min(2, (cv.clientWidth / W) * (window.devicePixelRatio || 1)));
+  // a little less sharp when the device can't keep up (PERF, set by the main loop)
+  const d = Math.max(1, Math.min(PERF.low ? 1.25 : 2, (cv.clientWidth / W) * (window.devicePixelRatio || 1)));
   if (d !== gridDPR) {
     DPR = d;
     cv.width = Math.round(W * d);
@@ -582,9 +586,22 @@ function tick() {
   fr++;
   if (state === 'play' || state === 'train') update();
 }
+// Performance: if frames keep taking too long (about 40 per second or fewer for 3 seconds), draw at a lower
+// resolution for the rest of the visit. Drawing only.
+const PERF = { low: false, slow: 0 };
+function perfWatch(dt) {
+  if (PERF.low || document.hidden || !(state === 'play' || state === 'train')) return;
+  PERF.slow = dt > 25 ? PERF.slow + 1 : Math.max(0, PERF.slow - 2);
+  if (PERF.slow > 120) {
+    PERF.low = true;
+    gridDPR = 0;
+    resize();
+  }
+}
 function loop(now) {
   const dt = Math.min(100, now - last);
   last = now;
+  perfWatch(dt);
   pollPad();
   if (portraitMQ.matches && live()) pause(true);
   if (NET.match) {

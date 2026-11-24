@@ -3052,3 +3052,17 @@ body.tut #posebtn {
 #pm-list h3 {
   margin: 8px 0 2px;
 }
+/* bigger text (Settings) */
+body.big .btn {
+  font-size: 125%;
+}
+body.big .ptile b {
+  font-size: max(15px, calc(var(--ps) * 0.19));
+}
+body.big .set label,
+body.big .chitem b,
+body.big .chitem small,
+body.big #ch-msg,
+body.big .screen p {
+  font-size: 118%;
+}

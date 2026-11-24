@@ -175,6 +175,39 @@ function drawFig(x, y, face, p, s, col, col2, spin, alpha, lw, out, hk, lay, hf)
   hook('legs');
   layer(() => L(col, [sho, eA, hA]));
 }
+// Colour help: the player's number over their head, with their team's shape in team Versus (▲ team 1, ● team 2)
+function drawTag(p) {
+  const tm = MODE.team && MODE.team(p),
+    t = 'P' + (p.slot + 1),
+    y = p.y - 112 * p.s * (p.look ? p.look.ht : 1) - 16;
+  ctx.save();
+  ctx.font = '900 15px Impact,"Arial Black",sans-serif';
+  const w = ctx.measureText(t).width + (tm ? 22 : 12);
+  ctx.fillStyle = '#fffdf7';
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(p.x - w / 2, y - 12, w, 20, 6);
+  else ctx.rect(p.x - w / 2, y - 12, w, 20);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = INK;
+  ctx.textAlign = 'left';
+  const tx = p.x - w / 2 + 6;
+  ctx.fillText(t, tx, y + 4);
+  if (tm) {
+    const sx = p.x + w / 2 - 11;
+    ctx.beginPath();
+    if (tm === 1) {
+      ctx.moveTo(sx, y - 6);
+      ctx.lineTo(sx + 6, y + 5);
+      ctx.lineTo(sx - 6, y + 5);
+      ctx.closePath();
+    } else ctx.arc(sx, y, 5.5, 0, 7);
+    ctx.fill();
+  }
+  ctx.restore();
+}
 function drawF(f) {
   if (f.hide) return; // inside a pipe (run.js)
   if (f.draw !== undefined) return drawPencilIn(f);
@@ -560,7 +593,7 @@ function hudBar(q, x0, y0, pw) {
     rw = Math.max(40, x0 + pw - rx - 6),
     tm = MODE.team && MODE.team(q),
     nm = (tm ? 'T' + tm + ' ' : '') + (q.name || 'P' + (q.slot + 1));
-  let fs = sm ? 13 : 15;
+  let fs = (sm ? 13 : 15) + (SET.big ? 3 : 0);
   ctx.font = '900 ' + fs + 'px Impact,"Arial Black",sans-serif';
   while (fs > 9 && ctx.measureText(nm).width > rw) ctx.font = '900 ' + --fs + 'px Impact,"Arial Black",sans-serif';
   ctx.textAlign = 'left';
@@ -867,6 +900,7 @@ function renderFrame() {
     drawF(p);
   });
   for (const x of FX) lifted(x.x || 0, () => drawFX(x));
+  if (SET.cb) for (const p of PL) if (p.st !== 'dead' && !p.hide) lifted(p.x, () => drawTag(p));
   drawLevelUps(false);
   if (MODE.world) MODE.world();
   // co-op revive progress over a downed teammate

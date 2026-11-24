@@ -10,6 +10,8 @@ const DEF = {
   mus: 0.6,
   diff: 1, // Easy, Normal, Hard (data/difficulty.js), for Story and Arcade
   tut: 0, // 1 once the tutorial has been offered
+  cb: 0, // colour help: each player's number (and team shape) over their head
+  big: 0, // bigger text in the menus and on the player bars
   tsize: 1,
   topac: 0.75,
   lay: null,
@@ -56,7 +58,8 @@ const HOUSE = {
 //   v12: fighters gain prog = { xp, sk (skill points by node id), ult (the branch whose ultimate they use) }
 //   v13: ultimates are bought as skill-tree nodes, so prog.ult goes; hit-stop and screen shake off, bodies stay 1 s
 //   v14: settings gain mus (the Music volume; vol is now the Sound volume), diff (the difficulty, 1 = Normal) and
-//        tut (the tutorial was offered; a save from before has played already, so it starts at 1)
+//        tut (the tutorial was offered; a save from before has played already, so it starts at 1), cb (colour
+//        help) and big (bigger text); cb and big start off from the defaults
 const SAVE_VERSION = 14;
 function migrate(s) {
   if (!s.saveVersion) {
