@@ -14,15 +14,23 @@ function mixC(a, b, t) {
     B = hexRGB(b);
   return 'rgb(' + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',') + ')';
 }
-// Chunk values (dusk, fireflies) blend over the last 300 px of each chunk.
+// Chunk values (dusk, fireflies) blend over the last 300 px of each chunk, into the next chunk of the same place.
+// Into a new place they hold, and carry on a little way into it while the two places' scenery blends
+// (biomes.js segMix), so the woods' evening doesn't turn back into morning at the end of the trail.
 function chunkVal(x, k) {
   const c = LV.ch;
   for (let i = 0; i < c.length; i++) {
     const a = c[i];
     if (x < a.x0 + a.w || i === c.length - 1) {
-      const n = c[i + 1],
-        f = n ? Math.max(0, Math.min(1, (x - (a.x0 + a.w - 300)) / 300)) : 0;
-      return a[k] + ((n ? n[k] : a[k]) - a[k]) * f;
+      const n = c[i + 1] && c[i + 1].look === a.look ? c[i + 1] : null,
+        f = n ? Math.max(0, Math.min(1, (x - (a.x0 + a.w - 300)) / 300)) : 0,
+        v = a[k] + ((n ? n[k] : a[k]) - a[k]) * f,
+        pv = c[i - 1];
+      if (pv && pv.look !== a.look) {
+        const h = Math.max(0, Math.min(1, (x - a.x0 - 400) / 300));
+        return pv[k] + (v - pv[k]) * h;
+      }
+      return v;
     }
   }
   return 0;

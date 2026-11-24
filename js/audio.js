@@ -215,24 +215,55 @@ function playStep(P, lvl) {
     for (const m of ms) if (m !== null && !isNaN(m)) INS[p.ins](t, hz(m), d, v, P.g);
   }
 }
-const MUS = { cur: null, want: undefined, old: [], lvl: 0 };
-// Fade out what's playing and start a song (or nothing)
-function musStart(id) {
-  const t = AC.currentTime + 0.06;
-  if (MUS.cur) {
-    const g = MUS.cur.g.gain;
-    g.cancelScheduledValues(t);
-    g.setValueAtTime(g.value, t);
-    g.linearRampToValueAtTime(0, t + 0.7);
-    MUS.old.push({ g: MUS.cur.g, end: t + 3 });
-  }
+const MUS = { cur: null, want: undefined, old: [], lvl: 0, next: undefined, at: null, gap: 0, fin: 1 };
+// Fade out what's playing over `out` seconds
+function musFade(out) {
+  if (!MUS.cur) return;
+  const t = AC.currentTime + 0.03,
+    g = MUS.cur.g.gain;
+  g.cancelScheduledValues(t);
+  g.setValueAtTime(g.value, t);
+  g.linearRampToValueAtTime(0, t + out);
+  MUS.old.push({ g: MUS.cur.g, end: t + out + 3 });
   MUS.cur = null;
+}
+// Start a song at time `at`, fading in over `fin` seconds
+function musPlay(id, at, fin) {
   if (!id || !MUSIC[id]) return;
   const g = AC.createGain();
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(1, t + 0.5);
+  g.gain.setValueAtTime(0, at);
+  g.gain.linearRampToValueAtTime(1, at + fin);
   g.connect(AUD.mus);
-  MUS.cur = { id, song: MUSIC[id], g, t, step: 0, done: false };
+  MUS.cur = { id, song: MUSIC[id], g, t: at, step: 0, done: false, loops: 0, rest: 0 };
+}
+// How one song hands over to the next: a short tune in between (sting), how long the old one fades (out), the quiet
+// before the new one (gap) and how slowly it comes in (fin)
+const IN_GAME = id => !!id && (!!BIOMES[id] || id === 'boss' || id === 'arcade' || id === 'training');
+function musTrans(from, to) {
+  if (to === 'boss') return { sting: 'bossin', out: 0.5, gap: 0.2, fin: 0.3 };
+  if (from === 'boss' && IN_GAME(to)) {
+    const won = MODE === LEVEL && LV && LV.encs.some(e => e.boss && e.st === 2); // not when you were knocked out
+    return { sting: won ? 'bosswin' : null, out: won ? 0.5 : 1.5, gap: 1.2, fin: 2.5 };
+  }
+  if (IN_GAME(to) && !IN_GAME(from)) return { sting: to === 'training' ? null : 'go', out: 0.8, gap: 0.4, fin: 1.5 };
+  if (BIOMES[from] && BIOMES[to]) return { out: 2.5, gap: 1.2, fin: 3 }; // walking on into the next place
+  if (to === 'victory' || to === 'over') return { out: 0.8, gap: 0.5, fin: 0.05 };
+  if (from === undefined) return { out: 0, gap: 0, fin: 1 };
+  return { out: 1.5, gap: 1.2, fin: 2 }; // back to the menus
+}
+function musGo(from, to) {
+  const now = AC.currentTime,
+    playing = MUS.cur && MUS.cur.song.sting && !MUS.cur.done;
+  MUS.next = to;
+  if (playing) return; // a sting is playing: the new song still waits for it to finish
+  const tr = musTrans(from, to);
+  musFade(tr.out);
+  MUS.gap = tr.gap;
+  MUS.fin = tr.fin;
+  if (tr.sting && MUSIC[tr.sting]) {
+    musPlay(tr.sting, now + tr.out * 0.4 + 0.05, 0.05);
+    MUS.at = null; // once the sting has played
+  } else MUS.at = now + tr.out + tr.gap;
 }
 // What should be playing: [song, intensity]
 function musWant() {
@@ -256,47 +287,68 @@ function musWant() {
   return ['menu', 0];
 }
 function musicTick() {
-  const [id, lvl] = musWant();
-  if (id !== MUS.want) {
-    MUS.want = id;
-    musStart(id);
-  } else if (MUS.cur && MUS.cur.done) musStart(MUS.cur.song.then); // a jingle played through: what comes after it
-  MUS.lvl = lvl;
-  const P = MUS.cur,
+  const [id, lvl] = musWant(),
     now = AC.currentTime;
+  if (id !== MUS.want) {
+    const from = MUS.want;
+    MUS.want = id;
+    musGo(from, id);
+  } else if (MUS.next === undefined && MUS.cur && MUS.cur.done && MUS.cur.song.then) musGo(MUS.cur.id, MUS.cur.song.then);
+  // the next song, after the sting (and its last notes ringing) or the quiet gap
+  if (MUS.next !== undefined) {
+    if (MUS.at === null && (!MUS.cur || MUS.cur.done)) MUS.at = (MUS.cur ? MUS.cur.t : now) + MUS.gap;
+    if (MUS.at !== null && now >= MUS.at) {
+      const n = MUS.next;
+      MUS.next = undefined;
+      if (MUS.cur && MUS.cur.done) musFade(0.3);
+      musPlay(n, now + 0.02, MUS.fin);
+    }
+  }
+  MUS.lvl = lvl;
+  const P = MUS.cur;
   MUS.old = MUS.old.filter(o => (now > o.end ? (o.g.disconnect(), false) : true));
   // the volume: the Music setting, quieter while paused
   const want = (SET.mus === undefined ? 0.6 : SET.mus) * 0.5 * (paused || SHOWN === 's-pause' ? 0.35 : 1);
   AUD.mus.gain.setTargetAtTime(want, now, 0.1);
   if (!P || !P.song) return;
-  if (P.t < now) P.t = now + 0.02; // after the page was in the background
+  if (P.t < now - 0.1) P.t = now + 0.02; // after the page was in the background
+  // a breather: a place's song (and the menu's) rests a few seconds every other time round, while it's calm;
+  // a fight brings it straight back
+  if (P.rest > now && lvl > 0) P.t = now + 0.02;
   const sd = 60 / P.song.bpm / (P.song.div || 4),
     len = P.song.prog.length * (P.song.beats || 4) * (P.song.div || 4);
   while (P.t < now + 0.2 && !P.done) {
     playStep(P, lvl);
     P.t += sd;
     P.step++;
-    if (P.song.once && P.step >= len) P.done = true;
+    if (P.step % len === 0) {
+      if (P.song.once) P.done = true;
+      else if (++P.loops % 2 === 0 && lvl === 0 && (BIOMES[P.id] || P.id === 'menu')) {
+        P.t += 4;
+        P.rest = P.t;
+      }
+    }
   }
 }
 // ===== BACKGROUND SOUND (per place) =====
-const AMBS = { src: null, f: null, g: null, look: null, t: 0 };
-// what each place sounds like: wind (filtered noise, rising and falling), waves, a hum; and little events
+const AMBS = { src: null, f: null, g: null, look: null, t: 0, puff: null };
+// what each place sounds like: a bed of filtered noise (waves, a hum) and little events. The windy places (puff) are
+// nearly still between puffs of wind that come and go, and howl in the mountain's big gusts (weather.js).
 const AMB_LOOK = {
-  woods: { bed: ['bandpass', 500, 0.04, 0.08], ev: 'bird' },
-  meadow: { bed: ['bandpass', 600, 0.05, 0.1], ev: 'bird' },
-  jungle: { bed: ['bandpass', 3500, 0.02, 0.4], ev: 'bird' },
+  woods: { bed: ['bandpass', 500, 0.05, 0], puff: 1, ev: 'bird' },
+  meadow: { bed: ['bandpass', 600, 0.06, 0], puff: 1, ev: 'bird' },
+  jungle: { bed: ['bandpass', 2600, 0.03, 0], puff: 1, ev: 'bird' },
   castle: { bed: ['lowpass', 300, 0.05, 0.1], ev: 'crackle' },
   sewer: { bed: ['lowpass', 250, 0.05, 0.1], ev: 'drip' },
   cave: { bed: ['lowpass', 220, 0.05, 0.1], ev: 'drip' },
   beach: { bed: ['lowpass', 700, 0.1, 0.06], ev: 'gull' },
   ship: { bed: ['lowpass', 600, 0.09, 0.06], ev: 'creak' },
-  slope: { bed: ['bandpass', 800, 0.08, 0.12], ev: null },
-  peak: { bed: ['bandpass', 900, 0.1, 0.15], ev: null },
+  slope: { bed: ['bandpass', 800, 0.09, 0], puff: 1, ev: null },
+  peak: { bed: ['bandpass', 900, 0.1, 0], puff: 1, ev: null },
   base: { bed: ['lowpass', 120, 0.06, 0.02], ev: 'beep' },
   rocket: { bed: ['lowpass', 90, 0.1, 0.02], ev: 'beep' },
   moon: { bed: ['lowpass', 150, 0.04, 0.05], ev: null },
-  ash: { bed: ['bandpass', 700, 0.08, 0.12], ev: 'rumble' },
+  ash: { bed: ['bandpass', 700, 0.08, 0], puff: 1, ev: 'rumble' },
   crater: { bed: ['lowpass', 200, 0.09, 0.05], ev: 'bubble' }
 };
 function ambLook() {
@@ -357,11 +409,25 @@ function ambTick() {
     }
   }
   if (!def) return;
-  // the bed rises and falls (gusts, waves)
-  const [, f, v, sw] = def.bed,
-    w = 0.5 + 0.5 * Math.sin(now * (look === 'beach' || look === 'ship' ? 0.9 : 0.35)) * Math.sin(now * 0.13 + 1);
-  AMBS.g.gain.setTargetAtTime(v * (1 - sw + sw * 2 * w), now, 0.3);
-  AMBS.f.frequency.setTargetAtTime(f * (0.8 + 0.4 * w), now, 0.3);
+  const [, f, v, sw] = def.bed;
+  if (def.puff) {
+    // wind: a puff now and then, swelling and fading with a flutter; between puffs, almost nothing
+    const pf = AMBS.puff;
+    if (pf && now > pf.t0 + pf.d) AMBS.puff = null;
+    if (!AMBS.puff && Math.random() < 0.005)
+      AMBS.puff = { t0: now, d: 1.2 + Math.random() * 2.6, a: 0.35 + Math.random() * 0.65, fl: 5 + Math.random() * 6 };
+    const q = AMBS.puff,
+      ph = q ? (now - q.t0) / q.d : 0,
+      w = q ? q.a * Math.pow(Math.sin(Math.PI * ph), 2) * (0.8 + 0.2 * Math.sin(now * q.fl)) : 0,
+      gu = gustAmt(); // the peak's big gust
+    AMBS.g.gain.setTargetAtTime(v * (0.06 + 1.6 * w + 3.2 * gu), now, 0.12);
+    AMBS.f.frequency.setTargetAtTime(f * (0.7 + 0.7 * w + 1.1 * gu), now, 0.15);
+  } else {
+    // the bed rises and falls (waves, a hum)
+    const w = 0.5 + 0.5 * Math.sin(now * (look === 'beach' || look === 'ship' ? 0.9 : 0.35)) * Math.sin(now * 0.13 + 1);
+    AMBS.g.gain.setTargetAtTime(v * (1 - sw + sw * 2 * w), now, 0.3);
+    AMBS.f.frequency.setTargetAtTime(f * (0.8 + 0.4 * w), now, 0.3);
+  }
   if (def.ev && Math.random() < 0.006) ambEvent(def.ev, now + 0.02);
 }
 // ===== SOUNDS THAT FOLLOW THE SCREEN =====

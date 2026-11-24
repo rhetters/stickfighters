@@ -3,6 +3,7 @@
 //   bpm      beats per minute; beats = beats per bar (4, or 3 for a waltz); div = steps per beat (4, or 3 for a lilt)
 //   prog     one chord per bar ('Dm', 'C', 'A7', 'Bbmaj7', 'Gsus4'); the song loops after the last
 //   once     play it one time only (a jingle), then the song named by then (or silence)
+//   sting    a short tune between two songs (audio.js musTrans picks which); the next song waits for it
 //   parts    the instruments, each playing a pattern:
 //     ins    bass, pluck, lead, flute, brass, organ, accordion, marimba, bell, arp, pad, drums
 //     lvl    the least intensity it plays at: 0 = always (walking, menus), 1 = in a fight, 2 = a boss (default 0)
@@ -490,6 +491,48 @@ const MUSIC = {
           'E5 - - - G5 - - - Bb5 - - - . . . .'
         ]
       }
+    ]
+  },
+  // ===== STINGS: short tunes between two songs =====
+  // Into a game: a drum roll and a rising "here we go"
+  go: {
+    bpm: 120,
+    once: 1,
+    sting: 1,
+    prog: ['G', 'C'],
+    parts: [
+      { ins: 'drums', pat: 's . . . s . . . s . s . s s s s|k . . . . . . . . . . . . . . .' },
+      { ins: 'arp', o: 4, v: 0.45, pat: 'R 3 5 8 R 3 5 8 3 5 8 9 5 8 9 8|. . . . . . . . . . . . . . . .' },
+      { ins: 'brass', o: 4, v: 0.6, pat: '. . . . . . . . . . . . . . . .|c - - - - - - - . . . . . . . .' },
+      { ins: 'bass', pat: 'R . . . . . . . R . . . R . R .|R - - - - - - - . . . . . . . .' },
+      { ins: 'lead', v: 0.8, mel: ['G4 - - - B4 - - - D5 - - - G5 - - -', 'C6 - - - - - - - . . . . . . . .'] }
+    ]
+  },
+  // A boss arrives: low toms rolling in, a dark brass chord
+  bossin: {
+    bpm: 96,
+    once: 1,
+    sting: 1,
+    prog: ['Cm', 'G'],
+    parts: [
+      { ins: 'drums', pat: 'k . . . . . . . t . . . t . t t|k . . . t t t t t t t t k . . .' },
+      { ins: 'brass', o: 3, v: 0.7, pat: 'c - - - - - - - . . . . . . . .|c - - - - - - - - - - - . . . .' },
+      { ins: 'bass', v: 1.2, pat: 'R - - - - - - - R - - - R - - -|R - - - - - - - - - - - . . . .' },
+      { ins: 'lead', v: 0.6, mel: ['C5 - - - - - - - B4 - - - C5 - - -', 'D5 - - - - - - - G4 - - - - - . .'] }
+    ]
+  },
+  // The boss is beaten: ta-da!
+  bosswin: {
+    bpm: 140,
+    once: 1,
+    sting: 1,
+    prog: ['G', 'C'],
+    parts: [
+      { ins: 'drums', pat: 'k . s . k . s . k k s s k s s s|k . . . . . . . . . . . . . . .' },
+      { ins: 'brass', o: 4, v: 0.55, pat: 'c . c . c . . . . . c - - - . .|c - - - - - - - . . . . . . . .' },
+      { ins: 'bass', pat: 'R . . . R . . . R . . . 5 . . .|R - - - - - - - . . . . . . . .' },
+      { ins: 'lead', mel: ['D5 . D5 . D5 . G5 - - - B5 - - - . .', 'C6 - - - - - - - - - - - . . . .'] },
+      { ins: 'bell', o: 5, v: 0.4, pat: '. . . . . . . . . . . . . . . .|R . 3 . 5 . 8 . . . . . . . . .' }
     ]
   },
   // The victory screen: a fanfare, then the menu tune

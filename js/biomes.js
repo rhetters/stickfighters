@@ -1273,6 +1273,7 @@ function drawPeak() {
 // Falling snow in front
 function drawSnowFg() {
   if (!live()) return;
+  const gu = gustAmt(); // a big gust blows the snow sideways (weather.js)
   if (AMB.filter(a => a.k === 'snow').length < 40 && Math.random() < 0.4)
     AMB.push({ k: 'snow', x: Math.random() * (W + 200), y: -10, vx: -0.6 - Math.random() * 0.6, vy: 0.8 + Math.random() * 1.2, r: 1.5 + Math.random() * 2.5 });
   ctx.fillStyle = 'rgba(255,255,255,0.95)';
@@ -1281,14 +1282,15 @@ function drawSnowFg() {
   for (let i = AMB.length - 1; i >= 0; i--) {
     const a = AMB[i];
     if (a.k !== 'snow') continue;
-    a.x += a.vx + Math.sin((fr + i * 13) * 0.05) * 0.4;
+    a.x += a.vx - gu * 16 + Math.sin((fr + i * 13) * 0.05) * 0.4;
     a.y += a.vy;
     ctx.beginPath();
     ctx.arc(a.x, a.y, a.r, 0, 7);
     ctx.fill();
     ctx.stroke();
-    if (a.y > H + 10) AMB.splice(i, 1);
+    if (a.y > H + 10 || a.x < -60) AMB.splice(i, 1);
   }
+  drawGust();
 }
 // Meadow, mountainside and peak props; returns true when it drew one
 function drawMountainPropDone(k, x, s) {

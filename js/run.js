@@ -179,6 +179,7 @@ function genRun(themeId, seed, ng = 0) {
         }
     }
     // 3. the main boss (last biome), or a transition into the next biome
+    const end0 = ch.length;
     if (last) {
       const c = chunk(B, bi, 1300, scatter(B, 1300, 4)),
         at = 650,
@@ -244,6 +245,11 @@ function genRun(themeId, seed, ng = 0) {
       seg.x1 = k === 'rope' ? t.x : x;
       t.nx = x; // where the next biome starts
       trans.push(t);
+    }
+    // the biome's last stretch keeps its last light (the woods stay at dusk to the end)
+    for (let j = end0; j < ch.length; j++) {
+      ch[j].dusk = light(n - 1);
+      ch[j].flies = ch[j].dusk > 0.6 ? 1 : 0;
     }
   });
   return {
