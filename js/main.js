@@ -558,8 +558,8 @@ function resize() {
     const tp = $('trainpanel');
     document.body.style.setProperty('--ph', tp.offsetHeight + 28 + 'px');
   }
-  // a little less sharp when the device can't keep up (PERF, set by the main loop)
-  const d = Math.max(1, Math.min(PERF.low ? 1.25 : 2, (cv.clientWidth / W) * (window.devicePixelRatio || 1)));
+  // a little less sharp when the device can't keep up (SLOWDRAW, set by the main loop)
+  const d = Math.max(1, Math.min(SLOWDRAW.low ? 1.25 : 2, (cv.clientWidth / W) * (window.devicePixelRatio || 1)));
   if (d !== gridDPR) {
     DPR = d;
     cv.width = Math.round(W * d);
@@ -588,12 +588,12 @@ function tick() {
 }
 // Performance: if frames keep taking too long (about 40 per second or fewer for 3 seconds), draw at a lower
 // resolution for the rest of the visit. Drawing only.
-const PERF = { low: false, slow: 0 };
+const SLOWDRAW = { low: false, slow: 0 };
 function perfWatch(dt) {
-  if (PERF.low || document.hidden || !(state === 'play' || state === 'train')) return;
-  PERF.slow = dt > 25 ? PERF.slow + 1 : Math.max(0, PERF.slow - 2);
-  if (PERF.slow > 120) {
-    PERF.low = true;
+  if (SLOWDRAW.low || document.hidden || !(state === 'play' || state === 'train')) return;
+  SLOWDRAW.slow = dt > 25 ? SLOWDRAW.slow + 1 : Math.max(0, SLOWDRAW.slow - 2);
+  if (SLOWDRAW.slow > 120) {
+    SLOWDRAW.low = true;
     gridDPR = 0;
     resize();
   }
