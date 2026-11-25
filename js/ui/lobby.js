@@ -13,7 +13,8 @@ const PCOL = [
 const GUESTCOL = ['col-orange', 'col-sky', 'col-green', 'col-purple'];
 let LOBBY = [],
   TEAMS = false;
-const LB = { max: 4, mode: 'level', theme: 'castle', lvl: null }; // the room size (2 to 4), the mode, the story picked
+const LB = { max: 4, mode: 'level', theme: 'castle', lvl: null, story: 'castle', pages: newPages() }; // the room size
+// (2 to 4), the mode, the story picked (story: the last one, for coming back from MY LEVELS); pages: the tiles' pages
 // (or 'mine': one of your own levels, lvl)
 // ===== FIGHTER PICKS =====
 // Like Mario Kart: each player picks a saved fighter (or plays as a guest) and can change the colour and hat for
@@ -210,9 +211,16 @@ function renderLobby() {
   roomTiles(
     $('lb-sub'),
     LB.mode === 'level'
-      ? LB.theme === 'mine'
-        ? levelTiles(EDIT.levels, (pickedLevel(EDIT.levels, LB.lvl) || {}).id, v => ((LB.lvl = v), renderLobby()), () => ((LB.theme = 'castle'), renderLobby()))
-        : storyTiles(LB.theme, v => ((LB.theme = v), renderLobby()))
+      ? storyRow({
+          mine: LB.theme === 'mine',
+          cur: LB.theme === 'mine' ? levelCur(EDIT.levels, LB.lvl) : LB.theme,
+          levels: EDIT.levels,
+          pages: LB.pages,
+          pick: v => (LB.theme === 'mine' ? (LB.lvl = v) : (LB.theme = v), renderLobby()),
+          toMine: () => ((LB.story = LB.theme), (LB.theme = 'mine'), renderLobby()),
+          toStories: () => ((LB.theme = LB.story || 'castle'), renderLobby()),
+          redraw: renderLobby
+        })
       : vs
         ? teamTiles(TEAMS, v => ((TEAMS = v), renderLobby()))
         : []
@@ -290,8 +298,8 @@ function startMulti(kind) {
   else if (kind === 'level')
     if (LB.theme === 'mine') {
       // one of your own levels
-      const L = pickedLevel(EDIT.levels, LB.lvl);
-      if (L) themeBurst($('s-lobby').querySelector('[data-lvl="' + L.id + '"]'), () => startCustom(L, 'menu'));
+      const L = levelToPlay(EDIT.levels, LB.lvl);
+      if (L) themeBurst($('s-lobby').querySelector('[data-lvl="' + (LB.lvl === '?' ? '?' : L.id) + '"]'), () => startCustom(L, 'menu'));
     } else
       themeBurst($('s-lobby').querySelector('[data-theme="' + LB.theme + '"]'), () =>
         LB.theme === '?' ? startRun(surpriseTheme(), 0, true) : startRun(LB.theme)

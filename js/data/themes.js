@@ -23,7 +23,6 @@
 //   ledges   rock ledges in each fight (platforms; the army follows you up and down them), and pools of lava on the
 //            floor between fights. Lava bounces you out with a little damage (it never knocks a player out)
 //   descent  the biome opens with a climb down: ledges stepping down from the rim over a lava pool
-//   enter    the transition that always leads into this biome
 const BIOMES = {
   woods: {
     name: 'WOODED TRAIL',
@@ -315,7 +314,6 @@ const BIOMES = {
     look: 'crater',
     ledges: 1,
     descent: 1,
-    enter: 'rim',
     props: [
       ['obsidian', 3],
       ['magma', 3],
@@ -333,31 +331,49 @@ const BIOMES = {
   }
 };
 // ===== TRANSITIONS between biomes =====
-// Each theme lists the ones it can use (THEMES[].trans); between two biomes one is picked at random among those.
+// Which one carries you from one place to the next is never chosen by hand: TRANS_INTO lists, for each place, the
+// transitions that can carry you INTO it, and one of those is picked at random (from the run's or level's seed).
 //   cine   1 = a short scene plays (players ride it); 0 = you break through and walk on
 //   gap    pixels of world between the two biomes (the rope swings over a chasm)
-//   needs  only between these biomes (either side)
 const TRANSITIONS = {
   catapult: { cine: 1, gap: 700 },
-  cannon: { cine: 1, gap: 700, needs: ['ship'] },
-  pipe: { cine: 1, gap: 700, needs: ['sewer'] },
+  cannon: { cine: 1, gap: 700 },
+  pipe: { cine: 1, gap: 700 },
   rope: { cine: 1, gap: 340 },
-  gate: { cine: 0, gap: 0, hp: 60, needs: ['sewer', 'castle'] },
+  gate: { cine: 0, gap: 0, hp: 60 },
   balloon: { cine: 1, gap: 700 },
   gondola: { cine: 1, gap: 700 },
   climb: { cine: 1, gap: 700 },
   // the launch: jump up the platforms of the launch tower to the rocket, then blast off (tower: 1 builds the
   // platforms; the scene starts when someone stands on the top deck)
-  launch: { cine: 1, gap: 700, needs: ['base'], tower: 1 },
-  landing: { cine: 1, gap: 700, needs: ['moon'] },
+  launch: { cine: 1, gap: 700, tower: 1 },
+  landing: { cine: 1, gap: 700 },
   // the geyser: everyone stands on a giant steam vent and gets blasted up and over to the next biome
-  geyser: { cine: 1, gap: 700, needs: ['jungle'] },
+  geyser: { cine: 1, gap: 700 },
   // the crater's rim: everyone jumps in and lands on the top ledge of the climb down (the crater's enter)
-  rim: { cine: 1, gap: 700, needs: ['crater'] }
+  rim: { cine: 1, gap: 700 }
+};
+// The transitions that can carry you into each place (a balloon never lands in the sewer). The crater is only ever
+// reached over its rim: the jump in lands on the top ledge of its climb down.
+const TRANS_INTO = {
+  woods: ['catapult', 'rope', 'balloon'],
+  sewer: ['pipe'],
+  castle: ['catapult', 'pipe', 'rope', 'gate'],
+  beach: ['catapult', 'rope', 'balloon'],
+  ship: ['catapult', 'cannon', 'rope', 'balloon'],
+  cave: ['catapult', 'cannon', 'rope'],
+  meadow: ['gondola', 'balloon', 'rope'],
+  slope: ['gondola', 'balloon', 'climb', 'rope'],
+  peak: ['gondola', 'balloon', 'climb', 'rope'],
+  base: ['catapult', 'balloon', 'rope'],
+  rocket: ['launch'],
+  moon: ['landing'],
+  jungle: ['catapult', 'rope', 'balloon'],
+  ashslope: ['geyser', 'rope', 'balloon'],
+  crater: ['rim']
 };
 // ===== THEMES =====
 //   c      the theme's colour (its card on the Campaign screen)
-//   trans  the transitions this theme can use between its biomes (TRANSITIONS)
 //   boss   the main boss at the end: enemy type, how it arrives (intro: 'pencil' is drawn in, 'jump' leaps in and
 //          knocks everyone down, 'beam' is beamed down from a flying saucer, 'erupt' bursts out of the lava), who comes
 //          with it, and its lines
@@ -369,7 +385,6 @@ const THEMES = {
     name: 'CASTLE SIEGE',
     c: '#ff4fa3',
     biomes: ['woods', 'sewer', 'castle'],
-    trans: ['catapult', 'pipe', 'rope', 'gate'],
     boss: {
       t: 'G',
       intro: 'pencil',
@@ -381,7 +396,6 @@ const THEMES = {
     name: 'PIRATE COVE',
     c: '#3ec5ff',
     biomes: ['beach', 'ship', 'cave'],
-    trans: ['catapult', 'cannon', 'rope', 'balloon'],
     boss: {
       t: 'P',
       intro: 'jump',
@@ -393,7 +407,6 @@ const THEMES = {
     name: 'MOUNTAIN',
     c: '#7fbf5f',
     biomes: ['meadow', 'slope', 'peak'],
-    trans: ['gondola', 'balloon', 'climb', 'rope'],
     boss: {
       t: 'Y',
       intro: 'jump',
@@ -405,7 +418,6 @@ const THEMES = {
     name: 'SPACE',
     c: '#8f7bff',
     biomes: ['base', 'rocket', 'moon'],
-    trans: ['launch', 'landing'],
     boss: {
       t: 'Z',
       intro: 'beam',
@@ -417,7 +429,6 @@ const THEMES = {
     name: 'VOLCANO',
     c: '#ff5a1f',
     biomes: ['jungle', 'ashslope', 'crater'],
-    trans: ['geyser', 'rope', 'balloon', 'rim'],
     boss: {
       t: 'K',
       intro: 'erupt',

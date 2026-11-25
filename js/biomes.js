@@ -139,6 +139,8 @@ function drawLevelBg() {
   if (m.b && m.f > 0) drawOver(() => sink(m.b, lookOfSeg(m.b).bg), m.f);
   const cx = CAM.x,
     dk = chunkVal(cx + W / 2, 'dusk');
+  // far-background scenery (your own levels): small, on the horizon, drifting slower than the world
+  sink(m.f > 0.5 && m.b ? m.b : m.a, () => drawFarProps(dk));
   ctx.save();
   // the world's props in the same view as the fighters (zoomed out and raised on the launch tower)
   camApply(viewX(), CAM.y, CAM.z);
@@ -147,7 +149,7 @@ function drawLevelBg() {
     if (c.x0 < cx + W + 400 && c.x0 + c.w > cx - 400)
       for (const p of c.props) {
         const x = c.x0 + p.x;
-        if (x > cx - 360 && x < cx + W + 360 && !(c.look === 'castle' && onWindow(p.k, x)))
+        if (!p.l && x > cx - 360 && x < cx + W + 360 && !(c.look === 'castle' && onWindow(p.k, x)))
           lifted(x, () => drawProp(p, x, dk));
       }
   for (const g of LV.gates) lifted(g.x, () => drawGate(g));
@@ -161,11 +163,65 @@ function drawLevelFg() {
   const m = segMix(),
     S = m.f > 0.5 && m.b ? m.b : m.a,
     dy = CAM_OWN.includes(BIOMES[S.b].look) ? 0 : -CAM.y * CAM.z;
-  if (dy < 0.5) return lookOfSeg(S).fg();
-  ctx.save();
-  ctx.translate(0, dy);
-  lookOfSeg(S).fg();
-  ctx.restore();
+  if (dy < 0.5) lookOfSeg(S).fg();
+  else {
+    ctx.save();
+    ctx.translate(0, dy);
+    lookOfSeg(S).fg();
+    ctx.restore();
+  }
+  drawFrontProps();
+}
+// Scenery on the far and front layers (a prop's l: 'z' or 'f'; the level creator). Drawing only.
+const FAR_K = 0.6, // far scenery's size and how fast it drifts past
+  FAR_Y = 46, // how far above the ground line its horizon is
+  PROPA = new WeakMap(); // each front prop's see-through amount
+function drawFarProps(dk) {
+  const cx = CAM.x + W / 2;
+  for (const c of LV.ch)
+    for (const p of c.props) {
+      if (p.l !== 'z') continue;
+      const px = c.x0 + p.x,
+        sx = W / 2 + (px - cx) * FAR_K;
+      if (sx < -260 || sx > W + 260) continue;
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.translate(sx, G - FAR_Y);
+      ctx.scale(FAR_K, FAR_K);
+      ctx.translate(-px, -G);
+      drawProp(p, px, dk);
+      ctx.restore();
+    }
+}
+// Front scenery stands a little nearer (bigger and lower) in front of the fighters, and turns see-through while
+// someone is behind it (fixed: the level creator's picture, always a little see-through)
+function drawFrontProps(fixed) {
+  const cx = CAM.x,
+    dk = chunkVal(cx + W / 2, 'dusk');
+  let any = false;
+  for (const c of LV.ch)
+    for (const p of c.props) {
+      if (p.l !== 'f') continue;
+      const px = c.x0 + p.x;
+      if (px < cx - 400 || px > cx + W + 400) continue;
+      if (!any) {
+        any = true;
+        ctx.save();
+        camApply(viewX(), CAM.y, CAM.z);
+      }
+      const behind = [...PL, ...E].some(f => !f.hide && !f.gone && f.st !== 'dead' && Math.abs(f.x - px) < 90 * (p.s || 1)),
+        a0 = PROPA.has(p) ? PROPA.get(p) : 1,
+        al = fixed || a0 + ((behind ? 0.4 : 1) - a0) * 0.15;
+      if (!fixed) PROPA.set(p, al);
+      ctx.save();
+      ctx.globalAlpha = al;
+      ctx.translate(px, G + 26);
+      ctx.scale(1.25, 1.25);
+      ctx.translate(-px, -G);
+      lifted(px, () => drawProp(p, px, dk));
+      ctx.restore();
+    }
+  if (any) ctx.restore();
 }
 // ===== SEWER: brick arches, pipes along the wall, a stone walkway and a water channel in front =====
 function drawSewer() {

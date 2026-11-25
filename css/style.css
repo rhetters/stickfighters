@@ -2052,7 +2052,8 @@ body.padnav #ui select:focus {
     'Arial Black',
     sans-serif;
   color: #a39aa8;
-  white-space: nowrap;
+  line-height: 1.05;
+  text-wrap: balance;
   transition: color 0.15s;
 }
 .thcard small {
@@ -2808,17 +2809,21 @@ body.padnav .ptile:focus b {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
 }
 .rmrow {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 .rmrow .ptile {
-  --ps: max(44px, min(calc(var(--wh, 440px) * 0.15), 70px));
+  --ps: max(42px, min(calc(var(--wh, 440px) * 0.135), 64px));
 }
 .rmrow .ptile b {
-  font-size: max(10px, calc(var(--ps) * 0.2));
+  max-width: calc(var(--ps) + 8px);
+  line-height: 1.05;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  font-size: max(9px, calc(var(--ps) * 0.18));
 }
 /* the difficulty: three small tiles beside the room's sticky note, and under the Solo tiles */
 .rmtop > .rmdiff {
@@ -3320,6 +3325,17 @@ body.big .screen p {
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
+  pointer-events: none; /* its box can reach under the tabs: only the button and the label take taps */
+}
+.edplay > * {
+  pointer-events: auto;
+}
+.edlayers {
+  display: flex;
+  gap: 3px;
+  align-self: center;
+  flex: 0 0 auto;
+  margin-right: 4px;
 }
 #ed-part {
   padding: 1px 8px;
@@ -3433,16 +3449,12 @@ body.big .screen p {
 .th-mine {
   background-color: transparent;
 }
-#s-themes,
-.rmroom {
-  position: relative;
-}
 .nostar {
   position: absolute;
   z-index: 3;
-  right: 2%;
-  bottom: -6px;
-  width: max(92px, min(calc(var(--wh, 440px) * 0.27), 136px));
+  right: 1.5%;
+  bottom: 2%;
+  width: max(84px, min(calc(var(--wh, 440px) * 0.24), 124px));
   aspect-ratio: 1;
   transform: rotate(-12deg);
   filter: drop-shadow(2.5px 0 0 #1c1626) drop-shadow(-2.5px 0 0 #1c1626) drop-shadow(0 2.5px 0 #1c1626)
@@ -3452,11 +3464,6 @@ body.big .screen p {
 }
 .nostar[hidden] {
   display: none;
-}
-#th-nostar {
-  top: 4%;
-  bottom: auto;
-  right: 4%;
 }
 .nostar i {
   display: flex;
@@ -3483,4 +3490,43 @@ body.big .screen p {
   from {
     transform: rotate(-30deg) scale(0.3);
   }
+}
+/* Paging the stories and MY LEVELS five at a time: up and down arrows, stacked, left of the first tile */
+.pgarrows {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.pgarrows button {
+  width: max(28px, min(calc(var(--wh, 440px) * 0.07), 40px));
+  aspect-ratio: 1;
+  padding: 0;
+  border: 3px solid #1c1626;
+  border-radius: 50%;
+  background: #fff8ec;
+  color: #1c1626;
+  font-size: max(11px, min(calc(var(--wh, 440px) * 0.03), 16px));
+  line-height: 1;
+  box-shadow: 0 3px 0 #1c1626;
+  cursor: pointer;
+}
+.pgarrows button:disabled {
+  opacity: 0.3;
+  box-shadow: none;
+  cursor: default;
+}
+.pgarrows button:focus-visible {
+  outline: 3px solid #ffd400;
+  outline-offset: 2px;
+}
+.rmrow .pgarrows {
+  align-self: flex-start;
+  height: max(42px, min(calc(var(--wh, 440px) * 0.135), 64px));
+  margin-top: 2px;
+}
+#th-cards .pgarrows {
+  align-self: center;
+  margin-bottom: 30px;
 }

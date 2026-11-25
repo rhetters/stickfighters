@@ -2,6 +2,16 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M17: places, a boss and scenery layers in the level creator; five tiles at a time (November 25, 2026)
+- **More places** (asked by Ron and Rhett): ADD A PLACE (in PARTS) adds up to three places to a level, each with up to 6 parts, so a level can run from the Wooded Trail into the Sewer into the Castle. Old levels become a level with one place.
+- **Transitions are picked for you:** every transition is now listed under the places it can carry you *into* (a balloon never lands in the sewer), and between two places one of those is picked at random. Online every device gets the same one. Stories use the same list now (into the sewer it's always the pipe).
+- **A boss:** the BOSS tool puts one of the five main bosses in the level's very last part. He arrives the way he does in his story, and beating him ends the fight like a story's finale.
+- **Scenery layers:** SCENERY can go far back (small, drifting slowly on the horizon), back (as before) or in front of the fighters (see-through while someone is behind it).
+- **Your levels act like their places:** wind gusts on the Snowy Peak, lava rocks and lava in the volcano, the crater's climb down after jumping in over the rim, and each place's own music.
+- **Five at a time** on the Story screen, the Players screen and online: five stories (or five of your levels), then **?** and **MY LEVELS** (or **STORIES**) on the right, with up and down arrows on the left to page through more. Under MY LEVELS, **?** plays one of your levels at random.
+- The red NO XP OR NINJA STARS sticker sits in the bottom-right corner, so it never covers a tile.
+- Save version 18 (levels have places). Version 66.
+
 ## M17: MY LEVELS (November 24, 2026)
 - **MY LEVELS** (asked by Ron and Rhett after testing): on the Story screen (Solo), the Players screen (Local) and in an online room there's a MY LEVELS tile. It swaps the stories for the host's own levels, each with its picture, and a red spiky sticker says they earn **no XP or ninja stars**. Online the host's levels go to everyone in the room, so friends with the room code all play the same level (custom levels will never be in matchmaking). At the end: the results and PLAY AGAIN.
 - **In stories is gone:** the star on a part and Rhett's parts turning up in stories were taken out; stories are made exactly as before.

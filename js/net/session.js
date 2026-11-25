@@ -473,7 +473,7 @@ function netStart() {
   if (NET.mode === 'vs' && !netVsReady()) return false;
   const ids = Object.keys(THEMES),
     myst = NET.theme === '?',
-    mine = NET.mode === 'level' && NET.theme === 'mine' ? pickedLevel(netLevels(), NET.lvl) : null,
+    mine = NET.mode === 'level' && NET.theme === 'mine' ? levelToPlay(netLevels(), NET.lvl) : null,
     theme = myst ? ids[Math.floor(Math.random() * ids.length)] : NET.theme;
   if (NET.mode === 'level' && NET.theme === 'mine' && !mine) return false;
   const r = live.map(p => p.rtt || 0).sort((a, b) => b - a),
@@ -494,7 +494,8 @@ function netStart() {
       // House mode visits the host's house (decoration only, so it can't affect the simulation)
       house: NET.mode === 'house' ? normHouse(HOUSE) : undefined,
       // MY LEVELS sends the whole level, so everyone builds the same one
-      level: mine ? normLevel(mine) : undefined
+      level: mine ? normLevel(mine) : undefined,
+      lq: mine && NET.lvl === '?' ? 1 : undefined
     };
   netAll(msg);
   netStartLocal(msg);
@@ -519,7 +520,7 @@ function netStartLocal(m) {
   // from the room, a story's tile bursts open first (ui/themes.js); the match starts when it's done
   if (m.mode === 'level' && SHOWN === 's-online' && !m.shown) {
     const t = $('s-online').querySelector(
-      m.level ? '[data-lvl="' + m.level.id + '"]' : '[data-theme="' + (m.myst ? '?' : m.theme) + '"]'
+      m.level ? '[data-lvl="' + (m.lq ? '?' : m.level.id) + '"]' : '[data-theme="' + (m.myst ? '?' : m.theme) + '"]'
     );
     return themeBurst(t, () => netStartLocal({ ...m, shown: 1 }));
   }
