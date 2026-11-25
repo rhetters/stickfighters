@@ -26,7 +26,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M14 | Boss level | Done | L | M13 | A look of its own for every boss, a slow-motion finale, a victory screen and harder replays, online rooms of 6, picture menus |
 | M15 | Platforms, vertical layers and boss fights | Done | L | M13, M14 | The Volcano: steam vents, falling lava rocks, a climb down into the crater on ledges the pink army follows you up and down, and the Pink Tiki's lava escape |
 | M16 | Polish, audio, balance | Done | L | M8–M15 | Music for every theme and boss, a full sound pass, difficulty choices, a balance pass, a first-play tutorial, a picture-menu character screen |
-| M17 | Level creator | Next | L | M8, M13 | Rhett builds levels that join the procedural pools |
+| M17 | Level creator | Next | L | M8, M13 | Rhett builds levels and plays them alone, locally or online |
 | M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
@@ -36,17 +36,17 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 ### M17 · Level creator
 
 - A mode for Rhett that edits a grid and saves a chunk or a whole level in the same data format the game uses.
-- His levels can be played directly and can be added to the procedural pools.
+- His levels can be played directly: alone, locally or online with a room code.
 - Levels are checked when loaded (sizes, known IDs only) and are never run as code (rule R3).
 
 How it works (decided by Claude, November 24; Ron asked for its picture between CHARACTER and HOUSE on Customize):
 - **LEVELS** on Customize opens Rhett's levels (up to 12) and NEW LEVEL, which asks for a place (any of the 15 biomes, shown as pictures of the real scenery).
 - **The editor** shows the real scenery of that place with a grid over it, like the house builder: picture tools for **platforms** (tap or drag along a row, five heights), **enemies** (the six pink army types and the place's own mini-boss, dropped where you tap, up to 10 a fight), **scenery** (that place's props), the **fight flag** (where the fight locks the screen) and the **eraser**. A level is up to 6 parts; each part is 900 to 2400 pixels wide.
 - **PLAY** plays the level right away from the editor (a sign at the start, an arch at the end) and comes back to it. Playing your own levels earns no stars or XP, so they can't be used to farm.
-- **In stories:** a star on each part with a fight puts it in that place's pool. When a story is generated, each fight in that place has a chance of being one of Rhett's parts instead (his platforms, enemies and scenery). Online, the host's parts go to everyone with the start of the run.
+- **MY LEVELS** (asked by Ron after testing, replacing the first plan of starred parts turning up in stories): on the Story screen (Solo), the Players screen (Local) and in an online room, a MY LEVELS tile swaps the stories for the host's own levels, with a red sticker: no XP or ninja stars. Online the host's levels go to everyone in the room and the one picked goes with the start. Custom levels will never be offered in matchmaking; a room code means you're already playing with friends.
 - **Checked when loaded:** sizes and counts are limited, only known places, enemy types and scenery are kept, everything else is dropped. Levels live in the save (a new save version).
 
-Built (version 63, see the CHANGELOG): all of the above. Still to do: Rhett tries it on the iPad.
+Built (versions 63 to 65, see the CHANGELOG): all of the above. Still to do: Rhett tries it on the iPad.
 
 **Done when:** Rhett builds a level on the iPad, plays it, and sees his chunks appear in generated runs.
 
@@ -71,4 +71,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-M17: Rhett builds a level on the iPad, plays it, and stars a part to see it turn up in a story.
+M17: Rhett builds a level on the iPad, then plays it from MY LEVELS alone, on Local and online.

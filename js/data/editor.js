@@ -7,8 +7,7 @@
 //   props  scenery: [{ k (one of the biome's props), x, s (size) }]
 //   foes   the fight's enemies: [{ t (an enemy type), x }]; they drop in over x when the fight starts
 //   at     the fight flag: where the fight stops the screen (only with foes)
-//   pool   1 = this part can turn up in generated stories through its biome (only with foes)
-const ED_LIM = { levels: 12, parts: 6, cols: [15, 40], plats: 12, foes: 10, props: 16, name: 16, pool: 24 };
+const ED_LIM = { levels: 12, parts: 6, cols: [15, 40], plats: 12, foes: 10, props: 16, name: 16 };
 const ED_CELL = 60; // a grid square, in pixels
 const ED_ROWS = 5; // platforms go 1 to 5 squares above the ground
 // The pink army types you can place (and each place's own mini-boss, BIOMES[b].mini.t)
@@ -26,5 +25,3 @@ const ED_PLAT = {
   moon: 'metal',
   crater: 'rock'
 };
-// The chance that a fight in a generated story is one of Rhett's parts for that biome (when he has any)
-const ED_POOL_CHANCE = 0.4;

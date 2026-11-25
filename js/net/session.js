@@ -21,7 +21,9 @@ const NET = {
   players: [], // [{ slot, id, name, f (fighter), cid (colour id), team (0 or 1), rtt, left }]
   mode: 'level',
   teams: false, // Versus in two teams instead of free-for-all
-  theme: 'castle', // the story a co-op run plays ('?' = a surprise theme, with a bonus)
+  theme: 'castle', // the story a co-op run plays ('?' = a surprise theme, with a bonus; 'mine' = one of the host's levels)
+  lvl: null, // under MY LEVELS: the id of the host's level picked
+  lvls: [], // a guest's copy of the host's levels (the host sends them one by one when a guest joins)
   max: 4, // the room size the host picked (2 to MAX_ONLINE)
   diff: 1, // the difficulty the host picked for Story and Arcade (data/difficulty.js)
   match: false, // a match is running
@@ -113,6 +115,8 @@ function netColours() {
     taken.push(c);
   }
 }
+// The levels MY LEVELS offers in a room: the host's own, or a guest's copy of them
+const netLevels = () => (NET.host ? EDIT.levels : NET.lvls.filter(Boolean));
 function netRoomMsg() {
   return {
     t: 'room',
@@ -120,6 +124,7 @@ function netRoomMsg() {
     mode: NET.mode,
     teams: NET.teams,
     theme: NET.theme,
+    lvl: NET.lvl,
     diff: NET.diff,
     max: NET.max,
     players: NET.players.map(p => ({
@@ -214,6 +219,8 @@ function netReset() {
     mySlot: 0,
     teams: false,
     theme: 'castle',
+    lvl: null,
+    lvls: [],
     diff: 1,
     max: 4
   });
@@ -361,6 +368,8 @@ function netHostMsg(id, m) {
     NET.players.push({ slot, id, name: f.name, f, team: slot % 2, rtt: 0, links: [], dv: DEV_KINDS.includes(m.dv) ? m.dv : 'kb' });
     NET.players.sort((a, b) => a.slot - b.slot);
     netSend(id, { t: 'welcome', slot });
+    // the host's own levels, for MY LEVELS (one message each, to keep messages small)
+    EDIT.levels.forEach((L, i) => netSend(id, { t: 'lvl', i, n: EDIT.levels.length, L }));
     sfx(700, 0.12, 'square', 0.04, 300);
     netRoomChanged();
   } else if (!p) return;
@@ -401,6 +410,7 @@ function netHostMsg(id, m) {
 function netClientMsg(m) {
   if (m.t === 'welcome') {
     NET.mySlot = m.slot;
+    NET.lvls = [];
     clearTimeout(NET.joinT);
     if (NET.joinWait) NET.joinWait.ok();
     NET.joinWait = null;
@@ -408,11 +418,21 @@ function netClientMsg(m) {
     clearTimeout(NET.joinT);
     if (NET.joinWait) NET.joinWait.bad(m.why);
     NET.joinWait = null;
+  } else if (m.t === 'lvl') {
+    // one of the host's levels (checked like any level: nothing in it is run)
+    const n = Math.max(0, Math.min(ED_LIM.levels, m.n | 0)),
+      i = m.i | 0;
+    if (i >= 0 && i < n) {
+      NET.lvls[i] = normLevel(m.L);
+      NET.lvls.length = n;
+    }
+    if (typeof renderOnline === 'function') renderOnline();
   } else if (m.t === 'room') {
     NET.players = m.players;
     NET.mode = m.mode;
     NET.teams = !!m.teams;
-    if (THEMES[m.theme] || m.theme === '?') NET.theme = m.theme;
+    if (THEMES[m.theme] || m.theme === '?' || m.theme === 'mine') NET.theme = m.theme;
+    NET.lvl = typeof m.lvl === 'string' ? m.lvl : null;
     NET.max = Math.max(2, Math.min(MAX_ONLINE, m.max || 4));
     NET.diff = DIFFS[m.diff] ? m.diff : 1;
     netMesh();
@@ -453,7 +473,9 @@ function netStart() {
   if (NET.mode === 'vs' && !netVsReady()) return false;
   const ids = Object.keys(THEMES),
     myst = NET.theme === '?',
+    mine = NET.mode === 'level' && NET.theme === 'mine' ? pickedLevel(netLevels(), NET.lvl) : null,
     theme = myst ? ids[Math.floor(Math.random() * ids.length)] : NET.theme;
+  if (NET.mode === 'level' && NET.theme === 'mine' && !mine) return false;
   const r = live.map(p => p.rtt || 0).sort((a, b) => b - a),
     oneWay = ((r[0] || 0) + (r[1] || 0)) / 2,
     D = Math.max(2, Math.min(10, Math.ceil(oneWay / 16.67) + 1)),
@@ -471,8 +493,8 @@ function netStart() {
       teams: NET.mode === 'vs' && NET.teams,
       // House mode visits the host's house (decoration only, so it can't affect the simulation)
       house: NET.mode === 'house' ? normHouse(HOUSE) : undefined,
-      // a story uses the host's starred parts from the level creator, so every device builds the same run
-      pool: NET.mode === 'level' && THEMES[theme] ? edPool(theme) : undefined
+      // MY LEVELS sends the whole level, so everyone builds the same one
+      level: mine ? normLevel(mine) : undefined
     };
   netAll(msg);
   netStartLocal(msg);
@@ -496,7 +518,9 @@ function netFresh(e) {
 function netStartLocal(m) {
   // from the room, a story's tile bursts open first (ui/themes.js); the match starts when it's done
   if (m.mode === 'level' && SHOWN === 's-online' && !m.shown) {
-    const t = $('s-online').querySelector('[data-theme="' + (m.myst ? '?' : m.theme) + '"]');
+    const t = $('s-online').querySelector(
+      m.level ? '[data-lvl="' + m.level.id + '"]' : '[data-theme="' + (m.myst ? '?' : m.theme) + '"]'
+    );
     return themeBurst(t, () => netStartLocal({ ...m, shown: 1 }));
   }
   if (!NET.match) NET.feelKeep = { ...FEEL };
@@ -525,7 +549,8 @@ function netStartLocal(m) {
   applyTouchVis();
   fr = 0;
   if (m.mode === 'vs') startVersus();
-  else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle', 0, !!m.myst, normPool(m.pool));
+  else if (m.mode === 'level' && m.level) startCustom(normLevel(m.level), 'menu');
+  else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle', 0, !!m.myst);
   else if (m.mode === 'house') {
     const host = m.players.find(p => p.slot === 0);
     startHouse({ ...normHouse(m.house, true), name: ((host && host.name) || 'HOST') + "'S HOUSE" });

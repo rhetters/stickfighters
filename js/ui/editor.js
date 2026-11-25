@@ -20,7 +20,7 @@ const ED_HELP = {
   prop: 'Pick some scenery, then tap where it goes.',
   flag: 'Tap where the fight should stop the screen.',
   erase: 'Tap or drag to take things away.',
-  parts: 'A level is up to 6 parts. A part with a star can turn up in stories.'
+  parts: 'A level is up to 6 parts, each up to 2½ screens long.'
 };
 const ED_COLS = W / ED_CELL; // squares across the view (15)
 const edLevel = () => EDIT.levels[EDS.i];
@@ -133,7 +133,7 @@ function edDraw() {
   withCtx(k, () => edScene(edLevel(), EDS.part, EDS.ox, true));
   const p = edPart(),
     L = edLevel();
-  $('ed-part').textContent = 'PART ' + (EDS.part + 1) + ' OF ' + L.parts.length + (p.pool ? ' ★' : '');
+  $('ed-part').textContent = 'PART ' + (EDS.part + 1) + ' OF ' + L.parts.length;
   $('ed-left').disabled = EDS.ox <= 0;
   $('ed-right').disabled = EDS.ox >= p.w - W;
 }
@@ -144,6 +144,25 @@ function edThumb(L) {
   big.height = H;
   withCtx(big.getContext('2d'), () => edScene(L, 0, 0, false));
   return k => k.drawImage(big, 210, 0, 420, 420, 17, 17, 166, 166);
+}
+// The same picture as a tile's image (cached by the level's contents)
+const EDTHUMB = new Map();
+function edThumbURL(L) {
+  const k = JSON.stringify(L);
+  if (!EDTHUMB.has(k)) {
+    const cv = document.createElement('canvas'),
+      draw = edThumb(L);
+    cv.width = cv.height = 200;
+    withCtx(cv.getContext('2d'), () => {
+      ctx.beginPath();
+      ctx.roundRect(17, 17, 166, 166, 16);
+      ctx.clip();
+      draw(ctx);
+    });
+    if (EDTHUMB.size > 40) EDTHUMB.clear();
+    EDTHUMB.set(k, cv.toDataURL());
+  }
+  return EDTHUMB.get(k);
 }
 // ===== MY LEVELS =====
 function openLevels() {
@@ -335,7 +354,6 @@ function edAct(c, r) {
     p.foes = p.foes.filter(f => Math.floor(f.x / ED_CELL) !== c);
     p.props = p.props.filter(q => Math.floor(q.x / ED_CELL) !== c);
     if (r >= 1) edPlatCut(p, x0, r);
-    if (!p.foes.length) delete p.pool;
     if (JSON.stringify(p) === n) return;
   } else return;
   edSave();
@@ -484,8 +502,6 @@ function edPal() {
     );
     edBtn(box, 'SHORTER', () => edWidth(-5), p.w <= ED_LIM.cols[0] * ED_CELL);
     edBtn(box, 'LONGER', () => edWidth(5), p.w >= ED_LIM.cols[1] * ED_CELL);
-    const st = edBtn(box, p.pool ? '★ IN STORIES' : '☆ NOT IN STORIES', edStar, !p.foes.length);
-    st.classList.toggle('on', !!p.pool);
     edBtn(box, EDS.del ? 'TAP AGAIN TO DELETE' : 'DELETE LEVEL', edDelLevel).classList.toggle('warn', !!EDS.del);
   } else {
     const k = EDS.tab;
@@ -535,17 +551,6 @@ function edWidth(d) {
   edPal();
   edDraw();
 }
-function edStar() {
-  const p = edPart();
-  if (!p.foes.length) return;
-  if (p.pool) delete p.pool;
-  else p.pool = 1;
-  edSave();
-  edPal();
-  edDraw();
-  edMsg(p.pool ? 'This part can now turn up in ' + BIOMES[edLevel().b].name + ' in stories!' : 'Kept out of stories.');
-  $('ed-pal').querySelector('.edbtn.on, .edbtn:nth-child(7)').focus({ preventScroll: true });
-}
 function edDelLevel() {
   if (!EDS.del) {
     EDS.del = 1;
@@ -569,7 +574,7 @@ $('ed-name').addEventListener('input', () => {
 $('ed-name').addEventListener('change', () => ($('ed-name').value = edLevel().name));
 $('ed-play').onclick = () => {
   edSave();
-  startCustom(edLevel());
+  startCustom(edLevel(), 'edit');
 };
 $('ed-back').onclick = () => {
   edSave();

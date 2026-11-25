@@ -23,15 +23,11 @@ await A.evaluate(()=>document.querySelector('.pready:not(:disabled)').click());a
 await H.evaluate(()=>document.querySelector('#on-sub [data-theme="castle"]').click());await H.waitForTimeout(400);
 await A.evaluate(()=>document.querySelector('.pready:not(:disabled)').click());await H.evaluate(()=>document.querySelector('.pready:not(:disabled)').click());await H.waitForTimeout(700);
 await Promise.all([H,A].map(q=>q.evaluate(()=>{BURST_MS.on=true})));
-// the host has a starred part from the level creator: it goes to everyone with the start
-await H.evaluate(()=>{EDIT.levels=[normLevel({b:'woods',parts:[{w:1500,plats:[{x1:300,x2:600,h:2}],foes:[{t:'b',x:500}],at:700,pool:1}]})]});
 await H.evaluate(()=>$('on-start').click());await H.waitForTimeout(700);
 ok(await A.evaluate(()=>!!document.querySelector('.burst')&&state!=='play')&&await H.evaluate(()=>!!document.querySelector('.burst')&&state!=='play'),'START: the story tile bursts open on both devices first');
 await H.waitForTimeout(2500);
 ok(await A.evaluate(()=>state==='play'&&MODE===LEVEL)&&await H.evaluate(()=>state==='play'&&MODE===LEVEL),'START starts the game on both devices');
 ok(await A.evaluate(()=>NET.match&&fr>30)&&await H.evaluate(()=>NET.match&&fr>30),'and the match runs on both');
-const shape=()=>JSON.stringify([LV.ch.map(c=>c.w),LV.encs.map(e=>e.list),LV.terr&&LV.terr.s,LV.run.pool.length]);
-ok(await A.evaluate(()=>LV.run.pool.length===1&&EDIT.levels.length===0)&&await A.evaluate(shape)===await H.evaluate(shape),'the host\'s level-creator parts reach the guest, and both build the same story');
 ok(await H.evaluate(()=>NET.players.every(q=>!q.ready)),'nobody is ready any more once it starts');
 // jump to the end of the run on both devices (a shortcut for the test): the victory screen
 await Promise.all([H,A].map(q=>q.evaluate(()=>{LV.encs.forEach(e=>e.st=2);LV.trans.forEach(t=>t.done=1);levelClear()})));await H.waitForTimeout(3000);

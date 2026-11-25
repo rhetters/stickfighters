@@ -364,7 +364,7 @@ $('b-set2').onclick = () => {
 // leaving a game: back to the house builder, the Local screen, the level creator (one of Rhett's levels) or the title
 function leaveGame() {
   if (MODE === HOUSE_MODE) return HVIEW.local ? openLobby() : openHouse();
-  if (MODE === LEVEL && LV && LV.custom) return edReturn();
+  if (MODE === LEVEL && LV && LV.custom && LV.from === 'edit') return edReturn();
   openTitle();
 }
 $('b-quit').onclick = netOr(leaveGame, 'room');

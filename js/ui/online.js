@@ -111,7 +111,15 @@ function renderOnline() {
   roomTiles(
     $('on-sub'),
     NET.mode === 'level'
-      ? storyTiles(NET.theme, v => ((NET.theme = v), netOptChanged()), !NET.host)
+      ? NET.theme === 'mine'
+        ? levelTiles(
+            netLevels(),
+            (pickedLevel(netLevels(), NET.lvl) || {}).id,
+            v => ((NET.lvl = v), netOptChanged()),
+            () => ((NET.theme = 'castle'), netOptChanged()),
+            !NET.host
+          )
+        : storyTiles(NET.theme, v => ((NET.theme = v), netOptChanged()), !NET.host)
       : NET.mode === 'vs'
         ? teamTiles(NET.teams, v => ((NET.teams = v), netOptChanged()), !NET.host)
         : []
@@ -124,8 +132,10 @@ function renderOnline() {
       ? diffTiles(NET.diff, v => ((NET.diff = v), netOptChanged()), !NET.host)
       : []
   );
-  // START can be pressed once everyone is ready (and Versus has its players)
-  $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady());
+  const mine = NET.mode === 'level' && NET.theme === 'mine';
+  $('on-nostar').hidden = !mine;
+  // START can be pressed once everyone is ready (and Versus has its players; MY LEVELS needs a level)
+  $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady()) || (mine && !netLevels().length);
 }
 // Change my fighter (my saved fighters, in order) and tell the room
 function onlineFighter(d) {
@@ -197,8 +207,8 @@ function onlineScreens(id) {
 function onlineScreensReset() {
   $('b-restart').hidden = false;
   $('b-set2').hidden = false;
-  // one of Rhett's levels goes back to the level creator
-  const mine = MODE === LEVEL && LV && LV.custom;
+  // one of Rhett's levels, tried from the level creator, goes back there
+  const mine = MODE === LEVEL && LV && LV.custom && LV.from === 'edit';
   $('b-quit').textContent = mine ? 'BACK TO EDITOR' : 'QUIT TO TITLE';
   for (const b of ['b-again', 'b-next']) $(b).hidden = false;
   for (const b of ['b-title', 'b-title2']) $(b).textContent = mine ? 'EDIT' : 'TITLE';
