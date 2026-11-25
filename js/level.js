@@ -303,9 +303,9 @@ function levelFail() {
   $('b-again').textContent = 'RESTART LEVEL';
   show('s-over');
 }
-// HUD: level name, a trail map with the fights, the gate and you, enemies left, and the GO arrow.
+// HUD: level name, a trail map with the fights, the gate and you, and the GO arrow.
 function levelHud() {
-  // enemies left in the fight, or GO → once it's won (the player bars are in render.js)
+  // GO → once a fight is won, or CLIMB! in the lava escape (the player bars are in render.js)
   const ae = LV.encs.find(e => e.st === 1);
   if (LV.esc && !LV.esc.said && !LV.fin && !LV.cine && state === 'play') {
     // the lava escape: CLIMB! with an arrow up
@@ -318,11 +318,6 @@ function levelHud() {
       ctx.fillStyle = '#ff5a1f';
       ctx.fillText('↑ CLIMB!', W - 24, 230);
     }
-  } else if (ae) {
-    const n = ae.q.length + E.filter(e => !e.dying).length;
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#e8212b';
-    ctx.fillText(n + ' LEFT', W - 16, 58);
   } else if (LV.go > 0 && (fr >> 4) % 2 && state === 'play') {
     ctx.textAlign = 'right';
     ctx.font = '900 44px Impact,"Arial Black",sans-serif';

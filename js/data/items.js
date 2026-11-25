@@ -18,7 +18,8 @@ const TABS = [
   { id: 'upper', name: 'Upper Body', secs: ['shirt', 'jacket', 'gloves'] },
   { id: 'lower', name: 'Lower Body', secs: ['pants', 'shorts', 'skirt', 'dress', 'shoes'] },
   { id: 'surge', name: 'Surge', secs: ['surge'] },
-  { id: 'poses', name: 'Poses', secs: ['pose'] }
+  { id: 'poses', name: 'Poses', secs: ['pose'] },
+  { id: 'pets', name: 'Pets', secs: ['pet'] }
 ];
 // A section's slot: you wear one item per slot. Pants, shorts, skirts and dresses share the "legs" slot.
 const SECS = {
@@ -27,6 +28,7 @@ const SECS = {
   hat: { name: 'Hats', slot: 'hat' },
   band: { name: 'Headbands', slot: 'band' },
   face: { name: 'Face', slot: 'face', note: 'glasses, shades, masks and more' },
+  pet: { name: 'Pets', slot: 'pet', note: 'a little friend who follows you everywhere' },
   scarf: { name: 'Scarves', slot: 'scarf' },
   tie: { name: 'Ties', slot: 'tie' },
   shirt: { name: 'Shirts', slot: 'shirt' },
@@ -45,7 +47,7 @@ const SECS = {
   hdecor: { name: 'Decorations', slot: 'house' }
 };
 // The slots a fighter wears (colour and the pose wheel are kept separately)
-const EQ = ['hair', 'hat', 'band', 'face', 'scarf', 'tie', 'shirt', 'jacket', 'gloves', 'legs', 'shoes', 'surge'];
+const EQ = ['hair', 'hat', 'band', 'face', 'scarf', 'tie', 'shirt', 'jacket', 'gloves', 'legs', 'shoes', 'surge', 'pet'];
 const WHEEL_MAX = 8;
 const ITEMS = [
   // body colors: all of them stand out against the pink army
@@ -94,6 +96,16 @@ const ITEMS = [
   { id: 'band-black', sec: 'band', name: 'Ninja Band', c: '#2b2533', price: 50 },
   { id: 'band-gold', sec: 'band', name: 'Gold Band', c: '#ffd400', how: { combo: 20 } },
   { id: 'band-rainbow', sec: 'band', name: 'Rainbow Band', c: 'rainbow', how: { drop: 1 } },
+  // pets: a little friend who follows you (k = the animal, pets.js; fly = flies over your shoulder)
+  { id: 'pet-frog', sec: 'pet', name: 'Froggy', c: '#7bc95a', c2: '#4f9a3a', k: 'frog', price: 150 },
+  { id: 'pet-dog', sec: 'pet', name: 'Puppy', c: '#d9a066', c2: '#8a5a33', k: 'dog', price: 200 },
+  { id: 'pet-cat', sec: 'pet', name: 'Kitty', c: '#ffa94d', c2: '#d9701a', k: 'cat', price: 200 },
+  { id: 'pet-bunny', sec: 'pet', name: 'Bunny', c: '#f4efe6', k: 'bunny', price: 250 },
+  { id: 'pet-penguin', sec: 'pet', name: 'Penguin', c: '#2b2f45', k: 'penguin', price: 300 },
+  { id: 'pet-armadillo', sec: 'pet', name: 'Armadillo', c: '#b9a28a', c2: '#7d6a58', k: 'armadillo', price: 350 },
+  { id: 'pet-wolf', sec: 'pet', name: 'Wolf Pup', c: '#a8b4c4', c2: '#6c7a8e', k: 'wolf', price: 400 },
+  { id: 'pet-owl', sec: 'pet', name: 'Owl', c: '#a8784a', c2: '#7a5230', k: 'owl', fly: 1, price: 450 },
+  { id: 'pet-dragon', sec: 'pet', name: 'Baby Dragon', c: '#5ac46a', c2: '#e8572b', k: 'dragon', fly: 1, price: 600 },
   // face (k = the style, looks.js drawFace)
   { id: 'face-glasses', sec: 'face', name: 'Round Glasses', c: '#ffffff', c2: '#6b4420', k: 'round', price: 30 },
   { id: 'face-nerd', sec: 'face', name: 'Nerd Glasses', c: '#ffffff', c2: '#1c1626', k: 'nerd', price: 40 },

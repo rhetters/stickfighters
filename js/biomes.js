@@ -3,7 +3,7 @@
 // runs into the next. Drawing only: it never changes the game, and uses Math.random() only for cosmetic effects.
 // ===== BACKGROUNDS =====
 const LOOKS = {
-  woods: { bg: () => drawWoods(1), fg: () => drawWoodsFg() },
+  woods: { bg: () => drawWoods(1), fg: () => (drawOaksFg(), drawWoodsFg()) },
   sewer: { bg: () => drawSewer(), fg: () => drawSewerFg() },
   castle: { bg: () => drawCastle(), fg: () => drawCastleFg() },
   beach: { bg: () => drawBeach(), fg: () => drawBeachFg() },

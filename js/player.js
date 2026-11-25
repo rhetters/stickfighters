@@ -217,6 +217,8 @@ function init() {
   spawnT = 0;
 }
 // ===== PLAYER =====
+// Crouching (holding Down): the block's kneel, held still
+const CROUCH = [10, 85, 85, 65, 105, 90, 90, -15, 75, 0];
 // Kneeling block pose. It trembles harder as the Surge bar empties, and flinches when a hit is blocked.
 function blockPose(f) {
   const weak = 1 - f.stm.v / f.smax,
@@ -388,6 +390,7 @@ function updP(f) {
       ghost(f, f.att.d.cost ? '#ffd400' : 0);
   }
   f.blk = 0;
+  f.crch = 0;
   if (f.blkT > 0) f.blkT--;
   // Pose wheel (looks only): hold the pose button on the ground to stand still and aim (8 directions)
   // at a pose, let go to strike it. Moving, jumping, Surge or attacking ends the pose.
@@ -440,6 +443,8 @@ function updP(f) {
         }
       }
     }
+    // Crouch: Down alone, standing on the ground (the kneel of the block, but steady; it doesn't block)
+    f.crch = g && K.d && !K.s && !m && !f.flip && !f.lad && !f.blk ? 1 : 0;
     if (g) {
       f.jumps = 0;
       f.hop = 0;
@@ -558,7 +563,9 @@ function updP(f) {
       } else
         tp = f.blk
           ? blockPose(f)
-          : f.running && g
+          : f.crch
+            ? CROUCH
+            : f.running && g
             ? runPose(f)
             : STM.winded && g && !m
               ? [TIRED[0] + Math.sin(f.t * 0.25) * 4, ...TIRED.slice(1)]

@@ -1299,6 +1299,7 @@ function lookPose(f) {
       f.y >= f.gy - 1 &&
       Math.abs(f.vx) < 0.9 &&
       !f.blk &&
+      !f.crch &&
       !f.running &&
       !f.flip &&
       !f.pose[9],
@@ -1381,6 +1382,11 @@ function drawItemIcon(it, cx, cy, sz, baseCol) {
   const f = { look: L, face: 1, s: 1, slot: 0, vx: it.slot === 'surge' ? 5 : 0, col };
   ctx.save();
   ctx.lineCap = 'round';
+  if (it.slot === 'pet') {
+    drawPet(it, cx, it.fly ? cy + sz * 0.02 : cy + sz * 0.22, sz / 58, 1, 0, false, false);
+    ctx.restore();
+    return;
+  }
   if (it.slot === 'hair' || it.slot === 'hat' || it.slot === 'band' || it.slot === 'face') {
     const r = sz * 0.17,
       hy = cy + sz * 0.08,

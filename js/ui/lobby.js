@@ -1,6 +1,6 @@
 // StickFighters: Players screen (local multiplayer), laid out like the online room (ui/rooms.js). Up to 4 players
 // join with a controller (any button), the keyboard or touch (tap its picture on an empty place); then pick the
-// mode (Story, Arcade or Versus) and its choice under it, and START. The players become the ROSTER the game is
+// mode (Story, Arcade, Versus or House: everyone walks round your house) and its choice under it, and START. The players become the ROSTER the game is
 // built from. Controllers: B leaves, left/right picks your fighter, the top button colour, the left button hat;
 // a second keyboard player joins with 0 on the number pad.
 // ===== PLAYERS SCREEN =====
@@ -193,7 +193,8 @@ function renderLobby() {
     [
       ['level', 'i-story', 'STORY'],
       ['arcade', 'i-arcade', 'ARCADE'],
-      ['vs', 'i-versus', 'VERSUS']
+      ['vs', 'i-versus', 'VERSUS'],
+      ['house', 'i-house', 'HOUSE']
     ].map(([m, img, label]) => ({
       data: ['mode', m],
       img,
@@ -217,7 +218,7 @@ function renderLobby() {
   // the difficulty, for Story and Arcade
   roomTiles(
     $('lb-diff'),
-    LB.mode === 'vs' ? [] : diffTiles(SET.diff, v => ((SET.diff = v), save(), renderLobby()))
+    LB.mode === 'vs' || LB.mode === 'house' ? [] : diffTiles(SET.diff, v => ((SET.diff = v), save(), renderLobby()))
   );
   const t0 = LOBBY.filter(r => r.team === 0).length,
     vsOk = n >= 2 && (!TEAMS || (t0 > 0 && t0 < n));
@@ -275,8 +276,7 @@ function lobbyPad(g, now, down) {
 }
 addEventListener('keydown', e => {
   if ($('s-lobby').hidden || $('ui').hidden || CAP) return;
-  if (e.code === 'Numpad0') lobbyJoin('kb2');
-  else if (e.key === 'Escape') $('lb-back').click();
+  if (e.code === 'Numpad0') lobbyJoin('kb2'); // (Esc: main.js, like every menu screen)
 });
 function startMulti(kind) {
   ROSTER = LOBBY.map(r => ({ ...r, team: kind === 'vs' && TEAMS ? r.team : undefined }));
@@ -286,6 +286,7 @@ function startMulti(kind) {
     themeBurst($('s-lobby').querySelector('[data-theme="' + LB.theme + '"]'), () =>
       LB.theme === '?' ? startRun(surpriseTheme(), 0, true) : startRun(LB.theme)
     );
+  else if (kind === 'house') startHouse({ ...HOUSE, name: 'OUR HOUSE', local: 1 }); // everyone walks round your house
   else start();
 }
 $('b-multi').onclick = openLobby;

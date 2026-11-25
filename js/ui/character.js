@@ -526,6 +526,13 @@ function charAnim() {
     k.beginPath();
     k.ellipse(f.x, f.y + 4, 22 * sc, 5, 0, 0, 7);
     k.fill();
+    // your pet sits beside you, looking up at you (on the Pets shelf it walks to and fro)
+    if (L.pet) {
+      const walk = CH.tab === 'pets',
+        px = f.x + 38 * sc + (walk ? Math.sin(t * 0.02) * 6 * sc : 0),
+        pf = walk ? (Math.cos(t * 0.02) >= 0 ? 1 : -1) : -1;
+      drawPet(L.pet, px, L.pet.fly ? f.y - 92 * sc + Math.sin(t * 0.06) * 4 : f.y, sc * 0.7, pf, t * 0.22, walk, !walk);
+    }
     if (surge) {
       // speed lines and afterimages behind, then the glow
       k.strokeStyle = surgeCol(L, 0);
@@ -623,9 +630,3 @@ $('ch-head-').onclick = () => chStep('head', -0.1, 0.8, 1.4, 10);
 $('ch-head+').onclick = () => chStep('head', 0.1, 0.8, 1.4, 10);
 $('ch-lw-').onclick = () => chStep('lw', -1, 5, 10, 1);
 $('ch-lw+').onclick = () => chStep('lw', 1, 5, 10, 1);
-addEventListener('keydown', e => {
-  if (e.key !== 'Escape' || $('ui').hidden || CAP) return;
-  if (!$('s-char').hidden && document.activeElement !== $('ch-name')) CH.tab ? chUp() : closeChar();
-  else if (!$('s-backup').hidden) $('bk-back').click();
-  else if (!$('s-house').hidden) closeHouse();
-});

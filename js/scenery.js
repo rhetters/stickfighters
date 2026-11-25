@@ -386,6 +386,104 @@ function drawGate(g) {
 }
 // Foreground: grass in front of the trail (faster than the fighters), falling leaves, fireflies at dusk.
 const AMB = [];
+// Big oaks in the foreground of a story's Wooded Trail (biomes.js LOOKS.woods): a trunk you walk behind, roots at
+// the bottom of the screen and a leafy crown over the top. Drawn on the screen, moving a little faster than the
+// path; a tree goes see-through while a player is behind it. Looks only.
+const OAKA = new Map();
+function drawOaksFg() {
+  const dk = chunkVal(CAM.x + W / 2, 'dusk'),
+    vx = viewX(),
+    z = CAM.z,
+    seen = new Set();
+  layer(1.35, 1300, 131, (x, r, i) => {
+    if (r < 0.35 || x < -260 || x > W + 260) return;
+    seen.add(i);
+    // see-through while a player is behind the trunk
+    const behind = PL.some(p => !p.hide && p.st !== 'dead' && Math.abs((p.x - vx) * z - x) < 95),
+      a0 = OAKA.has(i) ? OAKA.get(i) : 1,
+      al = a0 + ((behind ? 0.45 : 1) - a0) * 0.15;
+    OAKA.set(i, al);
+    const tw = 54 + r * 26, // trunk width
+      lean = (hh(i + 5) - 0.5) * 30,
+      top = 70,
+      bark = mixC('#8a6446', '#5e4a4a', dk),
+      barkD = mixC('#6b4a32', '#47363a', dk),
+      leaf = mixC('#8fbf73', '#6f7f68', dk),
+      leafD = mixC('#6fa25a', '#56634f', dk);
+    ctx.save();
+    ctx.globalAlpha = al;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    // trunk with roots spreading at the bottom
+    ctx.beginPath();
+    ctx.moveTo(x - tw / 2 - 34, H + 12);
+    ctx.quadraticCurveTo(x - tw / 2 - 4, H - 20, x - tw / 2 + 2, H - 70);
+    ctx.quadraticCurveTo(x - tw / 2 + lean * 0.6, (H + top) / 2, x - tw * 0.38 + lean, top);
+    ctx.lineTo(x + tw * 0.38 + lean, top);
+    ctx.quadraticCurveTo(x + tw / 2 + lean * 0.6, (H + top) / 2, x + tw / 2 - 2, H - 70);
+    ctx.quadraticCurveTo(x + tw / 2 + 4, H - 20, x + tw / 2 + 38, H + 12);
+    ctx.closePath();
+    ctx.fillStyle = bark;
+    ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    // bark lines and a knot
+    ctx.strokeStyle = barkD;
+    ctx.lineWidth = 3;
+    for (const k of [-0.22, 0.05, 0.27]) {
+      const bx = x + k * tw;
+      ctx.beginPath();
+      ctx.moveTo(bx + lean * 0.2, H - 30);
+      ctx.quadraticCurveTo(bx + lean * 0.5 + 6, 250, bx + lean * 0.85, top + 40 + hh(i + k * 10) * 40);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.ellipse(x + tw * 0.12 + lean * 0.5, 230, 7, 11, 0, 0, 7);
+    ctx.stroke();
+    // a branch reaching out
+    const bd = hh(i + 9) < 0.5 ? -1 : 1;
+    inked([[x + lean * 0.8, 150], [x + bd * 70 + lean, 110, x + bd * 130 + lean, 70]], 14, bark);
+    // the crown: puffs of leaves, darker underneath
+    const puffs = [
+      [0, 10, 120, 80],
+      [-95, 40, 80, 60],
+      [100, 35, 85, 62],
+      [-45, -40, 90, 62],
+      [55, -45, 95, 66],
+      [bd * 150, 70, 60, 45]
+    ];
+    for (const pass of [0, 1, 2]) {
+      ctx.beginPath();
+      for (const [dx, dy, rx, ry] of puffs) {
+        const px = x + lean + dx * (1 + r * 0.2),
+          py = dy + (pass === 2 ? -10 : 0);
+        ctx.moveTo(px + rx * (pass === 2 ? 0.75 : 1), py);
+        ctx.ellipse(px, py, rx * (pass === 2 ? 0.75 : 1), ry * (pass === 2 ? 0.7 : 1), 0, 0, 7);
+      }
+      if (pass === 0) {
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 8;
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = pass === 1 ? leafD : leaf;
+        ctx.fill();
+      }
+    }
+    // a few leaf scribbles
+    ctx.strokeStyle = leafD;
+    ctx.lineWidth = 3;
+    for (let k = 0; k < 7; k++) {
+      const px = x + lean + (hh(i * 7 + k) - 0.5) * 260,
+        py = (hh(i * 11 + k) - 0.4) * 120;
+      ctx.beginPath();
+      ctx.arc(px, py, 9, 0.2, 2.6);
+      ctx.stroke();
+    }
+    ctx.restore();
+  });
+  for (const k of OAKA.keys()) if (!seen.has(k)) OAKA.delete(k);
+}
 let ambCam = 0;
 function drawWoodsFg() {
   const cx = CAM.x,
