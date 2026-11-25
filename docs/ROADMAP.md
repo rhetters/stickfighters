@@ -46,6 +46,8 @@ How it works (decided by Claude, November 24; Ron asked for its picture between 
 - **In stories:** a star on each part with a fight puts it in that place's pool. When a story is generated, each fight in that place has a chance of being one of Rhett's parts instead (his platforms, enemies and scenery). Online, the host's parts go to everyone with the start of the run.
 - **Checked when loaded:** sizes and counts are limited, only known places, enemy types and scenery are kept, everything else is dropped. Levels live in the save (a new save version).
 
+Built (version 63, see the CHANGELOG): all of the above. Still to do: Rhett tries it on the iPad.
+
 **Done when:** Rhett builds a level on the iPad, plays it, and sees his chunks appear in generated runs.
 
 ### M11.5 · Rollback for online play (suggested before Steam)

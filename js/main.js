@@ -11,6 +11,9 @@ const gridC = document.createElement('canvas'),
   coarseMQ = matchMedia('(pointer:coarse)'),
   portraitMQ = matchMedia('(orientation:portrait) and (pointer:coarse)');
 const SCREENS = [
+  's-levels',
+  's-edpick',
+  's-edit',
   's-title',
   's-solo',
   's-cust',
@@ -358,14 +361,20 @@ $('b-set2').onclick = () => {
   back = 's-pause';
   show('s-settings');
 };
-$('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? (HVIEW.local ? openLobby() : openHouse()) : openTitle()), 'room');
+// leaving a game: back to the house builder, the Local screen, the level creator (one of Rhett's levels) or the title
+function leaveGame() {
+  if (MODE === HOUSE_MODE) return HVIEW.local ? openLobby() : openHouse();
+  if (MODE === LEVEL && LV && LV.custom) return edReturn();
+  openTitle();
+}
+$('b-quit').onclick = netOr(leaveGame, 'room');
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');
 $('b-level').onclick = () => tutOffer(() => openThemes((id, myst) => startRun(id, 0, myst), 's-solo'));
 $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : replayLevel()), 'again');
 $('b-title2').onclick = netOr(openTitle, 'room');
-$('b-title').onclick = netOr(openTitle, 'room');
+$('b-title').onclick = netOr(leaveGame, 'room');
 $('pausebtn').onclick = () => playerPause();
 // Pose wheel on touch: hold POSE, aim with the stick, let go to strike the pose
 {
@@ -475,7 +484,8 @@ function update() {
   for (const e of E) updE(e);
   bowl();
   sep();
-  if (MODE.drops && state === 'play') {
+  // (Rhett's own levels earn nothing, so they can't be used to farm stars or XP)
+  if (MODE.drops && state === 'play' && !(MODE === LEVEL && LV.custom)) {
     dropScan();
     xpScan();
   }

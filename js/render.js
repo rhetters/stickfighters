@@ -804,7 +804,7 @@ function hud() {
   }
   ctx.textAlign = 'right';
   ctx.fillStyle = INK;
-  if (state !== 'train' && MODE.drops) starHud();
+  if (state !== 'train' && MODE.drops && !(MODE === LEVEL && LV.custom)) starHud();
   if (NET.match) onlineHud();
   ctx.textAlign = 'center';
   ctx.font = '900 18px Impact,"Arial Black",sans-serif';

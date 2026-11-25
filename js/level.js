@@ -200,7 +200,7 @@ function levelTick() {
       // a boss or rare mini-boss arrives with a scene (run.js); others drop in
       if (ne.boss || ne.mini) bossArrive(ne);
       else {
-        bn(ne.list.includes('c') ? 'CAPTAIN AMBUSH!' : 'AMBUSH!');
+        bn(ne.list.some(q => (q.t || q) === 'c') ? 'CAPTAIN AMBUSH!' : 'AMBUSH!');
         sfx(330, 0.25, 'square', 0.05, 200);
       }
     }
@@ -259,6 +259,15 @@ function fmtT(fr_) {
 function levelClear() {
   state = 'clear';
   if (SELFTESTING) return;
+  // one of Rhett's levels: no scores or stars, back to the editor after a moment
+  if (LV.custom) {
+    bn('LEVEL CLEAR!');
+    sfx(520, 0.5, 'square', 0.05, 500);
+    setTimeout(() => {
+      if (state === 'clear' && MODE === LEVEL && LV.custom) edReturn();
+    }, 1800);
+    return;
+  }
   const id = LV.id,
     old = PROG[id] || {},
     tb = Math.max(0, 600 - Math.floor(LV.t / 60)) * 5;
@@ -291,7 +300,7 @@ function levelClear() {
 }
 function levelFail() {
   state = 'over';
-  if (!SELFTESTING) runEnd('o-st', { combo: maxc, bonus: LV.run && LV.run.myst ? SURPRISE_BONUS : 0 });
+  if (!SELFTESTING && !LV.custom) runEnd('o-st', { combo: maxc, bonus: LV.run && LV.run.myst ? SURPRISE_BONUS : 0 });
   $('o-l1').textContent =
     LV.def.name +
     ' · Score ' +

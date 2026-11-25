@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M17: the level creator (November 24, 2026)
+- **Customize → LEVELS** (between CHARACTER and HOUSE, asked by Ron): Rhett's levels, up to 12. NEW LEVEL picks one of the 15 places, shown as pictures of the real scenery.
+- **The editor** shows the place's real scenery with a grid over it: **PLATFORMS** (tap or drag along a row, five heights; wooden, stone, ice, metal or rock to suit the place), **ENEMIES** (the six pink army types and the place's own mini-boss, dropping in where you tap, up to 10 in a fight), **SCENERY** (the place's own), the **FLAG** (where the fight stops the screen) and **ERASE**. **PARTS**: up to 6 parts, each 900 to 2400 pixels wide.
+- **PLAY** tries the level right away: a sign with its name, the parts, and an arch at the end; back to the editor after. Your own levels earn no stars or XP, so they can't be used to farm.
+- **In stories:** a star on a part with a fight lets it turn up as one of the fights in that place when a story is made (about 4 in 10 fights there). Online, the host's starred parts go to everyone.
+- Every level is checked when it's loaded: unknown places, enemies or scenery are dropped, sizes and counts are limited, and nothing in a level is ever run.
+- Save version 17 (adds the list of levels).
+- Version 63.
+
 ## M16: crouch walk, a secret Froggy (November 24, 2026)
 - **Crouch walk:** hold Down and left or right to sneak along low and slower (asked by Ron); add Surge and it's the usual Surge run.
 - **Froggy is secret now** (Rhett's idea): enter crown, heart, heart, crown in the treasure chest. Anyone who already bought him keeps him.

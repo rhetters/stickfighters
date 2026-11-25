@@ -1798,10 +1798,22 @@ function drawMoon() {
   ctx.stroke();
 }
 // The launch tower's platforms (terrain) as steel girders, and the tower's frame behind them
+// Platforms: the launch tower's orange deck (no st), or one of the level creator's: wooden planks, stone, ice or
+// metal (st; the volcano's rock ledges are drawn after the props, drawRockLedges)
+const PLAT_LOOK = {
+  wood: ['#c9925a', '#8a5a33', 'rgba(110,70,35,0.8)'],
+  stone: ['#b9b3a8', '#7c766c', 'rgba(70,64,58,0.8)'],
+  ice: ['#d6f0fb', '#8cc6e0', 'rgba(110,160,190,0.8)'],
+  metal: ['#aeb7c6', '#6f7a8c', 'rgba(70,80,96,0.8)']
+};
 function drawPlatforms() {
   for (const s of LV.terr.s) {
-    if (s.st === 'rock') continue; // the volcano's rock ledges are drawn after the props (drawRockLedges)
+    if (s.st === 'rock') continue;
     const w = s.x2 - s.x1;
+    if (PLAT_LOOK[s.st]) {
+      drawPlatLook(s, w, PLAT_LOOK[s.st]);
+      continue;
+    }
     inkRect(s.x1, s.y1, w, 12, '#ff9a3c', 3);
     ctx.strokeStyle = 'rgba(28,22,38,0.6)';
     ctx.lineWidth = 2;
@@ -1820,6 +1832,58 @@ function drawPlatforms() {
     ctx.moveTo(s.x2 - 12, s.y1 + 12);
     ctx.lineTo(s.x2 - 12, G + 6);
     ctx.stroke();
+  }
+}
+function drawPlatLook(s, w, [c, d, post]) {
+  // posts (or chains, for metal) down to the ground, then the top
+  ctx.strokeStyle = post;
+  ctx.lineWidth = s.st === 'metal' ? 3 : 6;
+  ctx.beginPath();
+  for (const px of [s.x1 + 16, s.x2 - 16]) {
+    ctx.moveTo(px, s.y1 + 14);
+    ctx.lineTo(px, G + 6);
+  }
+  ctx.stroke();
+  inkRect(s.x1, s.y1, w, 16, c, 3);
+  ctx.strokeStyle = d;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  if (s.st === 'wood')
+    // planks with nails
+    for (let x = s.x1 + 40; x < s.x2 - 10; x += 40) {
+      ctx.moveTo(x, s.y1 + 2);
+      ctx.lineTo(x, s.y1 + 14);
+    }
+  else if (s.st === 'stone')
+    for (let x = s.x1 + 30, i = 0; x < s.x2 - 10; x += 30, i++) {
+      ctx.moveTo(x, s.y1 + (i % 2 ? 8 : 2));
+      ctx.lineTo(x, s.y1 + (i % 2 ? 14 : 8));
+    }
+  else if (s.st === 'ice') {
+    ctx.moveTo(s.x1 + 8, s.y1 + 5);
+    ctx.lineTo(s.x2 - 8, s.y1 + 5);
+  }
+  ctx.stroke();
+  if (s.st === 'metal' || s.st === 'wood') {
+    ctx.fillStyle = d;
+    for (let x = s.x1 + 10; x < s.x2; x += s.st === 'wood' ? 40 : 24) {
+      ctx.beginPath();
+      ctx.arc(x, s.y1 + 8, 2, 0, 7);
+      ctx.fill();
+    }
+  }
+  if (s.st === 'ice') {
+    // icicles under the edge
+    ctx.fillStyle = c;
+    ctx.strokeStyle = d;
+    for (let x = s.x1 + 14; x < s.x2 - 8; x += 26) {
+      ctx.beginPath();
+      ctx.moveTo(x - 5, s.y1 + 16);
+      ctx.lineTo(x, s.y1 + 28 + ((x * 7) % 9));
+      ctx.lineTo(x + 5, s.y1 + 16);
+      ctx.fill();
+      ctx.stroke();
+    }
   }
 }
 // A rocket standing at x (its middle) with its bottom at y; fire = flames under it

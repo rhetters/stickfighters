@@ -197,9 +197,11 @@ function onlineScreens(id) {
 function onlineScreensReset() {
   $('b-restart').hidden = false;
   $('b-set2').hidden = false;
-  $('b-quit').textContent = 'QUIT TO TITLE';
+  // one of Rhett's levels goes back to the level creator
+  const mine = MODE === LEVEL && LV && LV.custom;
+  $('b-quit').textContent = mine ? 'BACK TO EDITOR' : 'QUIT TO TITLE';
   for (const b of ['b-again', 'b-next']) $(b).hidden = false;
-  for (const b of ['b-title', 'b-title2']) $(b).textContent = 'TITLE';
+  for (const b of ['b-title', 'b-title2']) $(b).textContent = mine ? 'EDIT' : 'TITLE';
   for (const w of document.querySelectorAll('.netwait')) w.hidden = true;
 }
 $('on-host').onclick = async () => {

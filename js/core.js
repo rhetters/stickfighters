@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 62;
+const GAME_VERSION = 63;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -42,6 +42,8 @@ const HOUSE = {
   sides: {},
   items: []
 };
+// Rhett's levels (the level creator; data/editor.js has the format). Checked with normLevel (editor.js) when loaded.
+const EDIT = { levels: [] };
 // The save keeps one key forever and carries a version. migrate() upgrades older saves one step at a time.
 //   v1 (no saveVersion): { set, best }
 //   v2: adds prog = { levelId: { done, score, time, combo } }
@@ -62,7 +64,8 @@ const HOUSE = {
 //        help) and big (bigger text); cb and big start off from the defaults
 //   v15: fighters gain eq.face (glasses, shades, masks…; nothing worn to start)
 //   v16: fighters gain eq.pet (a pet that follows you; none to start)
-const SAVE_VERSION = 16;
+//   v17: adds edit = { levels: [] } (Rhett's levels from the level creator)
+const SAVE_VERSION = 17;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -150,6 +153,10 @@ function migrate(s) {
       for (const f of s.chr.list) if (f && f.eq && typeof f.eq === 'object' && !('pet' in f.eq)) f.eq.pet = null;
     s.saveVersion = 16;
   }
+  if (s.saveVersion === 16) {
+    s.edit = { levels: [] };
+    s.saveVersion = 17;
+  }
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).
@@ -177,6 +184,7 @@ function loadSave(s) {
   HOUSE.climbs = map(h.climbs);
   HOUSE.floors = map(h.floors);
   if (h.flip7) HOUSE.flip7 = 1;
+  EDIT.levels = s.edit && Array.isArray(s.edit.levels) ? s.edit.levels : []; // checked by editor.js
 }
 try {
   loadSave(migrate(JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')));
@@ -188,7 +196,8 @@ const saveData = () => ({
   prog: PROG,
   eco: ECO,
   chr: CHR,
-  house: HOUSE
+  house: HOUSE,
+  edit: EDIT
 });
 const save = () => {
   try {

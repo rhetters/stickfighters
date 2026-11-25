@@ -379,8 +379,12 @@ function bossThink(e, Q, T_, spd) {
   const want = T_.stop;
   e.vx += ((dist > want ? Math.sign(Q.x - e.x) : 0) * spd - e.vx) * 0.15;
 }
+// t = an enemy type (it drops in at one side), or { t, x } for one placed in a level (it drops in over x)
 function spawn(t) {
-  const e = F(rnd() < 0.5 ? WB.l + 50 + rnd() * 150 : WB.r - 50 - rnd() * 150, t, 0);
+  const e =
+    typeof t === 'object'
+      ? F(Math.max(WB.l + 40, Math.min(WB.r - 40, t.x)), t.t, 0)
+      : F(rnd() < 0.5 ? WB.l + 50 + rnd() * 150 : WB.r - 50 - rnd() * 150, t, 0);
   e.y = -70;
   E.push(e);
 }
