@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Pets' space bubbles, a clearer READY button (November 25, 2026)
+- On the moon, pets get a space bubble like their owner's helmet.
+- In an online room your own card's ready button is now a bright yellow **READY?** button that pulses until you tap it (then the green tick), and a line under the cards says to tap it, or who the room is still waiting for. The victory screen's ready buttons work the same way.
+- Version 71.
+
 ## Combat review: effects apart from the game, enemy hits on players (November 25, 2026)
 From a review of combat.js Ron brought from another chat, checked against the whole game first (it was right; the
 problem with effects was bigger than it could see).

@@ -102,10 +102,7 @@ function vicReady(slot) {
 function vicRefresh() {
   if ($('s-victory').hidden) return;
   for (const b of $('v-cards').querySelectorAll('.vready')) {
-    const on = vicIsReady(+b.dataset.slot);
-    b.classList.toggle('on', on);
-    b.innerHTML = STAMP_SVG(on);
-    b.setAttribute('aria-label', on ? 'Ready' : 'Not ready');
+    readyStamp(b, vicIsReady(+b.dataset.slot), !b.disabled);
   }
   const all = PL.every(p => p.left || vicIsReady(p.slot)),
     was = $('v-again').disabled;

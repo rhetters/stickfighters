@@ -10,7 +10,9 @@ await H.evaluate(()=>{$('b-online').click();$('on-host').click()});await H.waitF
 await A.evaluate(code=>{$('b-online').click();const [w,n]=code.split('-');ONC.w=ROOM_WORDS.indexOf(w);ONC.a=+n[0];ONC.b=+n[1];renderOnline();$('on-join').click();},code);await A.waitForTimeout(3500);
 await H.evaluate(()=>{NET.mode='level';NET.theme='castle';netRoomChanged()});await H.waitForTimeout(500);
 ok(await A.evaluate(()=>document.querySelectorAll('.pready').length===2&&document.querySelectorAll('.pready:not(:disabled)').length===1),'each room card has a ready button; only your own can be pressed');
+ok(await A.evaluate(()=>{const b=document.querySelector('.pready:not(:disabled)'),o=document.querySelector('.pready:disabled');return b.classList.contains('ask')&&b.textContent==='READY?'&&!o.classList.contains('ask')&&!$('on-wait').hidden&&/Tap READY\?/.test($('on-wait').textContent)}),'your own card shows a pulsing READY? button (others a stamp), and the room says to tap it');
 await A.evaluate(()=>document.querySelector('.pready:not(:disabled)').click());await A.waitForTimeout(600);
+ok(await A.evaluate(()=>{const b=document.querySelector('.pready:not(:disabled)');return b.classList.contains('on')&&!b.classList.contains('ask')&&/Waiting for 1 player/.test($('on-wait').textContent)}),'once ready it turns into the green tick, and the room says who it\'s waiting for');
 ok(await H.evaluate(()=>NET.players.find(q=>q.slot!==NET.mySlot).ready&&!NET.players.find(q=>q.slot===NET.mySlot).ready),'the host sees the guest ready');
 ok(await H.evaluate(()=>!!document.querySelector('.pready.on'))&&await H.evaluate(()=>state!=='play'),'one ready player does not start the game');
 ok(await H.evaluate(()=>$('on-start').disabled),'START is off until everyone is ready');

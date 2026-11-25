@@ -2290,6 +2290,10 @@ function drawHelmet(f, o) {
     hx = o.hd[0] - (f.face || 1) * 0.1 * o.hr,
     hy = o.hd[1] - fit[0] * o.hr,
     r = fit[1] * o.hr;
+  drawBubble(hx, hy, r);
+}
+// The glass bubble itself (a fighter's helmet, or a pet's bubble on the moon: pets.js)
+function drawBubble(hx, hy, r) {
   ctx.save();
   ctx.fillStyle = 'rgba(200,230,255,0.22)';
   ctx.strokeStyle = 'rgba(70,110,150,0.9)';

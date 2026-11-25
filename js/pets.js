@@ -422,5 +422,24 @@ function drawPetOf(f) {
   const q = petOf(f);
   if (!q) return;
   const s = f.s * (f.look.ht || 1);
-  lifted(q.x, () => drawPet(q.roll ? { ...q.it, rolling: 1 } : q.it, q.x, q.y, s, q.face, q.t, q.mv, q.still > 40));
+  lifted(q.x, () => {
+    drawPet(q.roll ? { ...q.it, rolling: 1 } : q.it, q.x, q.y, s, q.face, q.t, q.mv, q.still > 40);
+    // on the moon a pet gets a space bubble too, like its owner's helmet
+    if (helmOn && BIOMES[segAt(q.x).b].helmet) {
+      const B = PET_BUB[q.it.k] || PET_BUB.dog;
+      drawBubble(q.x + q.face * B[0] * s, q.y - B[1] * s, B[2] * s);
+    }
+  });
 }
+// Each pet's bubble: [forward of its middle, up from its feet, radius], in the pet's size
+const PET_BUB = {
+  dog: [2, 20, 25],
+  wolf: [2, 22, 27],
+  cat: [2, 20, 24],
+  armadillo: [0, 14, 23],
+  bunny: [0, 24, 25],
+  frog: [0, 13, 19],
+  penguin: [0, 22, 22],
+  owl: [0, 10, 22],
+  dragon: [2, 16, 27]
+};
