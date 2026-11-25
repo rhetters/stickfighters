@@ -120,10 +120,11 @@ function pause(on) {
   } else show(null);
 }
 const togglePause = () => pause(!paused);
-// A player pressing pause (Esc, a controller's Start, the pause button). Walking around your own house, that goes
-// straight back to the house builder; automatic pauses (switching apps, turning the iPad) still show the menu.
+// A player pressing pause (Esc, a controller's Start, the pause button). Walking around your own house (alone or with
+// everyone on Local), that goes straight back to the house builder; automatic pauses (switching apps, turning the
+// iPad) still show the menu.
 function playerPause() {
-  if (!paused && live() && MODE === HOUSE_MODE && !NET.match && !HVIEW.local) return openHouse();
+  if (!paused && live() && MODE === HOUSE_MODE && !NET.match) return openHouse();
   togglePause();
 }
 function over() {

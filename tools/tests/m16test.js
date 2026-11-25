@@ -118,6 +118,7 @@ await ev("startRun('mountain');cineEnd();LV.encs.forEach(e=>e.st=2);LV.trans.for
 ok(await ev("(()=>{const c=document.querySelector('#s-victory canvas'),r=c.getBoundingClientRect();return !$('s-victory').hidden&&Math.abs(r.width/r.height-c.width/c.height)<0.03})()"),'the victory photo is not squashed');
 await ev("openTitle()");
 // testing round: pets, crouch, oaks, Esc, the Join screen, Local house, no scroll bars, no enemy count
+ok(await ev("(()=>{if(owns('pet-frog'))return false;openCodes();CD.code=[3,2,2,3];const r=redeemCode();return ITEM['pet-frog'].how.code&&r&&owns('pet-frog')})()"),'Froggy is secret: crown, heart, heart, crown in the treasure chest');
 ok(await ev("(()=>{const m=migrate({saveVersion:15,chr:{cur:0,list:[{name:'A',eq:{face:'face-shades'}}]}});return m.saveVersion===SAVE_VERSION&&m.chr.list[0].eq.pet===null&&m.chr.list[0].eq.face==='face-shades'})()"),'save version 16: fighters gain a pet slot, nothing else changes');
 ok(await ev("TABS.some(t=>t.id==='pets'&&t.secs[0]==='pet')&&EQ.includes('pet')&&ITEMS.filter(i=>i.slot==='pet').length>=8&&['dog','cat','armadillo','wolf'].every(k=>ITEMS.some(i=>i.slot==='pet'&&i.k===k))"),'a PETS part with a puppy, a kitty, an armadillo, a wolf pup and more');
 ok(await ev("(()=>{for(const it of ITEMS.filter(i=>i.slot==='pet')){drawItemIcon(it,100,100,100,'#ff7a00');drawPet(it,200,200,1,1,1,true,false);drawPet(it,200,200,1,-1,0,false,true)}return true})()"),'every pet draws walking, sitting and as a shelf picture');
@@ -125,6 +126,8 @@ ok(await ev("(()=>{grantItem('pet-dog','test');const c=fighterNow();c.eq.pet='pe
 ok(await ev("(()=>{const f=PL[0];f.look.pet=null;return !petOf(f)})()"),'no pet, nothing follows');
 // crouch: Down alone kneels (and doesn't block); Down + Surge still blocks
 ok(await ev("(()=>{startTrain();const p=PL[0],I=inputOf(p);for(const k in I.K)I.K[k]=0;I.K.d=1;for(let i=0;i<20;i++){fr++;update()}const c=p.crch===1&&!p.blk&&p.st==='free';I.K.s=1;for(let i=0;i<5;i++){fr++;update()}const b=p.blk===1&&!p.crch;I.K.d=0;I.K.s=0;for(let i=0;i<5;i++){fr++;update()}return c&&b&&!p.crch})()"),'holding Down crouches (no block); Down + Surge still blocks');
+// crouch walk: Down + left or right, slower; with Surge it's the Surge run
+ok(await ev("(()=>{startTrain();const p=PL[0],I=inputOf(p);for(const k in I.K)I.K[k]=0;I.K.d=1;I.K.r=1;for(let i=0;i<30;i++){fr++;update()}const cw=p.cw===1&&!p.crch&&Math.abs(p.vx-2.2)<0.2;I.K.s=1;p.stm.v=p.smax;for(let i=0;i<10;i++){fr++;update()}const run=p.running===1&&!p.cw;for(const k in I.K)I.K[k]=0;for(let i=0;i<5;i++){fr++;update()}return cw&&run&&!p.cw})()"),'Down + right crouch-walks slowly; adding Surge switches to the Surge run');
 await ev("openTitle()");
 // big oaks in front on the Wooded Trail (a story), see-through while you're behind one; the meadow has none
 ok(await ev("LOOKS.woods.fg.toString().includes('drawOaksFg')&&!LOOKS.meadow.fg.toString().includes('drawOaksFg')"),'the Wooded Trail has big oaks in front, the Alpine Meadow doesn\'t');
@@ -142,7 +145,9 @@ await ev("openLobby()");await W(100);await p.keyboard.press('Escape');await W(10
 await ev("openLobby();lobbyJoin('kb');lobbyJoin('kb2');LB.mode='house';renderLobby()");await W(100);
 ok(await ev("!!$('lb-modes').querySelector('[data-mode=\"house\"]')"),'the Local screen has HOUSE');
 await p.click('#lb-start');await W(300);ok(await ev("MODE===HOUSE_MODE&&state==='play'&&PL.length===2"),'and everyone walks round your house');
-await ev("$('b-quit').click()");await W(100);ok(await ev("SHOWN==='s-lobby'"),'quitting goes back to the Local screen');
+await p.keyboard.press('Escape');await W(200);ok(await ev("SHOWN==='s-house'"),'Esc walking round the house (Local too) goes back to the house builder');
+await ev("openLobby();LB.mode='house';renderLobby()");await W(100);await p.click('#lb-start');await W(300);
+await ev("pause(true);$('b-quit').click()");await W(100);ok(await ev("SHOWN==='s-lobby'"),'QUIT on the pause menu goes back to the Local screen');
 await ev("openTitle()");
 // no scroll bars on Solo and the victory screen
 await ev("openSolo()");await W(200);ok(await ev("(()=>{const s=$('s-solo');return s.scrollHeight<=s.clientHeight+1})()"),'the Solo screen fits without a scroll bar');

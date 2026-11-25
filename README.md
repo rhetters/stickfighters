@@ -33,7 +33,7 @@ The title says **PRESS START**: press any key, button or tap. The menu is pictur
 | Jump (twice for a flip; Down + Jump drops through a floor) | Space | JUMP | A |
 | Punch / Kick | J / K | PUNCH / KICK | X / B |
 | Surge (hold, or tap on/off: Settings → Surge button): run through enemies, super jump, Surge moves | Shift | SURGE | Bumpers / triggers |
-| Crouch | S, standing still | Stick down | D-pad down |
+| Crouch (with left or right: crouch walk, slower) | S | Stick down | D-pad down |
 | Block (hits from the front cost Surge instead of health; drops when Surge runs out) | Shift + S, standing still | SURGE + stick down | Bumper + d-pad down |
 | Grab | J + K together | PUNCH + KICK | X + B |
 | Ultimate (blue meter full; pick it on the Skills screen) | U | ULT | Y |

@@ -97,7 +97,8 @@ const ITEMS = [
   { id: 'band-gold', sec: 'band', name: 'Gold Band', c: '#ffd400', how: { combo: 20 } },
   { id: 'band-rainbow', sec: 'band', name: 'Rainbow Band', c: 'rainbow', how: { drop: 1 } },
   // pets: a little friend who follows you (k = the animal, pets.js; fly = flies over your shoulder)
-  { id: 'pet-frog', sec: 'pet', name: 'Froggy', c: '#7bc95a', c2: '#4f9a3a', k: 'frog', price: 150 },
+  // secret: only from a code in the treasure chest (crown, heart, heart, crown)
+  { id: 'pet-frog', sec: 'pet', name: 'Froggy', c: '#7bc95a', c2: '#4f9a3a', k: 'frog', how: { code: 1 } },
   { id: 'pet-dog', sec: 'pet', name: 'Puppy', c: '#d9a066', c2: '#8a5a33', k: 'dog', price: 200 },
   { id: 'pet-cat', sec: 'pet', name: 'Kitty', c: '#ffa94d', c2: '#d9701a', k: 'cat', price: 200 },
   { id: 'pet-bunny', sec: 'pet', name: 'Bunny', c: '#f4efe6', k: 'bunny', price: 250 },
@@ -349,11 +350,13 @@ for (const it of ITEMS) it.slot = SECS[it.sec].slot;
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 // Idle stances (cosmetic: only how you stand while waiting). Same pose format as moves.js.
 // The treasure chest's codes (Character screen, ui/codes.js): four icons, by their place in CODE_ICONS, and the
-// item each code gives. Four stars (what the chest starts on) gives Rhett's Shirt; four ninja stars, the Ninja Mask.
+// item each code gives. Four stars (what the chest starts on) gives Rhett's Shirt; four ninja stars, the Ninja Mask; crown, heart, heart,
+// crown, Froggy.
 const CODE_ICONS = ['star', 'shuriken', 'heart', 'crown', 'bolt', 'flame', 'moon', 'drop'];
 const CODES = [
   { code: [0, 0, 0, 0], item: 'shirt-rhett' },
-  { code: [1, 1, 1, 1], item: 'face-ninja' }
+  { code: [1, 1, 1, 1], item: 'face-ninja' },
+  { code: [3, 2, 2, 3], item: 'pet-frog' }
 ];
 const STANCES = [
   { id: 'classic', name: 'Classic', p: [6, 35, 75, 20, 90, 18, 20, -18, 12, 0] },

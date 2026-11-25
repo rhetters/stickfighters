@@ -1300,6 +1300,7 @@ function lookPose(f) {
       Math.abs(f.vx) < 0.9 &&
       !f.blk &&
       !f.crch &&
+      !f.cw &&
       !f.running &&
       !f.flip &&
       !f.pose[9],
