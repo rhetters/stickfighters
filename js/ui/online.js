@@ -138,6 +138,12 @@ function renderOnline() {
   $('on-nostar').hidden = !mine;
   // START can be pressed once everyone is ready (and Versus has its players; MY LEVELS needs a level)
   $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady()) || (mine && !netLevels().length);
+  // who the room is waiting for
+  const me = NET.players.find(p => p.slot === NET.mySlot),
+    wait = NET.players.filter(p => !p.ready && !p.left).length;
+  $('on-wait').hidden = !wait || !NET.players.length || NET.players.length < 2;
+  $('on-wait').textContent =
+    me && !me.ready ? 'Tap READY? on your card when you\'re ready to play!' : 'Waiting for ' + wait + (wait > 1 ? ' players' : ' player') + ' to tap READY…';
 }
 // The online room's story and level tiles' pages (this device's own: a guest can look through them too)
 const ONPAGES = newPages();

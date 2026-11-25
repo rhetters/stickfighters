@@ -110,6 +110,7 @@ ok(await ev("(()=>{for(const id in THEMES)for(let s=1;s<60;s++)for(const t of ge
 ok(await ev("(()=>{startCustom(normLevel({places:[{b:'woods',parts:[{w:1200,props:[{k:'tree',x:600,l:'f'},{k:'pine',x:300,l:'z'},{k:'bush',x:900}]}]}]}));cineEnd();CAM.x=LV.ch[1].x0;const n=[];const o=drawProp;drawProp=(q,x,d)=>{n.push(q.k+(q.l||''));o(q,x,d)};drawLevelBg();drawLevelFg();drawProp=o;return n.join()==='pinez,bush,treef'})()"),'far, back and front scenery each drawn in their turn');
 ok(await ev("(()=>{const pr=LV.ch[1].props[0];PL[0].x=LV.ch[1].x0+600;for(let i=0;i<40;i++)drawLevelFg();const a=PROPA.get(pr);PL[0].x=LV.ch[1].x0+100;for(let i=0;i<40;i++)drawLevelFg();return a<0.5&&PROPA.get(pr)>0.95})()"),'front scenery turns see-through while a fighter is behind it');
 ok(await ev("(()=>{const L=normLevel({places:[{b:'woods',parts:[{w:1200}]}],boss:{t:'G',x:600}});const X=buildCustom(L,3);return X.encs.length===1&&X.encs[0].boss==='G'&&X.encs[0].list.length===0&&X.encs[0].intro==='pencil'})()"),'a boss alone makes the last part a boss fight');
+ok(await ev("(()=>{startCustom(normLevel({places:[{b:'moon'}]}),'menu');cineEnd();PL[0].look={...PL[0].look,pet:ITEMS.find(i=>i.id==='pet-dog')};const n=[];const o=drawBubble;drawBubble=(x,y,r)=>{n.push(r);o(x,y,r)};render();drawBubble=o;return n.length>=2})()"),'on the moon a pet gets a space bubble too');
 await ev("openTitle()");
 ok(!errs.length,'no errors: '+errs.join(' | '));
 console.log(fails?fails+' FAILED':'ALL PASS');await b.close();process.exit(fails?1:0)})();

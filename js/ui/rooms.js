@@ -15,6 +15,15 @@ const STAMP_SVG = on =>
   '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="' +
   (on ? 'M9 21 l8 8 l15 -17' : 'M11 11 l18 18 M29 11 l-18 18') +
   '" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// A ready stamp's look: a green tick when ready; for your own card, while you're not ready, a bright pulsing READY?
+// button (so it's plain what to tap), otherwise a red cross. Sets the button's class, contents and label.
+function readyStamp(b, on, mine) {
+  const ask = mine && !on;
+  b.classList.toggle('on', on);
+  b.classList.toggle('ask', ask);
+  b.innerHTML = ask ? '<em>READY?</em>' : STAMP_SVG(on);
+  b.setAttribute('aria-label', on ? 'Ready' : ask ? 'Tap when you are ready' : 'Not ready yet');
+}
 const PERSON_SVG =
   '<svg viewBox="0 0 40 40" aria-hidden="true"><g stroke="#1c1626" stroke-width="3.5" stroke-linecap="round" fill="none"><circle cx="20" cy="10" r="6" fill="#fff8ee"/><path d="M20 16 v12 M20 28 l-6 10 M20 28 l6 10 M20 20 l-8 4 M20 20 l8 4"/></g></svg>';
 // The sticky note: a room code (with "room code" written small in its corner) or a word such as LOCAL, and the
@@ -71,9 +80,8 @@ function roomCard(o) {
   if (o.next) c.querySelector('.pnext').onclick = o.next;
   if (o.ready !== undefined) {
     const s = document.createElement('button');
-    s.className = 'pready' + (o.ready ? ' on' : '');
-    s.innerHTML = STAMP_SVG(o.ready);
-    s.setAttribute('aria-label', o.ready ? 'Ready' : 'Not ready');
+    s.className = 'pready';
+    readyStamp(s, !!o.ready, !!o.readyMine);
     s.disabled = !o.readyMine;
     s.onclick = o.onReady;
     c.appendChild(s);
