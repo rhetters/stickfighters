@@ -63,7 +63,7 @@ function themeCards() {
   card('My levels: the levels you made (no XP or ninja stars)', '<span class="thpic th-levels"></span><b>MY LEVELS</b><small>NO XP OR STARS</small>', () => {
     THS.mine = true;
     themeCards();
-  });
+  }).classList.add('thmy');
   box.querySelector('button').focus({ preventScroll: true });
 }
 // A random theme for '?' (a menu pick, not part of the simulation, so Math.random is fine)

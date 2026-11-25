@@ -45,7 +45,7 @@ await ev("$('v-title').click()");await p.waitForTimeout(300);
 ok(await ev("$('s-victory').hidden&&state!=='play'"),'MAIN MENU leaves the victory screen');
 // the surprise story: '?' on the Story screen picks a theme and earns SURPRISE_BONUS more stars and XP
 await ev("openTitle();titleOpenAll();$('b-level').click()");await p.waitForTimeout(200);
-ok(await ev("$('th-cards').lastElementChild.classList.contains('thq')&&(()=>{const r=$('th-back').getBoundingClientRect();return r.bottom<=innerHeight&&r.height>30})()"),'the Story screen has a ? card, and its cards and BACK fit on the screen');
+ok(await ev("$('th-cards').lastElementChild.previousElementSibling.classList.contains('thq')&&$('th-cards').lastElementChild.classList.contains('thmy')&&(()=>{const r=$('th-back').getBoundingClientRect();return r.bottom<=innerHeight&&r.height>30})()"),'the Story screen has a ? card and MY LEVELS, and its cards and BACK fit on the screen');
 await ev("document.querySelector('.thq').click()");await p.waitForTimeout(200);
 ok(await ev("state==='play'&&!!THEMES[LV.run.theme]&&LV.run.myst===true"),'? starts a surprise run');
 ok(await ev("(()=>{cineEnd();RUN.stars=0;RUN.xp=200;grantStars(100,'test');runEnd('v-st',{bonus:SURPRISE_BONUS});return RUN.stars===110&&RUN.last.every(r=>r.xp===220)})()"),'a surprise run earns 10% more stars and XP');
