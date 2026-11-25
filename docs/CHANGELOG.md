@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Built-in music back (November 25, 2026)
+- Ron tried the recorded songs (versions 67 and 68) and liked the built-in music better, so they were taken out again: the game is as it was in version 66, with all its music made in the browser.
+- Version 69.
+
 ## M17: places, a boss and scenery layers in the level creator; five tiles at a time (November 25, 2026)
 - **More places** (asked by Ron and Rhett): ADD A PLACE (in PARTS) adds up to three places to a level, each with up to 6 parts, so a level can run from the Wooded Trail into the Sewer into the Castle. Old levels become a level with one place.
 - **Transitions are picked for you:** every transition is now listed under the places it can carry you *into* (a balloon never lands in the sewer), and between two places one of those is picked at random. Online every device gets the same one. Stories use the same list now (into the sewer it's always the pipe).
