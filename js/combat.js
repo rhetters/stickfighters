@@ -114,9 +114,9 @@ function tickAtk(f) {
     if (a.f % 4 === 0)
       fxp({
         k: 'l',
-        x: f.x - f.face * (30 + rnd() * 20),
-        y: f.y - 10 - rnd() * 50,
-        len: 40 + rnd() * 30,
+        x: f.x - f.face * (30 + fxr() * 20),
+        y: f.y - 10 - fxr() * 50,
+        len: 40 + fxr() * 30,
         dir: f.face,
         l: 9,
         m: 9
@@ -209,7 +209,7 @@ function tickAtk(f) {
             endAtk(f);
             return;
           }
-        } else hurtP(e, d, dr);
+        } else hurtP(e, d, dr, f);
       }
     }
   }
@@ -221,7 +221,7 @@ function tickAtk(f) {
     if (d.area && !f.pl) {
       for (const q of PL) {
         if (q.st === 'dead' || q.y < q.gy - 24 || Math.abs(q.x - f.x) > d.area) continue;
-        hurtP(q, { dmg: d.adm || 10, kb: 10, lift: -6 }, q.x >= f.x ? 1 : -1);
+        hurtP(q, { dmg: d.adm || 10, kb: 10, lift: -6, ef: d.ef }, q.x >= f.x ? 1 : -1, f);
       }
       shake = Math.max(shake, 12);
     }
@@ -394,6 +394,7 @@ function tryGrab(f) {
 }
 function pummel(f, e) {
   const dmg = Math.max(1, Math.round(4 * (f.combo < 4 ? 1 : Math.max(0.45, 1 - (f.combo - 3) * 0.04))));
+  tally(f, 'dealt', Math.min(dmg, Math.max(0, e.hp)));
   e.hp -= dmg;
   e.flash = 4;
   e.hs = 3;
@@ -474,7 +475,7 @@ function impact(w, dr, x, y, kill, ult) {
   camY += t.ky;
   if (t.z) zoom = Math.max(zoom, t.z);
   sfxHit(w);
-  if (w === 'H') fxp({ k: 'b', x, y, l: 9, m: 9, a: rnd() * 6 });
+  if (w === 'H') fxp({ k: 'b', x, y, l: 9, m: 9, a: fxr() * 6 });
 }
 // Hit effects (Combat Chart F): stagger, push, pop, launch, kd (knockdown), trip, splat, bounce.
 const JUGMAX = 7,
@@ -495,6 +496,9 @@ function hurtE(e, d, dr, src, by) {
   }
   if (e.st === 'down') e.otgU = 1; // one hit on a downed enemy per knockdown
   tally(ap, 'dealt', Math.min(dmg, Math.max(0, e.hp)));
+  // who sent it flying: a flying body that hits others gives that player the combo and meter (bowl). An index into PL,
+  // not the player object, so a saved game state stays plain data.
+  if (ap && ap.pl) e.by = PL.indexOf(ap);
   e.hp -= dmg;
   if (e.hp <= 0 && MODE.spare && MODE.spare(e)) e.hp = 1; // a mode can keep someone standing (the volcano's last stand)
   e.flash = 4;
@@ -664,6 +668,7 @@ function groundHit(e, d, dr, src) {
   if (e.dying) return;
   const dmg = Math.max(1, Math.round((d.dmg || 4) * 0.5));
   if (e.hp - dmg <= 0) return hurtE(e, { ...d, ef: 'kd' }, dr, src);
+  if (src) tally(src, 'dealt', dmg);
   e.hp -= dmg;
   e.flash = 4;
   e.hs = 3;
@@ -700,7 +705,13 @@ function blockHit(q, d, dr) {
     q.blk = 0;
   }
 }
-function hurtP(q, d, dr) {
+// An enemy's hit on a player (src = the enemy, when there is one). The move's ef sets how the player reacts (see
+// data/enemies.js); a move with chain is part of a combo string: the player gets only a short safe time (STR_INV)
+// so its next hit can land, until the string has landed the difficulty's str hits or strDmg of their health, or a
+// hit knocks them down. Otherwise a hit gives the usual safe time (65 frames; 110 when knocked down or sent flying).
+const STR_INV = 8, // frames safe between hits of one string
+  STR_GAP = 45; // a string's next hit must come this soon after the last, or it's a new string
+function hurtP(q, d, dr, src) {
   if (q.blk && dr === -q.face && q.st === 'free' && !q.inv) return blockHit(q, d, dr);
   if (state === 'train' && TR.god) return;
   if (q.inv > 0 || q.st === 'dead' || (q.att && q.att.d.invul)) return;
@@ -716,7 +727,15 @@ function hurtP(q, d, dr) {
   const hd = d.dmg * (1 - modOf(q, 'arm')) * (1 + 0.2 * hardScale()) * diffOf().dmg; // Tough Skin, Thick Skin (skill tree)
   tally(q, 'taken', Math.min(hd, Math.max(0, q.hp)));
   q.hp -= hd;
-  q.inv = 65;
+  const D = diffOf(),
+    by = src ? src.uid || 0 : 0,
+    S = q.str && q.str.by === by && fr - q.str.t <= STR_GAP ? q.str : (q.str = { by, n: 0, dmg: 0, t: fr });
+  S.n++;
+  S.dmg += hd;
+  S.t = fr;
+  const ef = { splat: 'launch', bounce: 'launch' }[d.ef] || d.ef || 'stagger',
+    more = !!(d.chain && by) && S.n < D.str && S.dmg < q.max * D.strDmg; // the string can go on
+  q.inv = more ? STR_INV : 65;
   q.flash = 4;
   q.hs = 7;
   q.combo = 0;
@@ -731,7 +750,7 @@ function hurtP(q, d, dr) {
   spark(q.x, q.y - 45, 26, '#ff4fa3');
   sfxHit('M');
   sfx(90, 0.25, 'sawtooth', 0.07, -50);
-  q.ri = { dr, ef: d.kb >= 12 ? 'launch' : 'kd' };
+  q.ri = { dr, ef: ef === 'launch' ? 'launch' : 'kd' };
   if (q.hp <= 0 && modOf(q, 'sw') && !q.swUsed) {
     // Second Wind (skill tree): once a fight, a knockout becomes a knockdown with some health back
     q.swUsed = 1;
@@ -758,27 +777,30 @@ function hurtP(q, d, dr) {
     q.deadT = 0;
     return;
   }
-  if (d.kb >= 12) {
+  if (ef === 'launch' || ef === 'kd' || ef === 'trip') {
+    // sent flying, knocked down or tripped: in the air, then down (player.js), safe until back up
+    const L = { launch: [7, -7, 14], kd: [4, -4, 10], trip: [2, -3, 18] }[ef];
     q.st = 'fly';
-    q.vx = dr * 7;
-    q.vy = -7;
-    q.spv = dr * 14;
+    q.vx = dr * L[0];
+    q.vy = L[1];
+    q.spv = dr * L[2];
     q.sp = 0;
     q.inv = 110;
+    q.str = null;
     return;
   }
   q.st = 'hurt';
-  q.stun = 18;
-  q.vx = dr * d.kb;
-  q.vy = d.lift ? -5 : -3;
+  q.stun = more ? 14 : 18;
+  q.vx = dr * d.kb * (ef === 'push' ? 1.4 : 1);
+  q.vy = ef === 'pop' ? -6 : d.lift ? -5 : -3;
 }
 // Bodies as projectiles: a flying enemy knocks down whoever it hits. Each link in the chain hits 25% softer.
 // Momentum is shared by mass; a heavy target with poise stops the projectile cold. Falling bodies crush; downed bodies make a pile-up.
 function bowl() {
-  // whoever gets the combo and meter when a flying body hits another: Player 1 (it isn't tracked who sent it flying)
-  const cred = PL[0];
   for (const a of E) {
     if (a.st !== 'fly' || a.gone || a.corpse) continue;
+    // the combo and meter go to the player who sent it flying (hurtE's e.by; a body it hits passes it on)
+    const cred = PL[a.by] || PL[0];
     const sp = Math.abs(a.vx),
       fall = a.vy > 7;
     if (sp < (a.thrown ? 3 : 4) && !fall) continue;

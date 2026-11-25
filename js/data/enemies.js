@@ -1,4 +1,20 @@
 // StickFighters: Enemy moves (EA), enemy types (T), names and tips; decorates every move with its info
+// ===== MAKING ENEMIES AND THEIR MOVES (the rules; they keep the game the same on every device, and ready for
+// rollback netcode later) =====
+// - A move is data, run by the shared attack engine (tickAtk in combat.js): d (length in frames), h (the frames it
+//   hits), dmg, r (reach), kb (knockback), lift, lv / lg (lunges), k (key poses), and for its hit on a player:
+//     ef     how the player reacts, from the move's row in the Combat chart (INFO, data/moves.js): 'stagger' (stunned,
+//            pushed back; a move without a row), 'push' (pushed farther), 'pop' (popped up a little), 'trip' (feet
+//            swept: down), 'kd' (knocked down), 'launch', 'splat' or 'bounce' (sent flying)
+//     chain  1 = more of the same enemy's combo string comes after this hit: the player is only safe for a moment
+//            (STR_INV), so the next hit can land, up to the difficulty's str hits and strDmg damage (data/difficulty.js)
+//   Add a new engine flag only when no existing one can say it, and write it here.
+// - Everything an enemy is doing lives on the enemy as plain data (its move, frame, cooldowns, plan, target), never
+//   in closures or hidden variables. Refer to other fighters by uid or by index, not by holding the object.
+// - Game randomness only through rnd(); effects (particles, sparks) through fxr(); never Math.random().
+// - Time in frames (fr, counters), never timers or the clock. Enemies never read buttons (NO_INPUT).
+// - Keep each frame's thinking cheap (no searches over everything): rollback will run frames several times over.
+// - Difficulty is data too (data/difficulty.js), not separate code. Go through lists in a fixed order (arrays).
 const EA = {
   pj: {
     d: 34,

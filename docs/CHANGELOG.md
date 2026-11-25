@@ -2,6 +2,16 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Combat review: effects apart from the game, enemy hits on players (November 25, 2026)
+From a review of combat.js Ron brought from another chat, checked against the whole game first (it was right; the
+problem with effects was bigger than it could see).
+- **Effects have their own random numbers.** Sparks, dust, the big-hit flash, ragdoll and gate debris, volcano debris and speed lines used the game's own random numbers, so showing them changed what came next. Now they can't, and a mute switch turns effects and sounds off for rollback's re-plays later. The self-test checks the game comes out the same either way. (This changes the self-test fingerprints: `1ad25e01` / `0d2bfc9f`.)
+- **Enemy hits on players follow the Combat chart** for every enemy: the Guard's Shield Bash pushes you farther; the Brute's Overhead, the Captains' slams, charges and quake leaps knock you down (before, the big ones sent you flying and the rest just staggered you).
+- **Enemy combo strings are possible:** a move marked as part of a string leaves the player safe only for a moment, so its next hit can land, up to 2 / 3 / 4 hits on Easy / Normal / Hard or 20 / 30 / 40% of their health. No enemy has one yet; they're ready for the theme enemies.
+- **The rules for making enemies** (data only, `rnd()`, frames, no buttons, cheap thinking) are written at the top of data/enemies.js.
+- Fixes: in co-op, a thrown enemy smashing into others gives the combo and meter to whoever threw it (it was always Player 1); pummel hits and hits on a downed enemy count in damage dealt on the results.
+- Version 70.
+
 ## Built-in music back (November 25, 2026)
 - Ron tried the recorded songs (versions 67 and 68) and liked the built-in music better, so they were taken out again: the game is as it was in version 66, with all its music made in the browser.
 - Version 69.
