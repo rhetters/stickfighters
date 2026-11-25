@@ -10,9 +10,12 @@ const p=await b.newPage({viewport:{width:1080,height:810}});p.on('pageerror',e=>
 await p.goto('http://127.0.0.1:9341/index.html');await p.waitForTimeout(300);
 await p.mouse.click(5,5);await p.evaluate(()=>{SET.tut=1;titleOpenAll();audUnlock()});
 const W=t=>p.waitForTimeout(t);
-for(let i=0;i<40&&!(await p.evaluate(()=>MUS.cur&&MUS.cur.buf));i++)await W(100);
-ok(await p.evaluate(()=>MUS.cur&&MUS.cur.id==='menu'&&MUS.cur.buf&&MUS.cur.path==='Menus/Menu'),'the title screen plays the recorded Menu song');
-ok(loads.every(u=>/\/music\/Menus\//.test(u))&&loads.length===3&&loads.every(u=>u.endsWith('.ogg')),'only the menus\' three songs are loaded on the menus (Ogg here): '+loads.join(' '));
+await W(2000);
+ok(await p.evaluate(()=>MUS.cur&&MUS.cur.id==='menu'&&!MUS.cur.buf&&musPath('menu')===null),'the title screen keeps its built-in song');
+ok(loads.every(u=>/\/music\/Menus\/(Character Creation|House Editor)\.ogg$/.test(u))&&loads.length===2,'on the menus only the Character screen\'s and the house builder\'s songs are loaded (Ogg here): '+loads.join(' '));
+await p.evaluate(()=>show('s-char'));for(let i=0;i<40&&!(await p.evaluate(()=>MUS.cur&&MUS.cur.buf));i++)await W(100);
+ok(await p.evaluate(()=>MUS.cur&&MUS.cur.id==='dressup'&&MUS.cur.buf&&MUS.cur.path==='Menus/Character Creation'),'the Character screen plays its recording');
+await p.evaluate(()=>openTitle());
 await p.evaluate(()=>{SET.seed='4';startRun('castle')});
 for(let i=0;i<60&&!(await p.evaluate(()=>MUS.cur&&MUS.cur.id==='woods'&&MUS.cur.buf));i++){await p.evaluate(()=>{if(LV.cine&&LV.cine.k==='drawin')cineEnd()});await W(100)}
 ok(await p.evaluate(()=>MUS.cur&&MUS.cur.id==='woods'&&MUS.cur.buf&&MUS.cur.path==='Castle Siege/The Woodland Trail'),'in Castle Siege: the recorded Woodland Trail');
@@ -31,6 +34,7 @@ ok(await p.evaluate(()=>Object.keys(MUS_BUF).every(k=>k.startsWith('Menus/'))),'
 // opened from disk: no loading at all
 const q=await b.newPage();q.on('pageerror',e=>errs.push(e.message));await q.goto('file://'+ROOT+'/index.html');await q.waitForTimeout(300);
 await q.mouse.click(5,5);await q.evaluate(()=>{SET.tut=1;titleOpenAll();audUnlock()});await q.waitForTimeout(1200);
-ok(await q.evaluate(()=>MUS.cur&&MUS.cur.id==='menu'&&!MUS.cur.buf&&Object.values(MUS_LOAD).every(v=>v==='failed')),'opened from disk: the synth songs play, nothing is fetched');
+await q.evaluate(()=>show('s-char'));await q.waitForTimeout(800);
+ok(await q.evaluate(()=>MUS.cur&&MUS.cur.id==='dressup'&&!MUS.cur.buf&&Object.values(MUS_LOAD).every(v=>v==='failed')),'opened from disk: the synth songs play, nothing is fetched');
 ok(errs.length===0,'no errors '+errs.join(' | '));
 console.log(fails?fails+' FAILED':'ALL PASS');await b.close();srv.close();process.exit(fails?1:0)})();

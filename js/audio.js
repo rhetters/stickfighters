@@ -223,8 +223,7 @@ function playStep(P, lvl) {
 // Each recording is there twice: Ogg Vorbis (.ogg) and, for browsers without it (older iPads), AAC (.m4a).
 const MUS_DIR = 'music/';
 const MUS_FILES = {
-  // menus
-  menu: 'Menus/Menu',
+  // menus (the title screen keeps its built-in song: Ron liked it better)
   dressup: 'Menus/Character Creation',
   house: 'Menus/House Editor',
   // places (by look)
@@ -293,12 +292,12 @@ function musBuf(id) {
   return (p && MUS_BUF[p]) || null;
 }
 // Decoded sound is big (an iPad can't hold them all): only the songs that can come up next are loaded, the rest let
-// go. In a level: its places, its boss and the escape; elsewhere: the menus' songs.
+// go. In a level: its places, its boss and the escape; elsewhere: the Character screen's and the house builder's.
 function musPrefetch() {
   const ids =
     MODE === LEVEL && LV && LV.segs && state !== 'menu'
       ? [...LV.segs.map(s => s.b), 'boss', 'escape'].filter(id => id !== 'escape' || (LV.run && LV.run.theme === 'volcano'))
-      : ['menu', 'dressup', 'house'];
+      : ['dressup', 'house'];
   if (MUS.want) ids.push(MUS.want);
   const keep = new Set(ids.map(musPath).filter(Boolean));
   if (MUS.cur && MUS.cur.path) keep.add(MUS.cur.path);

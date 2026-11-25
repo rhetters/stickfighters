@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## The title screen's own song back (November 25, 2026)
+- Ron liked the built-in title-screen music better, so the title screen plays it again; the Character screen and the house builder keep their new recordings.
+- Version 68.
+
 ## Recorded music (November 25, 2026)
 - **New music** (made by Ron with Opus 5.5): a recorded song for the title screen, the Character screen, the house builder, all 15 places, the five bosses and the Tiki's lava escape, in `music/`. The jingles (starting a story, a boss arriving and falling, every transition) stay the built-in ones.
 - Only the songs that can come up next are loaded (a level's places and boss, or the menus' songs), so the iPad isn't asked to hold them all. A song that hasn't arrived yet plays its built-in version and cross-fades to the recording when it does.
