@@ -111,15 +111,17 @@ function renderOnline() {
   roomTiles(
     $('on-sub'),
     NET.mode === 'level'
-      ? NET.theme === 'mine'
-        ? levelTiles(
-            netLevels(),
-            (pickedLevel(netLevels(), NET.lvl) || {}).id,
-            v => ((NET.lvl = v), netOptChanged()),
-            () => ((NET.theme = 'castle'), netOptChanged()),
-            !NET.host
-          )
-        : storyTiles(NET.theme, v => ((NET.theme = v), netOptChanged()), !NET.host)
+      ? storyRow({
+          mine: NET.theme === 'mine',
+          cur: NET.theme === 'mine' ? levelCur(netLevels(), NET.lvl) : NET.theme,
+          levels: netLevels(),
+          pages: ONPAGES,
+          pick: v => (NET.theme === 'mine' ? (NET.lvl = v) : (NET.theme = v), netOptChanged()),
+          toMine: () => ((ONPAGES.story.last = NET.theme), (NET.theme = 'mine'), netOptChanged()),
+          toStories: () => ((NET.theme = ONPAGES.story.last || 'castle'), netOptChanged()),
+          redraw: renderOnline,
+          disabled: !NET.host
+        })
       : NET.mode === 'vs'
         ? teamTiles(NET.teams, v => ((NET.teams = v), netOptChanged()), !NET.host)
         : []
@@ -137,6 +139,8 @@ function renderOnline() {
   // START can be pressed once everyone is ready (and Versus has its players; MY LEVELS needs a level)
   $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady()) || (mine && !netLevels().length);
 }
+// The online room's story and level tiles' pages (this device's own: a guest can look through them too)
+const ONPAGES = newPages();
 // Change my fighter (my saved fighters, in order) and tell the room
 function onlineFighter(d) {
   const ids = CHR.list.map((c, i) => i).filter(i => CHR.list[i]);

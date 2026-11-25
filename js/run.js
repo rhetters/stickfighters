@@ -26,6 +26,40 @@ function catBucket(x, t) {
 }
 // Transitions that leave something at the start of the next biome (its prop 'trans-<k>out' at this x)
 const OUTS = { pipe: 120, balloon: 300, gondola: 200, landing: 300 };
+// A transition's chunk is this wide (the rope's is short: its chasm is the gap after it)
+const transW = k => (k === 'rope' ? 600 : TRANSITIONS[k].tower ? 1500 : 900);
+// Transition k at the end of chunk c, from place bid into nb (genRun and custom levels): its scene's prop, the launch
+// tower's platforms, the gate to smash. Returns the transition (LV.trans); the caller adds the gap after it.
+function transBuild(k, c, bid, nb, terr, gates) {
+  const T_ = TRANSITIONS[k],
+    at = T_.tower ? 1110 : 600,
+    t = { k, from: bid, to: nb, x: c.x0 + at, done: 0 };
+  c.props.push({ k: 'trans-' + k, x: at });
+  if (T_.tower) {
+    // the launch tower: platforms to jump up (each about half a jump higher), then the top deck by the rocket.
+    // Walls under the deck and at the rocket keep you from walking (or falling) in under it.
+    const o = c.x0;
+    terr.s.push(
+      { x1: o + 480, x2: o + 620, y1: G - 100, y2: G - 100 },
+      { x1: o + 640, x2: o + 740, y1: G - 210, y2: G - 210 },
+      { x1: o + 480, x2: o + 620, y1: G - 320, y2: G - 320 },
+      { x1: o + 700, x2: o + 1055, y1: G - 430, y2: G - 430 }
+    );
+    terr.w.push({ x: o + 750, y1: G - 425, y2: G }, { x: o + 1058, y1: G - 700, y2: G });
+    t.top = G - 430;
+    t.deck = o + 760;
+  }
+  if (k === 'gate') gates.push({ k: 'door', x: t.x, hp: T_.hp, max: T_.hp, hit: 0, to: nb });
+  return t;
+}
+// The crater's climb down at the start of a place (its sign chunk starts at o): rock ledges stepping down over a lava
+// pool. Returns the top ledge's index in terr.s (where the rim scene lands everyone).
+function descentBuild(o, terr, haz) {
+  for (let i = 0; i < 4; i++)
+    terr.s.push({ x1: o + 60 + i * 230, x2: o + 320 + i * 230, y1: G - 480 + i * 120, y2: G - 480 + i * 120, st: 'rock' });
+  haz.pools.push({ x0: o + 10, x1: o + 990 });
+  return terr.s.length - 4;
+}
 // Builds a run: the same shape as buildLevel() (level.js) plus segs (one per biome), trans (transitions) and run.
 // ng (harder replays): fights start tougher and hold more enemies, and mini-bosses turn up more often.
 function genRun(themeId, seed, ng = 0) {
@@ -86,17 +120,8 @@ function genRun(themeId, seed, ng = 0) {
       ]);
     sign.dusk = light(0);
     if (B.descent) {
-      const o = sign.x0;
-      for (let i = 0; i < 4; i++)
-        terr.s.push({
-          x1: o + 60 + i * 230,
-          x2: o + 320 + i * 230,
-          y1: G - 480 + i * 120,
-          y2: G - 480 + i * 120,
-          st: 'rock'
-        });
-      haz.pools.push({ x0: o + 10, x1: o + 990 });
-      if (prev) prev.land = terr.s.length - 4; // the rim scene lands everyone on the top ledge
+      const top = descentBuild(sign.x0, terr, haz);
+      if (prev) prev.land = top; // the rim scene lands everyone on the top ledge
     }
     // 2. the fights
     for (let k = 0; k < B.fights; k++) {
@@ -213,35 +238,12 @@ function genRun(themeId, seed, ng = 0) {
       seg.x1 = x;
     } else {
       const nb = th.biomes[bi + 1],
-        fits = (th.trans || Object.keys(TRANSITIONS)).filter(k => {
-          const nd = TRANSITIONS[k].needs;
-          return (!nd || nd.includes(bid) || nd.includes(nb)) && !(BIOMES[nb].enter && k !== BIOMES[nb].enter);
-        }),
+        fits = TRANS_INTO[nb],
         k = fits[ri(0, fits.length - 1)],
-        T_ = TRANSITIONS[k],
-        at = T_.tower ? 1110 : 600,
-        c = chunk(B, bi, k === 'rope' ? 600 : T_.tower ? 1500 : 900, [
-          ...scatter(B, 460, 2),
-          { k: 'trans-' + k, x: at }
-        ]),
-        t = { k, from: bid, to: nb, x: c.x0 + at, done: 0 };
-      if (T_.tower) {
-        // the launch tower: platforms to jump up (each about half a jump higher), then the top deck by the rocket.
-        // Walls under the deck and at the rocket keep you from walking (or falling) in under it.
-        const o = c.x0;
-        terr.s.push(
-          { x1: o + 480, x2: o + 620, y1: G - 100, y2: G - 100 },
-          { x1: o + 640, x2: o + 740, y1: G - 210, y2: G - 210 },
-          { x1: o + 480, x2: o + 620, y1: G - 320, y2: G - 320 },
-          { x1: o + 700, x2: o + 1055, y1: G - 430, y2: G - 430 }
-        );
-        terr.w.push({ x: o + 750, y1: G - 425, y2: G }, { x: o + 1058, y1: G - 700, y2: G });
-        t.top = G - 430;
-        t.deck = o + 760;
-      }
-      if (k === 'gate') gates.push({ k: 'door', x: t.x, hp: T_.hp, max: T_.hp, hit: 0, to: nb });
+        c = chunk(B, bi, transW(k), scatter(B, 460, 2)),
+        t = transBuild(k, c, bid, nb, terr, gates);
       // the gap between the biomes: a chasm for the rope, an unseen stretch for scenes that fly or slide you there
-      x += T_.gap;
+      x += TRANSITIONS[k].gap;
       seg.x1 = k === 'rope' ? t.x : x;
       t.nx = x; // where the next biome starts
       trans.push(t);
@@ -302,10 +304,11 @@ function replayLevel(harder) {
   else if (LV && LV.custom) startCustom(LV.src, LV.from);
   else startLevel(LV ? LV.id : 'woods1');
 }
-// A biome is behind you: it counts as done for anything tied to it (the Wooded Trail's Ranger Hat)
+// A biome is behind you: it counts as done for anything tied to it (the Wooded Trail's Ranger Hat; not in your own
+// levels, which earn nothing)
 function biomeDone(bid) {
   const p = BIOMES[bid].prog;
-  if (p && !SELFTESTING && !(PROG[p] && PROG[p].done)) {
+  if (p && !SELFTESTING && !LV.custom && !(PROG[p] && PROG[p].done)) {
     PROG[p] = { ...(PROG[p] || {}), done: 1 };
     save();
   }

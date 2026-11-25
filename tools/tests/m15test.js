@@ -78,6 +78,6 @@ const det=await ev("(()=>{const go=()=>{SET.seed='9';startRun('volcano');cineEnd
 ok(det,'the same seed and inputs play out the same (vents, rocks, lava and climbing enemies are part of the game)');
 // the story picture
 await ev("openSolo&&openSolo()");await p.waitForTimeout(100);
-ok(await ev("(()=>{const t=storyTiles('volcano',()=>{},false).find(o=>o.data[1]==='volcano');return !!t&&t.on&&t.img==='i-volcano'&&getComputedStyle(Object.assign(document.createElement('span'),{className:'pimg i-volcano'})).backgroundImage!==undefined})()"),'Volcano is on the Story choices with its picture');
+ok(await ev("(()=>{const t=storyRow({cur:'volcano',levels:[],pages:newPages(),pick(){},redraw(){}}).find(o=>o.data[1]==='volcano');return !!t&&t.on&&t.img==='i-volcano'&&getComputedStyle(Object.assign(document.createElement('span'),{className:'pimg i-volcano'})).backgroundImage!==undefined})()"),'Volcano is on the Story choices with its picture');
 ok(!errs.length,'no errors: '+errs.slice(0,3).join(' | '));
 console.log(fails?fails+' FAILED':'ALL PASS');await b.close();process.exit(fails?1:0)})();

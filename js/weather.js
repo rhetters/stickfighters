@@ -8,7 +8,7 @@ const GUST_WARN = 80, // frames of the wind picking up before it pushes
   GUST_PUSH = 2.6; // px per frame at full strength (walking still gets you forward, slowly)
 // Is the camera in a gusty biome, and not at a boss fight or in a scene?
 function gustHere(ae) {
-  if (!LV || !LV.run || LV.cine || (ae && ae.boss)) return false;
+  if (!LV || !LV.segs || LV.cine || (ae && ae.boss)) return false;
   const sg = segAt(CAM.x + W / 2);
   return !!(sg && BIOMES[sg.b].gust);
 }

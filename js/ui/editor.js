@@ -1,30 +1,53 @@
 // StickFighters: the level creator's screens (Customize → LEVELS). MY LEVELS lists Rhett's levels and NEW LEVEL;
-// PICK A PLACE chooses a biome for a new one; the editor shows a part of the level with that place's real scenery and
-// a grid over it, like the house builder: every square in view is a button (touch, mouse, keyboard and
-// controllers). Tabs: PLATFORMS (tap or drag along a row), ENEMIES (drop one in where you tap), SCENERY, FLAG (where
-// the fight stops the screen), ERASE, and PARTS (move between parts, add or delete one, its width, and the star
-// that puts it in stories). PLAY plays the level and comes back here. Everything is saved as you go (EDIT.levels).
+// PICK A PLACE chooses a biome for a new one (or for a new place in a level); the editor shows a part of the level
+// with that place's real scenery and a grid over it, like the house builder: every square in view is a button (touch,
+// mouse, keyboard and controllers). Tabs: PLATFORMS (tap or drag along a row), ENEMIES (drop one in where you tap),
+// SCENERY (on one of three layers), FLAG (where the fight stops the screen), BOSS (only in the very last part), ERASE,
+// and PARTS (move between parts, add a part or a place, delete one, a part's width). PLAY plays the level and comes
+// back here. Everything is saved as you go (EDIT.levels).
 // ===== STATE =====
-const EDS = { i: -1, part: 0, ox: 0, tab: 'plat', foe: 'g', prop: null, paint: false, last: '', del: 0, delPart: 0 };
+// i: the level, pl: its place, part: the part in that place, ox: how far the view is scrolled into the part
+const EDS = {
+  i: -1,
+  pl: 0,
+  part: 0,
+  ox: 0,
+  tab: 'plat',
+  foe: 'g',
+  prop: null,
+  layer: 'b',
+  boss: 'G',
+  adding: false,
+  paint: false,
+  last: '',
+  del: 0,
+  delPart: 0,
+  delPlace: 0
+};
 const ED_TABS = [
   ['plat', 'PLATFORMS'],
   ['foe', 'ENEMIES'],
   ['prop', 'SCENERY'],
   ['flag', 'FLAG'],
+  ['boss', 'BOSS'],
   ['erase', 'ERASE'],
   ['parts', 'PARTS']
 ];
 const ED_HELP = {
   plat: 'Tap or drag along a row to lay a platform.',
   foe: 'Pick an enemy, then tap where it drops in. Up to 10 in a fight.',
-  prop: 'Pick some scenery, then tap where it goes.',
+  prop: 'Pick a layer and some scenery, then tap where it goes.',
   flag: 'Tap where the fight should stop the screen.',
+  boss: 'Pick a boss, then tap where he waits. One boss, in the very last part.',
   erase: 'Tap or drag to take things away.',
-  parts: 'A level is up to 6 parts, each up to 2½ screens long.'
+  parts: 'A level is up to 3 places, each up to 6 parts.'
 };
 const ED_COLS = W / ED_CELL; // squares across the view (15)
 const edLevel = () => EDIT.levels[EDS.i];
-const edPart = () => edLevel().parts[EDS.part];
+const edPlace = () => edLevel().places[EDS.pl];
+const edPart = () => edPlace().parts[EDS.part];
+// Is the part in view the level's very last one (where the boss goes)?
+const edIsLast = () => edPart() === edLastPart(edLevel());
 function edSave() {
   EDIT.levels[EDS.i] = normLevel(edLevel());
   save();
@@ -33,14 +56,15 @@ function edMsg(t) {
   $('ed-msg').textContent = t || '';
 }
 // ===== DRAWING =====
-// Draws part pi of level L with ox pixels scrolled into it, with the game's own scenery drawing (a level built
-// just for the picture; the game's LV and camera are put back after). marks = the editor's markers and grid.
-function edScene(L, pi, ox, marks) {
+// Draws part pi of place pl of level L with ox pixels scrolled into it, with the game's own scenery drawing (a level
+// built just for the picture; the game's LV and camera are put back after). marks = the editor's markers and grid.
+function edScene(L, pl, pi, ox, marks) {
   const keepLV = LV,
-    keepCam = { x: CAM.x, y: CAM.y, z: CAM.z };
+    keepCam = { x: CAM.x, y: CAM.y, z: CAM.z },
+    p = L.places[pl].parts[pi];
   try {
     LV = buildCustom(L);
-    const c = LV.ch[1 + pi];
+    const c = LV.ch[LV.pch[pl][pi]];
     CAM.x = c.x0 + ox;
     CAM.y = 0;
     CAM.z = 1;
@@ -49,8 +73,15 @@ function edScene(L, pi, ox, marks) {
     ctx.restore();
     ctx.save();
     camApply(CAM.x, 0, 1);
-    edFoes(L.parts[pi], c.x0);
-    if (marks) edMarks(L.parts[pi], c);
+    edFoes(p, c.x0);
+    if (L.boss && p === edLastPart(L)) edBossFig(L.boss, p, c.x0);
+    ctx.restore();
+    ctx.save();
+    drawFrontProps(0.75);
+    ctx.restore();
+    ctx.save();
+    camApply(CAM.x, 0, 1);
+    if (marks) edMarks(p, c);
     ctx.restore();
   } finally {
     LV = keepLV;
@@ -81,6 +112,13 @@ function edFoes(p, x0) {
     drawF(e);
   }
 }
+// The boss, waiting where he was put
+function edBossFig(bo, p, x0) {
+  const e = edFoeFig(bo.t),
+    y = edLand(p, bo.x);
+  Object.assign(e, { x: x0 + bo.x, y, gy: y, face: -1, st: 'free', flash: 0, hp: e.max, pmax: 0 });
+  drawF(e);
+}
 // The grid, the part's edges and the fight flag
 function edMarks(p, c) {
   ctx.strokeStyle = 'rgba(28,22,38,0.18)';
@@ -107,8 +145,10 @@ function edMarks(p, c) {
   ctx.stroke();
   ctx.setLineDash([]);
   // the fight flag, and the screen the fight will stop on
-  if (p.foes.length) {
-    const fx = c.x0 + p.at;
+  const bo = edLevel() && p === edLastPart(edLevel()) && edLevel().boss,
+    at = p.foes.length ? p.at : bo ? Math.max(W / 2, Math.min(p.w - W / 2, bo.x)) : null;
+  if (at !== null) {
+    const fx = c.x0 + at;
     ctx.fillStyle = 'rgba(255,79,163,0.08)';
     ctx.fillRect(fx - W / 2, -20, W, G + 20);
     ctx.strokeStyle = INK;
@@ -130,10 +170,16 @@ function edMarks(p, c) {
 // The editor's view
 function edDraw() {
   const k = $('ed-cv').getContext('2d');
-  withCtx(k, () => edScene(edLevel(), EDS.part, EDS.ox, true));
+  withCtx(k, () => edScene(edLevel(), EDS.pl, EDS.part, EDS.ox, true));
   const p = edPart(),
     L = edLevel();
-  $('ed-part').textContent = 'PART ' + (EDS.part + 1) + ' OF ' + L.parts.length;
+  $('ed-part').textContent =
+    (L.places.length > 1 ? 'PLACE ' + (EDS.pl + 1) + ': ' : '') +
+    BIOMES[edPlace().b].name +
+    ' · PART ' +
+    (EDS.part + 1) +
+    ' OF ' +
+    edPlace().parts.length;
   $('ed-left').disabled = EDS.ox <= 0;
   $('ed-right').disabled = EDS.ox >= p.w - W;
 }
@@ -142,7 +188,7 @@ function edThumb(L) {
   const big = document.createElement('canvas');
   big.width = W;
   big.height = H;
-  withCtx(big.getContext('2d'), () => edScene(L, 0, 0, false));
+  withCtx(big.getContext('2d'), () => edScene(L, 0, 0, 0, false));
   return k => k.drawImage(big, 210, 0, 420, 420, 17, 17, 166, 166);
 }
 // The same picture as a tile's image (cached by the level's contents)
@@ -214,8 +260,10 @@ function edPlusPic() {
   ctx.stroke();
 }
 // ===== PICK A PLACE =====
+// For a new level, or (add) for a new place in the level being edited
 const EDPLACE = {};
-function openPlaces() {
+function openPlaces(add = false) {
+  EDS.adding = add;
   const box = $('ed-places');
   box.innerHTML = '';
   // five columns, one for each story, its three places from top to bottom
@@ -229,7 +277,7 @@ function openPlaces() {
       t.innerHTML = '<span class="pimg chpic"></span><b></b>';
       t.querySelector('b').textContent = BIOMES[b].name;
       if (!EDPLACE[b]) {
-        const draw = edThumb(normLevel({ b })),
+        const draw = edThumb(normLevel({ places: [{ b }] })),
           cv = document.createElement('canvas');
         cv.width = cv.height = 200;
         withCtx(cv.getContext('2d'), () => {
@@ -241,30 +289,31 @@ function openPlaces() {
         EDPLACE[b] = cv.toDataURL();
       }
       t.querySelector('.pimg').style.setProperty('--ic', 'url(' + EDPLACE[b] + ')');
-      t.onclick = () => edNew(b);
+      t.onclick = () => (add ? edAddPlace(b) : edNew(b));
       box.appendChild(t);
     }
+  $('s-edpick').querySelector('h2').textContent = add ? 'ADD A PLACE' : 'PICK A PLACE';
   show('s-edpick');
   box.firstChild.focus({ preventScroll: true });
 }
 function edNew(b) {
   if (EDIT.levels.length >= ED_LIM.levels) return openLevels();
-  EDIT.levels.push(normLevel({ b, name: 'LEVEL ' + (EDIT.levels.length + 1) }));
+  EDIT.levels.push(normLevel({ places: [{ b }], name: 'LEVEL ' + (EDIT.levels.length + 1) }));
   save();
   openEdit(EDIT.levels.length - 1);
 }
 // ===== THE EDITOR =====
-function openEdit(i, part = 0) {
+function openEdit(i, pl = 0, part = 0) {
   closePanels();
   releaseAll();
   state = 'menu';
   EDS.i = i;
-  EDS.part = Math.min(part, edLevel().parts.length - 1);
+  EDS.adding = false;
+  EDS.pl = Math.min(pl, edLevel().places.length - 1);
+  EDS.part = Math.min(part, edPlace().parts.length - 1);
   EDS.ox = Math.max(0, Math.min(EDS.ox, edPart().w - W));
-  EDS.del = EDS.delPart = 0;
-  const B = BIOMES[edLevel().b];
-  if (!EDS.prop || !edPropOk(EDS.prop, edLevel().b)) EDS.prop = B.props[0][0];
-  if (!edFoeOk(EDS.foe, edLevel().b)) EDS.foe = 'g';
+  EDS.del = EDS.delPart = EDS.delPlace = 0;
+  edPicks();
   $('ed-name').value = edLevel().name;
   show('s-edit');
   edCells();
@@ -274,6 +323,12 @@ function openEdit(i, part = 0) {
   edMsg(ED_HELP[EDS.tab]);
   $('ed-tabs').querySelector('.on').focus({ preventScroll: true });
 }
+// The scenery and enemy picked must belong to the place in view
+function edPicks() {
+  const b = edPlace().b;
+  if (!EDS.prop || !edPropOk(EDS.prop, b)) EDS.prop = BIOMES[b].props[0][0];
+  if (!edFoeOk(EDS.foe, b)) EDS.foe = 'g';
+}
 // Back from playing a level (the pause menu's QUIT, the KO screen's EDIT, or the end of the level)
 function edReturn() {
   const id = LV && LV.custom,
@@ -281,7 +336,7 @@ function edReturn() {
   init();
   MODE = LEVEL;
   if (i < 0) return openLevels();
-  openEdit(i, EDS.part);
+  openEdit(i, EDS.pl, EDS.part);
 }
 // One button per square in view: 15 across, the ground row and 5 rows of platforms above it
 function edCells() {
@@ -345,16 +400,22 @@ function edAct(c, r) {
     sfx(330, 0.08, 'square', 0.04, 120);
   } else if (EDS.tab === 'prop') {
     if (p.props.length >= ED_LIM.props) return edMsg('That’s as much scenery as a part can hold!');
-    p.props.push({ k: EDS.prop, x: mid, s: 1 });
+    p.props.push({ k: EDS.prop, x: mid, s: 1, ...(EDS.layer !== 'b' ? { l: EDS.layer } : {}) });
   } else if (EDS.tab === 'flag') {
     if (!p.foes.length) return edMsg('Put some enemies in first: the flag is where their fight happens.');
     p.at = mid;
+  } else if (EDS.tab === 'boss') {
+    if (!edIsLast()) return edMsg('The boss waits at the very end: he goes in the last part.');
+    edLevel().boss = { t: EDS.boss, x: mid };
+    sfx(160, 0.2, 'sawtooth', 0.05, -60);
   } else if (EDS.tab === 'erase') {
-    const n = JSON.stringify(p);
+    const L = edLevel(),
+      n = JSON.stringify(L);
     p.foes = p.foes.filter(f => Math.floor(f.x / ED_CELL) !== c);
     p.props = p.props.filter(q => Math.floor(q.x / ED_CELL) !== c);
     if (r >= 1) edPlatCut(p, x0, r);
-    if (JSON.stringify(p) === n) return;
+    if (L.boss && edIsLast() && Math.floor(L.boss.x / ED_CELL) === c) delete L.boss;
+    if (JSON.stringify(L) === n) return;
   } else return;
   edSave();
   edDraw();
@@ -397,7 +458,7 @@ function edTabs() {
     b.dataset.k = k;
     b.onclick = () => {
       EDS.tab = k;
-      EDS.del = EDS.delPart = 0;
+      EDS.del = EDS.delPart = EDS.delPlace = 0;
       edTabs();
       edPal();
       edMsg(ED_HELP[k]);
@@ -444,7 +505,7 @@ function edBtn(box, label, fn, dis) {
 function edPal() {
   const box = $('ed-pal'),
     L = edLevel(),
-    B = BIOMES[L.b],
+    B = BIOMES[edPlace().b],
     p = edPart();
   box.innerHTML = '';
   box.className = EDS.tab === 'parts' ? 'edparts' : '';
@@ -473,6 +534,22 @@ function edPal() {
         t.length > 1 ? 'MINI-BOSS' : ''
       );
   } else if (EDS.tab === 'prop') {
+    // the layer first: far background, background, foreground
+    const lay = document.createElement('div');
+    lay.className = 'edlayers';
+    for (const [l, label] of ED_LAYERS) {
+      const b = document.createElement('button');
+      b.className = 'chtab' + (EDS.layer === l ? ' on' : '');
+      b.textContent = label;
+      b.dataset.l = l;
+      b.onclick = () => {
+        EDS.layer = l;
+        edPal();
+        box.querySelector('[data-l="' + l + '"]').focus({ preventScroll: true });
+      };
+      lay.appendChild(b);
+    }
+    box.appendChild(lay);
     for (const [k] of B.props)
       edPiece(
         box,
@@ -489,17 +566,59 @@ function edPal() {
         () => {
           EDS.prop = k;
           edPal();
-          box.querySelector('.on').focus({ preventScroll: true });
+          box.querySelector('.chitem.on').focus({ preventScroll: true });
         }
       );
+  } else if (EDS.tab === 'boss') {
+    for (const t of ED_BOSSES)
+      edPiece(
+        box,
+        !!L.boss && L.boss.t === t,
+        TNAME[t],
+        () => {
+          const e = edFoeFig(t),
+            s = Math.min(1, 0.62 / (T[t].s || 1));
+          ctx.save();
+          ctx.translate(26, 40);
+          ctx.scale(s, s);
+          Object.assign(e, { x: 0, y: 0, gy: 0, face: 1, st: 'free', flash: 0, hp: e.max, pmax: 0 });
+          drawF(e);
+          ctx.restore();
+        },
+        () => {
+          EDS.boss = t;
+          // a boss already in the level changes to this one
+          if (L.boss) {
+            L.boss.t = t;
+            edSave();
+            edDraw();
+          }
+          edPal();
+          box.querySelector('.on, .chitem').focus({ preventScroll: true });
+        },
+        EDS.boss === t && !L.boss ? 'PICKED' : ''
+      ).classList.toggle('pick', EDS.boss === t);
+    if (L.boss)
+      edBtn(box, 'NO BOSS', () => {
+        delete L.boss;
+        edSave();
+        edPal();
+        edDraw();
+      });
+    if (!edIsLast()) edBtn(box, 'GO TO THE LAST PART', edGoLast);
   } else if (EDS.tab === 'parts') {
-    edBtn(box, '◀ PART', () => edGoPart(-1), EDS.part <= 0);
-    edBtn(box, 'PART ▶', () => edGoPart(1), EDS.part >= L.parts.length - 1);
-    edBtn(box, '+ ADD A PART', edAddPart, L.parts.length >= ED_LIM.parts);
-    edBtn(box, EDS.delPart ? 'TAP AGAIN TO DELETE' : 'DELETE THIS PART', edDelPart, L.parts.length <= 1).classList.toggle(
+    const all = edParts(L),
+      n = all.findIndex(q => q.pl === EDS.pl && q.i === EDS.part);
+    edBtn(box, '◀ PART', () => edGoPart(-1), n <= 0);
+    edBtn(box, 'PART ▶', () => edGoPart(1), n >= all.length - 1);
+    edBtn(box, '+ ADD A PART', edAddPart, edPlace().parts.length >= ED_LIM.parts);
+    edBtn(box, '+ ADD A PLACE', () => openPlaces(true), L.places.length >= ED_LIM.places);
+    edBtn(box, EDS.delPart ? 'TAP AGAIN TO DELETE' : 'DELETE THIS PART', edDelPart, edPlace().parts.length <= 1).classList.toggle(
       'warn',
       !!EDS.delPart
     );
+    if (L.places.length > 1)
+      edBtn(box, EDS.delPlace ? 'TAP AGAIN TO DELETE' : 'DELETE THIS PLACE', edDelPlace).classList.toggle('warn', !!EDS.delPlace);
     edBtn(box, 'SHORTER', () => edWidth(-5), p.w <= ED_LIM.cols[0] * ED_CELL);
     edBtn(box, 'LONGER', () => edWidth(5), p.w >= ED_LIM.cols[1] * ED_CELL);
     edBtn(box, EDS.del ? 'TAP AGAIN TO DELETE' : 'DELETE LEVEL', edDelLevel).classList.toggle('warn', !!EDS.del);
@@ -508,35 +627,65 @@ function edPal() {
     edMsg(ED_HELP[k]);
   }
 }
+// To the part d parts on (across places: the last part of a place leads to the first of the next)
 function edGoPart(d) {
-  EDS.part = Math.max(0, Math.min(edLevel().parts.length - 1, EDS.part + d));
+  const all = edParts(edLevel()),
+    n = all.findIndex(q => q.pl === EDS.pl && q.i === EDS.part),
+    q = all[Math.max(0, Math.min(all.length - 1, n + d))];
+  edGoTo(q.pl, q.i);
+}
+function edGoTo(pl, part) {
+  EDS.pl = pl;
+  EDS.part = part;
   EDS.ox = 0;
-  EDS.delPart = 0;
+  EDS.delPart = EDS.delPlace = 0;
+  edPicks();
   edPal();
   edDraw();
 }
-function edAddPart() {
+const edGoLast = () => {
   const L = edLevel();
-  if (L.parts.length >= ED_LIM.parts) return;
-  L.parts.splice(EDS.part + 1, 0, normPart({}, L.b));
+  edGoTo(L.places.length - 1, L.places[L.places.length - 1].parts.length - 1);
+  edMsg(ED_HELP.boss);
+};
+function edAddPart() {
+  const P = edPlace();
+  if (P.parts.length >= ED_LIM.parts) return;
+  P.parts.splice(EDS.part + 1, 0, normPart({}, P.b));
   edSave();
-  edGoPart(1);
-  edMsg('A new part, after the last one.');
+  edGoTo(EDS.pl, EDS.part + 1);
+  edMsg('A new part, after this one.');
+}
+// A new place after the one in view (from PICK A PLACE), with one empty part
+function edAddPlace(b) {
+  const L = edLevel();
+  if (L.places.length >= ED_LIM.places) return openEdit(EDS.i, EDS.pl, EDS.part);
+  L.places.splice(EDS.pl + 1, 0, normPlace({ b }));
+  edSave();
+  openEdit(EDS.i, EDS.pl + 1, 0);
+  edMsg('A new place: ' + BIOMES[b].name + '. A transition will carry you here.');
 }
 function edDelPart() {
-  const L = edLevel();
-  if (L.parts.length <= 1) return;
+  const P = edPlace();
+  if (P.parts.length <= 1) return;
   if (!EDS.delPart) {
     EDS.delPart = 1;
     return edPal();
   }
-  L.parts.splice(EDS.part, 1);
-  EDS.part = Math.min(EDS.part, L.parts.length - 1);
-  EDS.ox = 0;
-  EDS.delPart = 0;
+  P.parts.splice(EDS.part, 1);
   edSave();
-  edPal();
-  edDraw();
+  edGoTo(EDS.pl, Math.min(EDS.part, P.parts.length - 1));
+}
+function edDelPlace() {
+  const L = edLevel();
+  if (L.places.length <= 1) return;
+  if (!EDS.delPlace) {
+    EDS.delPlace = 1;
+    return edPal();
+  }
+  L.places.splice(EDS.pl, 1);
+  edSave();
+  edGoTo(Math.min(EDS.pl, L.places.length - 1), 0);
 }
 function edWidth(d) {
   const p = edPart();
@@ -584,5 +733,5 @@ $('ed-lback').onclick = () => {
   openCust();
   $('b-levels').focus({ preventScroll: true });
 };
-$('ed-pback').onclick = () => openLevels();
+$('ed-pback').onclick = () => (EDS.adding ? openEdit(EDS.i, EDS.pl, EDS.part) : openLevels());
 $('b-levels').onclick = openLevels;

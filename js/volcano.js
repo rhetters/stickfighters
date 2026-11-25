@@ -16,10 +16,10 @@ function natHit(e, dmg, lift, dr) {
   NATURE.y = e.y;
   hurtE(e, { dmg, kb: 3, lift, ef: 'launch', pierce: 1, w: 'M' }, dr, null, NATURE);
 }
-// One step of a run's hazards (level.js, outside scenes): the volcano's, and the peak's gusts (weather.js). Other
-// themes have none, and nothing here touches rnd() for them.
+// One step of a run's or your own level's hazards (level.js, outside scenes): the volcano's, and the peak's gusts
+// (weather.js). Other places have none, and nothing here touches rnd() for them.
 function hazTick(ae) {
-  if (!LV.run) return;
+  if (!LV.segs) return;
   gustTick(ae);
   if (LV.haz && LV.haz.vents.length) ventTick();
   rockTick(ae);
@@ -806,7 +806,7 @@ function lavaBody(x0, x1, y, y2, cool) {
 }
 // In front of the fighters: lava pools, the rising lava, steam from the vents, falling rocks
 function drawVolcanoFront() {
-  if (!LV.run) return;
+  if (!LV.segs) return;
   const vx0 = viewX() - 60,
     vx1 = viewX() + W / CAM.z + 60;
   if (LV.haz)

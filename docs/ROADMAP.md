@@ -46,9 +46,22 @@ How it works (decided by Claude, November 24; Ron asked for its picture between 
 - **MY LEVELS** (asked by Ron after testing, replacing the first plan of starred parts turning up in stories): on the Story screen (Solo), the Players screen (Local) and in an online room, a MY LEVELS tile swaps the stories for the host's own levels, with a red sticker: no XP or ninja stars. Online the host's levels go to everyone in the room and the one picked goes with the start. Custom levels will never be offered in matchmaking; a room code means you're already playing with friends.
 - **Checked when loaded:** sizes and counts are limited, only known places, enemy types and scenery are kept, everything else is dropped. Levels live in the save (a new save version).
 
-Built (versions 63 to 65, see the CHANGELOG): all of the above. Still to do: Rhett tries it on the iPad.
+- **More places, a boss and scenery layers** (asked by Ron and Rhett, November 25):
+  - A level is up to 3 places (ADD A PLACE beside ADD A PART), each with up to 6 parts. Old levels become one place.
+  - Transitions are never chosen in the editor: every transition is listed under the places it can carry you *into*
+    (`TRANS_INTO` in data/themes.js, which stories use too), and between two places one of the arriving place's is
+    picked at random from the level's seed, so every device online gets the same one.
+  - One boss (any of the main bosses), only on the level's very last part.
+  - Scenery on three layers: far background (small, drifting slower), background (as before) and foreground (in front
+    of the fighters, see-through when someone is behind it).
+- **Five tiles at a time** on the Story screen, the Players screen and the online room: five stories, then `?` and MY
+  LEVELS fixed on the right; under MY LEVELS five levels, then `?` (a random one of them) and STORIES. Up and down
+  arrows left of the first tile page through them. The red sticker sits in the screen's bottom-right corner.
 
-**Done when:** Rhett builds a level on the iPad, plays it, and sees his chunks appear in generated runs.
+Built (versions 63 to 66, see the CHANGELOG): all of the above. Still to do: Rhett tries it on the iPad.
+
+**Done when:** Rhett builds a level with a few places and a boss on the iPad, and plays it from MY LEVELS alone, on
+Local and online.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 
@@ -71,4 +84,5 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-M17: Rhett builds a level on the iPad, then plays it from MY LEVELS alone, on Local and online.
+M17: Rhett builds a level with a few places and a boss on the iPad, then plays it from MY LEVELS alone, on Local
+and online.

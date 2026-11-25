@@ -227,7 +227,7 @@ function levelTick() {
       LV.cp = LV.encs.indexOf(ae);
       for (const p of alive) p.hp = Math.min(p.max, p.hp + diffOf().heal);
       score += 100 * ae.lvl;
-      bn(LV.encs.some(e => e.st === 0) ? 'CLEAR!' : LV.run ? 'VICTORY!' : 'TRAIL CLEAR!');
+      bn(LV.encs.some(e => e.st === 0) ? 'CLEAR!' : LV.segs ? 'VICTORY!' : 'TRAIL CLEAR!');
       LV.go = 220;
       sfx(600, 0.3, 'square', 0.05, 400);
     }
@@ -371,7 +371,7 @@ const LEVEL = {
   },
   // The final blow on a theme's main boss: everything else left standing falls with it, in slow motion
   onKill(e, by) {
-    const ae = LV.run && !LV.fin && LV.encs.find(x => x.st === 1);
+    const ae = LV.segs && !LV.fin && LV.encs.find(x => x.st === 1);
     if (!ae || !ae.boss || e.tk !== ae.boss) return;
     LV.fin = 1;
     ae.q = [];

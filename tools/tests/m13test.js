@@ -17,7 +17,7 @@ ok(minis>0.3&&minis<1,'mini-bosses are rare: '+minis.toFixed(2)+' per run (15 fi
 const play=async (seed,th='castle',again)=>{await ev(again?`$('b-again').click()`:`SET.seed='${seed}';titleOpenAll();startRun('${th}')`);await ev(`LV.encs[1].mini=BIOMES[LV.segs[0].b].mini.t;LV.encs[1].line='HI'`);const seen={};
  for(let i=0;i<900;i++){const st=await ev("(()=>{setA('kb','r',1);const P=PL[0];P.hp=P.max;let k='';const tw=nextTrans();if(tw&&tw.top&&!LV.cine&&P.x>tw.deck-500&&P.gy>tw.top+1&&!LV.encs.some(e=>e.st===1)){P.x=tw.deck+20;P.y=tw.top-2;P.vy=0}for(let n=0;n<30;n++){fr++;update();if(LV.cine)k=LV.cine.k;for(const e of E)if(!e.dying&&e.st!=='cine'&&LV.t%20===0){e.hp=0;hurtE(e,{dmg:1,kb:4,lift:-4,ef:'kd'},1,null,P)}for(const g of LV.gates)if(g.hp>0&&g.x-P.x<120)hurtGate(g,99)}return {k,state}})()");if(st.k)seen[st.k]=1;if(st.state!=='play')return {seen,state:st.state}}
  return {seen,state:'stuck'}};
-const r1=await play(7),r2=await play(39);
+const r1=await play(1),r2=await play(39);
 ok(r1.state==='clear'&&r2.state==='clear','two runs play through to the end ('+r1.state+', '+r2.state+')');
 const all={...r1.seen,...r2.seen};
 ok(['drawin','rope','pipe','catapult','jump','pencil'].every(k=>all[k]),'scenes seen: '+Object.keys(all).join(', ')+' (and a gate smashed)');
@@ -37,7 +37,7 @@ await ev("setA('kb','r',0)");
 ok(/PIRATE COVE CLEAR/.test(await ev("$('c-h1').textContent")),'the results say PIRATE COVE CLEAR!');
 // Mountain: meadow, mountainside, peak; the Pink Yeti; its own transitions (each theme draws from its own list)
 ok(await ev("(()=>{const L=genRun('mountain',5);return L.segs.map(s=>s.b).join()==='meadow,slope,peak'&&L.encs[L.encs.length-1].boss==='Y'&&L.encs[L.encs.length-1].intro==='jump'})()"),'Mountain: meadow, mountainside, snowy peak and the Pink Yeti at the end');
-ok(await ev("(()=>{for(const id in THEMES)for(let s=1;s<150;s++)for(const t of genRun(id,s).trans)if(!THEMES[id].trans.includes(t.k))return id+' '+t.k;return true})()")===true,'every theme only uses the transitions on its own list');
+ok(await ev("(()=>{for(const id in THEMES)for(let s=1;s<150;s++)for(const t of genRun(id,s).trans)if(!TRANS_INTO[t.to].includes(t.k))return id+' '+t.k;return true})()")===true,'every transition is one listed for the place it carries you into');
 const mk=await ev("(()=>{const o={};for(let s=1;s<200;s++)for(const t of genRun('mountain',s).trans)o[t.k]=(o[t.k]||0)+1;return o})()");
 ok(['gondola','balloon','climb','rope'].every(k=>mk[k]>10),'Mountain transitions all come up: '+JSON.stringify(mk));
 // the mountainside climbs: slopes only there, starting a screen in, and every fight on a flat ledge

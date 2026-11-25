@@ -111,13 +111,22 @@ function roomCard(o) {
   return c;
 }
 // A row of small picture tiles: opts = [{data: [key, value], img, label, on, disabled, pick}]. Rebuilt only when
-// the choices change, so a controller's highlight stays put.
+// the choices change, so a controller's highlight stays put. An option with arrows is the up and down arrows that page
+// through the choices ({arrows, up, down: can it go that way, onUp, onDown}).
 function roomTiles(box, opts) {
   const key = opts.map(o => o.data.join(':')).join();
   if (box.dataset.key !== key) {
     box.dataset.key = key;
     box.innerHTML = '';
     for (const o of opts) {
+      if (o.arrows) {
+        const d = document.createElement('div');
+        d.className = 'pgarrows';
+        d.innerHTML =
+          '<button class="pgup" aria-label="Back a page">&#9650;</button><button class="pgdn" aria-label="Next page">&#9660;</button>';
+        box.appendChild(d);
+        continue;
+      }
       const b = document.createElement('button');
       b.className = 'ptile';
       b.dataset[o.data[0]] = o.data[1];
@@ -129,45 +138,91 @@ function roomTiles(box, opts) {
   }
   [...box.children].forEach((b, i) => {
     const o = opts[i];
+    if (o.arrows) {
+      const [u, d] = b.children;
+      u.disabled = !o.up;
+      d.disabled = !o.down;
+      u.onclick = o.onUp;
+      d.onclick = o.onDown;
+      return;
+    }
     if (o.pic) b.querySelector('.pimg').style.setProperty('--ic', 'url(' + o.pic + ')'); // a drawn picture (chpic)
     b.classList.toggle('on', !!o.on);
     b.disabled = !!o.disabled;
     b.onclick = o.pick;
   });
 }
-// The story choices as tiles: each theme's picture (css .i-<theme>) and '?'
-const storyTiles = (cur, pick, disabled) => [
-  ...Object.keys(THEMES).map(id => ({
-    data: ['theme', id],
-    img: 'i-' + id,
-    label: THEMES[id].name.split(' ')[0],
-    aria: THEMES[id].name,
-    on: cur === id,
-    disabled,
-    pick: () => pick(id)
-  })),
-  { data: ['theme', '?'], img: 'i-q', label: '?', aria: 'Surprise story: more XP and stars', on: cur === '?', disabled, pick: () => pick('?') },
-  // the host's own levels from the level creator (no XP or ninja stars)
-  { data: ['theme', 'mine'], img: 'i-levels', label: 'MY LEVELS', aria: 'Levels you made (no XP or ninja stars)', on: cur === 'mine', disabled, pick: () => pick('mine') }
-];
-// MY LEVELS (theme 'mine'): STORIES to go back, then each of the host's levels with its picture (ui/editor.js)
-const levelTiles = (levels, cur, pick, back, disabled) => [
-  { data: ['lvl', '<'], img: 'i-story', label: 'STORIES', aria: 'Back to the stories', disabled, pick: back },
-  ...levels.map(L => ({
-    data: ['lvl', L.id],
-    img: 'chpic',
-    pic: edThumbURL(L),
-    label: L.name,
-    on: cur === L.id,
-    disabled,
-    pick: () => pick(L.id)
-  })),
-  ...(levels.length
-    ? []
-    : [{ data: ['lvl', 'none'], img: 'i-levels', label: 'NONE YET', aria: 'No levels yet: make one in Customize, then Levels', disabled: true, pick: () => 0 }])
-];
+// ===== STORIES AND MY LEVELS, FIVE AT A TIME =====
+// The Story screen, the Players screen and the online room show five stories (or, under MY LEVELS, five of the host's
+// levels) at a time, then '?' and MY LEVELS (or STORIES) always on the right; up and down arrows on the left page
+// through them. A page state ({ pg, sel }) is kept per screen and per list; it jumps to the page of the one picked
+// whenever the pick changes (online, when the host picks one).
+const PAGE = 5;
+function pageOf(st, items, cur) {
+  const n = Math.max(1, Math.ceil(items.length / PAGE));
+  if (cur !== st.sel) {
+    st.sel = cur;
+    const i = items.indexOf(cur);
+    if (i >= 0) st.pg = Math.floor(i / PAGE);
+  }
+  st.pg = Math.max(0, Math.min(n - 1, st.pg || 0));
+  return { list: items.slice(st.pg * PAGE, st.pg * PAGE + PAGE), up: st.pg > 0, down: st.pg < n - 1 };
+}
+// A fresh page state for a screen: one for the stories, one for MY LEVELS
+const newPages = () => ({ story: { pg: 0, sel: null }, mine: { pg: 0, sel: null } });
 // The level picked under MY LEVELS: the one chosen if it's still there, else the first
 const pickedLevel = (levels, id) => levels.find(L => L.id === id) || levels[0] || null;
+// What to light up under MY LEVELS: '?' (a random one) or the level picked
+const levelCur = (levels, id) => (id === '?' && levels.length ? '?' : (pickedLevel(levels, id) || {}).id);
+// The level to play: for '?', one of them at random (a menu choice; online the host makes it and sends the level)
+const levelToPlay = (levels, id) => (id === '?' && levels.length ? levels[Math.floor(Math.random() * levels.length)] : pickedLevel(levels, id));
+// The tiles for one of those rows. o = { mine (showing MY LEVELS), cur (the story, or the level id, picked), levels
+// (the host's), pages (newPages()), pick(v), toMine(), toStories(), redraw(), disabled (a guest: only the host picks) }
+function storyRow(o) {
+  const st = o.mine ? o.pages.mine : o.pages.story,
+    items = o.mine ? o.levels.map(L => L.id) : Object.keys(THEMES),
+    pg = pageOf(st, items, o.cur),
+    d = o.disabled,
+    tiles = [
+      {
+        data: ['pg', o.mine ? 'mine' : 'story'],
+        arrows: 1,
+        up: pg.up,
+        down: pg.down,
+        onUp: () => (st.pg--, o.redraw()),
+        onDown: () => (st.pg++, o.redraw())
+      }
+    ];
+  if (!o.mine) {
+    for (const id of pg.list)
+      tiles.push({
+        data: ['theme', id],
+        img: 'i-' + id,
+        label: THEMES[id].name.split(' ')[0],
+        aria: THEMES[id].name,
+        on: o.cur === id,
+        disabled: d,
+        pick: () => o.pick(id)
+      });
+    tiles.push(
+      { data: ['theme', '?'], img: 'i-q', label: '?', aria: 'Surprise story: more XP and stars', on: o.cur === '?', disabled: d, pick: () => o.pick('?') },
+      // the host's own levels from the level creator (no XP or ninja stars)
+      { data: ['theme', 'mine'], img: 'i-levels', label: 'MY LEVELS', aria: 'Levels you made (no XP or ninja stars)', disabled: d, pick: o.toMine }
+    );
+    return tiles;
+  }
+  for (const id of pg.list) {
+    const L = o.levels.find(q => q.id === id);
+    tiles.push({ data: ['lvl', id], img: 'chpic', pic: edThumbURL(L), label: L.name, on: o.cur === id, disabled: d, pick: () => o.pick(id) });
+  }
+  if (!o.levels.length)
+    tiles.push({ data: ['lvl', 'none'], img: 'i-levels', label: 'NONE YET', aria: 'No levels yet: make one in Customize, then Levels', disabled: true, pick: () => 0 });
+  tiles.push(
+    { data: ['lvl', '?'], img: 'i-q', label: '?', aria: 'A random one of your levels', on: o.cur === '?', disabled: d || !o.levels.length, pick: () => o.pick('?') },
+    { data: ['lvl', '<'], img: 'i-story', label: 'STORIES', aria: 'Back to the stories', disabled: d, pick: o.toStories }
+  );
+  return tiles;
+}
 // Easy, Normal, Hard (data/difficulty.js) as small tiles
 const diffTiles = (cur, pick, disabled) =>
   DIFFS.map((d, i) => ({

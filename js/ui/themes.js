@@ -2,7 +2,7 @@
 // the stylesheet), grey until highlighted, with a mark once it's been cleared; and '?' for a surprise theme that
 // earns more (SURPRISE_BONUS). Solo opens it from the title; local co-op from the Players screen (online, the host
 // picks in the room).
-const THS = { go: null, back: 's-title', mine: false };
+const THS = { go: null, back: 's-title', mine: false, pages: newPages() };
 // go(themeId, surprise) starts the run; back = the screen BACK returns to
 function openThemes(go, back) {
   THS.go = go;
@@ -11,60 +11,72 @@ function openThemes(go, back) {
   show('s-themes');
   themeCards();
 }
-// The cards: the stories, '?' and MY LEVELS; or, under MY LEVELS, STORIES and your levels
-function themeCards() {
+// The cards, five at a time (ui/rooms.js pageOf), with up and down arrows on the left: the stories, then '?' and MY
+// LEVELS; or, under MY LEVELS, your levels, then '?' (a random one) and STORIES. focus = what to highlight after.
+function themeCards(focus) {
   const box = $('th-cards'),
-    card = (label, html, on) => {
+    st = THS.mine ? THS.pages.mine : THS.pages.story,
+    pg = pageOf(st, THS.mine ? EDIT.levels.map(L => L.id) : Object.keys(THEMES), null),
+    card = (label, html, on, cls) => {
       const b = document.createElement('button');
-      b.className = 'thcard';
+      b.className = 'thcard' + (cls ? ' ' + cls : '');
       b.setAttribute('aria-label', label);
       b.innerHTML = html;
       b.onclick = on;
       box.appendChild(b);
       return b;
+    },
+    swap = mine => {
+      THS.mine = mine;
+      themeCards();
     };
   box.innerHTML = '';
   $('th-nostar').hidden = !THS.mine;
+  // the arrows
+  const ar = document.createElement('div');
+  ar.className = 'pgarrows';
+  ar.innerHTML = '<button class="pgup" aria-label="Back a page">&#9650;</button><button class="pgdn" aria-label="Next page">&#9660;</button>';
+  ar.children[0].disabled = !pg.up;
+  ar.children[1].disabled = !pg.down;
+  // after paging, the same arrow keeps the highlight (or the other one, when that was the last page that way)
+  ar.children[0].onclick = () => (st.pg--, themeCards('.pgup:not(:disabled), .pgdn'));
+  ar.children[1].onclick = () => (st.pg++, themeCards('.pgdn:not(:disabled), .pgup'));
+  box.appendChild(ar);
   if (THS.mine) {
-    card('Back to the stories', '<span class="thpic th-story"></span><b>STORIES</b><small></small>', () => {
-      THS.mine = false;
-      themeCards();
-    });
-    for (const L of EDIT.levels) {
-      const b = card(L.name, '<span class="thpic th-mine"></span><b></b><small></small>', () =>
-        themeBurst(b, () => startCustom(L, 'menu'))
-      );
+    for (const id of pg.list) {
+      const L = EDIT.levels.find(q => q.id === id),
+        b = card(L.name, '<span class="thpic th-mine"></span><b></b><small></small>', () => themeBurst(b, () => startCustom(L, 'menu')));
       b.querySelector('b').textContent = L.name;
       b.querySelector('.thpic').style.backgroundImage = 'url(' + edThumbURL(L) + ')';
     }
     if (!EDIT.levels.length)
       card('No levels yet: make one in Customize, then Levels', '<span class="thpic th-levels"></span><b>NONE YET</b><small>MAKE ONE IN CUSTOMIZE</small>', () => 0);
-    box.querySelector('button').focus({ preventScroll: true });
-    return;
+    const q = card('A random one of your levels', '<span class="thpic th-q"></span><b>?</b><small>ONE OF YOURS</small>', () => {
+      if (EDIT.levels.length) themeBurst(q, () => startCustom(levelToPlay(EDIT.levels, '?'), 'menu'));
+    }, 'thq');
+    q.disabled = !EDIT.levels.length;
+    card('Back to the stories', '<span class="thpic th-story"></span><b>STORIES</b><small></small>', () => swap(false), 'thmy');
+  } else {
+    for (const id of pg.list) {
+      const th = THEMES[id],
+        best = PROG['run:' + id],
+        b = card(
+          th.name + (best && best.done ? ', cleared' : ''),
+          // the theme's picture (css: .th-<id>), its name, and a mark once it's been cleared
+          '<span class="thpic th-' + id + '"></span><b>' + th.name + '</b><small>' + (best && best.done ? '★ CLEARED' : '') + '</small>',
+          () => themeBurst(b, () => THS.go(id))
+        );
+      b.style.setProperty('--tc', th.c);
+    }
+    const q = card(
+      'A surprise story: more XP and stars',
+      '<span class="thpic th-q"></span><b>?</b><small>+' + Math.round(SURPRISE_BONUS * 100) + '% XP & STARS</small>',
+      () => themeBurst(q, () => THS.go(surpriseTheme(), true)),
+      'thq'
+    );
+    card('My levels: the levels you made (no XP or ninja stars)', '<span class="thpic th-levels"></span><b>MY LEVELS</b><small>NO XP OR STARS</small>', () => swap(true), 'thmy');
   }
-  for (const [id, th] of Object.entries(THEMES)) {
-    const best = PROG['run:' + id],
-      b = document.createElement('button');
-    b.className = 'thcard';
-    b.style.setProperty('--tc', th.c);
-    b.setAttribute('aria-label', th.name + (best && best.done ? ', cleared' : ''));
-    // the theme's picture (css: .th-<id>), its name, and a mark once it's been cleared
-    b.innerHTML =
-      '<span class="thpic th-' + id + '"></span><b>' + th.name + '</b><small>' + (best && best.done ? '★ CLEARED' : '') + '</small>';
-    b.onclick = () => themeBurst(b, () => THS.go(id));
-    box.appendChild(b);
-  }
-  const q = document.createElement('button');
-  q.className = 'thcard thq';
-  q.setAttribute('aria-label', 'A surprise story: more XP and stars');
-  q.innerHTML = '<span class="thpic th-q"></span><b>?</b><small>+' + Math.round(SURPRISE_BONUS * 100) + '% XP & STARS</small>';
-  q.onclick = () => themeBurst(q, () => THS.go(surpriseTheme(), true));
-  box.appendChild(q);
-  card('My levels: the levels you made (no XP or ninja stars)', '<span class="thpic th-levels"></span><b>MY LEVELS</b><small>NO XP OR STARS</small>', () => {
-    THS.mine = true;
-    themeCards();
-  }).classList.add('thmy');
-  box.querySelector('button').focus({ preventScroll: true });
+  (box.querySelector(focus || '.thcard') || box.querySelector('.thcard')).focus({ preventScroll: true });
 }
 // A random theme for '?' (a menu pick, not part of the simulation, so Math.random is fine)
 const surpriseTheme = () => {

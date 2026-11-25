@@ -248,7 +248,7 @@ function musTrans(from, to) {
     return won ? { sting: 'bosswin', out: 0.4 } : { out: 1, fin: 0.5 };
   }
   if (IN_GAME(to) && to !== 'training' && CALM(from)) return { sting: 'go', out: 0.3 };
-  const bs = MODE === LEVEL && LV && LV.run && THEMES[LV.run.theme].biomes;
+  const bs = MODE === LEVEL && LV && LV.segs && LV.segs.map(s => s.b);
   if (bs && bs.indexOf(to) > 0 && bs.indexOf(to) === bs.indexOf(from) + 1) return { sting: 'tr-gate', out: 0.3 }; // through a smashed gate
   if (from === undefined) return { out: 0, fin: 1 };
   return { out: 1, fin: 0.6 };
@@ -295,7 +295,7 @@ function musWant() {
       // a scene that takes you to the next place (catapult, pipe…) plays its own jingle, then the next place's song
       if (cn && cn.tr && MUSIC['tr-' + cn.k]) return ['tr-' + cn.k, 0, cn.tr.to];
       // the song of the biome you're in (the Wooded Trail outside a story)
-      const sg = LV.run && segAt(CAM.x + W / 2),
+      const sg = LV.segs && segAt(CAM.x + W / 2),
         b = sg ? sg.b : 'woods';
       return [MUSIC[b] ? b : THEMES[LV.run ? LV.run.theme : 'castle'].biomes[0], ae ? 1 : 0];
     }
@@ -360,7 +360,7 @@ const AMB_LOOK = {
 };
 function ambLook() {
   if (state !== 'play' || !MODE || MODE.id !== 'level' || !LV) return null;
-  if (LV.run) {
+  if (LV.segs) {
     const s = segAt(CAM.x + W / 2);
     return s && BIOMES[s.b] ? BIOMES[s.b].look : null;
   }

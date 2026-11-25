@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 65;
+const GAME_VERSION = 66;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -65,7 +65,8 @@ const EDIT = { levels: [] };
 //   v15: fighters gain eq.face (glasses, shades, masks…; nothing worn to start)
 //   v16: fighters gain eq.pet (a pet that follows you; none to start)
 //   v17: adds edit = { levels: [] } (Rhett's levels from the level creator)
-const SAVE_VERSION = 17;
+//   v18: a level's place and parts ({ b, parts }) become places: [{ b, parts }] (up to three places in a level)
+const SAVE_VERSION = 18;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -156,6 +157,14 @@ function migrate(s) {
   if (s.saveVersion === 16) {
     s.edit = { levels: [] };
     s.saveVersion = 17;
+  }
+  if (s.saveVersion === 17) {
+    // a level becomes a list of places (it had one place: b and its parts)
+    if (s.edit && Array.isArray(s.edit.levels))
+      s.edit.levels = s.edit.levels.map(L =>
+        L && typeof L === 'object' && !Array.isArray(L.places) ? { id: L.id, name: L.name, places: [{ b: L.b, parts: L.parts }] } : L
+      );
+    s.saveVersion = 18;
   }
   return s;
 }
