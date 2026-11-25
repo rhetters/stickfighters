@@ -516,4 +516,7 @@ function navBack() {
   else if (sc.id === 's-moves') $('pm-back').click();
   else if (sc.id === 's-cust') $('b-custback').click();
   else if (sc.id === 's-codes') $('cd-back').click();
+  else if (sc.id === 's-levels') $('ed-lback').click();
+  else if (sc.id === 's-edpick') $('ed-pback').click();
+  else if (sc.id === 's-edit') $('ed-back').click();
 }

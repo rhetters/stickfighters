@@ -452,7 +452,8 @@ function netStart() {
   const live = NET.players.filter(p => !p.left);
   if (NET.mode === 'vs' && !netVsReady()) return false;
   const ids = Object.keys(THEMES),
-    myst = NET.theme === '?';
+    myst = NET.theme === '?',
+    theme = myst ? ids[Math.floor(Math.random() * ids.length)] : NET.theme;
   const r = live.map(p => p.rtt || 0).sort((a, b) => b - a),
     oneWay = ((r[0] || 0) + (r[1] || 0)) / 2,
     D = Math.max(2, Math.min(10, Math.ceil(oneWay / 16.67) + 1)),
@@ -461,7 +462,7 @@ function netStart() {
       e: NET.epoch + 1,
       seed: (Math.random() * 4294967296) >>> 0,
       mode: NET.mode,
-      theme: myst ? ids[Math.floor(Math.random() * ids.length)] : NET.theme,
+      theme,
       myst,
       diff: NET.diff,
       D,
@@ -469,7 +470,9 @@ function netStart() {
       players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid, team: p.team })),
       teams: NET.mode === 'vs' && NET.teams,
       // House mode visits the host's house (decoration only, so it can't affect the simulation)
-      house: NET.mode === 'house' ? normHouse(HOUSE) : undefined
+      house: NET.mode === 'house' ? normHouse(HOUSE) : undefined,
+      // a story uses the host's starred parts from the level creator, so every device builds the same run
+      pool: NET.mode === 'level' && THEMES[theme] ? edPool(theme) : undefined
     };
   netAll(msg);
   netStartLocal(msg);
@@ -522,7 +525,7 @@ function netStartLocal(m) {
   applyTouchVis();
   fr = 0;
   if (m.mode === 'vs') startVersus();
-  else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle', 0, !!m.myst);
+  else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle', 0, !!m.myst, normPool(m.pool));
   else if (m.mode === 'house') {
     const host = m.players.find(p => p.slot === 0);
     startHouse({ ...normHouse(m.house, true), name: ((host && host.name) || 'HOST') + "'S HOUSE" });
