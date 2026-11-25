@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: crouch walk, a secret Froggy (November 24, 2026)
+- **Crouch walk:** hold Down and left or right to sneak along low and slower (asked by Ron); add Surge and it's the usual Surge run.
+- **Froggy is secret now** (Rhett's idea): enter crown, heart, heart, crown in the treasure chest. Anyone who already bought him keeps him.
+- **Esc walking round the house on Local** goes back to the house builder, like it does alone.
+- Version 62.
+
 ## M16: the Join code's numbers (November 24, 2026)
 - On the Join screen the two numbers sit side by side, each with its up arrow above and down arrow below (asked by Ron).
 - Version 61.
