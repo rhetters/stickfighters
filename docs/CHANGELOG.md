@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M17: the backdrop follows the camera up (November 24, 2026)
+- When the camera rises over platforms (a jump up onto one), the whole backdrop now sinks with the world, ground line and all (spotted by Ron): before, the platforms, fighters and pets moved down but the ground stayed put, so platforms seemed to stand below the ground. The sky above stretches up to fill the screen. The launch base and the crater already did this themselves.
+- Version 64.
+
 ## M17: the level creator (November 24, 2026)
 - **Customize → LEVELS** (between CHARACTER and HOUSE, asked by Ron): Rhett's levels, up to 12. NEW LEVEL picks one of the 15 places, shown as pictures of the real scenery.
 - **The editor** shows the place's real scenery with a grid over it: **PLATFORMS** (tap or drag along a row, five heights; wooden, stone, ice, metal or rock to suit the place), **ENEMIES** (the six pink army types and the place's own mini-boss, dropping in where you tap, up to 10 in a fight), **SCENERY** (the place's own), the **FLAG** (where the fight stops the screen) and **ERASE**. **PARTS**: up to 6 parts, each 900 to 2400 pixels wide.
