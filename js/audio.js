@@ -1,7 +1,7 @@
-// StickFighters: music, background sound and the sounds that follow what's on screen. Everything is made here with
-// Web Audio (no recordings): the songs are data (data/music.js), played by a step sequencer that schedules notes a
-// moment ahead. All of it runs from the frame loop (audioTick in main.js) and only looks at the game, so it never
-// changes the simulation. Volumes: Music (SET.mus) and Sound (SET.vol) in Settings.
+// StickFighters: music, background sound and the sounds that follow what's on screen. Songs play from the OGG
+// recordings in /music when they're there (see RECORDED MUSIC); otherwise the Web Audio synth versions (data/music.js)
+// are played by a step sequencer that schedules notes a moment ahead. All of it runs from the frame loop (audioTick in
+// main.js) and only looks at the game, so it never changes the simulation. Volumes: Music (SET.mus) and Sound (SET.vol).
 // ===== THE AUDIO OUTPUT =====
 const AUD = { mus: null, amb: null, nb: null, on: false };
 function audCtx() {
@@ -171,7 +171,7 @@ const DRUM = {
   b: (t, v, o) => sweep(t, 320, 270, 0.13, 0.26 * v, 'sine', o),
   t: (t, v, o) => sweep(t, 130, 80, 0.3, 0.35 * v, 'sine', o)
 };
-// ===== THE SEQUENCER =====
+// ===== THE SEQUENCER (the synth songs) =====
 // A song's parts, read once: each bar a list of {tok, len} (len = steps held)
 function songPrep(s) {
   if (s._p) return s._p;
@@ -215,6 +215,97 @@ function playStep(P, lvl) {
     for (const m of ms) if (m !== null && !isNaN(m)) INS[p.ins](t, hz(m), d, v, P.g);
   }
 }
+// ===== RECORDED MUSIC (the files in music/) =====
+// A song or jingle id with a recording here plays the recording; anything without one (or before its file has
+// loaded, or if loading fails, or when the game is opened from disk, where browsers block loading files) plays the
+// synth version from data/music.js, so nothing ever goes silent. A synth song is swapped for its recording as soon as
+// it arrives. Places are matched by their look (AMB_LOOK's names); bosses by who the boss is.
+// Each recording is there twice: Ogg Vorbis (.ogg) and, for browsers without it (older iPads), AAC (.m4a).
+const MUS_DIR = 'music/';
+const MUS_FILES = {
+  // menus
+  menu: 'Menus/Menu',
+  dressup: 'Menus/Character Creation',
+  house: 'Menus/House Editor',
+  // places (by look)
+  woods: 'Castle Siege/The Woodland Trail',
+  sewer: 'Castle Siege/The Sewers',
+  castle: 'Castle Siege/The Castle',
+  beach: 'Pirate/Beach',
+  ship: 'Pirate/Pirate Ship',
+  cave: 'Pirate/Treasure Cave',
+  meadow: 'Mountain/Alpine Meadows',
+  slope: 'Mountain/Mountain Side',
+  peak: 'Mountain/Snowy Peaks',
+  base: 'Space/Launch Pad',
+  rocket: 'Space/Rocket Ship',
+  moon: 'Space/Moon',
+  jungle: 'Volcano/Jungle Base',
+  ash: 'Volcano/Ashy Ascent',
+  crater: 'Volcano/The Crater',
+  // bosses, by who the boss is (THEMES[].boss.t), and the volcano's lava escape
+  'boss-G': 'Castle Siege/King Boss',
+  'boss-P': 'Pirate/Pirate Boss',
+  'boss-Y': 'Mountain/Yeti Boss',
+  'boss-Z': 'Space/Alien Boss',
+  'boss-K': 'Volcano/Tiki Boss',
+  escape: 'Volcano/Escape'
+  // the transition jingles (tr-…) and the other jingles stay synth (data/music.js)
+};
+const MUS_REC = 1.3; // the recordings' loudness, to match the synth songs (they're mixed about 3 dB quieter)
+const MUS_EXT = (() => {
+  try {
+    return new Audio().canPlayType('audio/ogg; codecs="vorbis"') ? '.ogg' : '.m4a';
+  } catch (e) {
+    return '.ogg';
+  }
+})();
+const MUS_BUF = {}, // file -> its decoded sound
+  MUS_LOAD = {}; // file -> 'loading' or 'failed'
+function musLoad(path) {
+  if (MUS_BUF[path] || MUS_LOAD[path]) return;
+  if (location.protocol === 'file:') return void (MUS_LOAD[path] = 'failed');
+  MUS_LOAD[path] = 'loading';
+  fetch(MUS_DIR + encodeURI(path) + MUS_EXT)
+    .then(r => (r.ok ? r.arrayBuffer() : Promise.reject(r.status)))
+    .then(a => AC.decodeAudioData(a))
+    .then(b => {
+      MUS_BUF[path] = b;
+      delete MUS_LOAD[path];
+    })
+    .catch(() => (MUS_LOAD[path] = 'failed')); // missing or unsupported: the synth version plays
+}
+// The boss of the level being played (the one fighting now, else the level's)
+function musBoss() {
+  if (MODE !== LEVEL || !LV) return null;
+  const e = LV.encs.find(q => q.boss && q.st === 1) || LV.encs.find(q => q.boss);
+  return e ? e.boss : null;
+}
+// Which file a song id means: 'boss' depends on who the boss is; places go by their look
+function musKey(id) {
+  if (id === 'boss') return 'boss-' + musBoss();
+  if (MUS_FILES[id]) return id;
+  return BIOMES[id] && BIOMES[id].look;
+}
+const musPath = id => MUS_FILES[musKey(id)] || null;
+function musBuf(id) {
+  const p = musPath(id);
+  return (p && MUS_BUF[p]) || null;
+}
+// Decoded sound is big (an iPad can't hold them all): only the songs that can come up next are loaded, the rest let
+// go. In a level: its places, its boss and the escape; elsewhere: the menus' songs.
+function musPrefetch() {
+  const ids =
+    MODE === LEVEL && LV && LV.segs && state !== 'menu'
+      ? [...LV.segs.map(s => s.b), 'boss', 'escape'].filter(id => id !== 'escape' || (LV.run && LV.run.theme === 'volcano'))
+      : ['menu', 'dressup', 'house'];
+  if (MUS.want) ids.push(MUS.want);
+  const keep = new Set(ids.map(musPath).filter(Boolean));
+  if (MUS.cur && MUS.cur.path) keep.add(MUS.cur.path);
+  for (const o of MUS.old) if (o.path) keep.add(o.path);
+  for (const p of keep) musLoad(p);
+  for (const p in MUS_BUF) if (!keep.has(p)) delete MUS_BUF[p];
+}
 const MUS = { cur: null, want: undefined, old: [], lvl: 0 };
 // Fade out what's playing over `out` seconds
 function musFade(out) {
@@ -224,26 +315,43 @@ function musFade(out) {
   g.cancelScheduledValues(t);
   g.setValueAtTime(g.value, t);
   g.linearRampToValueAtTime(0, t + out);
-  MUS.old.push({ g: MUS.cur.g, end: t + out + 3 });
+  MUS.old.push({ g: MUS.cur.g, src: MUS.cur.src, path: MUS.cur.path, end: t + out + 3 });
   MUS.cur = null;
 }
 // Start a song now, fading in over `fin` seconds; `then` = what follows a jingle
 function musPlay(id, fin, then) {
-  if (!id || !MUSIC[id]) return;
+  const buf = id && musBuf(id);
+  if (!id || (!MUSIC[id] && !buf)) return;
   const at = AC.currentTime + 0.03,
-    g = AC.createGain();
+    g = AC.createGain(),
+    song = MUSIC[id] || { bpm: 120, prog: ['C'], parts: [] };
   g.gain.setValueAtTime(fin > 0.05 ? 0 : 1, at);
   if (fin > 0.05) g.gain.linearRampToValueAtTime(1, at + fin);
   g.connect(AUD.mus);
-  MUS.cur = { id, song: MUSIC[id], g, t: at, step: 0, done: false, then };
+  MUS.cur = { id, song, g, t: at, step: 0, done: false, then };
+  if (buf) {
+    // the recording: songs loop seamlessly, jingles play once and then hand on (musicTick)
+    const src = AC.createBufferSource(),
+      once = !!(song.sting || song.once);
+    const rg = AC.createGain();
+    rg.gain.value = MUS_REC;
+    src.buffer = buf;
+    src.loop = !once;
+    src.connect(rg);
+    rg.connect(g);
+    src.start(at);
+    Object.assign(MUS.cur, { src, buf: true, path: musPath(id), once, end: at + buf.duration });
+  }
 }
 // How one song hands over to the next: a jingle first (sting), how long the old one fades (out) and how quickly the
 // new one comes in (fin). Never a silent gap: songs cross-fade, or a jingle leads straight into the next song.
 const IN_GAME = id => !!id && (!!BIOMES[id] || id === 'boss' || id === 'arcade' || id === 'training'),
   CALM = id => id === 'menu' || id === 'dressup' || id === 'house'; // the menus, the Character screen, the house
 function musTrans(from, to) {
+  if (to === 'escape') return { out: 0.3, fin: 0.05 }; // the lava starts rising: straight in
+  if (from === 'escape' && to === 'boss') return { out: 0.6, fin: 0.3 }; // out at the top: back to the fight
   if (to === 'boss') return { sting: 'bossin', out: 0.4 };
-  if (from === 'boss' && IN_GAME(to)) {
+  if ((from === 'boss' || from === 'escape') && IN_GAME(to)) {
     const won = MODE === LEVEL && LV && LV.encs.some(e => e.boss && e.st === 2); // not when you were knocked out
     return won ? { sting: 'bosswin', out: 0.4 } : { out: 1, fin: 0.5 };
   }
@@ -291,13 +399,15 @@ function musWant() {
     if (MODE.id === 'level' && LV) {
       const ae = LV.encs.find(e => e.st === 1),
         cn = LV.cine;
+      // the rising lava: the escape song (if its recording is loaded; otherwise the boss song carries on)
+      if (LV.esc && !LV.fin && musBuf('escape')) return ['escape', 2];
       if ((ae && ae.boss) || (LV.esc && !LV.fin)) return ['boss', 2];
       // a scene that takes you to the next place (catapult, pipe…) plays its own jingle, then the next place's song
-      if (cn && cn.tr && MUSIC['tr-' + cn.k]) return ['tr-' + cn.k, 0, cn.tr.to];
+      if (cn && cn.tr && (MUSIC['tr-' + cn.k] || musBuf('tr-' + cn.k))) return ['tr-' + cn.k, 0, cn.tr.to];
       // the song of the biome you're in (the Wooded Trail outside a story)
       const sg = LV.segs && segAt(CAM.x + W / 2),
         b = sg ? sg.b : 'woods';
-      return [MUSIC[b] ? b : THEMES[LV.run ? LV.run.theme : 'castle'].biomes[0], ae ? 1 : 0];
+      return [MUSIC[b] || musBuf(b) ? b : THEMES[LV.run ? LV.run.theme : 'castle'].biomes[0], ae ? 1 : 0];
     }
   }
   return ['menu', 0];
@@ -311,22 +421,44 @@ function musicTick() {
     // already playing it, or a jingle is about to hand on to it: nothing to change
     if (!(MUS.cur && (MUS.cur.id === id || (MUS.cur.then === id && !MUS.cur.done)))) musGo(from, id, then);
   }
+  // load what can come up next; a synth song whose recording has just arrived cross-fades to it
+  if (!MUS.pf || now > MUS.pf) {
+    MUS.pf = now + 0.5;
+    musPrefetch();
+  }
+  if (MUS.cur && !MUS.cur.buf && !MUS.cur.song.sting && MUS.cur.id === MUS.want && musBuf(MUS.cur.id)) {
+    musFade(1.2);
+    musPlay(MUS.want, 1.2);
+  }
+  // a recorded jingle nearly over: mark it done, to hand on right at its end
+  const C = MUS.cur;
+  if (C && C.buf && C.once && !C.done && now >= C.end - 0.2) {
+    C.done = true;
+    C.t = C.end;
+  }
   // a jingle has played through: what follows it (straight away, no gap)
   if (MUS.cur && MUS.cur.done && now >= MUS.cur.t - 0.05) {
     const P = MUS.cur,
       n = P.then || P.song.then || MUS.want;
-    if (n && n !== P.id && MUSIC[n] && !MUSIC[n].sting) {
+    if (n && n !== P.id && (MUSIC[n] || musBuf(n)) && !(MUSIC[n] && MUSIC[n].sting)) {
       musFade(0.6);
       musPlay(n, 0.05);
     }
   }
   MUS.lvl = lvl;
   const P = MUS.cur;
-  MUS.old = MUS.old.filter(o => (now > o.end ? (o.g.disconnect(), false) : true));
+  MUS.old = MUS.old.filter(o => {
+    if (now <= o.end) return true;
+    try {
+      if (o.src) o.src.stop();
+    } catch (e) {}
+    o.g.disconnect();
+    return false;
+  });
   // the volume: the Music setting, quieter while paused
   const want = (SET.mus === undefined ? 0.6 : SET.mus) * 0.5 * (paused || SHOWN === 's-pause' ? 0.35 : 1);
   AUD.mus.gain.setTargetAtTime(want, now, 0.1);
-  if (!P || !P.song) return;
+  if (!P || !P.song || P.buf) return; // a recording plays itself
   if (P.t < now - 0.1) P.t = now + 0.02; // after the page was in the background
   const sd = 60 / P.song.bpm / (P.song.div || 4),
     len = P.song.end || P.song.prog.length * (P.song.beats || 4) * (P.song.div || 4);
