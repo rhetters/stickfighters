@@ -2,17 +2,6 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
-## The title screen's own song back (November 25, 2026)
-- Ron liked the built-in title-screen music better, so the title screen plays it again; the Character screen and the house builder keep their new recordings.
-- Version 68.
-
-## Recorded music (November 25, 2026)
-- **New music** (made by Ron with Opus 5.5): a recorded song for the title screen, the Character screen, the house builder, all 15 places, the five bosses and the Tiki's lava escape, in `music/`. The jingles (starting a story, a boss arriving and falling, every transition) stay the built-in ones.
-- Only the songs that can come up next are loaded (a level's places and boss, or the menus' songs), so the iPad isn't asked to hold them all. A song that hasn't arrived yet plays its built-in version and cross-fades to the recording when it does.
-- The boss's song goes by who the boss is, so a boss in one of Rhett's levels brings his own music.
-- Every song is there as Ogg and as AAC (`.m4a`) for iPads that can't play Ogg. Opened straight from disk instead of the website, the game plays the built-in songs as before.
-- Version 67.
-
 ## M17: places, a boss and scenery layers in the level creator; five tiles at a time (November 25, 2026)
 - **More places** (asked by Ron and Rhett): ADD A PLACE (in PARTS) adds up to three places to a level, each with up to 6 parts, so a level can run from the Wooded Trail into the Sewer into the Castle. Old levels become a level with one place.
 - **Transitions are picked for you:** every transition is now listed under the places it can carry you *into* (a balloon never lands in the sewer), and between two places one of those is picked at random. Online every device gets the same one. Stories use the same list now (into the sewer it's always the pipe).
