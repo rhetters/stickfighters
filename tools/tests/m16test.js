@@ -38,7 +38,7 @@ ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged wit
 // difficulty
 const d=await ev("(()=>{const r=[];for(const v of [0,1,2]){SET.diff=v;init();MODE=ARCADE;const e=F(300,'g',0);r.push(e.hp)}SET.diff=1;return r})()");
 ok(d[0]<d[1]&&d[1]<d[2],'Easy, Normal, Hard: enemy health '+d.join(' / '));
-ok(await ev("DIFFS[0].dmg<1&&DIFFS[0].rv<DIFFS[1].rv&&DIFFS[0].heal>DIFFS[1].heal&&DIFFS[0].tok<0&&DIFFS[2].dmg>1&&JSON.stringify(DIFFS[1])==JSON.stringify({id:'normal',name:'NORMAL',hp:1,dmg:1,cd:1,spd:1,tok:0,rv:120,heal:25})"),'Easy is more than weaker enemies (less damage, fewer attackers, quicker revives, more health back); Normal is the game as before');
+ok(await ev("DIFFS[0].dmg<1&&DIFFS[0].rv<DIFFS[1].rv&&DIFFS[0].heal>DIFFS[1].heal&&DIFFS[0].tok<0&&DIFFS[2].dmg>1&&JSON.stringify(DIFFS[1])==JSON.stringify({id:'normal',name:'NORMAL',hp:1,dmg:1,cd:1,spd:1,tok:0,rv:120,heal:25,str:3,strDmg:0.3})"),'Easy is more than weaker enemies (less damage, fewer attackers, quicker revives, more health back); Normal is the game as before');
 await ev("openSolo()");await W(150);
 ok(await ev("$('solo-diff').children.length===3&&$('solo-diff').querySelector('.on').dataset.diff==='1'"),'the Solo screen has EASY / NORMAL / HARD tiles');
 await ev("$('solo-diff').children[0].click()");ok(await ev("SET.diff===0&&$('solo-diff').querySelector('.on').dataset.diff==='0'"),'tapping EASY picks it (and keeps it)');
