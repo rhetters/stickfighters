@@ -139,6 +139,7 @@ function vicDraw(cv, p, t) {
     ctx.beginPath();
     ctx.ellipse(60, 122, 26, 5, 0, 0, 7);
     ctx.fill();
+    if (L && L.pet) drawPet(L.pet, 24, L.pet.fly ? 40 + Math.sin(t * 0.08) * 3 : 121, 0.9, 1, 0, false, true); // their pet
     ctx.save();
     if (pz.sx !== undefined) {
       ctx.translate(60, 0);

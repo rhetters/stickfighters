@@ -106,7 +106,7 @@ await ev("openTitle();openLobby();LB.mode='level';LB.theme='pirate';renderLobby(
 ok(await ev("!!$('s-lobby').querySelector('[data-theme=\"pirate\"] .pimg')"),'the Players screen has the story tile to burst');
 await ev("openTitle()");
 // the Face kind on the Head: glasses, shades and masks; the Ninja Mask only from the chest (four ninja stars)
-ok(await ev("(()=>{const m=migrate({saveVersion:14,chr:{cur:0,list:[{name:'A',eq:{hat:'hat-cap'}},null]}});return m.saveVersion===15&&m.chr.list[0].eq.face===null&&m.chr.list[0].eq.hat==='hat-cap'})()"),'save version 15: fighters gain a face slot, nothing else changes');
+ok(await ev("(()=>{const m=migrate({saveVersion:14,chr:{cur:0,list:[{name:'A',eq:{hat:'hat-cap'}},null]}});return m.saveVersion===SAVE_VERSION&&m.chr.list[0].eq.face===null&&m.chr.list[0].eq.hat==='hat-cap'})()"),'save version 15: fighters gain a face slot, nothing else changes');
 ok(await ev("TABS.find(t=>t.id==='head').secs.includes('face')&&EQ.includes('face')&&ITEMS.filter(i=>i.slot==='face'&&!i.how).length>=12&&ITEM['face-ninja'].how.code"),'HEAD has a FACE kind with a dozen or more things to buy, and the Ninja Mask is secret');
 ok(await ev("(()=>{let n=0;for(const it of ITEMS.filter(i=>i.slot==='face')){const L=lookRaw(normFighter(FIGHTER0));L.face=it;const f={look:L,face:1,s:1,slot:0,vx:0},o={};drawFig(300,300,1,STANCES[0].p,1,L.col,L.d2,0,1,7,o,1,lookLayers(f,{face:1,s:1},1));drawItemIcon(it,100,100,100,'#ff7a00');n++}return n>=15})()"),'every face item draws, on a fighter and as a shelf picture');
 ok(await ev("(()=>{openChar();chGo('head');return [...$('ch-cats').querySelectorAll('button')].some(b=>/FACE/i.test(b.textContent))})()"),'the Head part opens onto a FACE tile');
@@ -116,6 +116,38 @@ await ev("openTitle()");
 // the victory photo keeps the fighter's proportions (it was squashed flat)
 await ev("startRun('mountain');cineEnd();LV.encs.forEach(e=>e.st=2);LV.trans.forEach(t=>t.done=1);levelClear()");await W(3500);
 ok(await ev("(()=>{const c=document.querySelector('#s-victory canvas'),r=c.getBoundingClientRect();return !$('s-victory').hidden&&Math.abs(r.width/r.height-c.width/c.height)<0.03})()"),'the victory photo is not squashed');
+await ev("openTitle()");
+// testing round: pets, crouch, oaks, Esc, the Join screen, Local house, no scroll bars, no enemy count
+ok(await ev("(()=>{const m=migrate({saveVersion:15,chr:{cur:0,list:[{name:'A',eq:{face:'face-shades'}}]}});return m.saveVersion===SAVE_VERSION&&m.chr.list[0].eq.pet===null&&m.chr.list[0].eq.face==='face-shades'})()"),'save version 16: fighters gain a pet slot, nothing else changes');
+ok(await ev("TABS.some(t=>t.id==='pets'&&t.secs[0]==='pet')&&EQ.includes('pet')&&ITEMS.filter(i=>i.slot==='pet').length>=8&&['dog','cat','armadillo','wolf'].every(k=>ITEMS.some(i=>i.slot==='pet'&&i.k===k))"),'a PETS part with a puppy, a kitty, an armadillo, a wolf pup and more');
+ok(await ev("(()=>{for(const it of ITEMS.filter(i=>i.slot==='pet')){drawItemIcon(it,100,100,100,'#ff7a00');drawPet(it,200,200,1,1,1,true,false);drawPet(it,200,200,1,-1,0,false,true)}return true})()"),'every pet draws walking, sitting and as a shelf picture');
+ok(await ev("(()=>{grantItem('pet-dog','test');const c=fighterNow();c.eq.pet='pet-dog';saveFighter(CHR.cur,c);startRun('castle');cineEnd();const s0=JSON.stringify([PL[0].x,PL[0].y,rnd.s||0]);PL[0].x+=300;for(let i=0;i<90;i++){fr++;render()}const q=PETF.get(PL[0]);const near=q&&Math.abs(q.x-PL[0].x)<80;return near&&q.y===q.y})()"),'your pet follows you along the trail');
+ok(await ev("(()=>{const f=PL[0];f.look.pet=null;return !petOf(f)})()"),'no pet, nothing follows');
+// crouch: Down alone kneels (and doesn't block); Down + Surge still blocks
+ok(await ev("(()=>{startTrain();const p=PL[0],I=inputOf(p);for(const k in I.K)I.K[k]=0;I.K.d=1;for(let i=0;i<20;i++){fr++;update()}const c=p.crch===1&&!p.blk&&p.st==='free';I.K.s=1;for(let i=0;i<5;i++){fr++;update()}const b=p.blk===1&&!p.crch;I.K.d=0;I.K.s=0;for(let i=0;i<5;i++){fr++;update()}return c&&b&&!p.crch})()"),'holding Down crouches (no block); Down + Surge still blocks');
+await ev("openTitle()");
+// big oaks in front on the Wooded Trail (a story), see-through while you're behind one; the meadow has none
+ok(await ev("LOOKS.woods.fg.toString().includes('drawOaksFg')&&!LOOKS.meadow.fg.toString().includes('drawOaksFg')"),'the Wooded Trail has big oaks in front, the Alpine Meadow doesn\'t');
+ok(await ev("(()=>{startRun('castle');cineEnd();let hit=null;for(let s=0;s<60&&hit===null;s++){CAM.x=s*120;layer(1.35,1300,131,(x,r,i)=>{if(r>=0.35&&x>W*0.3&&x<W*0.7)hit=[x,i]})}const [x,i]=hit;PL[0].x=viewX()+x/CAM.z;for(let k=0;k<40;k++)drawOaksFg();const a=OAKA.get(i);PL[0].x+=600;for(let k=0;k<40;k++)drawOaksFg();return a<0.6&&OAKA.get(i)>0.9})()"),'an oak goes see-through while you walk behind it');
+await ev("openTitle()");
+// no enemy count in the corner (it ran into the pause button)
+ok(await ev("!levelHud.toString().includes(\"' LEFT'\")"),'no "LEFT" count under the pause button in a story');
+// Esc backs out of every menu screen
+await ev("openOnline();ONC.join=true;renderOnline()");await W(100);
+ok(await ev("$('s-online').classList.contains('joining')"),'the Join screen: the room code in the middle, JOIN under it, BACK at the bottom');
+await p.keyboard.press('Escape');await W(100);ok(await ev("SHOWN==='s-online'&&!ONC.join"),'Esc on Join goes back to Multiplayer');
+await p.keyboard.press('Escape');await W(100);ok(await ev("SHOWN==='s-title'"),'Esc on Multiplayer goes back to the title');
+await ev("openLobby()");await W(100);await p.keyboard.press('Escape');await W(100);ok(await ev("SHOWN==='s-online'"),'Esc on Local goes back to Multiplayer');
+// House on the Local screen
+await ev("openLobby();lobbyJoin('kb');lobbyJoin('kb2');LB.mode='house';renderLobby()");await W(100);
+ok(await ev("!!$('lb-modes').querySelector('[data-mode=\"house\"]')"),'the Local screen has HOUSE');
+await p.click('#lb-start');await W(300);ok(await ev("MODE===HOUSE_MODE&&state==='play'&&PL.length===2"),'and everyone walks round your house');
+await ev("$('b-quit').click()");await W(100);ok(await ev("SHOWN==='s-lobby'"),'quitting goes back to the Local screen');
+await ev("openTitle()");
+// no scroll bars on Solo and the victory screen
+await ev("openSolo()");await W(200);ok(await ev("(()=>{const s=$('s-solo');return s.scrollHeight<=s.clientHeight+1})()"),'the Solo screen fits without a scroll bar');
+await ev("startRun('castle');cineEnd();LV.encs.forEach(e=>e.st=2);levelClear()");await W(3300);
+ok(await ev("(()=>{RUN.last=[{xp:1735,from:1,to:1}];vicRewards();const s=$('s-victory');return s.scrollHeight<=s.clientHeight+1})()"),'the victory screen fits without a scroll bar, XP and all');
 await ev("openTitle()");
 ok(!errs.length,'no errors: '+errs.slice(0,3).join(' | '));
 console.log(fails?fails+' FAILED':'ALL PASS');await b.close();process.exit(fails?1:0)})();

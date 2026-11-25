@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: pets, crouching, oaks and fixes from the testing round (November 24, 2026)
+- **Pets** (Rhett's idea): a new Pets part on the Character screen, with Froggy, Puppy, Kitty, Bunny, Penguin, Armadillo (it rolls into a ball when you run), Wolf Pup, Owl and Baby Dragon (the owl and the dragon fly over your shoulder). Your pet follows you everywhere, sits when you stop, and shows in your polaroid and the victory photo. Looks only.
+- **Crouch:** hold Down to crouch (the block's kneel); blocking still needs Surge too.
+- **Big oaks** in front on the Wooded Trail in the Castle Siege story; you walk behind them and they go see-through while you do. The Alpine Meadow is unchanged.
+- **House on the Local screen:** everyone walks round your house together.
+- **Fixes:** the enemy count in the top right corner is gone (it ran into the pause button); the Solo screen and the victory screen no longer get a scroll bar; Esc backs out of every menu screen (Join, Multiplayer, Local and the rest), like BACK; the Join screen has the room code in the middle with JOIN under it and BACK at the bottom; the Arcade clouds pass in front of the sun.
+- Save version 16 (fighters gain a pet slot).
+- Version 60.
+
 ## M16: Face items and a squashed victory photo (November 23, 2026)
 - **A new Face kind under Head** (asked by Ron): Round Glasses, Nerd Glasses, Shades, Pink Shades, 3D Glasses, Aviators, Star Shades, Heart Shades, a Monocle, Ski Goggles, a Cyber Visor, an Eye Patch, a Mustache and a Clown Nose, from 30 to 200 ninja stars.
 - **The Ninja Mask** is secret: enter four ninja stars in the treasure chest.

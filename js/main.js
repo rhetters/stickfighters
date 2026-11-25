@@ -123,7 +123,7 @@ const togglePause = () => pause(!paused);
 // A player pressing pause (Esc, a controller's Start, the pause button). Walking around your own house, that goes
 // straight back to the house builder; automatic pauses (switching apps, turning the iPad) still show the menu.
 function playerPause() {
-  if (!paused && live() && MODE === HOUSE_MODE && !NET.match) return openHouse();
+  if (!paused && live() && MODE === HOUSE_MODE && !NET.match && !HVIEW.local) return openHouse();
   togglePause();
 }
 function over() {
@@ -318,10 +318,11 @@ addEventListener(
       titleReveal();
       e.preventDefault();
       e.stopImmediatePropagation();
-    } else if (e.key === 'Escape' && !$('ui').hidden && !CAP) {
-      if (!$('s-solo').hidden || !$('s-cust').hidden) navBack();
-      else if (!$('s-settings').hidden || !$('s-binds').hidden || !$('s-skills').hidden || !$('s-themes').hidden) {
-        // Esc backs out of Settings (and its Buttons page, also when opened from pause) , Skills and Campaign, like their back buttons
+    } else if (e.key === 'Escape' && !$('ui').hidden && !CAP && !(e.target && e.target.tagName === 'INPUT')) {
+      // Esc backs out of any menu screen, like its BACK button (the pause menu, the title and the end screens have
+      // their own keys)
+      const sc = navScreen();
+      if (sc && !['s-title', 's-pause', 's-over', 's-victory', 's-clear'].includes(sc.id)) {
         navBack();
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -356,7 +357,7 @@ $('b-set2').onclick = () => {
   back = 's-pause';
   show('s-settings');
 };
-$('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? openHouse() : openTitle()), 'room');
+$('b-quit').onclick = netOr(() => (MODE === HOUSE_MODE ? (HVIEW.local ? openLobby() : openHouse()) : openTitle()), 'room');
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
 $('b-cont').onclick = netOr(continueLevel, 'cont');

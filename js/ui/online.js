@@ -38,6 +38,7 @@ function renderOnline() {
   $('on-joinpane').hidden = NET.on || !ONC.join;
   $('on-room').hidden = !NET.on;
   $('on-h2').textContent = ONC.join && !NET.on ? 'JOIN' : 'MULTIPLAYER';
+  $('s-online').classList.toggle('joining', ONC.join && !NET.on);
   $('on-w').textContent = ROOM_WORDS[ONC.w];
   $('on-a').textContent = ONC.a;
   $('on-b').textContent = ONC.b;

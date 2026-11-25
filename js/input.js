@@ -515,4 +515,5 @@ function navBack() {
   else if (sc.id === 's-learn') openSolo();
   else if (sc.id === 's-moves') $('pm-back').click();
   else if (sc.id === 's-cust') $('b-custback').click();
+  else if (sc.id === 's-codes') $('cd-back').click();
 }

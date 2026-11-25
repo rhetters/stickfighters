@@ -371,12 +371,30 @@ function bg() {
   for (let i = 0; i <= 13; i++) ctx.lineTo(-30 + i * 80 + ox * 2, G - 30 - ((i * 37) % 5) * 18);
   ctx.lineTo(W + 30, G);
   ctx.stroke();
-  ctx.strokeStyle = '#d7dbe6';
+  // puffy paper clouds drifting by, in front of the sun (outlines first, then the fill over the inner lines)
   for (let i = 0; i < 3; i++) {
-    const x = ((fr * 0.12 + i * 330) % (W + 200)) - 100;
-    ctx.beginPath();
-    ctx.ellipse(x, 70 + i * 34, 50, 13, 0, 0, 7);
-    ctx.stroke();
+    const x = ((fr * 0.12 + i * 330) % (W + 200)) - 100,
+      y = 70 + i * 34,
+      puffs = [
+        [0, 4, 50, 15],
+        [-22, -4, 22, 15],
+        [12, -10, 26, 19]
+      ];
+    for (const pass of [0, 1]) {
+      ctx.beginPath();
+      for (const [dx, dy, rx, ry] of puffs) {
+        ctx.moveTo(x + dx + rx, y + dy);
+        ctx.ellipse(x + dx, y + dy, rx, ry, 0, 0, 7);
+      }
+      if (pass) {
+        ctx.fillStyle = '#fbfaf4';
+        ctx.fill();
+      } else {
+        ctx.strokeStyle = '#cfd4e0';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+      }
+    }
   }
   ctx.fillStyle = '#f0ece2';
   ctx.fillRect(-30, G + 6, W + 60, H);
@@ -888,6 +906,7 @@ function renderFrame() {
   for (const e of E) lifted(e.x, () => drawF(e));
   drawPickups();
   drawLevelUps(true);
+  for (const p of PL) drawPetOf(p); // pets trot along behind (pets.js)
   for (const p of PL) lifted(p.x, () => {
     // Surge glow while Surge is held (the sparkles that rise from it are made in updP)
     if (inputOf(p).K.s && live() && p.st !== 'dead' && !p.stm.winded) {
