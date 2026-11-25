@@ -129,6 +129,7 @@ function roomTiles(box, opts) {
   }
   [...box.children].forEach((b, i) => {
     const o = opts[i];
+    if (o.pic) b.querySelector('.pimg').style.setProperty('--ic', 'url(' + o.pic + ')'); // a drawn picture (chpic)
     b.classList.toggle('on', !!o.on);
     b.disabled = !!o.disabled;
     b.onclick = o.pick;
@@ -145,8 +146,28 @@ const storyTiles = (cur, pick, disabled) => [
     disabled,
     pick: () => pick(id)
   })),
-  { data: ['theme', '?'], img: 'i-q', label: '?', aria: 'Surprise story: more XP and stars', on: cur === '?', disabled, pick: () => pick('?') }
+  { data: ['theme', '?'], img: 'i-q', label: '?', aria: 'Surprise story: more XP and stars', on: cur === '?', disabled, pick: () => pick('?') },
+  // the host's own levels from the level creator (no XP or ninja stars)
+  { data: ['theme', 'mine'], img: 'i-levels', label: 'MY LEVELS', aria: 'Levels you made (no XP or ninja stars)', on: cur === 'mine', disabled, pick: () => pick('mine') }
 ];
+// MY LEVELS (theme 'mine'): STORIES to go back, then each of the host's levels with its picture (ui/editor.js)
+const levelTiles = (levels, cur, pick, back, disabled) => [
+  { data: ['lvl', '<'], img: 'i-story', label: 'STORIES', aria: 'Back to the stories', disabled, pick: back },
+  ...levels.map(L => ({
+    data: ['lvl', L.id],
+    img: 'chpic',
+    pic: edThumbURL(L),
+    label: L.name,
+    on: cur === L.id,
+    disabled,
+    pick: () => pick(L.id)
+  })),
+  ...(levels.length
+    ? []
+    : [{ data: ['lvl', 'none'], img: 'i-levels', label: 'NONE YET', aria: 'No levels yet: make one in Customize, then Levels', disabled: true, pick: () => 0 }])
+];
+// The level picked under MY LEVELS: the one chosen if it's still there, else the first
+const pickedLevel = (levels, id) => levels.find(L => L.id === id) || levels[0] || null;
 // Easy, Normal, Hard (data/difficulty.js) as small tiles
 const diffTiles = (cur, pick, disabled) =>
   DIFFS.map((d, i) => ({

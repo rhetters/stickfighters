@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M17: MY LEVELS (November 24, 2026)
+- **MY LEVELS** (asked by Ron and Rhett after testing): on the Story screen (Solo), the Players screen (Local) and in an online room there's a MY LEVELS tile. It swaps the stories for the host's own levels, each with its picture, and a red spiky sticker says they earn **no XP or ninja stars**. Online the host's levels go to everyone in the room, so friends with the room code all play the same level (custom levels will never be in matchmaking). At the end: the results and PLAY AGAIN.
+- **In stories is gone:** the star on a part and Rhett's parts turning up in stories were taken out; stories are made exactly as before.
+- **The foreground follows the camera up too** (spotted by Ron on the Wooded Trail): the big oaks, grass and snow in front now sink with the ground when the camera rises over platforms, instead of riding up with the player.
+- Version 65.
+
 ## M17: the backdrop follows the camera up (November 24, 2026)
 - When the camera rises over platforms (a jump up onto one), the whole backdrop now sinks with the world, ground line and all (spotted by Ron): before, the platforms, fighters and pets moved down but the ground stayed put, so platforms seemed to stand below the ground. The sky above stretches up to fill the screen. The launch base and the crater already did this themselves.
 - Version 64.

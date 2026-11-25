@@ -32,10 +32,7 @@ function normPart(p, b) {
       .slice(0, ED_LIM.foes)
       .map(q => ({ t: q.t, x: edNum(q.x, 0, w, 0) })),
     out = { w, plats, props, foes };
-  if (foes.length) {
-    out.at = edNum(s.at, 0, w, Math.round(w / 2));
-    if (s.pool) out.pool = 1;
-  }
+  if (foes.length) out.at = edNum(s.at, 0, w, Math.round(w / 2));
   return out;
 }
 // A whole level, checked (a missing or broken level becomes an empty one in the Wooded Trail)
@@ -123,12 +120,17 @@ const edPlat = (x0, q, B) => ({
   st: B.ledges ? 'rock' : ED_PLAT[edBiomeId(B)] || 'wood'
 });
 const edBiomeId = B => Object.keys(BIOMES).find(k => BIOMES[k] === B);
-// Play one of Rhett's levels (from the editor; offline only). It earns no stars or XP.
-function startCustom(L) {
+// Play one of Rhett's levels. It earns no stars or XP. from = 'edit' (trying it from the level creator: the end, QUIT
+// and EDIT go back there) or 'menu' (picked under MY LEVELS on the Story screen, the Players screen or an online
+// room, where the host's level is sent to everyone: the end shows the results, like a fixed level).
+function startCustom(L, from = 'edit') {
   closePanels();
   newSeed();
   init();
-  LV = buildCustom(normLevel(L));
+  const src = normLevel(L);
+  LV = buildCustom(src);
+  LV.src = src;
+  LV.from = from;
   LV.stats = {};
   levelSim();
   paused = false;
@@ -137,21 +139,4 @@ function startCustom(L) {
   for (const p of PL) p.draw = 0;
   cineStart('drawin');
   bn(LV.def.name);
-}
-// ===== IN STORIES =====
-// Rhett's starred parts for a theme's biomes: [{ b, part }] (genRun picks from these; online the host sends them)
-function edPool(themeId) {
-  const bs = THEMES[themeId] ? THEMES[themeId].biomes : [],
-    out = [];
-  for (const L of EDIT.levels)
-    if (bs.includes(L.b)) for (const p of L.parts) if (p.pool && p.foes.length) out.push({ b: L.b, part: p });
-  return out.slice(0, ED_LIM.pool);
-}
-// A pool that came from somewhere else (the host, online): checked like a level
-function normPool(a) {
-  return edArr(a)
-    .filter(q => q && typeof q === 'object' && typeof q.b === 'string' && BIOMES[q.b])
-    .slice(0, ED_LIM.pool)
-    .map(q => ({ b: q.b, part: normPart(q.part, q.b) }))
-    .filter(q => q.part.foes.length);
 }

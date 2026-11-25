@@ -259,12 +259,18 @@ function fmtT(fr_) {
 function levelClear() {
   state = 'clear';
   if (SELFTESTING) return;
-  // one of Rhett's levels: no scores or stars, back to the editor after a moment
+  // one of Rhett's levels: no scores or stars; back to the level creator after a moment, or (picked from a menu)
+  // the results
   if (LV.custom) {
     bn('LEVEL CLEAR!');
     sfx(520, 0.5, 'square', 0.05, 500);
+    $('c-h1').textContent = LV.def.name + ' CLEAR!';
+    $('c-l1').textContent = 'Time ' + fmtT(LV.t) + ' · Best combo ' + maxc;
+    $('c-l2').textContent = $('c-l3').textContent = '';
+    $('c-st').textContent = 'A level of your own: no XP or ninja stars.';
+    $('b-next').textContent = 'PLAY AGAIN';
     setTimeout(() => {
-      if (state === 'clear' && MODE === LEVEL && LV.custom) edReturn();
+      if (state === 'clear' && MODE === LEVEL && LV.custom) LV.from === 'edit' ? edReturn() : show('s-clear');
     }, 1800);
     return;
   }

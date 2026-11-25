@@ -13,7 +13,8 @@ const PCOL = [
 const GUESTCOL = ['col-orange', 'col-sky', 'col-green', 'col-purple'];
 let LOBBY = [],
   TEAMS = false;
-const LB = { max: 4, mode: 'level', theme: 'castle' }; // the room size (2 to 4), the mode and the story picked
+const LB = { max: 4, mode: 'level', theme: 'castle', lvl: null }; // the room size (2 to 4), the mode, the story picked
+// (or 'mine': one of your own levels, lvl)
 // ===== FIGHTER PICKS =====
 // Like Mario Kart: each player picks a saved fighter (or plays as a guest) and can change the colour and hat for
 // this session, with their own controller (left/right = fighter, top button = colour, left button = hat) or by
@@ -209,7 +210,9 @@ function renderLobby() {
   roomTiles(
     $('lb-sub'),
     LB.mode === 'level'
-      ? storyTiles(LB.theme, v => ((LB.theme = v), renderLobby()))
+      ? LB.theme === 'mine'
+        ? levelTiles(EDIT.levels, (pickedLevel(EDIT.levels, LB.lvl) || {}).id, v => ((LB.lvl = v), renderLobby()), () => ((LB.theme = 'castle'), renderLobby()))
+        : storyTiles(LB.theme, v => ((LB.theme = v), renderLobby()))
       : vs
         ? teamTiles(TEAMS, v => ((TEAMS = v), renderLobby()))
         : []
@@ -222,7 +225,9 @@ function renderLobby() {
   );
   const t0 = LOBBY.filter(r => r.team === 0).length,
     vsOk = n >= 2 && (!TEAMS || (t0 > 0 && t0 < n));
-  $('lb-start').disabled = n < 1 || (vs && !vsOk);
+  const mine = LB.mode === 'level' && LB.theme === 'mine';
+  $('lb-nostar').hidden = !mine;
+  $('lb-start').disabled = n < 1 || (vs && !vsOk) || (mine && !EDIT.levels.length);
 }
 // The room size: 2 to 4 places, never cutting off a player already in
 const lbMinSize = () => Math.max(2, ...LOBBY.map(r => r.slot + 1));
@@ -283,9 +288,14 @@ function startMulti(kind) {
   applyTouchVis();
   if (kind === 'vs') startVersus();
   else if (kind === 'level')
-    themeBurst($('s-lobby').querySelector('[data-theme="' + LB.theme + '"]'), () =>
-      LB.theme === '?' ? startRun(surpriseTheme(), 0, true) : startRun(LB.theme)
-    );
+    if (LB.theme === 'mine') {
+      // one of your own levels
+      const L = pickedLevel(EDIT.levels, LB.lvl);
+      if (L) themeBurst($('s-lobby').querySelector('[data-lvl="' + L.id + '"]'), () => startCustom(L, 'menu'));
+    } else
+      themeBurst($('s-lobby').querySelector('[data-theme="' + LB.theme + '"]'), () =>
+        LB.theme === '?' ? startRun(surpriseTheme(), 0, true) : startRun(LB.theme)
+      );
   else if (kind === 'house') startHouse({ ...HOUSE, name: 'OUR HOUSE', local: 1 }); // everyone walks round your house
   else start();
 }

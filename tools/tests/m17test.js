@@ -9,9 +9,9 @@ const ev=x=>p.evaluate(x),W=t=>p.waitForTimeout(t);
 // the save
 ok(await ev("(()=>{const m=migrate({saveVersion:16,set:{vol:0.4}});return m.saveVersion===SAVE_VERSION&&Array.isArray(m.edit.levels)&&!m.edit.levels.length&&m.set.vol===0.4})()"),'save version 17: an empty list of levels, nothing else changes');
 // checks: only known places, enemies and scenery; sizes and counts limited; names cleaned
-ok(await ev(`(()=>{const L=normLevel({id:'<x>',name:'alert(1)<b>',b:'nowhere',parts:Array(9).fill({w:99999,plats:[{x1:-50,x2:1e9,h:99},{x1:'a'}],props:[{k:'tree',x:10},{k:'rocket',x:5},{k:'tree',x:20,s:9}],foes:[{t:'g',x:5},{t:'G',x:6},{t:'mw',x:7},{t:'zz'}].concat(Array(20).fill({t:'r',x:1})),at:-4,pool:1,evil:'x'})});
-const P=L.parts[0];return L.b==='woods'&&/^[a-z0-9]+$/.test(L.id)&&L.name==='ALERT1B'&&L.parts.length===6&&P.w===2400&&P.plats.every(q=>q.x1>=0&&q.x2<=P.w&&q.h<=5&&q.h>=1)&&P.props.length===2&&P.props[1].s===1.4&&P.foes.length===10&&!P.foes.some(f=>f.t==='G')&&P.foes.some(f=>f.t==='mw')&&P.at===0&&P.pool===1&&!('evil' in P)&&JSON.stringify(normLevel(L))===JSON.stringify(L)})()`),'a level is checked: unknown places, enemies (a main boss too) and scenery dropped, sizes and counts limited, the name cleaned');
-ok(await ev("normLevel(null).parts.length===1&&normPart({foes:[]},'woods').pool===undefined&&normPart({foes:[{t:'g',x:1}],pool:1},'woods').pool===1"),'a broken level becomes an empty one; only a part with a fight can be starred');
+ok(await ev(`(()=>{const L=normLevel({id:'<x>',name:'alert(1)<b>',b:'nowhere',parts:Array(9).fill({w:99999,plats:[{x1:-50,x2:1e9,h:99},{x1:'a'}],props:[{k:'tree',x:10},{k:'rocket',x:5},{k:'tree',x:20,s:9}],foes:[{t:'g',x:5},{t:'G',x:6},{t:'mw',x:7},{t:'zz'}].concat(Array(20).fill({t:'r',x:1})),at:-4,evil:'x'})});
+const P=L.parts[0];return L.b==='woods'&&/^[a-z0-9]+$/.test(L.id)&&L.name==='ALERT1B'&&L.parts.length===6&&P.w===2400&&P.plats.every(q=>q.x1>=0&&q.x2<=P.w&&q.h<=5&&q.h>=1)&&P.props.length===2&&P.props[1].s===1.4&&P.foes.length===10&&!P.foes.some(f=>f.t==='G')&&P.foes.some(f=>f.t==='mw')&&P.at===0&&!('pool' in P)&&!('evil' in P)&&JSON.stringify(normLevel(L))===JSON.stringify(L)})()`),'a level is checked: unknown places, enemies (a main boss too) and scenery dropped, sizes and counts limited, the name cleaned');
+ok(await ev("normLevel(null).parts.length===1&&normPart({foes:[]},'woods').at===undefined&&normPart({foes:[{t:'g',x:1}]},'woods').at===600"),'a broken level becomes an empty one; only a part with a fight has a flag');
 // Customize: LEVELS between CHARACTER and HOUSE
 await ev("openCust()");await W(100);
 ok(await ev("[...$('s-cust').querySelectorAll('.ptile')].map(b=>b.id).join()==='b-char,b-levels,b-house'"),'Customize: CHARACTER, LEVELS, HOUSE');
@@ -36,13 +36,11 @@ await p.click('#ed-tabs [data-k="prop"]');await p.click('#ed-pal .chitem:nth-chi
 ok(await ev("EDIT.levels[0].parts[0].props[0].k===BIOMES.sewer.props[1][0]"),'SCENERY from the sewer\'s own');
 await p.click('#ed-tabs [data-k="erase"]');q=cell(5,2);await p.mouse.click(...q);
 ok(await ev("(()=>{const P=EDIT.levels[0].parts[0];return P.foes.length===1&&P.plats.length===2&&P.plats.every(q=>q.x2<=300||q.x1>=360)})()"),'ERASE takes the enemy and splits the platform');
-// PARTS: add, width, star, delete
+// PARTS: add, width, delete (and nothing about stories)
 await p.click('#ed-tabs [data-k="parts"]');await W(50);
-await ev("[...$('ed-pal').children].find(b=>/IN STORIES/.test(b.textContent)).click()");
-ok(await ev("EDIT.levels[0].parts[0].pool===1"),'the star puts a part with a fight in stories');
+ok(await ev("![...$('ed-pal').children].some(b=>/STOR/.test(b.textContent))"),'PARTS has no IN STORIES button');
 await ev("[...$('ed-pal').children].find(b=>/ADD A PART/.test(b.textContent)).click()");
 ok(await ev("EDIT.levels[0].parts.length===2&&EDS.part===1&&$('ed-part').textContent==='PART 2 OF 2'"),'ADD A PART');
-ok(await ev("[...$('ed-pal').children].find(b=>/IN STORIES/.test(b.textContent)).disabled"),'an empty part can\'t be starred');
 await ev("[...$('ed-pal').children].find(b=>/LONGER/.test(b.textContent)).click()");
 ok(await ev("EDIT.levels[0].parts[1].w===1500&&!$('ed-right').disabled"),'LONGER, and the view scrolls along it');
 await ev("const d=()=>[...$('ed-pal').children].find(b=>/DELETE THIS PART|TAP AGAIN/.test(b.textContent));d().click();d().click()");
@@ -63,12 +61,9 @@ await p.click('#ed-play');await W(300);await ev("cineEnd();levelFail()");await W
 ok(await ev("$('b-title').textContent==='EDIT'"),'knocked out: EDIT (or try again)');
 await ev("$('b-title').click()");await W(200);ok(await ev("SHOWN==='s-edit'"),'EDIT goes back to the editor');
 await p.keyboard.press('Escape');await W(200);ok(await ev("SHOWN==='s-levels'&&$('ed-list').children.length===2"),'Esc (DONE) goes back to MY LEVELS, with the level on it');
-// in stories
-ok(await ev("(()=>{const pool=edPool('castle');let mine=0,all=0;for(let s=1;s<60;s++){const r=genRun('castle',s,0,pool);for(const e of r.encs){all++;if(e.list.some(q=>typeof q==='object'))mine++}}return pool.length===1&&mine/all>0.05&&mine/all<0.3&&!edPool('pirate').length})()"),'a starred part turns up in its biome in generated stories (only that theme)');
-ok(await ev("(()=>{const pool=edPool('castle');for(let s=1;s<60;s++){const r=genRun('castle',s,0,pool);const e=r.encs.find(e=>e.list.some(q=>typeof q==='object'));if(e){const c=r.ch.find(c=>e.x>=c.x0&&e.x<c.x0+c.w);return c.w===1200&&r.terr.s.some(t=>t.x1===c.x0+180&&t.st==='stone')&&e.x===c.x0+570}}return false})()"),'with its width, platforms and flag');
-ok(await ev("JSON.stringify(genRun('castle',7))===JSON.stringify(genRun('castle',7,0,[]))"),'without a pool, runs come out exactly as before');
-ok(await ev("(()=>{SET.seed='9';startRun('castle');return LV.run.pool.length===1})()"),'a story started here uses this device\'s starred parts');
-ok(await ev("JSON.stringify(normPool(JSON.parse(JSON.stringify(edPool('castle')))))===JSON.stringify(edPool('castle'))&&normPool([{b:'zz',part:{}},{b:'woods',part:{foes:[]}},5]).length===0"),'a pool from the host is checked like a level');
+// stories are never changed by your levels
+ok(await ev("typeof edPool==='undefined'&&genRun.length===2&&(()=>{SET.seed='9';startRun('castle');return !('pool' in LV.run)})()"),'stories are made as before: your levels never go into them');
+ok(await ev("(()=>{startCustom(normLevel({b:'woods',parts:[{w:1200,plats:[{x1:120,x2:600,h:3}]}]}));cineEnd();CAM.x=900;CAM.y=0;let l=[];const a=[],b=[],o=ctx.translate.bind(ctx),hit=q=>q.some(y=>Math.abs(y-160*CAM.z)<1);ctx.translate=(x,y)=>{l.push(y);o(x,y)};l=a;drawLevelFg();CAM.y=-160;l=b;drawLevelFg();ctx.translate=o;CAM.y=0;return !hit(a)&&hit(b)})()"),'the foreground (the oaks in front) sinks with the camera too');
 ok(await ev("(()=>{startCustom(normLevel({b:'meadow',parts:[{w:1200,plats:[{x1:120,x2:600,h:3}]}]}));cineEnd();PL[0].x=PL[0].sx=1000;const k=cv.getContext('2d'),T=k.getTransform();const dark=()=>{let m=999;for(let y=G-6;y<=G+6;y++){const q=k.getImageData(Math.round(800*T.a+T.e),Math.round(y*T.d+T.f),1,1).data;m=Math.min(m,q[0]+q[1]+q[2])}return m};CAM.x=900;CAM.y=0;render();const flat=dark();CAM.x=900;CAM.y=-160;render();const up=dark();CAM.y=0;return flat<250&&up>400})()"),'the ground line sinks with the camera over platforms (it isn\'t left behind at the old height)');
 await ev("openTitle()");
 ok(!errs.length,'no errors: '+errs.join(' | '));

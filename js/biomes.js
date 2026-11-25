@@ -155,10 +155,17 @@ function drawLevelBg() {
   if (LV.haz) drawVents();
   ctx.restore();
 }
+// The foreground (grass, oaks, snow in front) sinks with the backdrop when the camera rises, so it stays on the ground
 function drawLevelFg() {
   if (!LV.segs) return drawWoodsFg();
-  const m = segMix();
-  lookOfSeg(m.f > 0.5 && m.b ? m.b : m.a).fg();
+  const m = segMix(),
+    S = m.f > 0.5 && m.b ? m.b : m.a,
+    dy = CAM_OWN.includes(BIOMES[S.b].look) ? 0 : -CAM.y * CAM.z;
+  if (dy < 0.5) return lookOfSeg(S).fg();
+  ctx.save();
+  ctx.translate(0, dy);
+  lookOfSeg(S).fg();
+  ctx.restore();
 }
 // ===== SEWER: brick arches, pipes along the wall, a stone walkway and a water channel in front =====
 function drawSewer() {

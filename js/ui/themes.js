@@ -2,14 +2,46 @@
 // the stylesheet), grey until highlighted, with a mark once it's been cleared; and '?' for a surprise theme that
 // earns more (SURPRISE_BONUS). Solo opens it from the title; local co-op from the Players screen (online, the host
 // picks in the room).
-const THS = { go: null, back: 's-title' };
+const THS = { go: null, back: 's-title', mine: false };
 // go(themeId, surprise) starts the run; back = the screen BACK returns to
 function openThemes(go, back) {
   THS.go = go;
   THS.back = back || 's-title';
+  THS.mine = false;
   show('s-themes');
-  const box = $('th-cards');
+  themeCards();
+}
+// The cards: the stories, '?' and MY LEVELS; or, under MY LEVELS, STORIES and your levels
+function themeCards() {
+  const box = $('th-cards'),
+    card = (label, html, on) => {
+      const b = document.createElement('button');
+      b.className = 'thcard';
+      b.setAttribute('aria-label', label);
+      b.innerHTML = html;
+      b.onclick = on;
+      box.appendChild(b);
+      return b;
+    };
   box.innerHTML = '';
+  $('th-nostar').hidden = !THS.mine;
+  if (THS.mine) {
+    card('Back to the stories', '<span class="thpic th-story"></span><b>STORIES</b><small></small>', () => {
+      THS.mine = false;
+      themeCards();
+    });
+    for (const L of EDIT.levels) {
+      const b = card(L.name, '<span class="thpic th-mine"></span><b></b><small></small>', () =>
+        themeBurst(b, () => startCustom(L, 'menu'))
+      );
+      b.querySelector('b').textContent = L.name;
+      b.querySelector('.thpic').style.backgroundImage = 'url(' + edThumbURL(L) + ')';
+    }
+    if (!EDIT.levels.length)
+      card('No levels yet: make one in Customize, then Levels', '<span class="thpic th-levels"></span><b>NONE YET</b><small>MAKE ONE IN CUSTOMIZE</small>', () => 0);
+    box.querySelector('button').focus({ preventScroll: true });
+    return;
+  }
   for (const [id, th] of Object.entries(THEMES)) {
     const best = PROG['run:' + id],
       b = document.createElement('button');
@@ -28,6 +60,10 @@ function openThemes(go, back) {
   q.innerHTML = '<span class="thpic th-q"></span><b>?</b><small>+' + Math.round(SURPRISE_BONUS * 100) + '% XP & STARS</small>';
   q.onclick = () => themeBurst(q, () => THS.go(surpriseTheme(), true));
   box.appendChild(q);
+  card('My levels: the levels you made (no XP or ninja stars)', '<span class="thpic th-levels"></span><b>MY LEVELS</b><small>NO XP OR STARS</small>', () => {
+    THS.mine = true;
+    themeCards();
+  });
   box.querySelector('button').focus({ preventScroll: true });
 }
 // A random theme for '?' (a menu pick, not part of the simulation, so Math.random is fine)

@@ -28,9 +28,7 @@ function catBucket(x, t) {
 const OUTS = { pipe: 120, balloon: 300, gondola: 200, landing: 300 };
 // Builds a run: the same shape as buildLevel() (level.js) plus segs (one per biome), trans (transitions) and run.
 // ng (harder replays): fights start tougher and hold more enemies, and mini-bosses turn up more often.
-// pool: Rhett's starred parts for this theme ([{ b, part }], editor.js): a fight in their biome may be one of them
-// (his width, platforms, scenery and enemies). Without a pool nothing changes (no extra random numbers are drawn).
-function genRun(themeId, seed, ng = 0, pool = []) {
+function genRun(themeId, seed, ng = 0) {
   const th = THEMES[themeId],
     R = runRng(seed),
     ri = (a, b) => a + Math.floor(R() * (b - a + 1)),
@@ -101,26 +99,19 @@ function genRun(themeId, seed, ng = 0, pool = []) {
       if (prev) prev.land = terr.s.length - 4; // the rim scene lands everyone on the top ledge
     }
     // 2. the fights
-    const mine = pool.filter(q => q.b === bid);
     for (let k = 0; k < B.fights; k++) {
-      // one of Rhett's parts, now and then
-      const P = mine.length && R() < ED_POOL_CHANCE ? mine[ri(0, mine.length - 1)].part : null,
-        w = P ? P.w : ri(B.w[0], B.w[1]),
+      const w = ri(B.w[0], B.w[1]),
         lvl = base + Math.floor(k / 2) + ng,
         mix = B.mix.filter(m => m.at <= lvl).pop() || B.mix[0],
-        count = P ? ng : Math.min(8 + ng, 3 + Math.floor(k / 2) + bi + ng),
+        count = Math.min(8 + ng, 3 + Math.floor(k / 2) + bi + ng),
         list = [];
       for (let i = 0; i < count; i++) list.push(pickW(mix.w));
       if (k === B.fights - 1 && !last) list.push('c'); // a Captain closes each biome
-      const c = chunk(B, bi, w, P ? P.props.map(q => ({ ...q })) : scatter(B, w, ri(4, 6)));
-      if (P) {
-        list.unshift(...P.foes.map(f => ({ t: f.t, x: c.x0 + f.x })));
-        for (const q of P.plats) terr.s.push(edPlat(c.x0, q, B));
-      }
+      const c = chunk(B, bi, w, scatter(B, w, ri(4, 6)));
       c.dusk = light(k + 1);
       c.flies = c.dusk > 0.6 ? 1 : 0;
       // on a climb, each fight's ledge is near the start of its chunk and the rest of the chunk goes uphill
-      const at = P ? P.at : B.climb ? Math.round(560 + R() * 120) : Math.round(w * (0.45 + R() * 0.15)),
+      const at = B.climb ? Math.round(560 + R() * 120) : Math.round(w * (0.45 + R() * 0.15)),
         e = {
           x: c.x0 + at,
           lock: Math.max(0, c.x0 + at - W / 2),
@@ -138,9 +129,8 @@ function genRun(themeId, seed, ng = 0, pool = []) {
       if (B.vents)
         for (let v = ri(1, 2), i = 0; i < v; i++)
           haz.vents.push({ x: Math.round(e.x + (i ? 1 : -1) * (90 + R() * 250)), o: ri(0, 239) });
-      // rock ledges over the fight: low ones at the sides and a higher one in between (two layouts; Rhett's parts
-      // have his own platforms)
-      if (B.ledges && !P) {
+      // rock ledges over the fight: low ones at the sides and a higher one in between (two layouts)
+      if (B.ledges) {
         const L = (a, b, h) => terr.s.push({ x1: e.x + a, x2: e.x + b, y1: G - h, y2: G - h, st: 'rock' });
         if (R() < 0.5) {
           L(-400, -220, 125);
@@ -278,7 +268,7 @@ function genRun(themeId, seed, ng = 0, pool = []) {
     ramps: ramps.length ? ramps : null,
     terr: terr.s.length ? terr : null,
     haz: haz.vents.length || haz.pools.length ? haz : null,
-    run: { theme: themeId, seed, ng, pool },
+    run: { theme: themeId, seed, ng },
     len: x,
     cp: -1,
     t: 0,
@@ -289,12 +279,11 @@ function genRun(themeId, seed, ng = 0, pool = []) {
 const segAt = x => (LV.segs ? LV.segs.find(s => x < s.x1) || LV.segs[LV.segs.length - 1] : null);
 // ng = how many times harder than normal (0; each PLAY AGAIN from the victory screen adds one)
 // myst = picked as a surprise ('?' on the Story screen): the run earns 10% more stars and XP
-// pool = Rhett's parts that may turn up (this device's starred parts; online, the host's)
-function startRun(themeId, ng = 0, myst = false, pool = edPool(themeId)) {
+function startRun(themeId, ng = 0, myst = false) {
   closePanels();
   newSeed();
   init();
-  LV = genRun(themeId, curSeed, ng, pool);
+  LV = genRun(themeId, curSeed, ng);
   LV.run.myst = !!myst;
   LV.stats = {}; // each player's stats for the victory screen (LEVEL.tally), kept through a continue
   levelSim();
@@ -309,8 +298,8 @@ function startRun(themeId, ng = 0, myst = false, pool = edPool(themeId)) {
 // Play the same level again: a campaign run gets a new run (new seed), a fixed level starts over. harder = one
 // step harder than the run just played (the victory screen's ready-up)
 function replayLevel(harder) {
-  if (LV && LV.run) startRun(LV.run.theme, (LV.run.ng || 0) + (harder ? 1 : 0), LV.run.myst, LV.run.pool);
-  else if (LV && LV.custom) startCustom(EDIT.levels.find(L => L.id === LV.custom) || {});
+  if (LV && LV.run) startRun(LV.run.theme, (LV.run.ng || 0) + (harder ? 1 : 0), LV.run.myst);
+  else if (LV && LV.custom) startCustom(LV.src, LV.from);
   else startLevel(LV ? LV.id : 'woods1');
 }
 // A biome is behind you: it counts as done for anything tied to it (the Wooded Trail's Ranger Hat)
