@@ -362,14 +362,11 @@ $('b-set2').onclick = () => {
   show('s-settings');
 };
 // leaving a game: back to the house builder, the Local screen, the level creator (one of Rhett's levels) or the title
-const leaveGame = () =>
-  MODE === HOUSE_MODE
-    ? HVIEW.local
-      ? openLobby()
-      : openHouse()
-    : MODE === LEVEL && LV && LV.custom
-      ? edReturn()
-      : openTitle();
+function leaveGame() {
+  if (MODE === HOUSE_MODE) return HVIEW.local ? openLobby() : openHouse();
+  if (MODE === LEVEL && LV && LV.custom) return edReturn();
+  openTitle();
+}
 $('b-quit').onclick = netOr(leaveGame, 'room');
 $('b-back').onclick = () => show(back);
 $('b-again').onclick = netOr(() => (MODE === LEVEL ? replayLevel() : start()), 'again');
