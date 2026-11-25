@@ -25,36 +25,26 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M13 | Themes and procedural runs | Done | XL | M8, M10, M12 | Castle Siege, Pirate Cove, Mountain and Space generated from a seed, a Campaign screen, transitions per theme, platforms, mini-bosses, four main bosses |
 | M14 | Boss level | Done | L | M13 | A look of its own for every boss, a slow-motion finale, a victory screen and harder replays, online rooms of 6, picture menus |
 | M15 | Platforms, vertical layers and boss fights | Done | L | M13, M14 | The Volcano: steam vents, falling lava rocks, a climb down into the crater on ledges the pink army follows you up and down, and the Pink Tiki's lava escape |
-| M16 | Polish, audio, balance | Next | L | M8–M15 | Music for every theme and boss, a full sound pass, difficulty choices, a balance pass, a first-play tutorial, a picture-menu character screen |
-| M17 | Level creator | Planned | L | M8, M13 | Rhett builds levels that join the procedural pools |
+| M16 | Polish, audio, balance | Done | L | M8–M15 | Music for every theme and boss, a full sound pass, difficulty choices, a balance pass, a first-play tutorial, a picture-menu character screen |
+| M17 | Level creator | Next | L | M8, M13 | Rhett builds levels that join the procedural pools |
 | M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
 ## Upcoming milestones
 
-### M16 · Polish, audio, balance
-
-Decided by Ron (November 23): all of the below; no "1.0" (this is just another milestone). Music and sounds are made by the game itself; recorded ones can replace them later.
-
-- **Music:** a loop for each theme, the menus and the boss fights, plus a short victory tune. It follows the action (quieter while walking, fuller in a fight, the boss's own track) and fades between them. Separate Music and Sound volumes in Settings (a save change, with a migration).
-- **A full sound pass:** footsteps, jumps and landings, voices for enemies and bosses, the hazards, menu taps, ninja stars, the ready stamp; ambient sound per biome.
-- **Difficulty:** Easy, Normal and Hard for Story and Arcade, more than enemy strength (on Easy: slower, fewer attackers at once, quicker revives, more hearts); online the host picks. Harder replays (+1) stack on top.
-- **Balance pass:** test bots play every theme and measure run time, damage taken, stars and XP per run. The numbers go to Ron before anything changes.
-- **First-play tutorial:** a guided start in the Training Room with picture prompts (move, jump, punch, kick, a combo, Surge, a grab), offered the first time; the move list also opens from Pause.
-- **A new character screen** (asked by Ron): the fighter in a polaroid, a name box in the style of the rooms, the store as picture buttons (body part, then kind, then the items to buy), so lots more cosmetics stay tidy; skills on a corner of the frame, glowing when there are points to spend.
-- **Accessibility:** hit flashes and team colours that work with colour blindness, a bigger text option (reduced screen shake and button remapping already exist).
-- **Performance:** checked with 6 players and lots of enemies at iPad size; fewer effects automatically when the game slows down.
-
-Built (version 54, see the CHANGELOG): the music and sound, the difficulty choices, the tutorial and MOVES on Pause, the new character screen, colour help and bigger text, the lower resolution for slow devices. Balance: test bots played every story on each difficulty; the numbers are with Ron, and nothing in the balance has changed yet.
-
-**Done when:** every theme and boss has its music, the sound pass is in, the difficulty choices work alone, in co-op and online, the balance numbers have been reviewed with Ron, a new player can learn the basics from the tutorial, the new character screen is in, and 6 players run smoothly on the iPad.
-
 ### M17 · Level creator
 
 - A mode for Rhett that edits a grid and saves a chunk or a whole level in the same data format the game uses.
 - His levels can be played directly and can be added to the procedural pools.
 - Levels are checked when loaded (sizes, known IDs only) and are never run as code (rule R3).
+
+How it works (decided by Claude, November 24; Ron asked for its picture between CHARACTER and HOUSE on Customize):
+- **LEVELS** on Customize opens Rhett's levels (up to 12) and NEW LEVEL, which asks for a place (any of the 15 biomes, shown as pictures of the real scenery).
+- **The editor** shows the real scenery of that place with a grid over it, like the house builder: picture tools for **platforms** (tap or drag along a row, five heights), **enemies** (the six pink army types and the place's own mini-boss, dropped where you tap, up to 10 a fight), **scenery** (that place's props), the **fight flag** (where the fight locks the screen) and the **eraser**. A level is up to 6 parts; each part is 900 to 2400 pixels wide.
+- **PLAY** plays the level right away from the editor (a sign at the start, an arch at the end) and comes back to it. Playing your own levels earns no stars or XP, so they can't be used to farm.
+- **In stories:** a star on each part with a fight puts it in that place's pool. When a story is generated, each fight in that place has a chance of being one of Rhett's parts instead (his platforms, enemies and scenery). Online, the host's parts go to everyone with the start of the run.
+- **Checked when loaded:** sizes and counts are limited, only known places, enemy types and scenery are kept, everything else is dropped. Levels live in the save (a new save version).
 
 **Done when:** Rhett builds a level on the iPad, plays it, and sees his chunks appear in generated runs.
 
@@ -79,4 +69,4 @@ Settled decisions (Surge, phasing, grab and throw, side-scrolling levels, blocki
 
 ## Suggested next step
 
-M16: Ron and Rhett try it on the iPad (the music, the tutorial, the character screen, Easy for the younger ones) and decide on the balance numbers.
+M17: Rhett builds a level on the iPad, plays it, and stars a part to see it turn up in a story.

@@ -444,3 +444,22 @@ Still to do:
 **Done when:** the new theme plays through alone, in local co-op and online; enemies follow players onto platforms; the boss has three phases you can learn; and fights on platforms are as readable as on the ground.
 
 **Status: done** (November 23, 2026, version 53). The Volcano: the Tiki Jungle's steam vents, the Ashy Slopes' falling lava rocks, a climb down into the Crater on rock ledges the pink army follows you up and down, and the Pink Tiki, whose last stand is a lava escape up to the rim. Versus ledges and ledges in other themes were left for later.
+
+### M16 · Polish, audio, balance
+
+Decided by Ron (November 23): all of the below; no "1.0" (this is just another milestone). Music and sounds are made by the game itself; recorded ones can replace them later.
+
+- **Music:** a loop for each theme, the menus and the boss fights, plus a short victory tune. It follows the action (quieter while walking, fuller in a fight, the boss's own track) and fades between them. Separate Music and Sound volumes in Settings (a save change, with a migration).
+- **A full sound pass:** footsteps, jumps and landings, voices for enemies and bosses, the hazards, menu taps, ninja stars, the ready stamp; ambient sound per biome.
+- **Difficulty:** Easy, Normal and Hard for Story and Arcade, more than enemy strength (on Easy: slower, fewer attackers at once, quicker revives, more hearts); online the host picks. Harder replays (+1) stack on top.
+- **Balance pass:** test bots play every theme and measure run time, damage taken, stars and XP per run. The numbers go to Ron before anything changes.
+- **First-play tutorial:** a guided start in the Training Room with picture prompts (move, jump, punch, kick, a combo, Surge, a grab), offered the first time; the move list also opens from Pause.
+- **A new character screen** (asked by Ron): the fighter in a polaroid, a name box in the style of the rooms, the store as picture buttons (body part, then kind, then the items to buy), so lots more cosmetics stay tidy; skills on a corner of the frame, glowing when there are points to spend.
+- **Accessibility:** hit flashes and team colours that work with colour blindness, a bigger text option (reduced screen shake and button remapping already exist).
+- **Performance:** checked with 6 players and lots of enemies at iPad size; fewer effects automatically when the game slows down.
+
+Built (version 54, see the CHANGELOG): the music and sound, the difficulty choices, the tutorial and MOVES on Pause, the new character screen, colour help and bigger text, the lower resolution for slow devices. Balance: test bots played every story on each difficulty; the numbers are with Ron, and nothing in the balance has changed yet.
+
+**Done when:** every theme and boss has its music, the sound pass is in, the difficulty choices work alone, in co-op and online, the balance numbers have been reviewed with Ron, a new player can learn the basics from the tutorial, the new character screen is in, and 6 players run smoothly on the iPad.
+
+**Status: done** (November 24, 2026, version 62). Music for every place, menu and boss, with jingles for every transition and boss; a full sound pass and wind; Easy, Normal and Hard; the first-play tutorial and MOVES on Pause; the picture-menu character screen with a polaroid, Face items and pets; colour help and bigger text; a lower resolution for slow devices. Also: gusts on the Snowy Peak, the story tile burst, crouch and crouch walk, foreground oaks on the Wooded Trail, House on the Local screen. The balance numbers went to Ron, and the balance was left as it was.
