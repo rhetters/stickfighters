@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## M16: the Join code's numbers (November 24, 2026)
+- On the Join screen the two numbers sit side by side, each with its up arrow above and down arrow below (asked by Ron).
+- Version 61.
+
 ## M16: pets, crouching, oaks and fixes from the testing round (November 24, 2026)
 - **Pets** (Rhett's idea): a new Pets part on the Character screen, with Froggy, Puppy, Kitty, Bunny, Penguin, Armadillo (it rolls into a ball when you run), Wolf Pup, Owl and Baby Dragon (the owl and the dragon fly over your shoulder). Your pet follows you everywhere, sits when you stop, and shows in your polaroid and the victory photo. Looks only.
 - **Crouch:** hold Down to crouch (the block's kneel); blocking still needs Surge too.
