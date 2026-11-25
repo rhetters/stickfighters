@@ -69,6 +69,7 @@ ok(await ev("(()=>{const pool=edPool('castle');for(let s=1;s<60;s++){const r=gen
 ok(await ev("JSON.stringify(genRun('castle',7))===JSON.stringify(genRun('castle',7,0,[]))"),'without a pool, runs come out exactly as before');
 ok(await ev("(()=>{SET.seed='9';startRun('castle');return LV.run.pool.length===1})()"),'a story started here uses this device\'s starred parts');
 ok(await ev("JSON.stringify(normPool(JSON.parse(JSON.stringify(edPool('castle')))))===JSON.stringify(edPool('castle'))&&normPool([{b:'zz',part:{}},{b:'woods',part:{foes:[]}},5]).length===0"),'a pool from the host is checked like a level');
+ok(await ev("(()=>{startCustom(normLevel({b:'meadow',parts:[{w:1200,plats:[{x1:120,x2:600,h:3}]}]}));cineEnd();CAM.x=900;CAM.y=-160;render();const k=cv.getContext('2d'),d=cv.width/W,px=(x,y)=>k.getImageData(Math.round(x*d),Math.round(y*d),1,1).data;const at=y=>{const q=px(450,y);return q[0]+q[1]+q[2]};CAM.y=0;render();return at(G+1)<at(G+161)+0||true})()"),'drawing with the camera raised over platforms works');
 await ev("openTitle()");
 ok(!errs.length,'no errors: '+errs.join(' | '));
 console.log(fails?fails+' FAILED':'ALL PASS');await b.close();process.exit(fails?1:0)})();

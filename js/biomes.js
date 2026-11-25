@@ -101,11 +101,42 @@ function drawOver(fn, f) {
 }
 // The level's background: a campaign run draws its biome's look (mixing two where they meet), then every prop
 // and gate in view; a fixed level (the Wooded Trail) is all woods.
+// Looks that follow the camera's height themselves (the launch base, the crater); the others are drawn flat, so when
+// the camera rises over platforms (CAM.y < 0) the whole backdrop, ground line and all, sinks with the world
+const CAM_OWN = ['base', 'crater'];
 function drawLevelBg() {
   if (!LV.segs) return drawWoods();
-  const m = segMix();
-  lookOfSeg(m.a).bg();
-  if (m.b && m.f > 0) drawOver(lookOfSeg(m.b).bg, m.f);
+  const m = segMix(),
+    sink = (L, fn) => {
+      const dy = CAM_OWN.includes(BIOMES[L.b].look) ? 0 : -CAM.y * CAM.z;
+      if (dy < 0.5) return fn();
+      ctx.save();
+      ctx.translate(0, dy);
+      fn();
+      ctx.restore();
+      // above it: the lowered sky's top edge, stretched up to the top of the screen
+      const T = ctx.getTransform(),
+        c = ctx.canvas,
+        y = Math.max(0, Math.round((dy - 20) * T.d + T.f));
+      if (y > 1) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.drawImage(c, 0, y, c.width, 1, 0, 0, c.width, y);
+        ctx.restore();
+        // and the paper's grid back over it
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(-30, -30, W + 60, dy + 10);
+        ctx.clip();
+        ctx.globalAlpha = 0.7;
+        const gx = -(CAM.x % 30);
+        ctx.drawImage(gridC, gx, 0, W, H);
+        ctx.drawImage(gridC, gx + W, 0, W, H);
+        ctx.restore();
+      }
+    };
+  sink(m.a, lookOfSeg(m.a).bg);
+  if (m.b && m.f > 0) drawOver(() => sink(m.b, lookOfSeg(m.b).bg), m.f);
   const cx = CAM.x,
     dk = chunkVal(cx + W / 2, 'dusk');
   ctx.save();
