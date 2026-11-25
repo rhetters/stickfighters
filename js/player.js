@@ -95,9 +95,13 @@ function pick(f, btn, chain, plain, stop) {
   f.seq = seq;
   return mv;
 }
+// Every fighter made gets a number of its own (uid), so game state can say who did what with plain data, not object
+// links (an enemy's combo string on a player, hurtP). Counted from each init().
+let UIDN = 0;
 function F(x, t, pl) {
   const e_ = F0(x, t, pl);
   e_.tk = t;
+  e_.uid = ++UIDN;
   if (!pl && T[t].look) e_.look = bossLook(T[t]); // a main boss's own look (drawing only)
   return e_;
 }
@@ -181,6 +185,7 @@ function tgt(e) {
 }
 function init() {
   wave = 0;
+  UIDN = 0;
   CAM.x = CAM.y = WB.l = WW.l = 0;
   CAM.z = 1;
   WB.r = WW.r = W;
@@ -480,9 +485,9 @@ function updP(f) {
       if (f.t % 2 === 0)
         fxp({
           k: 'l',
-          x: f.x - f.face * (20 + rnd() * 40),
-          y: f.y - 8 - rnd() * 72,
-          len: 30 + rnd() * 50,
+          x: f.x - f.face * (20 + fxr() * 40),
+          y: f.y - 8 - fxr() * 72,
+          len: 30 + fxr() * 50,
           dir: f.face,
           l: 9,
           m: 9

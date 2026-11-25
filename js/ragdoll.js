@@ -330,18 +330,18 @@ function corpseTick(f, dissolve) {
   if (R.dis) {
     R.dis++;
     if (R.dis % 3 === 0) {
-      const q = R.p[(rnd() * 13) | 0];
+      const q = R.p[(fxr() * 13) | 0];
       for (let i = 0; i < 3; i++)
         fxp({
           k: 'c',
           x: q.x,
           y: q.y,
-          vx: (rnd() - 0.5) * 3,
-          vy: -1 - rnd() * 2.5,
-          a: rnd() * 6,
-          va: (rnd() - 0.5) * 0.4,
+          vx: (fxr() - 0.5) * 3,
+          vy: -1 - fxr() * 2.5,
+          a: fxr() * 6,
+          va: (fxr() - 0.5) * 0.4,
           c: (f.pl ? [f.col, f.d2, '#ffffff', '#ffd400'] : ['#ff4fa3', '#ff93c8', '#ffd1e8', '#ffffff'])[
-            (rnd() * 4) | 0
+            (fxr() * 4) | 0
           ],
           l: 34,
           m: 34

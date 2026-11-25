@@ -4,7 +4,7 @@
 // The hash must be identical before and after any refactor. Cosmetic effects (FX) are not part of the hash.
 // The fingerprints the game should give. A refactor must not change them; a gameplay change will, and then the new
 // values go here (and in the CHANGELOG entry for that change).
-const SELFTEST_EXPECT = { arcade: '1b77eddf', level: '365c11ac' };
+const SELFTEST_EXPECT = { arcade: '1ad25e01', level: '0d2bfc9f' };
 // The feel the fingerprints were made with (the defaults before hit-stop and shake started off)
 const SELFTEST_FEEL = { hitstop: 1, shake: 1, kb: 1, grav: 1, bounce: 1, body: 2.5 };
 let SELFTESTING = false;

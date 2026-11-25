@@ -127,10 +127,10 @@ function hurtGate(g, d) {
       k: 'c',
       x: g.x - 30,
       y: G - 20,
-      vx: -1 - rnd() * 3,
-      vy: -2 - rnd() * 3,
+      vx: -1 - fxr() * 3,
+      vy: -2 - fxr() * 3,
       a: 0,
-      va: rnd() - 0.5,
+      va: fxr() - 0.5,
       l: 40,
       m: 40,
       c: '#a4794f'
@@ -140,15 +140,15 @@ function hurtGate(g, d) {
     for (let i = 0; i < 26; i++)
       fxp({
         k: 'c',
-        x: g.x - 40 + rnd() * 80,
-        y: G - 30 + rnd() * 20,
-        vx: (rnd() - 0.5) * 8,
-        vy: -3 - rnd() * 6,
-        a: rnd() * 6,
-        va: rnd() - 0.5,
+        x: g.x - 40 + fxr() * 80,
+        y: G - 30 + fxr() * 20,
+        vx: (fxr() - 0.5) * 8,
+        vy: -3 - fxr() * 6,
+        a: fxr() * 6,
+        va: fxr() - 0.5,
         l: 70,
         m: 70,
-        c: rnd() < 0.5 ? '#a4794f' : '#c9a27a'
+        c: fxr() < 0.5 ? '#a4794f' : '#c9a27a'
       });
     ring(g.x, G - 20, 80);
     shake = Math.max(shake, 12);

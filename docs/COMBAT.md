@@ -99,6 +99,18 @@ The design of every move: input, animation, effect and unlock tier. It's the ref
 | Splat | Pinned to the wall for a moment, then slides down |
 | Bounce | Hits the floor, rebounds once, then settles |
 
+## F2. Enemy hits on players
+
+An enemy move's effect (its row in the chart, `INFO` in data/moves.js) also sets how a **player** reacts, tuned for
+players: Stagger (stunned, pushed back), Pushback (pushed back farther), Pop (popped up a little), Trip (feet swept,
+down), Knockdown (down, then get up), Launch, Splat or Bounce (sent flying, then down). Knocked down or sent flying, a
+player is safe until back up.
+
+**Combo strings:** an enemy move with `chain` is part of a string. Between its hits the player is only safe for a
+moment, so the next hit can land; a string stops after 2 / 3 / 4 hits (Easy / Normal / Hard) or 20 / 30 / 40% of the
+player's health, or when a hit knocks them down. Any other hit gives the usual safe time. No enemy has a string yet:
+they're for the theme enemies to come. The rules for making enemies are at the top of data/enemies.js.
+
 ## G. Grab and throw (Punch + Kick together)
 
 | Input | Move | Animation output | Effect |

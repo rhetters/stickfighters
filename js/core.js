@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 69;
+const GAME_VERSION = 70;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -226,6 +226,20 @@ function rnd() {
   t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
+// Effects' own random numbers (particles, sparks, debris, speed lines): never rnd(), so whether effects are shown
+// can't change the game. (Rollback will re-play frames with effects off, SIM.mute; the game must come out the same.)
+let FXSEED = 7;
+function fxr() {
+  FXSEED = (FXSEED + 0x6d2b79f5) >>> 0;
+  let t = FXSEED;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+// The simulation's switches. mute: effects and sounds do nothing (fxp, ghost, sfx, noise, sfxHit check it), for
+// re-playing frames that were already shown. The camera's shake, kick and zoom (shake, camX, camY, zoom) are only
+// looks too, but they're set in many places: a re-play saves them first and puts them back after.
+const SIM = { mute: 0 };
 const cv = document.getElementById('c'),
   W = 900,
   H = 420,
@@ -265,6 +279,7 @@ function camApply(cx, cy, z) {
 const FEEL = { hitstop: 0, shake: 0, kb: 1, grav: 1, bounce: 1, body: 1 };
 let NB;
 function noise(d, v, hp) {
+  if (SIM.mute) return;
   if (SET.vol <= 0) return;
   try {
     AC = AC || new AudioContext();
@@ -291,6 +306,7 @@ function noise(d, v, hp) {
 }
 // Layered hit sounds: light = snap, medium = snap + thump, heavy = crunch + deep boom
 function sfxHit(w) {
+  if (SIM.mute) return;
   if (w === 'L') {
     noise(0.05, 0.06, 2600);
     sfx(260, 0.06, 'square', 0.035, -130);
@@ -332,6 +348,7 @@ function playSnd(name, v = 1) {
 }
 let AC;
 function sfx(f, d, t = 'square', v = 0.05, s = 0) {
+  if (SIM.mute) return;
   if (SET.vol <= 0) return;
   try {
     AC = AC || new AudioContext();

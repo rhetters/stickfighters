@@ -69,7 +69,7 @@ function rockTick(ae) {
     if (++r.t === ROCK_T) {
       for (const p of PL)
         if (p.st !== 'dead' && p.st !== 'cine' && Math.abs(p.x - r.x) < 46 && p.y > G - 70)
-          hurtP(p, { dmg: 9, kb: 12 }, p.x < r.x ? -1 : 1);
+          hurtP(p, { dmg: 9, kb: 12, ef: 'launch' }, p.x < r.x ? -1 : 1);
       for (const e of E)
         if (!e.dying && !e.gone && e.st !== 'cine' && Math.abs(e.x - r.x) < 50 && e.y > G - 70)
           natHit(e, 12, -10, e.x < r.x ? -1 : 1);
@@ -81,10 +81,10 @@ function rockTick(ae) {
           k: 'c',
           x: r.x,
           y: G - 14,
-          vx: (rnd() - 0.5) * 9,
-          vy: -3 - rnd() * 5,
+          vx: (fxr() - 0.5) * 9,
+          vy: -3 - fxr() * 5,
           a: 0,
-          va: rnd() - 0.5,
+          va: fxr() - 0.5,
           l: 40,
           m: 40,
           c: i % 2 ? '#ff7a00' : '#4a3a3e'
