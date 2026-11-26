@@ -113,6 +113,8 @@ Not yet planned into milestones.
 11. **Bug, the Skyscraper:** players or enemies knocked down on the floors (the full-width levels) disappear for a
     moment. (A likely cause: the bodies that fall and ragdoll still only know the street level, `groundY` in
     combat.js.)
+12. **Suburban Street:** take away the grass in the foreground.
+13. **Cars can be hurt:** players in cars take damage (today nothing hurts them there).
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 
