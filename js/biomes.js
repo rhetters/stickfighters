@@ -103,7 +103,7 @@ function drawOver(fn, f) {
 // and gate in view; a fixed level (the Wooded Trail) is all woods.
 // Looks that follow the camera's height themselves (the launch base, the crater); the others are drawn flat, so when
 // the camera rises over platforms (CAM.y < 0) the whole backdrop, ground line and all, sinks with the world
-const CAM_OWN = ['base', 'crater'];
+const CAM_OWN = ['base', 'crater', 'tower'];
 function drawLevelBg() {
   if (!LV.segs) return drawWoods();
   const m = segMix(),
@@ -1902,8 +1902,9 @@ const PLAT_LOOK = {
   metal: ['#aeb7c6', '#6f7a8c', 'rgba(70,80,96,0.8)']
 };
 function drawPlatforms() {
+  if (LV.terr.c) for (const c of LV.terr.c) drawShaftLadder(c); // the Skyscraper's ladders (city.js)
   for (const s of LV.terr.s) {
-    if (s.st === 'rock') continue;
+    if (s.st === 'rock' || drawCityPlat(s)) continue; // the volcano's ledges; the Skyscraper's (city.js)
     const w = s.x2 - s.x1;
     if (PLAT_LOOK[s.st]) {
       drawPlatLook(s, w, PLAT_LOOK[s.st]);

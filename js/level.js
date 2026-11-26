@@ -39,11 +39,14 @@ function levelSim() {
   CAM.y = 0;
   CAM.z = 1;
   // platforms (a run's launch tower); none otherwise
-  if (LV.terr) terrainSet(LV.terr.s, LV.terr.w);
+  if (LV.terr) terrainSet(LV.terr.s, LV.terr.w, LV.terr.c);
   PL.forEach((p, i) => {
     p.x = CAM.x + 200 - i * (PL.length > 4 ? 36 : 60); // five or six players stand closer, all on screen
     p.face = 1;
+    // a checkpoint up the Skyscraper: back on that floor
+    if (cpE && cpE.fy !== undefined) p.y = cpE.fy;
   });
+  if (cpE && cpE.fy !== undefined) CAM.y = Math.min(0, cpE.fy - 260);
   levelWalls();
   LV.go = 200;
 }
@@ -189,10 +192,12 @@ function levelTick() {
     if (trc) mx = Math.min(mx, trc.x - W + 260);
     const d = Math.min(lead - W * 0.45, mx) - CAM.x;
     if (d > 0 && !LV.esc) CAM.x += Math.min(d, 1 + d * 0.08); // out of the volcano, the run ends at the rim
-    if (ne && CAM.x >= ne.lock - 0.5) {
+    // a fight up the Skyscraper starts once someone reaches its floor (city.js)
+    if (ne && CAM.x >= ne.lock - 0.5 && (ne.fy === undefined || shaftReach(ne, alive))) {
       ne.st = 1;
-      // online, anyone left behind is brought into the arena
+      // online, anyone left behind is brought into the arena; up the Skyscraper, onto the floor
       if (ownView()) warpIn();
+      if (ne.fy !== undefined) shaftGather(ne);
       ne.q = ne.list.slice();
       coopExtra(ne.q);
       wave = ne.lvl;
@@ -215,12 +220,15 @@ function levelTick() {
     const there = trc && (trc.top ? alive.some(p => p.gy <= trc.top + 1 && p.x >= trc.deck) : lead >= trc.x - 150);
     if (there && !LV.encs.some(e => e.st === 1)) cineStart(trc.k, { tr: trc });
   }
+  if (LV.shaft) shaftCeil(); // the hatch over a floor's ambush
   // online each screen frames only its own player (CAM.y and CAM.z are drawing only); fights on ledges too
   if (LV.terr) levelCamUp(ownView() ? alive.filter(p => p.slot === NET.mySlot) : alive);
   levelWalls();
   if (ae) {
     if (ae.q.length && --spawnT <= 0 && E.filter(e => !e.dying).length < ae.max + PL.length - 1) {
       spawn(ae.q.shift());
+      // up the Skyscraper they drop in from above the floor
+      if (ae.fy !== undefined) E[E.length - 1].y = ae.fy - 420;
       spawnT = 40;
     }
     if (!ae.q.length && !E.some(e => !e.dying)) {
@@ -251,7 +259,8 @@ function levelTick() {
   }
   for (const e of E) if (e.x < CAM.x - 120) e.gone = 1; // bodies left behind as the trail scrolls on
   // the end of the level, or (the volcano) a moment after the boss falls at the rim
-  if (!ne && !ae && (lead > LV.len - 150 || (LV.esc && LV.fin && LV.go < 120))) levelClear();
+  // (the Skyscraper) a moment after the boss falls on the roof
+  if (!ne && !ae && (lead > LV.len - 150 || ((LV.esc || LV.shaft) && LV.fin && LV.go < 120))) levelClear();
 }
 function fmtT(fr_) {
   const s = Math.floor(fr_ / 60);
@@ -404,6 +413,9 @@ function levelCamUp(alive) {
     tz = 1;
   if (alive.length && CAM.x + W > x0 && CAM.x < x1) {
     let top = Math.min(...alive.map(p => p.y)) - 110; // headroom above the highest player
+    // up the Skyscraper, a floor's ambush shows its shut hatch (city.js)
+    const af = LV.shaft && LV.encs.find(e => e.st === 1 && e.fy !== undefined && e.fy !== LV.shaft.roof);
+    if (af) top = Math.min(top, af.fy - SHAFT_CEIL - 40);
     // the volcano's climb out: a jump doesn't lift the bottom of the view (it stays where you took off from)
     const foot = p => {
       if (!LV.esc || p.y >= p.gy - 1 || CAM_FOOT[p.slot] === undefined) CAM_FOOT[p.slot] = p.y;

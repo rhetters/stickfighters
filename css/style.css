@@ -344,14 +344,17 @@ body:not(.padnav) :focus {
 .editing #rh.on {
   display: block;
 }
+/* the layout editor's panel floats in the middle of the screen, so the controls at the top (POSE) and bottom stay
+   reachable */
 #layed {
   position: absolute;
   z-index: 7;
-  left: 0;
-  right: 0;
-  top: 0;
+  left: 4%;
+  right: 4%;
+  top: 20%;
   background: rgba(255, 248, 238, 0.97);
-  border-bottom: 3px solid #1c1626;
+  border: 3px solid #1c1626;
+  border-radius: 10px;
   color: #1c1626;
   padding: 6px 8px;
   font:
@@ -1406,29 +1409,10 @@ body.padnav #ui select:focus {
   background: #1c1626;
   border: 0;
 }
-/* Pose wheel touch button: hold it, aim with the stick, let go */
-#posebtn {
-  position: absolute;
-  z-index: 4;
-  left: calc(50% + 34px);
-  top: 11%;
-  height: 40px;
-  padding: 0 10px;
-  border-radius: 20px;
-  border: 3px solid #1c1626;
-  background: rgba(255, 248, 238, 0.85);
-  font:
-    900 11px Impact,
-    sans-serif;
-  color: #1c1626;
-  display: none;
-  touch-action: none;
-}
-.playing.touch-on #posebtn {
-  display: block;
-}
+/* Pose wheel touch button (a touch control like the others: hold it, aim with the stick, let go) */
 #posebtn.on {
   background: #ffd400;
+  color: #1c1626;
 }
 .chtab i {
   display: inline-block;

@@ -25,6 +25,10 @@
 //   descent  the biome opens with a climb down: ledges stepping down from the rim over a lava pool
 //   drive    1 = everyone drives a car here (cars.js): one of the car models, picked from the seed, in each player's
 //            colour. They can't be hurt in it; driving into enemies sends them flying.
+//   shaft    1 = in a story the place is one climb straight up (city.js builds it): a street, then fire-escape
+//            platforms and ladders one screen wide, an ambush on each floor (a hatch above stays shut until it's won)
+//            and the main boss on the roof. `fights` is the number of floors; `w` is unused. In your own levels it's
+//            an ordinary place at street level.
 const BIOMES = {
   woods: {
     name: 'WOODED TRAIL',
@@ -377,15 +381,15 @@ const BIOMES = {
     name: 'THE SKYSCRAPER',
     look: 'tower',
     props: [
-      ['acunit', 3],
-      ['pottedplant', 2],
-      ['satdish', 1],
-      ['watertank', 1],
-      ['antenna', 1]
+      ['pottedplant', 3],
+      ['bench', 2],
+      ['streetlamp', 2],
+      ['newsbox', 1],
+      ['hydrant', 1]
     ],
     w: [1600, 1900],
-    fights: 4,
-    climb: [0.16, 0.32],
+    fights: 3,
+    shaft: 1,
     mix: [
       { at: 5, w: { g: 3, u: 2, f: 2, b: 2, r: 1 } },
       { at: 6, w: { g: 2, u: 3, f: 2, b: 2, r: 1 } }
@@ -514,7 +518,7 @@ const THEMES = {
     }
   },
   city: {
-    name: 'THE CITY',
+    name: 'CITY',
     c: '#ffb400',
     biomes: ['burbs', 'city', 'tower'],
     boss: {
