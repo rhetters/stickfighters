@@ -83,6 +83,30 @@ Pink Kong on the iPad.
 
 **Done when:** the City story plays through on the iPad, solo, locally and online, and the kids enjoy the drive.
 
+### Ron's notes (November 26), to work on next
+Not yet planned into milestones.
+1. **Leftovers after playing your own level online:** after playing one of Rhett's levels together and backing out,
+   the red NO XP OR NINJA STARS sticker stays on the MULTIPLAYER screen and a scroll bar appears. Beating his level
+   showed the old results screen (orange text), not the new victory screen; Ron thinks one other place does this too.
+2. **House builder furniture:** more for each room (bathroom, bedroom, living room, dining room, attic, kitchen…),
+   and a redeemable decoration: a big pink stuffed teddy bear (code heart-heart-heart-heart).
+3. **Cars:** a double jump; while surging, the car's outline glows, not the driver's.
+4. **Cars in your own levels:** on a City level, reaching the boss took everyone out of their cars and put them
+   into new ones.
+5. **Using furniture:** Punch or Kick by a piece of furniture uses it where that makes sense (chair: sit, bed: lie
+   down…); Punch or Kick again gets up.
+6. **House barriers:** walking under one needs 3 blocks of room; it should be 2 (a door is 2 high). Test it.
+7. **Versus and Arcade stages:** about five stage layouts inspired by the best-liked fighting-game stages (their
+   shapes: platforms, edges, walls; our own look).
+8. **A unicorn pet**, as cute as the others.
+9. **Character screen:** DELETE THIS FIGHTER moves under the polaroid and stays there on every page, not only BODY.
+10. **Colours, redone:** COLORS shows 8 tiles (2 rows of 4: Body, Head, Neck, Upper Body | Lower Body, Surge,
+    Poses, Pets), each showing what you're wearing. Tapping one shows that item at the top (tap it to pick another
+    item you own) and below it every colour you can buy for that item. The colours are the same list everywhere, but
+    each is bought per item: a blue ball cap and a blue ninja mask are two purchases. Surges become recolourable
+    effects (lightning, ink; Ice as clear crystal snowflakes, Heart as see-through hearts). Needs a save change
+    (version and migration).
+
 ### M11.5 · Rollback for online play (suggested before Steam)
 
 - Why: Versus at 58 ping felt laggy in the first real test. The direct-connection patch halved the delay; rollback removes most of the rest.
