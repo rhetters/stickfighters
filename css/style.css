@@ -3589,3 +3589,9 @@ body.big .screen p {
   color: #1c1626;
   letter-spacing: 0.5px;
 }
+/* A controller on your READY button: it holds still (bigger) so the highlight rings around it show plainly; the
+   pulse's glow would hide them */
+body.padnav .polar .pready.mine:focus {
+  animation: none;
+  transform: rotate(-10deg) scale(1.15);
+}
