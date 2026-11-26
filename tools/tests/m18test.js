@@ -130,4 +130,7 @@ await G.evaluate(()=>netSetTeam(NET.mySlot));await G.waitForTimeout(500);ok(awai
 await G.evaluate(()=>netSetTeam(NET.mySlot));await G.waitForTimeout(500);await H.evaluate(()=>netStart());await H.waitForTimeout(1500);
 ok(await G.evaluate(()=>MODE===VERSUS&&VS.teams&&new Set(PL.map(p=>p.team)).size===2),'the match starts as teams on every device');
 srv.kill();
+// the Big Pink Teddy: a secret decoration from the chest code heart, heart, heart, heart
+const td=await ev("(()=>{const hid=()=>{openHouse();HS.tab='hdecor';housePal();return ![...document.querySelectorAll('#hs-pal *')].some(e=>/Teddy/.test(e.textContent))};const before=!owns('hd-teddy')&&hid();openTitle();openCodes();CD.code=[2,2,2,2];const got=redeemCode()&&owns('hd-teddy');$('cd-pop').hidden=true;const after=!hid();HOUSE.items.push({id:'hd-teddy',x:5,y:0});houseSave();return {before,got,after}})()");
+ok(td.before&&td.got&&td.after,'four hearts in the chest gives the Big Pink Teddy, which shows in DECORATIONS only once you have it '+JSON.stringify(td));
 ok(errs.length===0,'no errors '+errs.join(' | '));console.log(fails?fails+' FAILED':'ALL PASS');await b.close()})();

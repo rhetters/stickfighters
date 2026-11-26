@@ -320,6 +320,57 @@ function houseThing(it, x, y, w, h) {
     ctx.restore();
     ctx.stroke();
     houseBox(cx - w * 0.16, b - h * 0.16 + bob, w * 0.32, h * 0.15, '#a96e3a');
+  } else if (k === 'teddy') {
+    // a big stuffed bear sitting up: legs out front, round tummy with a heart, arms, head with ears and a muzzle
+    const u = Math.min(w, h),
+      cx = x + w / 2,
+      teddy = (ex, ey, rx, ry, col) => {
+        ctx.fillStyle = col;
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(ex, ey, rx, ry, 0, 0, 7);
+        ctx.fill();
+        ctx.stroke();
+      };
+    teddy(cx - u * 0.3, b - u * 0.24, u * 0.13, u * 0.17, c); // arms
+    teddy(cx + u * 0.3, b - u * 0.24, u * 0.13, u * 0.17, c);
+    teddy(cx, b - u * 0.3, u * 0.3, u * 0.28, c); // tummy
+    teddy(cx, b - u * 0.28, u * 0.17, u * 0.16, '#ffe0ef');
+    teddy(cx - u * 0.24, b - u * 0.08, u * 0.15, u * 0.09, c); // feet
+    teddy(cx + u * 0.24, b - u * 0.08, u * 0.15, u * 0.09, c);
+    teddy(cx - u * 0.24, b - u * 0.08, u * 0.07, u * 0.05, c2);
+    teddy(cx + u * 0.24, b - u * 0.08, u * 0.07, u * 0.05, c2);
+    const hy = b - u * 0.7;
+    teddy(cx - u * 0.2, hy - u * 0.18, u * 0.09, u * 0.09, c); // ears
+    teddy(cx + u * 0.2, hy - u * 0.18, u * 0.09, u * 0.09, c);
+    teddy(cx - u * 0.2, hy - u * 0.18, u * 0.045, u * 0.045, c2);
+    teddy(cx + u * 0.2, hy - u * 0.18, u * 0.045, u * 0.045, c2);
+    teddy(cx, hy, u * 0.24, u * 0.21, c); // head
+    teddy(cx, hy + u * 0.07, u * 0.1, u * 0.075, '#ffe0ef'); // muzzle
+    ctx.fillStyle = INK;
+    for (const dx of [-0.09, 0.09]) {
+      ctx.beginPath();
+      ctx.arc(cx + dx * u, hy - u * 0.03, u * 0.025, 0, 7);
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.ellipse(cx, hy + u * 0.045, u * 0.035, u * 0.025, 0, 0, 7);
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, hy + u * 0.07, u * 0.035, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+    // a heart on the tummy
+    const hx = cx,
+      hyy = b - u * 0.3,
+      r = u * 0.06;
+    ctx.fillStyle = '#e8212b';
+    ctx.beginPath();
+    ctx.moveTo(hx, hyy + r * 1.3);
+    ctx.bezierCurveTo(hx - r * 2, hyy, hx - r, hyy - r * 1.3, hx, hyy - r * 0.4);
+    ctx.bezierCurveTo(hx + r, hyy - r * 1.3, hx + r * 2, hyy, hx, hyy + r * 1.3);
+    ctx.fill();
   } else if (k === 'trophy') {
     houseBox(x + w * 0.3, b - h * 0.15, w * 0.4, h * 0.13, '#8a5a33');
     houseBox(x + w * 0.45, y + h * 0.48, w * 0.1, h * 0.4, c);

@@ -351,7 +351,8 @@ function housePal() {
       );
     }
   if (HS.tab === 'hfurn' || HS.tab === 'hdecor')
-    for (const it of ITEMS.filter(i => i.sec === HS.tab)) {
+    // a secret (a chest code) shows only once you have it
+    for (const it of ITEMS.filter(i => i.sec === HS.tab && !(i.how && i.how.code && !owns(i.id)))) {
       const can = !!it.price || owns(it.id);
       card(
         HS.item === it.id,

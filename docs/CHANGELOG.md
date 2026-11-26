@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## The Big Pink Teddy (November 26, 2026)
+- A new secret house decoration: the **Big Pink Teddy**, a big stuffed pink bear with a heart on its tummy (2 by 2 squares). Enter heart, heart, heart, heart in the treasure chest on the Character screen; then it's in the house builder's DECORATIONS, free to place.
+- Secret house items stay out of the DECORATIONS list until you have them, like secret store items.
+- Version 77.
+
 ## The Skyscraper climbs straight up, and fixes (November 26, 2026)
 Ron's notes after trying the City.
 - **The Skyscraper is now one climb straight up.** From the street you jump up fire-escape platforms (each overlaps the one below, so a jump straight up always works) or take a ladder with Up, and the camera rises with you: the city sinks away below, clouds drift past and the sky turns toward evening. On each of three floors the pink army ambushes you, and a locked hatch above stays shut until you win. Pink Kong leaps onto the roof at the top, and his air conditioners land on the roof. A KO continues on the last floor you won. (In your own levels the Skyscraper is still a place at street level.)

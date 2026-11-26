@@ -88,8 +88,8 @@ Not yet planned into milestones.
 1. **Leftovers after playing your own level online:** after playing one of Rhett's levels together and backing out,
    the red NO XP OR NINJA STARS sticker stays on the MULTIPLAYER screen and a scroll bar appears. Beating his level
    showed the old results screen (orange text), not the new victory screen; Ron thinks one other place does this too.
-2. **House builder furniture:** more for each room (bathroom, bedroom, living room, dining room, attic, kitchen…),
-   and a redeemable decoration: a big pink stuffed teddy bear (code heart-heart-heart-heart).
+2. **House builder furniture:** more for each room (bathroom, bedroom, living room, dining room, attic, kitchen…).
+   (The Big Pink Teddy, code heart-heart-heart-heart, is done: version 77.)
 3. **Cars (a feel-good place):** a double jump; while surging, the car's outline glows, not the driver's. Punch
    bumps the front of the car up briefly, as if punching with the hood; Kick does the same with the back. Ramming
    while surging does extra damage as well as going faster, and punching or kicking with the car does extra damage.
