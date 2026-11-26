@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## READY with a controller (November 25, 2026)
+- With a controller on your READY button it stops pulsing and grows a little, so the yellow-and-dark highlight ring every menu uses shows plainly around it, yellow or green (the pulse's glow hid it).
+- Version 74.
+
 ## READY where the tick goes (November 25, 2026)
 - Ron's note: your own card's button now sits where the green tick goes and is a yellow, pulsing READY? until you tap it, then a green, still READY, a little smaller. (In the photo's corner it overlapped your fighter.)
 - Version 73.
