@@ -356,7 +356,10 @@ const AMB_LOOK = {
   rocket: { bed: ['lowpass', 90, 0.1, 0.02], ev: 'beep' },
   moon: { bed: ['lowpass', 150, 0.04, 0.05], ev: null },
   ash: { bed: ['bandpass', 700, 0.08, 0], puff: 1, ev: 'rumble' },
-  crater: { bed: ['lowpass', 200, 0.09, 0.05], ev: 'bubble' }
+  crater: { bed: ['lowpass', 200, 0.09, 0.05], ev: 'bubble' },
+  burbs: { bed: ['bandpass', 550, 0.05, 0], puff: 1, ev: 'bird' },
+  city: { bed: ['lowpass', 260, 0.08, 0.04], ev: 'honk' },
+  tower: { bed: ['bandpass', 850, 0.1, 0], puff: 1, ev: 'honk' }
 };
 function ambLook() {
   if (state !== 'play' || !MODE || MODE.id !== 'level' || !LV) return null;
@@ -380,7 +383,12 @@ function ambEvent(k, t) {
   else if (k === 'creak') sweep(t, 180, 140, 0.5, 0.05, 'sawtooth', filt('lowpass', 500, o));
   else if (k === 'beep') ping(t, r < 0.5 ? 1320 : 880, 0.12, 0.02, 'square', o);
   else if (k === 'rumble') sweep(t, 60, 40, 1.2, 0.12, 'sine', o);
-  else if (k === 'bubble') for (let i = 0; i < 3; i++) sweep(t + i * 0.08, 120 + Math.random() * 80, 260, 0.07, 0.07, 'sine', o);
+  else if (k === 'honk') {
+    // a car horn somewhere down the street
+    const f = 330 + r * 140;
+    ping(t, f, 0.18, 0.02, 'square', filt('lowpass', 1200, o));
+    if (r < 0.5) ping(t + 0.24, f, 0.14, 0.015, 'square', filt('lowpass', 1200, o));
+  } else if (k === 'bubble') for (let i = 0; i < 3; i++) sweep(t + i * 0.08, 120 + Math.random() * 80, 260, 0.07, 0.07, 'sine', o);
 }
 function ambTick() {
   const look = ambLook(),

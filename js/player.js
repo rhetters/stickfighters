@@ -284,6 +284,7 @@ function updP(f) {
     if (f.t % 2 === 0) ghost(f, '#ffd400');
   }
   if (f.comboT > 0 && --f.comboT === 0) f.combo = 0;
+  if (f.car && f.st !== 'dead') return carTick(f, I); // driving (cars.js)
   let tp = f.pose,
     k = 0.3;
   if (f.st === 'dead') {

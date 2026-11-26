@@ -111,6 +111,13 @@ moment, so the next hit can land; a string stops after 2 / 3 / 4 hits (Easy / No
 player's health, or when a hit knocks them down. Any other hit gives the usual safe time. No enemy has a string yet:
 they're for the theme enemies to come. The rules for making enemies are at the top of data/enemies.js.
 
+**Thrown things:** an enemy move with `drop` (and `dropAt`, the frame it lets go) throws something that lands a
+moment later where the enemy was aiming, with a shadow first, through the falling rocks (`LV.rk`): Pink Kong's Air
+Conditioner Throw. His Chest Pound pushes back anyone close in front.
+
+**Cars** (The City's Downtown): a car hitting an enemy at speed launches it, harder with the turbo; players in cars
+can't be hurt.
+
 ## G. Grab and throw (Punch + Kick together)
 
 | Input | Move | Animation output | Effect |

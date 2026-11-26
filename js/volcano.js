@@ -850,7 +850,21 @@ function drawVolcanoFront() {
   if (LV.rk)
     for (const r of LV.rk.list)
       lifted(r.x, () => {
-        if (r.t < ROCK_T) {
+        if (r.k === 'ac') {
+          // Pink Kong's air conditioner (city.js): a dark shadow growing where it will land, then down it comes
+          const k = Math.min(1, r.t / ROCK_T);
+          if (r.t < ROCK_T) {
+            ctx.fillStyle = `rgba(28,22,38,${0.15 + 0.3 * k})`;
+            ctx.beginPath();
+            ctx.ellipse(r.x, G + 6, 14 + k * 26, 4 + k * 5, 0, 0, 7);
+            ctx.fill();
+            if (k > 0.45) drawDropAC(r.x, G + 6 - (600 * (1 - k)) / 0.55, false);
+          } else {
+            ctx.globalAlpha = Math.max(0, 1 - (r.t - ROCK_T) / 40);
+            drawDropAC(r.x, G + 6, true);
+            ctx.globalAlpha = 1;
+          }
+        } else if (r.t < ROCK_T) {
           // the glowing mark where it will land, and the rock coming down
           const k = r.t / ROCK_T;
           ctx.strokeStyle = `rgba(255,90,31,${0.4 + 0.5 * Math.abs(Math.sin(r.t * 0.25))})`;

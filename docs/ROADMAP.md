@@ -28,6 +28,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M16 | Polish, audio, balance | Done | L | M8–M15 | Music for every theme and boss, a full sound pass, difficulty choices, a balance pass, a first-play tutorial, a picture-menu character screen |
 | M17 | Level creator | Next | L | M8, M13 | Rhett builds levels and plays them alone, locally or online |
 | M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
+| M19 | The City | Next | L | M13, M15 | A sixth story: the suburbs, a car smash through the city streets, and the climb up a skyscraper to Pink Kong |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
@@ -62,6 +63,23 @@ Built (versions 63 to 66, see the CHANGELOG): all of the above. Still to do: Rhe
 
 **Done when:** Rhett builds a level with a few places and a boss on the iPad, and plays it from MY LEVELS alone, on
 Local and online.
+
+### M19 · The City
+
+Asked by Ron and Rhett (November 26). A sixth story, CITY, after the Volcano:
+- **Suburban Street** (first place): houses, picket fences, mailboxes, lawns.
+- **Downtown** (second place): everyone starts in a car (ten models, picked at random from the run's seed, painted
+  in each player's colour) and is locked in it for the whole place. Left and right drive, jump hops, attack honks a
+  turbo burst. Driving into the pink army sends them flying (ragdolls, bodies bowling into others); cars can't be
+  hurt. Fights and rewards as usual (not more enemies than any place).
+- **The Skyscraper** (last place): out of the cars at the tower's door, then the climb up its fire escapes to the
+  roof, where **Pink Kong** waits: chest pounds, roof-shaking leaps, air-conditioner units thrown down on you.
+- New transitions: the car park (into Downtown: everyone gets in) and the screech stop (into the Skyscraper:
+  everyone hops out). Songs, mini-bosses, scenery, the level creator's places and boss, and the Story screen's tile.
+
+Built (version 75, see the CHANGELOG): all of the above. Still to do: the kids try the drive and Pink Kong on the iPad.
+
+**Done when:** the City story plays through on the iPad, solo, locally and online, and the kids enjoy the drive.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 

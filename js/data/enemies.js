@@ -6,6 +6,8 @@
 //     ef     how the player reacts, from the move's row in the Combat chart (INFO, data/moves.js): 'stagger' (stunned,
 //            pushed back; a move without a row), 'push' (pushed farther), 'pop' (popped up a little), 'trip' (feet
 //            swept: down), 'kd' (knocked down), 'launch', 'splat' or 'bounce' (sent flying)
+//     drop   a thing thrown that falls on the target from above (Pink Kong's air conditioners: 'ac'), dropAt frames
+//            into the move; it lands where the target was, after a shadow warns (city.js)
 //     chain  1 = more of the same enemy's combo string comes after this hit: the player is only safe for a moment
 //            (STR_INV), so the next hit can land, up to the difficulty's str hits and strDmg damage (data/difficulty.js)
 //   Add a new engine flag only when no existing one can say it, and write it here.
@@ -120,6 +122,42 @@ const EA = {
       [0.3, [-20, -40, 90, -50, 90, 40, 70, -30, 60, 0]],
       [0.35, [38, 60, 40, -40, 60, 60, 40, -60, 20, 0]],
       [0.8, [38, 60, 40, -40, 60, 60, 40, -60, 20, 0]],
+      [1, IDLE]
+    ]
+  },
+  // Pink Kong's chest pound: a roar that blasts everyone in front of him back
+  kpound: {
+    d: 64,
+    h: [34, 38],
+    dmg: 6,
+    r: 200,
+    kb: 11,
+    lift: -4,
+    boss: 1,
+    k: [
+      [0, IDLE],
+      [0.15, [0, 40, 150, -40, 150, 25, 30, -25, 30, 0]],
+      [0.3, [0, -30, 140, 30, 140, 25, 30, -25, 30, 0]],
+      [0.45, [0, 40, 150, -40, 150, 25, 30, -25, 30, 0]],
+      [0.55, [-10, 120, 20, 70, 20, 30, 25, -30, 25, 0]],
+      [1, [-10, 120, 20, 70, 20, 30, 25, -30, 25, 0]]
+    ]
+  },
+  // Pink Kong lifts an air conditioner over his head and throws it: it comes down on whoever he aimed at
+  kthrow: {
+    d: 56,
+    h: [99, 99],
+    dmg: 0,
+    r: 0,
+    kb: 0,
+    drop: 'ac',
+    dropAt: 30,
+    boss: 1,
+    k: [
+      [0, IDLE],
+      [0.35, [-12, 170, 10, 170, 10, 20, 25, -20, 25, 0]],
+      [0.55, [-12, 170, 10, 170, 10, 20, 25, -20, 25, 0]],
+      [0.7, [20, 60, 10, 50, 10, 30, 25, -30, 25, 0]],
       [1, IDLE]
     ]
   },
@@ -518,6 +556,81 @@ const T = {
     boss: 'MAGMA MUNCHER',
     ai: 'boss'
   },
+  // The City's mini-bosses
+  mq: {
+    hp: 200,
+    s: 1.85,
+    spd: 1,
+    col: '#d04a8a',
+    d2: '#922f60',
+    atk: 'cslam',
+    cd: 80,
+    sc: 300,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'GRUMPY NEIGHBOR',
+    ai: 'boss'
+  },
+  mz: {
+    hp: 220,
+    s: 1.85,
+    spd: 1.1,
+    col: '#e04f86',
+    d2: '#a0345f',
+    atk: 'cslam',
+    cd: 70,
+    sc: 320,
+    ar: 90,
+    stop: 70,
+    m: 3.6,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 105,
+    boss: 'TRAFFIC TITAN',
+    ai: 'boss'
+  },
+  my: {
+    hp: 230,
+    s: 1.85,
+    spd: 1.1,
+    col: '#c94a86',
+    d2: '#8a2f5c',
+    atk: 'cslam',
+    cd: 70,
+    sc: 320,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 105,
+    boss: 'WINDOW WASHER',
+    ai: 'boss'
+  },
+  // Pink Kong: a giant pink gorilla on the skyscraper's roof
+  N: {
+    hp: 650,
+    s: 2.25,
+    spd: 1.2,
+    col: '#e0408a',
+    d2: '#a02a62',
+    atk: 'cslam',
+    cd: 56,
+    sc: 1800,
+    ar: 110,
+    stop: 80,
+    m: 5.2,
+    fr: 0.62,
+    bnc: 0.15,
+    poise: 160,
+    boss: 'PINK KONG',
+    look: { head: 1.2, full: 1, lw: 10, stance: 'low', fur: ['#c2357a', '#a02a62'], extra: ['furbody', 'apeface'] },
+    ai: 'boss'
+  },
   K: {
     hp: 600,
     s: 2,
@@ -652,7 +765,11 @@ const TNAME = {
   mj: 'Jungle Jumbo',
   ma: 'Ash Brute',
   mv: 'Magma Muncher',
-  K: 'The Pink Tiki'
+  K: 'The Pink Tiki',
+  mq: 'Grumpy Neighbor',
+  mz: 'Traffic Titan',
+  my: 'Window Washer',
+  N: 'Pink Kong'
 };
 // How to beat each type, shown in the training Info panel (I)
 const TTIP = {
@@ -681,7 +798,11 @@ const TTIP = {
   mj: 'JUNGLE JUMBO (jungle mini-boss): lure it onto a steam vent, then juggle it',
   ma: 'ASH BRUTE (slopes mini-boss): watch for falling lava rocks and let them hit it',
   mv: 'MAGMA MUNCHER (crater mini-boss): it follows you up the ledges; knock it into the lava',
-  K: 'THE PINK TIKI: bursts out of the lava, three phases. At his last bit of health the lava rises: climb out and finish him at the rim'
+  K: 'THE PINK TIKI: bursts out of the lava, three phases. At his last bit of health the lava rises: climb out and finish him at the rim',
+  mq: 'GRUMPY NEIGHBOR (suburbs mini-boss): tough poise; heavy hits and throws',
+  mz: 'TRAFFIC TITAN (downtown mini-boss): it takes a few car hits. Turbo into it',
+  my: 'WINDOW WASHER (skyscraper mini-boss): tough poise; knock it down the stairs',
+  N: 'PINK KONG: leaps onto the roof, three phases. His chest pound blasts you back; jump his quake leaps; dodge the air conditioners he throws (watch for the shadow)'
 };
 for (const o of [A, EA])
   for (const k in o) {

@@ -814,7 +814,8 @@ function cineTick() {
       LV.say = null;
       cineEnd();
     }
-  } else volcanoCine(c, t, ps); // the geyser, the jump into the crater, the Tiki's entrance and last stand
+  } else if (!cityCine(c, t, ps)) volcanoCine(c, t, ps); // the City's car park and tower door (city.js); the geyser, the
+  // jump into the crater, the Tiki's entrance and last stand
 }
 // A boss or mini-boss arrives as its fight starts (level.js calls this instead of dropping it in)
 function bossArrive(ne) {
@@ -854,7 +855,7 @@ function drawCine() {
   else if (c.k === 'landing' && c.lx !== undefined) drawRocket(c.lx, G + 6 + c.ly, c.ly < 0);
   else if (c.k === 'beam' && c.ux !== undefined) drawSaucer(c.ux, c.uy, c.beam ? c.e : null);
   else if (c.k === 'catapult' && c.t < 100) drawCatBowl(c.tr.x, c.t);
-  else drawVolcanoCine(c);
+  else if (!drawCityCine(c)) drawVolcanoCine(c);
 }
 // Speech bubble over whoever is talking (world space, drawn by render.js after the fighters)
 function drawSay() {

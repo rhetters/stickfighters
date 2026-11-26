@@ -640,6 +640,7 @@ function drawBiomeProp(p, x) {
   else if (drawMountainPropDone(k, x, s)) return;
   else if (drawSpacePropDone(k, x, s)) return;
   else if (drawVolcanoProp(k, x, s)) return;
+  else if (drawCityProp(k, x, s)) return;
   else if (k === 'trans-pipe' || k === 'trans-pipeout') drawBigPipe(x, k === 'trans-pipeout');
   else if (k === 'trans-rope') drawChasm(x);
   else if (k === 'trans-gate') {

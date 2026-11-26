@@ -19,7 +19,7 @@ const ED_ROWS = 5; // platforms go 1 to 5 squares above the ground
 // The pink army types you can place (and each place's own mini-boss, BIOMES[b].mini.t)
 const ED_FOES = ['g', 'r', 'u', 'b', 'f', 'c'];
 // The main bosses you can put at the end of a level (each story's boss; they arrive the way they do in their story)
-const ED_BOSSES = ['G', 'P', 'Y', 'Z', 'K'];
+const ED_BOSSES = ['G', 'P', 'Y', 'Z', 'K', 'N'];
 // Scenery layers, back to front: far background (small and drifting slower), background, foreground (in front of the
 // fighters; see-through while someone is behind it)
 const ED_LAYERS = [
@@ -38,5 +38,7 @@ const ED_PLAT = {
   base: 'metal',
   rocket: 'metal',
   moon: 'metal',
-  crater: 'rock'
+  crater: 'rock',
+  city: 'metal',
+  tower: 'metal'
 };

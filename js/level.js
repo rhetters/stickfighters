@@ -162,6 +162,7 @@ function hurtGate(g, d) {
 function levelTick() {
   LV.t++;
   reviveTick();
+  carsTick(); // cars in Downtown, none anywhere else (cars.js)
   if (LV.go > 0) LV.go--;
   if (LV.cine) {
     // a scene is playing (run.js): it moves the players; fights and the camera wait

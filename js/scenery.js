@@ -318,8 +318,10 @@ function drawProp(p, x, dk) {
     }
   } else if (p.k === 'sign' || p.k === 'arch') {
     const arch = p.k === 'arch',
-      hw = arch ? 110 : 66,
       top = arch ? gy - 190 : gy - 100;
+    // the board grows to fit a long name
+    ctx.font = '900 ' + (arch ? 18 : 15) + 'px Impact,"Arial Black",sans-serif';
+    const hw = Math.max(arch ? 110 : 66, ctx.measureText(p.t + (arch ? '  →' : '')).width / 2 + 10);
     ctx.strokeStyle = INK;
     ctx.lineWidth = 4;
     ctx.fillStyle = '#e3d4c1';
@@ -335,7 +337,6 @@ function drawProp(p, x, dk) {
     ctx.fill();
     ctx.stroke();
     ctx.fillStyle = INK;
-    ctx.font = '900 ' + (arch ? 18 : 15) + 'px Impact,"Arial Black",sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(p.t + (arch ? '  →' : ''), x, top + 11);

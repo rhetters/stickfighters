@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## The City (November 26, 2026)
+A sixth story, asked for by Ron and Rhett.
+- **Suburban Street:** houses, picket fences, hedges, mailboxes, hydrants; the Grumpy Neighbor is its mini-boss.
+- **Downtown:** everyone walks into a car park and drives out in a car picked at random from ten models (hatchback, sedan, sports car, pickup, van, jeep, taxi, ice cream truck, monster truck, bug), painted in their own colour. You stay in it all through Downtown and can't be hurt. Drive into the pink army to send them flying; Jump hops the car, Punch or Kick is a turbo with a honk. Fights and rewards as usual. The Traffic Titan is its mini-boss.
+- **The Skyscraper:** everyone parks, hops out and runs in, then climbs the fire escape to the roof, where **Pink Kong** jumps in: Chest Pound pushes you back, and from a distance he throws air conditioners that land where his shadow-mark is. The Window Washer is the mini-boss on the way up.
+- Songs for the three places and both scenes, city sounds, the Story screen's picture (the stories now page, five at a time), and the three places and Pink Kong in the level creator.
+- Long place names fit on their signs.
+- Version 75.
+
 ## READY with a controller (November 25, 2026)
 - With a controller on your READY button it stops pulsing and grows a little, so the yellow-and-dark highlight ring every menu uses shows plainly around it, yellow or green (the pulse's glow hid it).
 - Version 74.

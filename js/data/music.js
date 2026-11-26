@@ -425,6 +425,81 @@ const MUSIC = {
       }
     ]
   },
+  // Suburban Street: a sunny, bouncy Saturday morning, whistling down the sidewalk
+  burbs: {
+    bpm: 118,
+    prog: ['C', 'Am', 'F', 'G', 'C', 'Am', 'Dm', 'G'],
+    parts: [
+      { ins: 'bass', pat: 'R . . 5 . . R . R . . 5 . 8 . .' },
+      { ins: 'pluck', o: 4, v: 0.55, pat: '. . c . . . c . . . c . . . c c' },
+      { ins: 'drums', max: 0, v: 0.6, pat: 'k . . . s . . . k . . . s . . .' },
+      { ins: 'drums', lvl: 1, pat: 'k . h . s . h h k . h k s . h .' },
+      {
+        ins: 'flute',
+        v: 0.7,
+        mel: [
+          'E5 - G5 - C6 - - - B5 - A5 - G5 - - -',
+          'A5 - - - E5 - - - C5 - - - . . . .',
+          'F5 - A5 - C6 - - - A5 - G5 - F5 - - -',
+          'D5 - E5 - F5 - G5 - - - - - . . . .',
+          'E5 - G5 - C6 - - - D6 - C6 - B5 - - -',
+          'C6 - - - A5 - - - E5 - - - . . . .',
+          'F5 - - - A5 - - - D6 - C6 - A5 - - -',
+          'B5 - - - D6 - - - G5 - - - . . . .'
+        ]
+      }
+    ]
+  },
+  // Downtown: a funky driving groove, horns and a wah-wah bass, built for smashing through
+  city: {
+    bpm: 132,
+    prog: ['Em', 'Em', 'A', 'A', 'Em', 'Em', 'C', 'B7'],
+    parts: [
+      { ins: 'bass', pat: 'R . R 8 . R . 5 R . R . 8 . 5 .' },
+      { ins: 'organ', o: 4, v: 0.35, pat: '. c . c . c . c . c . c . c . c' },
+      { ins: 'drums', pat: 'k . h k s . h . k k h . s . h h' },
+      { ins: 'brass', lvl: 1, o: 4, v: 0.45, pat: 'c . . c . . c . . . . . c - . .' },
+      {
+        ins: 'lead',
+        v: 0.6,
+        mel: [
+          'E5 - G5 - E5 - D5 - E5 - - - B4 - - -',
+          'E5 - G5 - A5 - G5 - E5 - - - . . . .',
+          'A5 - - - C#6 - - - B5 - A5 - E5 - - -',
+          'F#5 - E5 - C#5 - - - A4 - - - . . . .',
+          'E5 - G5 - B5 - - - A5 - G5 - E5 - - -',
+          'G5 - A5 - B5 - D6 - E6 - - - . . . .',
+          'E6 - - - C6 - - - G5 - - - E5 - - -',
+          'D#5 - - - F#5 - - - B5 - - - . . . .'
+        ]
+      }
+    ]
+  },
+  // The Skyscraper: climbing higher and higher, a soaring tune with a ticking pulse
+  tower: {
+    bpm: 124,
+    prog: ['Dm', 'Bb', 'C', 'Dm', 'Dm', 'Bb', 'Gm', 'A'],
+    parts: [
+      { ins: 'bass', pat: 'R . . R . . R . R . . R . . 5 .' },
+      { ins: 'arp', o: 4, v: 0.35, pat: 'R 3 5 8 R 3 5 8 R 3 5 8 R 3 5 8' },
+      { ins: 'drums', max: 0, v: 0.7, pat: 'k . . . s . . . k . . . s . . .' },
+      { ins: 'drums', lvl: 1, pat: 'k . h . s . h k k . h . s . t t' },
+      {
+        ins: 'brass',
+        v: 0.55,
+        mel: [
+          'D5 - - - F5 - - - A5 - - - D6 - - -',
+          'C6 - Bb5 - A5 - - - F5 - - - . . . .',
+          'C5 - - - E5 - - - G5 - - - C6 - - -',
+          'A5 - - - - - - - . . . . . . . .',
+          'D6 - - - C6 - - - A5 - - - F5 - - -',
+          'F5 - G5 - A5 - Bb5 - D6 - - - . . . .',
+          'G5 - - - Bb5 - - - D6 - - - G6 - - -',
+          'E6 - - - C#6 - - - A5 - - - . . . .'
+        ]
+      }
+    ]
+  },
   // Every theme's boss: fast and driving, in a minor key
   boss: {
     bpm: 144,
@@ -701,6 +776,32 @@ const MUSIC = {
       { ins: 'marimba', mel: ['C5 C5 . . E5 . . G5 . . C6 . . . . .', 'B5 . C6 . E6 - - - . . . . . . . .'] },
       { ins: 'bass', pat: 'R . . . . . . R . . R . . . . .|R - - - . . . . . . . . . . . .' },
       { ins: 'drums', pat: 'B . b . B . b b B . b . B b b b|B . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // The car park: keys jingle, engines roar, and everyone drives off (honk honk!)
+  'tr-cars': {
+    bpm: 150,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['G', 'G'],
+    parts: [
+      { ins: 'brass', mel: ['G4 . B4 . D5 . G5 . . . D5 . G5 - - -', 'A5 . B5 - - - . . . . . . . . . .'] },
+      { ins: 'bass', pat: 'R . R . R . R . R . R . R - - -|R - - - . . . . . . . . . . . .' },
+      { ins: 'drums', pat: 'k . s . k . s . k k s . k s s s|B . . . . . . . . . . . . . . .' }
+    ]
+  },
+  // The Skyscraper's door: brakes squeal, doors slam, and look up... way up
+  'tr-park': {
+    bpm: 128,
+    once: 1,
+    sting: 1,
+    end: 26,
+    prog: ['Dm', 'Dm'],
+    parts: [
+      { ins: 'bell', mel: ['D5 . . F5 . . A5 . . D6 . . F6 - - -', 'E6 . F6 - - - . . . . . . . . . .'] },
+      { ins: 'bass', pat: 'R . . . R . . . R . . . R - - -|R - - - . . . . . . . . . . . .' },
+      { ins: 'drums', pat: 'k . . . s . . . k . k . s . t t|k . . . . . . . . . . . . . . .' }
     ]
   },
   // The rim: a deep breath, and jump into the crater
