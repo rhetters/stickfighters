@@ -93,6 +93,8 @@ Not yet planned into milestones.
 3. **Cars (a feel-good place):** a double jump; while surging, the car's outline glows, not the driver's. Punch
    bumps the front of the car up briefly, as if punching with the hood; Kick does the same with the back. Ramming
    while surging does extra damage as well as going faster, and punching or kicking with the car does extra damage.
+   ULT in a car does a move of that model's own: the monster truck pops a wheelie, the bug spins round and round
+   (360s), and so on for each of the ten.
 4. **Cars in your own levels:** on a City level, reaching the boss took everyone out of their cars and put them
    into new ones.
 5. **Using furniture:** Punch or Kick by a piece of furniture uses it where that makes sense (chair: sit, bed: lie
