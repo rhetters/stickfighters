@@ -2,6 +2,16 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## The Skyscraper climbs straight up, and fixes (November 26, 2026)
+Ron's notes after trying the City.
+- **The Skyscraper is now one climb straight up.** From the street you jump up fire-escape platforms (each overlaps the one below, so a jump straight up always works) or take a ladder with Up, and the camera rises with you: the city sinks away below, clouds drift past and the sky turns toward evening. On each of three floors the pink army ambushes you, and a locked hatch above stays shut until you win. Pink Kong leaps onto the roof at the top, and his air conditioners land on the roof. A KO continues on the last floor you won. (In your own levels the Skyscraper is still a place at street level.)
+- Holding **Surge** in a car drives faster, with flames.
+- The jeep's spare tyre is drawn from the side, like a tyre on a back door, not a circle.
+- The story's name is **CITY** (on the Multiplayer screen only "THE" fit).
+- The **POSE** button is centred at the top by default and can be moved and resized in Settings → Touch layout → Customize like every other button (saved layouts get it in its default place). The editor's panel now floats in the middle of the screen so the controls at the top can be reached.
+- Quakes and slams only hit fighters on the same level as the attacker.
+- Version 76.
+
 ## The City (November 26, 2026)
 A sixth story, asked for by Ron and Rhett.
 - **Suburban Street:** houses, picket fences, hedges, mailboxes, hydrants; the Grumpy Neighbor is its mini-boss.

@@ -80,9 +80,10 @@ function genRun(themeId, seed, ng = 0) {
     segs = [],
     trans = [],
     ramps = [],
-    terr = { s: [], w: [] },
+    terr = { s: [], w: [], c: [] },
     haz = { vents: [], pools: [] }; // the volcano's steam vents and lava pools (volcano.js)
-  let x = 0;
+  let x = 0,
+    shaft = null; // the Skyscraper's climb: where it is, its floors and roof
   // scenery for a chunk: a few props spread across it
   const scatter = (B, w, n) => {
     const props = [];
@@ -122,6 +123,43 @@ function genRun(themeId, seed, ng = 0) {
     if (B.descent) {
       const top = descentBuild(sign.x0, terr, haz);
       if (prev) prev.land = top; // the rim scene lands everyone on the top ledge
+    }
+    // a climb straight up (the Skyscraper, city.js): one screen-wide shaft of platforms and ladders, an ambush on
+    // each floor and the main boss on the roof. It ends the run.
+    if (B.shaft && last) {
+      const sh = chunk(B, bi, W, []),
+        L = shaftLayout(sh.x0, B.fights, R),
+        bs = th.boss,
+        at = { x: sh.x0 + W / 2, lock: sh.x0 };
+      terr.s.push(...L.s);
+      terr.c.push(...L.c);
+      L.fys.forEach((fy, k) => {
+        const lvl = base + Math.floor(k / 2) + ng,
+          mix = B.mix.filter(m => m.at <= lvl).pop() || B.mix[0],
+          list = [];
+        for (let i = 0, n = Math.min(8 + ng, 3 + Math.floor(k / 2) + bi + ng); i < n; i++) list.push(pickW(mix.w));
+        const e = { ...at, fy, lvl, max: 3 + Math.min(2, bi), list, st: 0, q: [] };
+        if (B.mini && R() < B.mini.chance * (1 + ng)) {
+          e.mini = B.mini.t;
+          e.line = B.mini.lines[ri(0, B.mini.lines.length - 1)];
+        }
+        encs.push(e);
+      });
+      encs.push({
+        ...at,
+        fy: L.roof,
+        lvl: base + 3,
+        max: 5,
+        list: bs.adds.slice(),
+        st: 0,
+        q: [],
+        boss: bs.t,
+        intro: bs.intro,
+        line: bs.lines[ri(0, bs.lines.length - 1)]
+      });
+      shaft = { x0: sh.x0, fys: L.fys, roof: L.roof };
+      seg.x1 = x;
+      return;
     }
     // 2. the fights
     for (let k = 0; k < B.fights; k++) {
@@ -269,6 +307,7 @@ function genRun(themeId, seed, ng = 0) {
     trans,
     ramps: ramps.length ? ramps : null,
     terr: terr.s.length ? terr : null,
+    shaft,
     haz: haz.vents.length || haz.pools.length ? haz : null,
     run: { theme: themeId, seed, ng },
     len: x,
@@ -760,14 +799,15 @@ function cineTick() {
     if (!c.land) {
       e.vy += 0.9;
       e.y += e.vy;
-      if (e.y >= G) {
-        e.y = G;
+      const gy = c.gy === undefined ? G : c.gy;
+      if (e.y >= gy) {
+        e.y = gy;
         e.vy = 0;
         c.land = t;
-        ring(e.x, G, 220);
-        ring(e.x, G, 120);
-        dust(e.x - 60, G, 8);
-        dust(e.x + 60, G, 8);
+        ring(e.x, gy, 220);
+        ring(e.x, gy, 120);
+        dust(e.x - 60, gy, 8);
+        dust(e.x + 60, gy, 8);
         shake = Math.max(shake, 16);
         camY += 8;
         sfx(50, 0.6, 'sine', 0.2);
@@ -840,9 +880,10 @@ function bossArrive(ne) {
     e.hide = 1;
     cineStart('beam', { e, line: ne.line });
   } else {
-    e.y = -280;
+    // leaps in from above the screen (up the Skyscraper, onto the floor of the fight)
+    e.y = (ne.fy === undefined ? G : ne.fy) - G - 280;
     e.vy = 0;
-    cineStart('jump', { e, line: ne.line });
+    cineStart('jump', { e, line: ne.line, gy: ne.fy === undefined ? G : ne.fy });
   }
 }
 // The moving basket or cabin of a balloon or gondola ride (world space, drawn over the riders so it hides their legs)

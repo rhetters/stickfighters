@@ -169,7 +169,7 @@ function terrainWalls(f, x0) {
 }
 // Drop through the surface you stand on (Down + Jump)
 function terrainDrop(f) {
-  if (f.gy >= G) return false;
+  if (f.gy >= G || (f.surf && f.surf.solid)) return false; // a solid floor (the Skyscraper's) can't be dropped through
   f.drop = 12;
   f.gy = G;
   f.surf = null;

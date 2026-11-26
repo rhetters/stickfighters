@@ -115,8 +115,10 @@ they're for the theme enemies to come. The rules for making enemies are at the t
 moment later where the enemy was aiming, with a shadow first, through the falling rocks (`LV.rk`): Pink Kong's Air
 Conditioner Throw. His Chest Pound pushes back anyone close in front.
 
-**Cars** (The City's Downtown): a car hitting an enemy at speed launches it, harder with the turbo; players in cars
-can't be hurt.
+**Cars** (the City's Downtown): a car hitting an enemy at speed launches it, harder with the turbo; holding Surge
+drives faster. Players in cars can't be hurt.
+
+**Area hits** (quakes, slams) only reach fighters standing on the same level as the attacker.
 
 ## G. Grab and throw (Punch + Kick together)
 

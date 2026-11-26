@@ -156,87 +156,377 @@ function drawCity() {
   groundLine();
 }
 // ===== THE SKYSCRAPER =====
-// The tower's wall is part of the climb: a window at height A above the street shows at G - A + (how high you've
-// climbed), so the windows slide down past you as you go up the fire escape.
-const TOWER_ROW = 120;
+// In a story it's a climb straight up (LV.shaft, built by shaftLayout below): the camera rises with you, so this look
+// follows the camera's height itself (CAM_OWN in biomes.js). The sky deepens toward evening as you climb, the city
+// sinks away below, clouds drift down past you, and the tower's wall (world space) has windows by the floor, a
+// painted number on each ambush floor, the lobby at the street and the roof at the top. In your own levels it's the
+// same wall at street level.
+const TOWER_STORY = 150, // one storey of windows
+  TOWER_EDGE = 70; // sky shows either side of the tower's wall in the shaft
 function drawTower() {
-  const cx = CAM.x,
-    up = slopeRef,
-    dy = Math.min(320, up * 0.35);
+  const S = LV.shaft,
+    hgt = Math.max(0, -CAM.y),
+    k = Math.min(1, hgt / 2400),
+    z = CAM.z;
   paperBg();
-  skyWash('#9cc8f0', '#eef5fb', 0.5);
-  // the city far below, sinking as you climb
-  layer(0.08, 100, 341, (x, r) => {
-    const h = 120 + r * 160;
-    ctx.fillStyle = 'rgba(150,160,185,0.3)';
-    ctx.fillRect(x - 30, G + 20 + dy - h, 60, h + 400);
-  });
-  // a cloud or two drifting by up here
-  layer(0.05, 420, 343, (x, r) => {
-    if (r < 0.4) return;
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  skyWash('#8fc2ee', '#eef5fb', 0.55);
+  if (k > 0) skyWash('#5d7fd0', '#ffc98e', 0.4 * k);
+  // the city far below, sinking as you climb (two layers, slow)
+  for (const [f, sp, seed, c, sink] of [
+    [0.05, 110, 351, 'rgba(150,160,190,0.35)', 0.22],
+    [0.12, 150, 353, 'rgba(120,130,165,0.4)', 0.4]
+  ])
+    layer(f, sp, seed, (x, r) => {
+      const h = 90 + r * 200,
+        b = G + 40 + hgt * sink * z;
+      if (b - h > H + 20) return;
+      ctx.fillStyle = c;
+      ctx.fillRect(x - 32, b - h, 64, h + 60);
+      ctx.fillStyle = 'rgba(255,243,176,0.5)';
+      for (let wy = b - h + 14; wy < Math.min(H + 10, b - 10); wy += 22)
+        for (const wx of [-18, 4]) if (hh(Math.round(x * 3 + wy)) > 0.6) ctx.fillRect(x + wx, wy, 10, 9);
+    });
+  // clouds drifting down past you as you rise
+  for (let j = 0; j < 6; j++) {
+    const y = ((j * 170 + hgt * 0.45) % 1020) - 200,
+      x = ((hh(j * 31 + 5) * 1400 - CAM.x * 0.03) % 1300) - 200;
+    if (hgt < 200 && y > G - 120) continue;
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
     ctx.beginPath();
-    ctx.ellipse(x, 90 + r * 60 + dy * 0.3, 60, 16, 0, 0, 7);
-    ctx.ellipse(x + 30, 80 + r * 60 + dy * 0.3, 36, 14, 0, 0, 7);
+    ctx.ellipse(x, y, 70, 18, 0, 0, 7);
+    ctx.ellipse(x + 36, y - 12, 40, 16, 0, 0, 7);
+    ctx.ellipse(x - 30, y - 6, 30, 12, 0, 0, 7);
     ctx.fill();
-  });
-  // the tower's wall: one panel per 200 px, rows of windows by height
-  const x0 = Math.floor((cx - 40) / 200) * 200;
-  for (let wx = x0; wx < cx + W + 200; wx += 200) {
-    const sx = wx - cx;
-    ctx.fillStyle = '#e6e1ea';
-    ctx.fillRect(sx, -30, 200, H + 60);
-    ctx.strokeStyle = 'rgba(110,100,125,0.5)';
+  }
+  // the tower and the street, in the world's view (raised and zoomed with the camera)
+  ctx.save();
+  camApply(viewX(), CAM.y, z);
+  const vx = viewX(),
+    vw = W / z,
+    top = G + CAM.y - G / z - 20,
+    bot = G + CAM.y + (H - G) / z + 20;
+  if (S) {
+    const a = S.x0 + TOWER_EDGE,
+      b = S.x0 + W - TOWER_EDGE;
+    towerWall(a, b, Math.max(S.roof, top), Math.min(G, bot), S.x0);
+    // the roof: water tank, aerial with a blinking light, a vent
+    if (S.roof > top - 300) towerRoof(S);
+    // the ambush floors' numbers, painted on the wall
+    S.fys.forEach((fy, i) => {
+      if (fy < top - 80 || fy > bot + 80) return;
+      ctx.fillStyle = 'rgba(28,22,38,0.55)';
+      ctx.font = '900 34px Impact,"Arial Black",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('FLOOR ' + (i + 1) * 20, S.x0 + W / 2, fy - 150);
+    });
+    // the lobby's doors at the street
+    if (G > top) towerLobby(S.x0 + W / 2);
+  } else towerWall(vx - 40, vx + vw + 40, Math.max(G - 1400, top), G, 0);
+  // the sidewalk and the road
+  if (bot > G) {
+    ctx.fillStyle = '#d9d5dc';
+    ctx.fillRect(vx - 40, G + 6, vw + 80, 26);
+    ctx.fillStyle = '#9a96a2';
+    ctx.fillRect(vx - 40, G + 32, vw + 80, 400);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(vx - 40, G + 6);
+    ctx.lineTo(vx + vw + 40, G + 6);
+    ctx.stroke();
+    ctx.strokeStyle = '#f2efe6';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    for (let x = Math.floor(vx / 120) * 120; x < vx + vw + 40; x += 120) {
+      ctx.moveTo(x, G + 70);
+      ctx.lineTo(x + 60, G + 70);
+    }
+    ctx.stroke();
+  }
+  // a floor's hatch, shut while its ambush is on: nobody climbs on until it's won
+  if (S)
+    for (const e of LV.encs)
+      if (e.fy !== undefined && e.fy !== S.roof && e.st === 1) towerHatch(S.x0, e.fy - SHAFT_CEIL);
+  ctx.restore();
+}
+// The tower's wall from x a to b, between heights y0 (top) and y1 (the street): storeys of windows between pillars
+function towerWall(a, b, y0, y1, ox) {
+  ctx.fillStyle = '#e9e4ee';
+  ctx.fillRect(a, y0, b - a, y1 - y0 + 6);
+  // the shaded corners and the pillars
+  ctx.fillStyle = 'rgba(110,100,130,0.18)';
+  ctx.fillRect(a, y0, 16, y1 - y0);
+  ctx.fillRect(b - 16, y0, 16, y1 - y0);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(a, y0);
+  ctx.lineTo(a, y1 + 6);
+  ctx.moveTo(b, y0);
+  ctx.lineTo(b, y1 + 6);
+  ctx.stroke();
+  const cols = Math.max(1, Math.round((b - a) / 190)),
+    cw = (b - a) / cols,
+    r0 = Math.floor((G - y1) / TOWER_STORY),
+    r1 = Math.ceil((G - y0) / TOWER_STORY);
+  for (let r = Math.max(1, r0); r <= r1; r++) {
+    const fy = G - r * TOWER_STORY; // this storey's floor line
+    if (fy < y0 - TOWER_STORY || fy > y1 + TOWER_STORY) continue;
+    ctx.strokeStyle = 'rgba(110,100,130,0.35)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(sx, -30);
-    ctx.lineTo(sx, H + 30);
+    ctx.moveTo(a, fy);
+    ctx.lineTo(b, fy);
     ctx.stroke();
-    const r0 = Math.floor((up - 80) / TOWER_ROW) - 1;
-    for (let row = r0; row < r0 + 7; row++) {
-      const y = G - row * TOWER_ROW + up - 100;
-      if (y < -90 || y > H + 10) continue;
-      for (const k of [0, 1]) {
-        const lit = hh(row * 13 + wx * 0.07 + k) > 0.7;
-        inkRect(sx + 26 + k * 92, y, 58, 70, lit ? '#fff3b0' : '#cfe3f5', 2.5);
-        ctx.strokeStyle = 'rgba(28,22,38,0.4)';
-        ctx.beginPath();
-        ctx.moveTo(sx + 55 + k * 92, y);
-        ctx.lineTo(sx + 55 + k * 92, y + 70);
+    if (r === 1) continue; // the ground floor is the lobby
+    for (let c = 0; c < cols; c++) {
+      const id = r * 97 + c * 13 + ox,
+        wx = a + c * cw + cw / 2 - 34,
+        wy = fy + 34,
+        lit = hh(id) > 0.62;
+      if (wy > y1 - 20 || wy + 80 < y0) continue;
+      inkRect(wx, wy, 68, 84, lit ? '#fff1b0' : '#cfe3f5', 2.5);
+      ctx.strokeStyle = 'rgba(28,22,38,0.35)';
+      ctx.beginPath();
+      ctx.moveTo(wx + 34, wy);
+      ctx.lineTo(wx + 34, wy + 84);
+      ctx.stroke();
+      const v = hh(id + 5);
+      if (v < 0.18) {
+        // blinds half down
+        ctx.fillStyle = 'rgba(200,190,170,0.85)';
+        ctx.fillRect(wx + 2, wy + 2, 64, 30);
+        ctx.strokeStyle = 'rgba(28,22,38,0.25)';
+        for (let ly = wy + 8; ly < wy + 32; ly += 6) {
+          ctx.moveTo(wx + 2, ly);
+          ctx.lineTo(wx + 66, ly);
+        }
         ctx.stroke();
+      } else if (v > 0.9) {
+        // a pot plant on the sill
+        ctx.fillStyle = '#c2703d';
+        ctx.fillRect(wx + 44, wy + 70, 14, 12);
+        ctx.fillStyle = '#5aa04a';
+        ctx.beginPath();
+        ctx.arc(wx + 51, wy + 64, 9, 0, 7);
+        ctx.fill();
       }
     }
   }
-  // the fire escape: a grated walkway following the climb, with its railing
-  const pts = [];
-  for (let sx = -30; sx <= W + 30; sx += 15) pts.push([sx, G + 6 + upAt(cx + sx)]);
-  ctx.fillStyle = 'rgba(70,64,80,0.12)';
-  ctx.beginPath();
-  ctx.moveTo(-30, H + 30);
-  for (const [px, py] of pts) ctx.lineTo(px, py);
-  ctx.lineTo(W + 30, H + 30);
-  ctx.closePath();
-  ctx.fill();
-  ctx.strokeStyle = '#5d5668';
-  ctx.lineWidth = 3;
-  layer(1, 32, 347, x => {
-    const y = G + 6 + upAt(cx + x);
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x, y - 38);
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + 16, y + 22);
-    ctx.stroke();
-  });
+}
+function towerLobby(x) {
+  inkRect(x - 130, G - 128, 260, 22, '#c0392b', 3); // the awning
+  inkRect(x - 90, G - 104, 180, 110, '#bfe0f7', 3);
+  ctx.strokeStyle = INK;
   ctx.lineWidth = 3;
   ctx.beginPath();
-  pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py - 38) : ctx.moveTo(px, py - 38)));
+  ctx.moveTo(x, G - 104);
+  ctx.lineTo(x, G + 6);
   ctx.stroke();
+  ctx.fillStyle = INK;
+  ctx.font = '900 13px Impact,"Arial Black",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('KONG TOWER', x, G - 112);
+}
+function towerRoof(S) {
+  const y = S.roof,
+    x0 = S.x0;
+  // the water tank on its legs
   ctx.strokeStyle = INK;
   ctx.lineWidth = 4;
   ctx.beginPath();
-  pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+  ctx.moveTo(x0 + 150, y);
+  ctx.lineTo(x0 + 160, y - 90);
+  ctx.moveTo(x0 + 230, y);
+  ctx.lineTo(x0 + 220, y - 90);
   ctx.stroke();
+  inkRect(x0 + 140, y - 190, 100, 100, '#a67c52', 3);
+  ctx.fillStyle = '#a67c52';
+  ctx.beginPath();
+  ctx.moveTo(x0 + 132, y - 190);
+  ctx.lineTo(x0 + 190, y - 232);
+  ctx.lineTo(x0 + 248, y - 190);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // the aerial and its light
+  ctx.beginPath();
+  ctx.moveTo(x0 + 720, y);
+  ctx.lineTo(x0 + 720, y - 260);
+  ctx.moveTo(x0 + 700, y - 200);
+  ctx.lineTo(x0 + 740, y - 200);
+  ctx.moveTo(x0 + 706, y - 150);
+  ctx.lineTo(x0 + 734, y - 150);
+  ctx.stroke();
+  ctx.fillStyle = (LV.t >> 5) % 2 ? '#ff4d4d' : '#7a2a2a';
+  ctx.beginPath();
+  ctx.arc(x0 + 720, y - 264, 7, 0, 7);
+  ctx.fill();
+  ctx.stroke();
+  // the stairwell hut with its door
+  inkRect(x0 + 470, y - 110, 120, 110, '#cfc8d4', 3);
+  inkRect(x0 + 510, y - 80, 40, 80, '#8a6a5c', 2.5);
+}
+// A floor's shut hatch: a steel shutter across the shaft with hazard stripes and a padlock
+function towerHatch(x0, y) {
+  inkRect(x0 - 10, y - 18, W + 20, 18, '#6f7a8c', 3);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x0 - 10, y - 18, W + 20, 18);
+  ctx.clip();
+  ctx.fillStyle = '#ffd400';
+  for (let x = x0 - 30; x < x0 + W + 30; x += 36) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + 18, y - 18);
+    ctx.lineTo(x + 32, y - 18);
+    ctx.lineTo(x + 14, y);
+    ctx.fill();
+  }
+  ctx.restore();
+  const cx = x0 + W / 2;
+  inkRect(cx - 16, y - 4, 32, 26, '#ffd400', 3);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(cx, y - 4, 10, Math.PI, 0);
+  ctx.stroke();
+}
+// The climb's platforms (drawPlatforms in biomes.js hands them here; false = not one of ours): fire-escape
+// balconies with a railing and brackets to the wall, the ambush floors (concrete, hazard-striped edge), the roof
+function drawCityPlat(s) {
+  const w = s.x2 - s.x1;
+  if (s.st === 'fire') {
+    ctx.strokeStyle = '#4a4356';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for (let x = s.x1 + 6; x <= s.x2 - 4; x += 32) {
+      ctx.moveTo(x, s.y1);
+      ctx.lineTo(x, s.y1 - 34);
+    }
+    ctx.moveTo(s.x1 + 6, s.y1 - 34);
+    ctx.lineTo(s.x2 - 6, s.y1 - 34);
+    ctx.moveTo(s.x1 + 6, s.y1 - 18);
+    ctx.lineTo(s.x2 - 6, s.y1 - 18);
+    // brackets under it, to the wall
+    ctx.moveTo(s.x1 + 20, s.y1 + 10);
+    ctx.lineTo(s.x1 + 54, s.y1 + 46);
+    ctx.moveTo(s.x2 - 20, s.y1 + 10);
+    ctx.lineTo(s.x2 - 54, s.y1 + 46);
+    ctx.stroke();
+    inkRect(s.x1, s.y1, w, 10, '#5d5668', 3);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let x = s.x1 + 8; x < s.x2 - 4; x += 8) {
+      ctx.moveTo(x, s.y1 + 2);
+      ctx.lineTo(x, s.y1 + 8);
+    }
+    ctx.stroke();
+    return true;
+  }
+  if (s.st === 'floor' || s.st === 'roof') {
+    if (s.st === 'roof') inkRect(s.x1, s.y1 - 26, w, 26, '#d8d2dc', 3); // the parapet behind you
+    inkRect(s.x1, s.y1, w, 24, '#c9c2cf', 3);
+    if (s.st === 'floor') {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(s.x1, s.y1 + 2, w, 10);
+      ctx.clip();
+      ctx.fillStyle = '#ffd400';
+      for (let x = s.x1 - 20; x < s.x2 + 20; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, s.y1 + 12);
+        ctx.lineTo(x + 10, s.y1 + 2);
+        ctx.lineTo(x + 22, s.y1 + 2);
+        ctx.lineTo(x + 12, s.y1 + 12);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    return true;
+  }
+  return false;
+}
+// A fire-escape ladder (a climb: hold Up beside it)
+function drawShaftLadder(c) {
+  ctx.strokeStyle = '#4a4356';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  for (const dx of [-13, 13]) {
+    ctx.moveTo(c.x + dx, c.y1 - 30);
+    ctx.lineTo(c.x + dx, c.y2);
+  }
+  ctx.stroke();
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let y = c.y2 - 16; y > c.y1 - 26; y -= 20) {
+    ctx.moveTo(c.x - 13, y);
+    ctx.lineTo(c.x + 13, y);
+  }
+  ctx.stroke();
+}
+// ===== THE CLIMB (part of the game: genRun builds it, from the run's random numbers) =====
+// The Skyscraper in a story is one climb straight up, a screen wide: from the street, fire-escape platforms zig-zag
+// up the wall (each SHAFT_STEP higher, a jump's reach is about 190) with a ladder in each stretch, to a full-width
+// floor every SHAFT_FLOOR. Each floor is an ambush; the last one is the roof. Floors and the roof can't be dropped
+// through (solid).
+const SHAFT_FLOOR = 600,
+  SHAFT_STEP = 120,
+  SHAFT_CEIL = 320; // how far above a floor its hatch closes during the ambush
+function shaftLayout(o, floors, R) {
+  const s = [],
+    c = [],
+    fys = [];
+  let side = R() < 0.5 ? -1 : 1;
+  for (let f = 0; f <= floors; f++) {
+    const base = G - f * SHAFT_FLOOR,
+      steps = [];
+    for (let i = 1; i < SHAFT_FLOOR / SHAFT_STEP; i++) {
+      side = -side;
+      // each one overlaps the one below, so jumping straight up always gets you onto it
+      const w = 220 + Math.round(R() * 50),
+        cx = o + W / 2 + side * (50 + Math.round(R() * 40)),
+        st = { x1: cx - w / 2, x2: cx + w / 2, y1: base - i * SHAFT_STEP, y2: base - i * SHAFT_STEP, st: 'fire' };
+      steps.push(st);
+      s.push(st);
+    }
+    // a ladder from the floor up to the second platform, at its inner end
+    const L = steps[1],
+      lx = Math.round(L.x1 + L.x2 > 2 * (o + W / 2) ? L.x1 + 30 : L.x2 - 30);
+    c.push({ x: lx, y1: L.y1, y2: base });
+    const fy = base - SHAFT_FLOOR;
+    s.push({ x1: o, x2: o + W, y1: fy, y2: fy, st: f === floors ? 'roof' : 'floor', solid: 1 });
+    if (f < floors) fys.push(fy);
+  }
+  return { s, c, fys, roof: G - (floors + 1) * SHAFT_FLOOR };
+}
+// The hatch over the floor of the ambush going on (LV.shaft): nobody climbs past it until the fight is won
+function shaftCeil() {
+  const ae = LV.shaft && LV.encs.find(e => e.st === 1 && e.fy !== undefined);
+  if (!ae || ae.fy === LV.shaft.roof) return;
+  const top = ae.fy - SHAFT_CEIL;
+  for (const p of PL)
+    if (p.st !== 'dead' && p.y < top + 80 * p.s) {
+      p.y = top + 80 * p.s;
+      if (p.vy < 0) p.vy = 0;
+    }
+}
+// A fight on a floor starts once someone stands on it; anyone still below is brought up onto it
+function shaftReach(ne, alive) {
+  return alive.some(p => p.gy <= ne.fy + 1 && p.y >= p.gy - 2);
+}
+function shaftGather(ne) {
+  PL.forEach((p, i) => {
+    if (p.st !== 'dead' && p.gy > ne.fy + 1) {
+      p.x = ne.x - 120 + i * 50;
+      p.y = ne.fy - 40;
+      p.vx = p.vy = 0;
+      p.lad = 0;
+      ring(p.x, p.y - 45, 40);
+    }
+  });
 }
 // ===== SCENERY =====
 // The City's props (drawBiomeProp in biomes.js hands them here); false = not one of ours
@@ -577,7 +867,7 @@ function dropThrow(f, k) {
   if (!LV || MODE !== LEVEL) return;
   const R = LV.rk || (LV.rk = { n: 1e9, list: [] }),
     x = Math.round(Math.max(WB.l + 40, Math.min(WB.r - 40, f.tgx === undefined ? f.x + f.face * 250 : f.tgx)));
-  R.list.push({ x, t: 25, k });
+  R.list.push({ x, y: f.gy, t: 25, k }); // it lands on the floor he stands on
   sfx(220, 0.25, 'sawtooth', 0.05, 120);
 }
 // An air conditioner coming down (y = its bottom), or (landed) lying smashed on the roof

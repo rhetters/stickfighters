@@ -221,14 +221,14 @@ function tickAtk(f) {
     sfx(60, 0.2, 'sine', 0.12);
     if (d.area && !f.pl) {
       for (const q of PL) {
-        if (q.st === 'dead' || q.y < q.gy - 24 || Math.abs(q.x - f.x) > d.area) continue;
+        if (q.st === 'dead' || q.y < q.gy - 24 || Math.abs(q.gy - f.gy) > 40 || Math.abs(q.x - f.x) > d.area) continue;
         hurtP(q, { dmg: d.adm || 10, kb: 10, lift: -6, ef: d.ef }, q.x >= f.x ? 1 : -1, f);
       }
       shake = Math.max(shake, 12);
     }
     if (d.area && f.pl && MODE.pvp)
       for (const q of foes(f)) {
-        if (q.inv > 0 || q.st === 'dead' || q.y < q.gy - 24 || Math.abs(q.x - f.x) > d.area) continue;
+        if (q.inv > 0 || q.st === 'dead' || q.y < q.gy - 24 || Math.abs(q.gy - f.gy) > 40 || Math.abs(q.x - f.x) > d.area) continue;
         pvpHit(q, { dmg: d.adm || 12, kb: 9, lift: -7, ef: 'kd' }, q.x >= f.x ? 1 : -1, f);
       }
     if (d.area && f.pl)

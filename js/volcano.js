@@ -67,20 +67,23 @@ function rockTick(ae) {
   }
   for (const r of R.list)
     if (++r.t === ROCK_T) {
+      // r.y: the floor it lands on (Pink Kong's throws on the roof); lava rocks land on the ground
+      const gy = r.y === undefined ? G : r.y,
+        near = f => f.y > gy - 70 && f.y < gy + 10;
       for (const p of PL)
-        if (p.st !== 'dead' && p.st !== 'cine' && Math.abs(p.x - r.x) < 46 && p.y > G - 70)
+        if (p.st !== 'dead' && p.st !== 'cine' && Math.abs(p.x - r.x) < 46 && near(p))
           hurtP(p, { dmg: 9, kb: 12, ef: 'launch' }, p.x < r.x ? -1 : 1);
       for (const e of E)
-        if (!e.dying && !e.gone && e.st !== 'cine' && Math.abs(e.x - r.x) < 50 && e.y > G - 70)
+        if (!e.dying && !e.gone && e.st !== 'cine' && Math.abs(e.x - r.x) < 50 && near(e))
           natHit(e, 12, -10, e.x < r.x ? -1 : 1);
-      ring(r.x, G - 10, 70);
-      dust(r.x - 20, G, 6);
-      dust(r.x + 20, G, 6);
+      ring(r.x, gy - 10, 70);
+      dust(r.x - 20, gy, 6);
+      dust(r.x + 20, gy, 6);
       for (let i = 0; i < 8; i++)
         fxp({
           k: 'c',
           x: r.x,
-          y: G - 14,
+          y: gy - 14,
           vx: (fxr() - 0.5) * 9,
           vy: -3 - fxr() * 5,
           a: 0,
@@ -851,17 +854,18 @@ function drawVolcanoFront() {
     for (const r of LV.rk.list)
       lifted(r.x, () => {
         if (r.k === 'ac') {
+          const gy = r.y === undefined ? G : r.y;
           // Pink Kong's air conditioner (city.js): a dark shadow growing where it will land, then down it comes
           const k = Math.min(1, r.t / ROCK_T);
           if (r.t < ROCK_T) {
             ctx.fillStyle = `rgba(28,22,38,${0.15 + 0.3 * k})`;
             ctx.beginPath();
-            ctx.ellipse(r.x, G + 6, 14 + k * 26, 4 + k * 5, 0, 0, 7);
+            ctx.ellipse(r.x, gy + 6, 14 + k * 26, 4 + k * 5, 0, 0, 7);
             ctx.fill();
-            if (k > 0.45) drawDropAC(r.x, G + 6 - (600 * (1 - k)) / 0.55, false);
+            if (k > 0.45) drawDropAC(r.x, gy + 6 - (600 * (1 - k)) / 0.55, false);
           } else {
             ctx.globalAlpha = Math.max(0, 1 - (r.t - ROCK_T) / 40);
-            drawDropAC(r.x, G + 6, true);
+            drawDropAC(r.x, gy + 6, true);
             ctx.globalAlpha = 1;
           }
         } else if (r.t < ROCK_T) {

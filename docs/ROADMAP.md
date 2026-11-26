@@ -72,12 +72,14 @@ Asked by Ron and Rhett (November 26). A sixth story, CITY, after the Volcano:
   in each player's colour) and is locked in it for the whole place. Left and right drive, jump hops, attack honks a
   turbo burst. Driving into the pink army sends them flying (ragdolls, bodies bowling into others); cars can't be
   hurt. Fights and rewards as usual (not more enemies than any place).
-- **The Skyscraper** (last place): out of the cars at the tower's door, then the climb up its fire escapes to the
-  roof, where **Pink Kong** waits: chest pounds, roof-shaking leaps, air-conditioner units thrown down on you.
+- **The Skyscraper** (last place): out of the cars at the tower's door, then one climb straight up its fire escapes
+  (platforms and ladders, the camera rising with you). Each floor is an ambush with a locked hatch above until it's
+  won; **Pink Kong** waits on the roof: chest pounds, roof-shaking leaps, air-conditioner units thrown at you.
 - New transitions: the car park (into Downtown: everyone gets in) and the screech stop (into the Skyscraper:
   everyone hops out). Songs, mini-bosses, scenery, the level creator's places and boss, and the Story screen's tile.
 
-Built (version 75, see the CHANGELOG): all of the above. Still to do: the kids try the drive and Pink Kong on the iPad.
+Built (versions 75 and 76, see the CHANGELOG): all of the above. Still to do: the kids try the drive, the climb and
+Pink Kong on the iPad.
 
 **Done when:** the City story plays through on the iPad, solo, locally and online, and the kids enjoy the drive.
 
