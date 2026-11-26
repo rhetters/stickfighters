@@ -90,7 +90,9 @@ Not yet planned into milestones.
    showed the old results screen (orange text), not the new victory screen; Ron thinks one other place does this too.
 2. **House builder furniture:** more for each room (bathroom, bedroom, living room, dining room, attic, kitchen…),
    and a redeemable decoration: a big pink stuffed teddy bear (code heart-heart-heart-heart).
-3. **Cars:** a double jump; while surging, the car's outline glows, not the driver's.
+3. **Cars (a feel-good place):** a double jump; while surging, the car's outline glows, not the driver's. Punch
+   bumps the front of the car up briefly, as if punching with the hood; Kick does the same with the back. Ramming
+   while surging does extra damage as well as going faster, and punching or kicking with the car does extra damage.
 4. **Cars in your own levels:** on a City level, reaching the boss took everyone out of their cars and put them
    into new ones.
 5. **Using furniture:** Punch or Kick by a piece of furniture uses it where that makes sense (chair: sit, bed: lie
@@ -106,6 +108,9 @@ Not yet planned into milestones.
     each is bought per item: a blue ball cap and a blue ninja mask are two purchases. Surges become recolourable
     effects (lightning, ink; Ice as clear crystal snowflakes, Heart as see-through hearts). Needs a save change
     (version and migration).
+11. **Bug, the Skyscraper:** players or enemies knocked down on the floors (the full-width levels) disappear for a
+    moment. (A likely cause: the bodies that fall and ragdoll still only know the street level, `groundY` in
+    combat.js.)
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 
