@@ -1383,6 +1383,13 @@ function drawItemIcon(it, cx, cy, sz, baseCol) {
   const f = { look: L, face: 1, s: 1, slot: 0, vx: it.slot === 'surge' ? 5 : 0, col };
   ctx.save();
   ctx.lineCap = 'round';
+  if (it.slot === 'house' && it.w) {
+    // furniture or a decoration (house.js), fitted in the icon
+    const s = Math.min(sz / it.w, sz / it.h) * 0.9;
+    houseThing(it, cx - (it.w * s) / 2, cy + sz * 0.4 - it.h * s, it.w * s, it.h * s);
+    ctx.restore();
+    return;
+  }
   if (it.slot === 'pet') {
     drawPet(it, cx, it.fly ? cy + sz * 0.02 : cy + sz * 0.22, sz / 58, 1, 0, false, false);
     ctx.restore();

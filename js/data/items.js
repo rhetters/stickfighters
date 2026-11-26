@@ -335,6 +335,8 @@ const ITEMS = [
     c2: '#ffd400',
     price: 250
   },
+  // secret: only from a code in the treasure chest (heart, heart, heart, heart)
+  { id: 'hd-teddy', sec: 'hdecor', name: 'Big Pink Teddy', k: 'teddy', w: 2, h: 2, c: '#ff9cc9', c2: '#e2629f', how: { code: 1 } },
   {
     id: 'hd-trophy',
     sec: 'hdecor',
@@ -351,12 +353,13 @@ const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 // Idle stances (cosmetic: only how you stand while waiting). Same pose format as moves.js.
 // The treasure chest's codes (Character screen, ui/codes.js): four icons, by their place in CODE_ICONS, and the
 // item each code gives. Four stars (what the chest starts on) gives Rhett's Shirt; four ninja stars, the Ninja Mask; crown, heart, heart,
-// crown, Froggy.
+// crown, Froggy; four hearts, the Big Pink Teddy for the house.
 const CODE_ICONS = ['star', 'shuriken', 'heart', 'crown', 'bolt', 'flame', 'moon', 'drop'];
 const CODES = [
   { code: [0, 0, 0, 0], item: 'shirt-rhett' },
   { code: [1, 1, 1, 1], item: 'face-ninja' },
-  { code: [3, 2, 2, 3], item: 'pet-frog' }
+  { code: [3, 2, 2, 3], item: 'pet-frog' },
+  { code: [2, 2, 2, 2], item: 'hd-teddy' }
 ];
 const STANCES = [
   { id: 'classic', name: 'Classic', p: [6, 35, 75, 20, 90, 18, 20, -18, 12, 0] },
