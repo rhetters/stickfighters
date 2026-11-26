@@ -214,10 +214,10 @@ function drawTower() {
     // the ambush floors' numbers, painted on the wall
     S.fys.forEach((fy, i) => {
       if (fy < top - 80 || fy > bot + 80) return;
-      ctx.fillStyle = 'rgba(28,22,38,0.55)';
-      ctx.font = '900 34px Impact,"Arial Black",sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('FLOOR ' + (i + 1) * 20, S.x0 + W / 2, fy - 150);
+      ctx.fillStyle = 'rgba(28,22,38,0.5)';
+      ctx.font = '900 26px Impact,"Arial Black",sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('FLOOR ' + (i + 1) * 20, S.x0 + TOWER_EDGE + 24, fy - 46);
     });
     // the lobby's doors at the street
     if (G > top) towerLobby(S.x0 + W / 2);
