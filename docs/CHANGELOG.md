@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## READY where the tick goes (November 25, 2026)
+- Ron's note: your own card's button now sits where the green tick goes and is a yellow, pulsing READY? until you tap it, then a green, still READY, a little smaller. (In the photo's corner it overlapped your fighter.)
+- Version 73.
+
 ## A smaller READY? button (November 25, 2026)
 - Ron's note: the READY? button was too big on smaller screens and covered the next player's card. It's now smaller and sits in the bottom-right corner of the photo, clear of the name, its arrows and the next card.
 - Version 72.
