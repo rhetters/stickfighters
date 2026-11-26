@@ -345,6 +345,17 @@ BOSSPH.K = [
   { at: 0.66, cd: 0.75, enter: () => (bn('THE TIKI IS ANGRY!'), bossCall(['g', 'r', 'f'])) },
   { at: 0.33, cd: 0.5, enter: () => (bn('THE TIKI IS FURIOUS!'), bossCall(['b', 'u', 'g', 'r'])) }
 ];
+// Pink Kong: the same three phases, calling his city crew (his moves: BOSSPICK below)
+BOSSPH.N = [
+  { at: 1, cd: 1 },
+  { at: 0.66, cd: 0.75, enter: () => (bn('KONG IS ANGRY!'), bossCall(['g', 'r', 'f'])) },
+  { at: 0.33, cd: 0.5, enter: () => (bn('KONG IS FURIOUS!'), bossCall(['b', 'u', 'g', 'r'])) }
+];
+// A boss's own moves, picked before the shared ones (slam, charge, quake): returns a move name, or null for those.
+// Pink Kong throws air conditioners at whoever is far off and pounds his chest at anyone close in front.
+const BOSSPICK = {
+  N: (e, dist) => (dist > 230 && rnd() < 0.55 ? 'kthrow' : dist < 210 && rnd() < 0.3 ? 'kpound' : null)
+};
 BOSSPH.Z = [
   { at: 1, cd: 1 },
   { at: 0.66, cd: 0.75, enter: () => (bn('THE ALIEN IS ANGRY!'), bossCall(['g', 'f', 'r'])) },
@@ -366,8 +377,9 @@ function bossThink(e, Q, T_, spd) {
   }
   const dist = Math.abs(Q.x - e.x);
   if (e.cd <= 0) {
-    let mv = null;
-    if (e.bp > 1 && dist > 110 && dist < 330 && rnd() < 0.45) mv = 'cquake';
+    let mv = BOSSPICK[e.tk] ? BOSSPICK[e.tk](e, dist) : null;
+    if (mv) e.tgx = Q.x; // where a thrown thing comes down
+    else if (e.bp > 1 && dist > 110 && dist < 330 && rnd() < 0.45) mv = 'cquake';
     else if (dist > 190) mv = 'ccharge';
     else if (dist <= T_.ar) mv = 'cslam';
     if (mv) {

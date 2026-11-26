@@ -62,6 +62,7 @@ function tickAtk(f) {
     eat = k => eatIn(I, k);
   a.f++;
   f.tp = kf(d.k, Math.min(1, a.f / (d.kt || d.d)));
+  if (d.drop && a.f === d.dropAt) dropThrow(f, d.drop); // thrown to fall on the target (city.js)
   if (f.pl && a.b && !a.chained && !d.cost && !d.air && a.f <= Math.min(5, d.h[0]) && f.y >= f.gy - 1) {
     const o = a.b === 'p' ? 'k' : 'p';
     if (want(o) && Math.abs(press[o] - a.pf) <= 3) {
@@ -712,6 +713,7 @@ function blockHit(q, d, dr) {
 const STR_INV = 8, // frames safe between hits of one string
   STR_GAP = 45; // a string's next hit must come this soon after the last, or it's a new string
 function hurtP(q, d, dr, src) {
+  if (q.car) return carBump(q); // nothing hurts a player in a car (cars.js)
   if (q.blk && dr === -q.face && q.st === 'free' && !q.inv) return blockHit(q, d, dr);
   if (state === 'train' && TR.god) return;
   if (q.inv > 0 || q.st === 'dead' || (q.att && q.att.d.invul)) return;

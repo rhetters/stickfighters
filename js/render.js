@@ -210,6 +210,7 @@ function drawTag(p) {
 }
 function drawF(f) {
   if (f.hide) return; // inside a pipe (run.js)
+  if (f.car) return drawCar(f); // driving (cars.js)
   if (f.draw !== undefined) return drawPencilIn(f);
   let a = 1;
   if (f.pl && f.inv > 0 && f.inv < 900 && f.st !== 'dead' && Math.floor(f.t / 3) % 2) a = 0.45;

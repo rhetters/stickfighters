@@ -18,7 +18,8 @@ function bossLook(T0) {
       name: T0.boss,
       wheel: [],
       pose: null,
-      extra: d.extra || []
+      extra: d.extra || [],
+      fur: d.fur || null // the fur's colours [front, back] (the Yeti's is white; Pink Kong's is pink)
     };
   for (const s of EQ) L[s] = d[s] ? ITEM[d[s]] : null;
   return L;
@@ -47,9 +48,9 @@ function drawBossParts(f, J, L, r, w, ph) {
       );
     }
     // the Yeti's shaggy fur behind its limbs: thick white strokes, inked
-    if (X.has('furbody')) furLimbs(J, w, 1);
+    if (X.has('furbody')) furLimbs(J, w, 1, L.fur);
   } else if (ph === 'mid') {
-    if (X.has('furbody') && J.nk && J.hp) furTorso(J, r, w);
+    if (X.has('furbody') && J.nk && J.hp) furTorso(J, r, w, L.fur);
     if (X.has('spacesuit') && J.nk && J.hp) {
       // a collar ring and a belt with a glowing buckle
       ctx.fillStyle = '#e8ecf4';
@@ -141,7 +142,7 @@ function drawBossParts(f, J, L, r, w, ph) {
       ctx.fill();
     }
   } else {
-    if (X.has('furbody')) furLimbs(J, w, 0);
+    if (X.has('furbody')) furLimbs(J, w, 0, L.fur);
     // Pinkbeard's hook in place of his back hand
     if (X.has('hook') && J.hb && J.eb) {
       const u = unit(sub(J.hb, J.eb)),
@@ -291,6 +292,36 @@ function bossHead(X, r, w) {
     ctx.lineWidth = w;
     ctx.stroke();
   }
+  if (X.has('apeface')) {
+    // Pink Kong's face: a pale muzzle, a heavy brow, big nostrils and a grumpy mouth (the head faces right here)
+    ctx.beginPath();
+    ctx.ellipse(r * 0.35, r * 0.32, r * 0.62, r * 0.5, 0, 0, 7);
+    shapeDo('#ffc2dc', w * 0.8);
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.45, -r * 0.3);
+    ctx.quadraticCurveTo(r * 0.3, -r * 0.62, r * 0.98, -r * 0.3);
+    ctx.lineTo(r * 0.9, -r * 0.1);
+    ctx.quadraticCurveTo(r * 0.3, -r * 0.38, -r * 0.4, -r * 0.12);
+    ctx.closePath();
+    shapeDo('#a02a62', w * 0.8);
+    ctx.fillStyle = INK;
+    for (const [x, y, q] of [
+      [0.1, -0.05, 0.1],
+      [0.62, -0.05, 0.1],
+      [0.3, 0.22, 0.07],
+      [0.55, 0.22, 0.07]
+    ]) {
+      ctx.beginPath();
+      ctx.arc(x * r, y * r, q * r, 0, 7);
+      ctx.fill();
+    }
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = Math.max(1.5, w * 0.6);
+    ctx.beginPath();
+    ctx.moveTo(r * 0.05, r * 0.55);
+    ctx.quadraticCurveTo(r * 0.4, r * 0.45, r * 0.8, r * 0.58);
+    ctx.stroke();
+  }
   if (X.has('horns'))
     for (const d of [-1, 1]) {
       ctx.beginPath();
@@ -418,7 +449,7 @@ function bossHead(X, r, w) {
   }
 }
 // The Yeti's fur: its torso as a shaggy white mound, its limbs as thick inked white strokes (back limbs first)
-function furTorso(J, r, w) {
+function furTorso(J, r, w, fur) {
   const a = J.nk,
     b = J.hp,
     cx = (a[0] + b[0]) / 2,
@@ -435,10 +466,10 @@ function furTorso(J, r, w) {
     ctx.lineTo(Math.cos(t) * len * 0.6 * q, Math.sin(t) * r * 0.9 * q);
   }
   ctx.closePath();
-  shapeDo('#fff4f9', w);
+  shapeDo(fur ? fur[0] : '#fff4f9', w);
   ctx.restore();
 }
-function furLimbs(J, w, back) {
+function furLimbs(J, w, back, fur) {
   const lw = (J.lw || 7) * 1.5,
     lines = back
       ? [
@@ -451,6 +482,6 @@ function furLimbs(J, w, back) {
         ];
   for (const pts of lines) {
     if (pts.some(p => !p)) continue;
-    inked(pts, lw, back ? '#f3d7e4' : '#ffeef5');
+    inked(pts, lw, fur ? fur[back ? 1 : 0] : back ? '#f3d7e4' : '#ffeef5');
   }
 }

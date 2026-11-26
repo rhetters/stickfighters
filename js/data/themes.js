@@ -23,6 +23,8 @@
 //   ledges   rock ledges in each fight (platforms; the army follows you up and down them), and pools of lava on the
 //            floor between fights. Lava bounces you out with a little damage (it never knocks a player out)
 //   descent  the biome opens with a climb down: ledges stepping down from the rim over a lava pool
+//   drive    1 = everyone drives a car here (cars.js): one of the car models, picked from the seed, in each player's
+//            colour. They can't be hurt in it; driving into enemies sends them flying.
 const BIOMES = {
   woods: {
     name: 'WOODED TRAIL',
@@ -328,6 +330,67 @@ const BIOMES = {
       { at: 6, w: { g: 2, u: 3, f: 2, b: 2, r: 1 } }
     ],
     mini: { t: 'mv', chance: 0.05, lines: ['DINNER IS SERVED... HOT!', 'NOBODY LEAVES THE CRATER!', 'I EAT LAVA FOR BREAKFAST!'] }
+  },
+  // ===== THE CITY (city.js draws it; cars.js drives it) =====
+  burbs: {
+    name: 'SUBURBAN STREET',
+    look: 'burbs',
+    props: [
+      ['mailbox', 3],
+      ['picket', 3],
+      ['hedge', 2],
+      ['tree', 2],
+      ['streetlamp', 1],
+      ['hydrant', 1],
+      ['trashcan', 1]
+    ],
+    w: [1000, 1300],
+    fights: 5,
+    mix: [
+      { at: 1, w: { g: 6, r: 2 } },
+      { at: 2, w: { g: 5, r: 3, u: 1, f: 1 } },
+      { at: 3, w: { g: 4, r: 2, u: 1, f: 2, b: 1 } }
+    ],
+    mini: { t: 'mq', chance: 0.04, lines: ['GET OFF MY LAWN!', 'THIS STREET IS PINK NOW!', 'NO SOLICITORS!'] }
+  },
+  city: {
+    name: 'DOWNTOWN',
+    look: 'city',
+    drive: 1,
+    props: [
+      ['streetlamp', 3],
+      ['trafficlight', 2],
+      ['hydrant', 2],
+      ['bench', 1],
+      ['cone', 2],
+      ['newsbox', 1]
+    ],
+    w: [1200, 1500],
+    fights: 5,
+    mix: [
+      { at: 3, w: { g: 5, r: 3, f: 2, b: 1 } },
+      { at: 4, w: { g: 4, r: 3, f: 2, b: 2, u: 1 } }
+    ],
+    mini: { t: 'mz', chance: 0.05, lines: ['THIS IS A NO DRIVING ZONE!', 'BEEP BEEP YOURSELF!', 'TRAFFIC JAM TIME!'] }
+  },
+  tower: {
+    name: 'THE SKYSCRAPER',
+    look: 'tower',
+    props: [
+      ['acunit', 3],
+      ['pottedplant', 2],
+      ['satdish', 1],
+      ['watertank', 1],
+      ['antenna', 1]
+    ],
+    w: [1600, 1900],
+    fights: 4,
+    climb: [0.16, 0.32],
+    mix: [
+      { at: 5, w: { g: 3, u: 2, f: 2, b: 2, r: 1 } },
+      { at: 6, w: { g: 2, u: 3, f: 2, b: 2, r: 1 } }
+    ],
+    mini: { t: 'my', chance: 0.05, lines: ['NO CLIMBING THE BUILDING!', 'GOING DOWN?', 'THE VIEW IS MINE!'] }
   }
 };
 // ===== TRANSITIONS between biomes =====
@@ -351,7 +414,9 @@ const TRANSITIONS = {
   // the geyser: everyone stands on a giant steam vent and gets blasted up and over to the next biome
   geyser: { cine: 1, gap: 700 },
   // the crater's rim: everyone jumps in and lands on the top ledge of the climb down (the crater's enter)
-  rim: { cine: 1, gap: 700 }
+  rim: { cine: 1, gap: 700 },
+  cars: { cine: 1, gap: 700 },
+  park: { cine: 1, gap: 700 }
 };
 // The transitions that can carry you into each place (a balloon never lands in the sewer). The crater is only ever
 // reached over its rim: the jump in lands on the top ledge of its climb down.
@@ -370,7 +435,11 @@ const TRANS_INTO = {
   moon: ['landing'],
   jungle: ['catapult', 'rope', 'balloon'],
   ashslope: ['geyser', 'rope', 'balloon'],
-  crater: ['rim']
+  crater: ['rim'],
+  burbs: ['catapult', 'rope', 'balloon'],
+  // Downtown is driven: the car park, where everyone gets a car; the Skyscraper's door, where everyone gets out
+  city: ['cars'],
+  tower: ['park']
 };
 // ===== THEMES =====
 //   c      the theme's colour (its card on the Campaign screen)
@@ -442,6 +511,17 @@ const THEMES = {
         ],
         top: ['YOU MADE IT?! UH... NICE WEATHER?', 'NO FAIR! NO CLIMBING!', 'WAIT, I WAS JUST LEAVING!']
       }
+    }
+  },
+  city: {
+    name: 'THE CITY',
+    c: '#ffb400',
+    biomes: ['burbs', 'city', 'tower'],
+    boss: {
+      t: 'N',
+      intro: 'jump',
+      adds: ['g', 'r', 'f', 'g', 'b', 'u'],
+      lines: ['ME PINK KONG! THIS ROOF MINE!', 'HOO HOO HAA HAA! WHO CLIMB MY TOWER?', 'YOU WANT BANANA? COME GET IT!']
     }
   }
 };

@@ -1175,6 +1175,8 @@ const INFO = {
   cslam: ['Overhead Slam', 'Knockdown', 'kd', ''],
   ccharge: ['Charge', 'Knockdown', 'kd', ''],
   cquake: ['Quake Leap', 'Knockdown, area', 'kd', ''],
+  kpound: ['Chest Pound', 'Pushback', 'push', ''],
+  kthrow: ['Air Conditioner Throw', 'Launch', 'launch', ''],
   tornado: ['Tornado Kick', 'Multi-hit, last spin launches', 'pop', 'Ult'],
   grab: ['Grab', 'Holds the enemy', 'stagger', 'Start'],
   pummel: ['Knee (while holding)', 'Light hits', 'stagger', 'Start'],
