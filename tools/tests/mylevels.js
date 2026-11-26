@@ -40,7 +40,7 @@ ok(await S.evaluate(()=>{const r=$('th-nostar').getBoundingClientRect(),f=$('s-t
 await S.evaluate(()=>$('th-cards').querySelector('.thq').click());await S.waitForTimeout(300);
 ok(await S.evaluate(()=>MODE===LEVEL&&/^l\d+$/.test(LV.custom)),'? plays one of your levels');
 await S.evaluate(()=>{openTitle();$('b-level').click()});await S.waitForTimeout(100);
-ok(await cards()==='CASTLE SIEGE,PIRATE COVE,MOUNTAIN,SPACE,VOLCANO,?,MY LEVELS'&&await arr()==='00','the stories: five, both arrows greyed out (more stories will page)');
+ok(await cards()==='CASTLE SIEGE,PIRATE COVE,MOUNTAIN,SPACE,VOLCANO,?,MY LEVELS'&&await arr()==='01','the stories: five on a page, more below (down lit)');
 // ----- Local: the Players screen -----
 await S.evaluate(LEVELS);
 await S.evaluate(()=>{openTitle();openLobby();lobbyJoin('kb');lobbyJoin('kb2');LB.mode='level';renderLobby()});await S.waitForTimeout(200);

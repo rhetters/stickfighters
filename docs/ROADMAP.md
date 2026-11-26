@@ -77,6 +77,8 @@ Asked by Ron and Rhett (November 26). A sixth story, CITY, after the Volcano:
 - New transitions: the car park (into Downtown: everyone gets in) and the screech stop (into the Skyscraper:
   everyone hops out). Songs, mini-bosses, scenery, the level creator's places and boss, and the Story screen's tile.
 
+Built (version 75, see the CHANGELOG): all of the above. Still to do: the kids try the drive and Pink Kong on the iPad.
+
 **Done when:** the City story plays through on the iPad, solo, locally and online, and the kids enjoy the drive.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
