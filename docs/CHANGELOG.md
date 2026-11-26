@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## A smaller READY? button (November 25, 2026)
+- Ron's note: the READY? button was too big on smaller screens and covered the next player's card. It's now smaller and sits in the bottom-right corner of the photo, clear of the name, its arrows and the next card.
+- Version 72.
+
 ## Pets' space bubbles, a clearer READY button (November 25, 2026)
 - On the moon, pets get a space bubble like their owner's helmet.
 - In an online room your own card's ready button is now a bright yellow **READY?** button that pulses until you tap it (then the green tick), and a line under the cards says to tap it, or who the room is still waiting for. The victory screen's ready buttons work the same way.
