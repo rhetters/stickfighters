@@ -49,9 +49,12 @@ function carTick(f, I) {
   f.att = null;
   const dir = (K.r ? 1 : 0) - (K.l ? 1 : 0),
     ground = f.y >= f.gy - 1,
-    top = M.top * (C.tb > 0 ? 1.6 : 1);
+    surge = !!K.s, // holding Surge: a steady boost while held
+    top = M.top * (C.tb > 0 ? 1.6 : surge ? 1.45 : 1);
+  C.sg = surge && Math.abs(f.vx) > 2; // drawn with flames
   if (dir) f.face = dir;
   if (C.tb > 0) f.vx += (f.face * top - f.vx) * 0.3;
+  else if (surge) f.vx += (f.face * top - f.vx) * 0.12;
   else if (dir) f.vx += dir * M.acc * (ground ? 1 : 0.4);
   else if (ground) f.vx *= 0.93;
   f.vx = Math.max(-top, Math.min(top, f.vx));
@@ -241,8 +244,8 @@ function drawCar(f, empty) {
     ctx.restore();
   }
   ctx.restore();
-  // turbo: flames out the back and speed lines (cosmetic: Math.random is fine in drawing)
-  if (C.tb > 0) {
+  // turbo or Surge: flames out the back (cosmetic: Math.random is fine in drawing)
+  if (C.tb > 0 || C.sg) {
     const bx = f.x - fc * ((lo - hi) / 2 + 6);
     ctx.save();
     ctx.globalAlpha = 0.85;
@@ -313,12 +316,26 @@ function carExtras(M, col, dark) {
     ctx.stroke();
   }
   if (X.has('spare')) {
+    // the spare tyre on the back door, seen edge-on from the side: a tall rounded band with its tread, on a bracket
+    const sx = hi - 13,
+      sy = by - 50,
+      sw = 13,
+      sh = 32;
+    box(hi - 3, sy + sh / 2 - 4, 4, 8, '#8a8494');
     ctx.fillStyle = '#2b2533';
     ctx.strokeStyle = INK;
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(hi - 8, by - 34, 13, 0, 7);
+    ctx.roundRect(sx, sy, sw, sh, 6);
     ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = '#5a5262';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 1; i < 5; i++) {
+      ctx.moveTo(sx + 3, sy + (sh * i) / 5);
+      ctx.lineTo(sx + sw - 3, sy + (sh * i) / 5);
+    }
     ctx.stroke();
   }
   if (X.has('taxisign')) {

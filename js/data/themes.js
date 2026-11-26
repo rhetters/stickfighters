@@ -514,7 +514,7 @@ const THEMES = {
     }
   },
   city: {
-    name: 'THE CITY',
+    name: 'CITY',
     c: '#ffb400',
     biomes: ['burbs', 'city', 'tower'],
     boss: {

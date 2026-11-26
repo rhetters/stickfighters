@@ -1,14 +1,15 @@
 // StickFighters: Touch controls layout, profiles and the layout editor
 // ===== TOUCH LAYOUT: every control's centre (x, y) and size are fractions of the game area, so a layout fits any screen =====
-const CTL = ['stick', 'x', 'j', 's', 'p', 'k'],
-  CTLNAME = { stick: 'Stick', x: 'ULT', j: 'JUMP', s: 'SURGE', p: 'PUNCH', k: 'KICK' };
+const CTL = ['stick', 'x', 'j', 's', 'p', 'k', 'e'],
+  CTLNAME = { stick: 'Stick', x: 'ULT', j: 'JUMP', s: 'SURGE', p: 'PUNCH', k: 'KICK', e: 'POSE' };
 const LDEF = {
   stick: { x: 0.105, y: 0.785, s: 0.37 },
   x: { x: 0.866, y: 0.716, s: 0.16 },
   j: { x: 0.95, y: 0.716, s: 0.16 },
   s: { x: 0.782, y: 0.894, s: 0.16 },
   p: { x: 0.866, y: 0.894, s: 0.16 },
-  k: { x: 0.95, y: 0.894, s: 0.16 }
+  k: { x: 0.95, y: 0.894, s: 0.16 },
+  e: { x: 0.5, y: 0.1, s: 0.11 } // the pose wheel, centred at the top
 };
 const mirrorL = L => Object.fromEntries(Object.entries(L).map(([k, c]) => [k, { ...c, x: 1 - c.x }]));
 const BUILTIN = { Default: LDEF, 'Left-handed': mirrorL(LDEF) };
@@ -17,8 +18,9 @@ SET.lay = LAY;
 delete SET.mirror; // older saves: Left-hand layout becomes the Left-handed profile
 const EDITING = () => $('wrap').classList.contains('editing');
 const cloneL = L => JSON.parse(JSON.stringify(L));
+// a layout saved before a control existed (the pose button) gets that control's default place
 function getProf(n) {
-  return BUILTIN[n] || LAY.custom[n] || LDEF;
+  return { ...cloneL(LDEF), ...(BUILTIN[n] || LAY.custom[n] || LDEF) };
 }
 function saveLay() {
   SET.lay = LAY;
@@ -54,7 +56,7 @@ function applyLayout(L) {
   const builtin =
     (!L && BUILTIN[LAY.active]) ||
     (L && ED && BUILTIN[ED.prof] && JSON.stringify(L) === JSON.stringify(BUILTIN[ED.prof]));
-  L = L || getProf(LAY.active);
+  L = L ? { ...LDEF, ...L } : getProf(LAY.active);
   const w = $('wrap'),
     ww = w.clientWidth,
     wh = w.clientHeight;

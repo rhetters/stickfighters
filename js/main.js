@@ -376,18 +376,6 @@ $('b-next').onclick = netOr(() => (MODE === VERSUS ? startVersus() : replayLevel
 $('b-title2').onclick = netOr(openTitle, 'room');
 $('b-title').onclick = netOr(leaveGame, 'room');
 $('pausebtn').onclick = () => playerPause();
-// Pose wheel on touch: hold POSE, aim with the stick, let go to strike the pose
-{
-  const pb = $('posebtn'),
-    on = v => e => {
-      e.preventDefault();
-      pb.classList.toggle('on', v);
-      setA('tc', 'e', v);
-    };
-  pb.addEventListener('pointerdown', on(1));
-  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) pb.addEventListener(ev, on(0));
-  pb.addEventListener('pointerdown', e => pb.setPointerCapture && pb.setPointerCapture(e.pointerId));
-}
 // training panel + hotkeys (1/2/3 spawn, 0 clear, H boxes, [ ] speed, \ freeze, . step)
 function syncTrain() {
   document
