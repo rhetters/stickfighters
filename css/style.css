@@ -3043,6 +3043,12 @@ body.padnav #s-char #ch-skills:focus {
 .chcats[hidden] {
   display: none;
 }
+/* COLORS: its eight kinds in two rows of four */
+.chcats.paints {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: center;
+}
 #s-char .chnav .btn {
   width: auto;
   min-width: 0;

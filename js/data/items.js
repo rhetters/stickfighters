@@ -2,7 +2,7 @@
 // ===== ITEMS =====
 // Store items are cosmetic only: nothing here changes how a fighter plays.
 // An item: { id (never rename it, saves keep it), sec (shelf section), name, price in ninja stars, c / c2 colors,
-//   k (drawing style), how }
+//   k (drawing style), how, fx (a Surge style's effect: bolt, ink, snow, heart, flame, bubble, smoke, spark) }
 //   how missing     = buy it in the store for `price`
 //   how.free        = everyone owns it from the start
 //   how.lvl         = unlocked by clearing that level      how.combo = by landing a combo that long
@@ -276,15 +276,15 @@ const ITEMS = [
     how: { drop: 1 }
   },
   // Surge styles: the glow and afterimages when you use Surge (the ids say "trail" for older saves)
-  { id: 'trail-ink', sec: 'surge', name: 'Ink Surge', c: '#1c1626', price: 60 },
-  { id: 'surge-toxic', sec: 'surge', name: 'Toxic Surge', c: '#62e000', price: 120 },
-  { id: 'trail-fire', sec: 'surge', name: 'Fire Surge', c: 'fire', price: 150 },
-  { id: 'trail-ice', sec: 'surge', name: 'Ice Surge', c: 'ice', price: 150 },
-  { id: 'surge-shadow', sec: 'surge', name: 'Shadow Surge', c: '#6a2fc9', price: 150 },
-  { id: 'trail-gold', sec: 'surge', name: 'Gold Surge', c: '#ff9f1a', price: 200 },
-  { id: 'surge-bolt', sec: 'surge', name: 'Lightning Surge', c: 'bolt', price: 250 },
+  { id: 'trail-ink', sec: 'surge', name: 'Ink Surge', c: '#1c1626', fx: 'ink', price: 60 },
+  { id: 'surge-toxic', sec: 'surge', name: 'Toxic Surge', c: '#62e000', fx: 'bubble', price: 120 },
+  { id: 'trail-fire', sec: 'surge', name: 'Fire Surge', c: 'fire', fx: 'flame', price: 150 },
+  { id: 'trail-ice', sec: 'surge', name: 'Ice Surge', c: 'ice', fx: 'snow', price: 150 },
+  { id: 'surge-shadow', sec: 'surge', name: 'Shadow Surge', c: '#6a2fc9', fx: 'smoke', price: 150 },
+  { id: 'trail-gold', sec: 'surge', name: 'Gold Surge', c: '#ff9f1a', fx: 'spark', price: 200 },
+  { id: 'surge-bolt', sec: 'surge', name: 'Lightning Surge', c: 'bolt', fx: 'bolt', price: 250 },
   { id: 'trail-rainbow', sec: 'surge', name: 'Rainbow Surge', c: 'rainbow', price: 300 },
-  { id: 'trail-hearts', sec: 'surge', name: 'Heart Surge', c: 'hearts', how: { drop: 1 } },
+  { id: 'trail-hearts', sec: 'surge', name: 'Heart Surge', c: 'hearts', fx: 'heart', how: { drop: 1 } },
   // poses: put up to 8 on your pose wheel (hold T, Select or POSE in a fight); the first is your victory pose
   { id: 'pose-flex', sec: 'pose', name: 'Flex', how: { free: 1 } },
   { id: 'pose-wave', sec: 'pose', name: 'Wave', how: { free: 1 } },
@@ -396,6 +396,39 @@ const CODES = [
   { code: [1, 1, 1, 1], item: 'face-ninja' },
   { code: [3, 2, 2, 3], item: 'pet-frog' },
   { code: [2, 2, 2, 2], item: 'hd-teddy' }
+];
+// Colours for items (the Character screen's COLORS): every item can be bought in any of these, one at a time (a blue
+// cap and a blue mask are two buys). Body colours are the color items above.
+const TINTS = [
+  { id: 'red', name: 'Red', c: '#e8212b' },
+  { id: 'orange', name: 'Orange', c: '#ff7a00' },
+  { id: 'yellow', name: 'Yellow', c: '#ffd400' },
+  { id: 'lime', name: 'Lime', c: '#8fe000' },
+  { id: 'green', name: 'Green', c: '#2fa84f' },
+  { id: 'teal', name: 'Teal', c: '#0fa39a' },
+  { id: 'sky', name: 'Sky Blue', c: '#3ec5ff' },
+  { id: 'blue', name: 'Blue', c: '#2f5fe0' },
+  { id: 'navy', name: 'Navy', c: '#22306b' },
+  { id: 'purple', name: 'Purple', c: '#8a3ffc' },
+  { id: 'pink', name: 'Pink', c: '#ff5fb0' },
+  { id: 'white', name: 'White', c: '#ffffff' },
+  { id: 'grey', name: 'Grey', c: '#9a96a2' },
+  { id: 'black', name: 'Black', c: '#2b2533' },
+  { id: 'brown', name: 'Brown', c: '#8a5a33' },
+  { id: 'gold', name: 'Gold', c: '#e0a800' }
+];
+const TINT = Object.fromEntries(TINTS.map(t => [t.id, t]));
+const TINT_PRICE = 30; // stars for one colour on one item
+// The COLORS page's eight kinds: what's recoloured in each (Body = the body colours)
+const PAINTS = [
+  { id: 'body', name: 'Body', secs: ['color'] },
+  { id: 'head', name: 'Head', secs: ['hat', 'hair', 'band', 'face'] },
+  { id: 'neck', name: 'Neck', secs: ['scarf', 'tie'] },
+  { id: 'upper', name: 'Upper Body', secs: ['shirt', 'jacket', 'gloves'] },
+  { id: 'lower', name: 'Lower Body', secs: ['pants', 'shorts', 'skirt', 'dress', 'shoes'] },
+  { id: 'surge', name: 'Surge', secs: ['surge'] },
+  { id: 'poses', name: 'Poses', secs: ['pose'] },
+  { id: 'pets', name: 'Pets', secs: ['pet'] }
 ];
 const STANCES = [
   { id: 'classic', name: 'Classic', p: [6, 35, 75, 20, 90, 18, 20, -18, 12, 0] },

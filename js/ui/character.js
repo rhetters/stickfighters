@@ -5,7 +5,9 @@
 // again to buy it with ninja stars. Poses go on the pose wheel instead of being worn. Everything here is cosmetic.
 // ===== CHARACTER & STORE =====
 // tab = the part of the body open (null = the picture tiles of every part), sec = the kind open in it
-const CH = { tab: null, sec: null, tryOn: {}, pose: null, raf: 0, t: 0, msg: '', del: -1, hist: [] };
+// paint / pitem / pick / tryTint: the COLORS page (its kind, the item being coloured, choosing another item, a colour
+// being tried on)
+const CH = { tab: null, sec: null, tryOn: {}, pose: null, raf: 0, t: 0, msg: '', del: -1, hist: [], paint: null, pitem: null, pick: false, tryTint: null };
 const NAMES = [
   'BLAZE',
   'ZIGZAG',
@@ -107,6 +109,7 @@ function previewFighter() {
     if (s === 'color') c.col = CH.tryOn[s];
     else if (s !== 'pose') c.eq[s] = CH.tryOn[s];
   }
+  if (CH.tryTint) c.tint[CH.tryTint.id] = CH.tryTint.t; // a colour being tried on (COLORS)
   return lookRaw(c);
 }
 function wear(c, it) {
@@ -178,15 +181,30 @@ function renderChar() {
   // where you are: the parts of the body, a part's kinds, a shelf, or the body settings
   const tab = TABS.find(t => t.id === CH.tab),
     secs = tab ? (CH.sec ? [CH.sec] : tab.secs) : [],
-    view = !tab ? 'cats' : tab.id === 'body' ? 'body' : secs.length > 1 ? 'kinds' : 'items',
+    view = !tab
+      ? 'cats'
+      : tab.id === 'body'
+        ? 'body'
+        : tab.id === 'colors'
+          ? CH.paint
+            ? 'paint'
+            : 'paints'
+          : secs.length > 1
+            ? 'kinds'
+            : 'items',
     base = ITEM[c.col].c;
   $('ch-nav').hidden = view === 'cats';
   $('ch-path').textContent = tab
-    ? tab.name.toUpperCase() + (CH.sec && tab.secs.length > 1 ? ' \u203a ' + SECS[CH.sec].name.toUpperCase() : '')
+    ? tab.name.toUpperCase() +
+      (CH.sec && tab.secs.length > 1 ? ' \u203a ' + SECS[CH.sec].name.toUpperCase() : '') +
+      (view === 'paint' ? ' \u203a ' + PAINTS.find(p => p.id === CH.paint).name.toUpperCase() : '')
     : '';
-  $('ch-cats').hidden = view !== 'cats' && view !== 'kinds';
+  $('ch-cats').hidden = view !== 'cats' && view !== 'kinds' && view !== 'paints';
   $('ch-body').hidden = view !== 'body';
-  $('ch-grid').hidden = view !== 'items';
+  $('ch-grid').hidden = view !== 'items' && view !== 'paint';
+  $('ch-cats').classList.toggle('paints', view === 'paints');
+  if (view === 'paints') renderPaints(c, base);
+  if (view === 'paint') renderPaint(c, base);
   const fresh = ss => ITEMS.some(i => ss.includes(i.sec) && ECO.own.includes(i.id) && !ECO.seen.includes(i.id));
   if (view === 'cats' || view === 'kinds') {
     const opts =
@@ -237,6 +255,18 @@ function chGo(tab, sec) {
   if (f) f.focus({ preventScroll: true });
 }
 function chUp() {
+  // COLORS: from a kind's colours back to the eight kinds
+  if (CH.tab === 'colors' && CH.paint) {
+    const from = 'paint-' + CH.paint;
+    CH.paint = CH.pitem = CH.tryTint = null;
+    CH.pick = false;
+    CH.msg = '';
+    renderChar();
+    const b = $('ch-cats').querySelector('[data-k="' + from + '"]');
+    if (b) b.focus({ preventScroll: true });
+    return;
+  }
+  CH.tryTint = null;
   const tab = TABS.find(t => t.id === CH.tab),
     kind = CH.sec && tab && tab.secs.length > 1,
     from = kind ? 'sec-' + CH.sec : 'tab-' + CH.tab;
@@ -459,6 +489,205 @@ function renderShelf(c, secs) {
     if (b) b.focus({ preventScroll: true });
   }
 }
+// ===== COLORS =====
+// Eight kinds (PAINTS), each showing what you wear in it. A kind shows the item you're colouring at the top (tap it
+// to pick another of yours) and every colour for that item below: its own colours free, the others bought for that
+// item alone (TINT_PRICE). Body is the body colours, as always.
+// What you wear in a kind (the first worn slot; Poses: your victory pose; Body: your body colour)
+function paintWorn(c, P) {
+  if (P.id === 'body') return c.col;
+  if (P.id === 'poses') return c.wheel[0] || null;
+  for (const sec of P.secs) {
+    const id = c.eq[SECS[sec].slot];
+    if (id && P.secs.includes(ITEM[id].sec)) return id;
+  }
+  return null;
+}
+// The items of a kind you own, the ones you wear first (poses: the ones on your wheel)
+function paintOwned(c, P) {
+  const mine = ITEMS.filter(i => P.secs.includes(i.sec) && owns(i.id) && (P.id !== 'poses' || c.wheel.includes(i.id)));
+  const worn = new Set(EQ.map(s => c.eq[s]));
+  return mine.sort((a, b) => (worn.has(b.id) ? 1 : 0) - (worn.has(a.id) ? 1 : 0));
+}
+function renderPaints(c, base) {
+  const box = $('ch-cats'),
+    L = lookRaw(c),
+    opts = PAINTS.map(P => {
+      const id = paintWorn(c, P),
+        it = id && (P.id === 'body' ? ITEM[id] : tinted(ITEM[id], c.tint)),
+        key = 'paint-' + P.id + ':' + (id || '') + ':' + (id && c.tint[id] ? c.tint[id] : '');
+      return {
+        k: 'paint-' + P.id,
+        label: P.name,
+        pic: chPic(key, base, () => {
+          if (it) drawItemIcon(it, 100, 104, 215, base);
+          else {
+            ctx.strokeStyle = '#c9bfae';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.arc(100, 100, 40, 0, 7);
+            ctx.moveTo(72, 128);
+            ctx.lineTo(128, 72);
+            ctx.stroke();
+          }
+          if (P.id === 'poses' && it && c.tint[id]) {
+            ctx.fillStyle = TINT[c.tint[id]].c;
+            ctx.beginPath();
+            ctx.arc(160, 40, 16, 0, 7);
+            ctx.fill();
+          }
+        }),
+        pick: () => {
+          CH.paint = P.id;
+          CH.pitem = P.id === 'body' ? null : paintWorn(c, P) || (paintOwned(c, P)[0] || {}).id || null;
+          CH.pick = false;
+          CH.tryTint = null;
+          CH.msg = '';
+          $('ch-grid').scrollTop = 0;
+          renderChar();
+          const f = $('ch-grid').querySelector('button');
+          if (f) f.focus({ preventScroll: true });
+        }
+      };
+    });
+  roomTiles(
+    box,
+    opts.map(o => ({ data: ['k', o.k], img: 'chpic', label: o.label.toUpperCase(), aria: o.label, pick: o.pick }))
+  );
+  [...box.children].forEach((b, i) => b.querySelector('.pimg').style.setProperty('--ic', 'url(' + opts[i].pic + ')'));
+}
+function renderPaint(c, base) {
+  const P = PAINTS.find(p => p.id === CH.paint),
+    g = $('ch-grid');
+  if (P.id === 'body') return renderShelf(c, ['color']);
+  const keep = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.id : null,
+    top = g.scrollTop,
+    mine = paintOwned(c, P);
+  g.innerHTML = '';
+  const shelf = note => {
+    if (note) {
+      const h = document.createElement('h4');
+      h.innerHTML = '<small></small>';
+      h.querySelector('small').textContent = note;
+      g.appendChild(h);
+    }
+    const r = document.createElement('div');
+    r.className = 'chshelf';
+    g.appendChild(r);
+    return r;
+  };
+  if (!mine.length) {
+    shelf('You have no ' + P.name.toLowerCase() + ' items yet: get some in ' + P.name + ' first.');
+    return;
+  }
+  if (!CH.pitem || !mine.some(i => i.id === CH.pitem)) CH.pitem = mine[0].id;
+  const it = ITEM[CH.pitem];
+  if (CH.pick) {
+    // pick which of your items to colour (and wear it)
+    const r = shelf('Pick one of yours to colour');
+    for (const m of mine)
+      card(
+        r,
+        'own' + (m.id === CH.pitem ? ' on' : ''),
+        m.name,
+        m.id === CH.pitem ? 'COLOURING' : 'OWNED',
+        () => drawItemIcon(tinted(m, c.tint), 32, 26, 56, base),
+        () => {
+          CH.pitem = m.id;
+          CH.pick = false;
+          CH.tryTint = null;
+          if (m.slot !== 'pose') setChar(cc => wear(cc, m));
+          else renderChar();
+        },
+        'pick-' + m.id
+      );
+  } else {
+    // the item being coloured: tap to pick another
+    const r = shelf();
+    card(
+      r,
+      'own on',
+      it.name,
+      mine.length > 1 ? 'TAP TO CHANGE' : 'COLOURING',
+      () => drawItemIcon(tinted(it, c.tint), 32, 26, 56, base),
+      () => {
+        if (mine.length < 2) return;
+        CH.pick = true;
+        CH.tryTint = null;
+        renderChar();
+      },
+      'cur-' + it.id
+    );
+    // its colours: the original, then every colour
+    const rc = shelf('Colours for ' + it.name + ': ' + TINT_PRICE + ' stars each, for this item only');
+    const cur = c.tint[it.id] || null,
+      sw = (col, draw) => () => {
+        ctx.fillStyle = col || '#fbfaf4';
+        ctx.strokeStyle = '#1c1626';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(54, 12, 8, 0, 7);
+        ctx.fill();
+        ctx.stroke();
+        draw();
+      };
+    card(
+      rc,
+      'own' + (!cur && !CH.tryTint ? ' on' : ''),
+      'Original',
+      !cur ? 'WEARING' : 'FREE',
+      sw(null, () => drawItemIcon(it, 32, 26, 56, base)),
+      () => {
+        CH.tryTint = null;
+        CH.msg = '';
+        setChar(cc => delete cc.tint[it.id]);
+      },
+      'tint-none'
+    );
+    for (const t of TINTS) {
+      const own = tintOwns(it.id, t.id),
+        trying = CH.tryTint && CH.tryTint.id === it.id && CH.tryTint.t === t.id;
+      card(
+        rc,
+        (own ? 'own' : '') + (cur === t.id ? ' on' : '') + (trying ? ' try' : ''),
+        t.name,
+        own ? (cur === t.id ? 'WEARING' : 'OWNED') : TINT_PRICE,
+        sw(t.c, () => drawItemIcon(tinted(it, { [it.id]: t.id }), 32, 26, 56, base)),
+        () => paintTap(it, t),
+        'tint-' + t.id
+      );
+    }
+  }
+  g.scrollTop = top;
+  if (keep) {
+    const b = g.querySelector('[data-id="' + keep + '"]');
+    if (b) b.focus({ preventScroll: true });
+  }
+}
+// A colour tapped: wear it if it's yours; otherwise try it on, and a second tap buys it
+function paintTap(it, t) {
+  CH.msg = '';
+  if (tintOwns(it.id, t.id)) {
+    CH.tryTint = null;
+    return setChar(c => (c.tint[it.id] = t.id));
+  }
+  const trying = CH.tryTint && CH.tryTint.id === it.id && CH.tryTint.t === t.id;
+  if (!trying) {
+    CH.tryTint = { id: it.id, t: t.id };
+    CH.msg =
+      ECO.stars >= TINT_PRICE
+        ? 'Trying on ' + t.name + ' ' + it.name + '. Tap it again to buy it for ' + TINT_PRICE + ' stars.'
+        : t.name + ' for ' + it.name + ' costs ' + TINT_PRICE + ' stars. You need ' + (TINT_PRICE - ECO.stars) + ' more.';
+  } else if (buyTint(it.id, t.id)) {
+    CH.tryTint = null;
+    sfx(880, 0.25, 'triangle', 0.06, 600);
+    const c = fighterNow();
+    c.tint[it.id] = t.id;
+    saveFighter(CHR.cur, c);
+    CH.msg = 'Bought ' + t.name + ' for ' + it.name + '!';
+  } else CH.msg = 'You need ' + (TINT_PRICE - ECO.stars) + ' more stars for ' + t.name + '.';
+  renderChar();
+}
 // ===== THE BIG PREVIEW =====
 // Body and clothes: your stance. Surge: running, punching and kicking with your Surge style. Poses: the pose.
 function charAnim() {
@@ -496,7 +725,9 @@ function charAnim() {
     };
   let pose,
     surge = false;
-  if (CH.tab === 'surge') {
+  // COLORS shows a kind the way its own shelf does (Surge running, Poses posing, Pets walking)
+  const mode = CH.tab === 'colors' && CH.paint ? { surge: 'surge', poses: 'poses', pets: 'pets' }[CH.paint] || '' : CH.tab;
+  if (mode === 'surge') {
     // run, then jab, cross, kick, high kick, all with Surge on
     const u = t % 200,
       mv = u < 80 ? null : u < 100 ? 'jab' : u < 118 ? 'cross' : u < 146 ? 'kick' : u < 174 ? 'high' : null;
@@ -509,9 +740,11 @@ function charAnim() {
       pose = kf(A[mv].k, Math.min(1, (u - st) / len));
       pose[9] = 0;
     }
-  } else if (CH.tab === 'poses') {
-    const id = CH.tryOn.pose || CH.pose || (L.wheel[0] && L.wheel[0].id) || 'pose-flex';
+  } else if (mode === 'poses') {
+    const id =
+      (CH.tab === 'colors' && CH.pitem) || CH.tryOn.pose || CH.pose || (L.wheel[0] && L.wheel[0].id) || 'pose-flex';
     pose = VPOSE[id](t);
+    pose.glow = L.ptint[id]; // its colour: a glow
   } else {
     const b = Math.sin(t * 0.1) * 3,
       S = (STANCES.find(s => s.id === L.stance) || STANCES[0]).p;
@@ -528,7 +761,7 @@ function charAnim() {
     k.fill();
     // your pet sits beside you, looking up at you (on the Pets shelf it walks to and fro)
     if (L.pet) {
-      const walk = CH.tab === 'pets',
+      const walk = mode === 'pets',
         px = f.x + 38 * sc + (walk ? Math.sin(t * 0.02) * 6 * sc : 0),
         pf = walk ? (Math.cos(t * 0.02) >= 0 ? 1 : -1) : -1;
       drawPet(L.pet, px, L.pet.fly ? f.y - 92 * sc + Math.sin(t * 0.06) * 4 : f.y, sc * 0.7, pf, t * 0.22, walk, !walk);
@@ -592,6 +825,7 @@ function charAnim() {
       k.scale(Math.abs(pose.sx) < 0.08 ? 0.08 * Math.sign(pose.sx || 1) : pose.sx, 1);
       k.translate(-f.x, 0);
     }
+    if (pose.glow) drawFig(f.x, f.y, 1, pose, sc, pose.glow, pose.glow, pose[9], 0.4, 17);
     drawFig(
       f.x,
       f.y,

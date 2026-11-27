@@ -1188,10 +1188,12 @@ function drawFace(it, r, w, wv, col) {
   }
 }
 // ===== SURGE STYLES =====
-// The colour of Surge for a look (the glow, afterimages and sparkles); classic yellow without a style.
+// The colour of Surge for a look (the glow, afterimages and sparkles); classic yellow without a style. A style in a
+// bought colour (tc, Character screen COLORS) glows in that colour, a little lighter now and then.
 function surgeCol(L, i) {
   const t = L && L.surge;
   if (!t) return '#ffd400';
+  if (t.tc) return (i >>> 0) % 3 ? t.tc : shade(t.tc, 0.35);
   if (t.c === 'rainbow') return rainbow(i);
   if (t.c === 'fire') return ['#e8212b', '#ff7a00', '#ffb000', '#ffd400'][(i >>> 0) % 4];
   if (t.c === 'ice') return ['#3ec5ff', '#8fdcff', '#d6f5ff'][(i >>> 0) % 3];
@@ -1199,30 +1201,148 @@ function surgeCol(L, i) {
   if (t.c === 'hearts') return '#ff5a7a';
   return t.c;
 }
-// Extra Surge decoration around a surging fighter: lightning sparks or hearts
+// A Surge style's effect around a surging fighter (fx in data/items.js), in its colour: lightning, ink splats, clear
+// crystal snowflakes, see-through hearts, flames, bubbles, smoke or sparkles. Looks only (Math.random is fine).
+const SURGE_FX_COL = { bolt: '#7df9ff', ink: '#1c1626', snow: '#bfeaff', heart: '#ff5a7a', flame: '#ff7a00', bubble: '#62e000', smoke: '#6a2fc9', spark: '#ffd400' };
 function surgeExtra(f) {
   const t = f.look && f.look.surge;
-  if (!t || (t.c !== 'bolt' && t.c !== 'hearts')) return;
-  const s = f.s;
-  if (t.c === 'hearts') {
-    if (Math.random() < 0.3)
-      heart(f.x + (Math.random() - 0.5) * 50 * s, f.y - Math.random() * 80 * s, 3 + Math.random() * 3);
-    return;
-  }
+  if (!t || !t.fx) return;
+  surgeFx(t.fx, t.tc || SURGE_FX_COL[t.fx], f.x, f.y, f.s);
+}
+function surgeFx(fx, col, fx0, fy0, s) {
+  const R = Math.random,
+    px = () => fx0 + (R() - 0.5) * 54 * s,
+    py = () => fy0 - R() * 90 * s;
   ctx.save();
-  ctx.strokeStyle = '#7df9ff';
-  ctx.lineWidth = 2;
-  for (let k = 0; k < 2; k++) {
-    let x = f.x + (Math.random() - 0.5) * 40 * s,
-      y = f.y - 90 * s * Math.random();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    for (let i = 0; i < 4; i++) {
-      x += (Math.random() - 0.5) * 16;
-      y += 6 + Math.random() * 6;
-      ctx.lineTo(x, y);
+  ctx.lineCap = ctx.lineJoin = 'round';
+  if (fx === 'bolt') {
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 2;
+    for (let k = 0; k < 2; k++) {
+      let x = px(),
+        y = fy0 - 90 * s * R();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      for (let i = 0; i < 4; i++) {
+        x += (R() - 0.5) * 16;
+        y += 6 + R() * 6;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
     }
-    ctx.stroke();
+  } else if (fx === 'ink') {
+    // splats: a blot and its drops
+    if (R() < 0.45) {
+      const x = px(),
+        y = py(),
+        r = 3 + R() * 4;
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.75;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, 7);
+      for (let i = 0; i < 4; i++) {
+        const a = R() * 7,
+          d = r + 2 + R() * 6;
+        ctx.moveTo(x + Math.cos(a) * d, y + Math.sin(a) * d);
+        ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, 1 + R() * 1.6, 0, 7);
+      }
+      ctx.fill();
+    }
+  } else if (fx === 'snow') {
+    // clear crystal snowflakes: six arms with little branches, see-through
+    if (R() < 0.35) {
+      const x = px(),
+        y = py(),
+        r = 4 + R() * 4,
+        a0 = R();
+      ctx.strokeStyle = col;
+      ctx.globalAlpha = 0.65;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = a0 + (i * Math.PI) / 3,
+          c = Math.cos(a),
+          sn = Math.sin(a);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + c * r, y + sn * r);
+        const bx = x + c * r * 0.6,
+          by = y + sn * r * 0.6;
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + Math.cos(a + 0.7) * r * 0.35, by + Math.sin(a + 0.7) * r * 0.35);
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + Math.cos(a - 0.7) * r * 0.35, by + Math.sin(a - 0.7) * r * 0.35);
+      }
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.beginPath();
+      ctx.arc(x, y, r * 0.25, 0, 7);
+      ctx.fill();
+    }
+  } else if (fx === 'heart') {
+    // see-through hearts with an outline
+    if (R() < 0.3) {
+      const x = px(),
+        y = py(),
+        r = 3 + R() * 3;
+      ctx.beginPath();
+      ctx.moveTo(x, y + r * 1.3);
+      ctx.bezierCurveTo(x - r * 2, y, x - r, y - r * 1.3, x, y - r * 0.4);
+      ctx.bezierCurveTo(x + r, y - r * 1.3, x + r * 2, y, x, y + r * 1.3);
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.4;
+      ctx.fill();
+      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  } else if (fx === 'flame') {
+    if (R() < 0.5) {
+      const x = px(),
+        y = fy0 - R() * 40 * s,
+        h = 8 + R() * 10;
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(x - 4, y);
+      ctx.quadraticCurveTo(x, y - h * 2, x + 4, y);
+      ctx.fill();
+    }
+  } else if (fx === 'bubble') {
+    if (R() < 0.35) {
+      ctx.strokeStyle = col;
+      ctx.globalAlpha = 0.7;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.arc(px(), py(), 2 + R() * 4, 0, 7);
+      ctx.stroke();
+    }
+  } else if (fx === 'smoke') {
+    if (R() < 0.4) {
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.22;
+      ctx.beginPath();
+      ctx.arc(px(), py(), 6 + R() * 8, 0, 7);
+      ctx.fill();
+    }
+  } else if (fx === 'spark') {
+    if (R() < 0.4) {
+      const x = px(),
+        y = py(),
+        r = 3 + R() * 3;
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.moveTo(x, y - r);
+      ctx.lineTo(x + r * 0.3, y - r * 0.3);
+      ctx.lineTo(x + r, y);
+      ctx.lineTo(x + r * 0.3, y + r * 0.3);
+      ctx.lineTo(x, y + r);
+      ctx.lineTo(x - r * 0.3, y + r * 0.3);
+      ctx.lineTo(x - r, y);
+      ctx.lineTo(x - r * 0.3, y - r * 0.3);
+      ctx.fill();
+    }
   }
   ctx.restore();
 }

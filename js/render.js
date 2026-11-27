@@ -248,6 +248,10 @@ function drawF(f) {
     ds = f.s * (L ? L.ht : 1), // height (character creation) is drawing only
     fa = a * (1 - rA);
   if (!(rOn && R.blend >= 1)) {
+    // a pose in a colour bought for it glows while it's struck (economy.js, L.ptint)
+    const pk = L && L.ptint && LOOKK.get(f);
+    if (pk && pk.v > 0.15 && L.ptint[pk.id])
+      drawFig(f.x, f.y, f.face, pz, ds, L.ptint[pk.id], L.ptint[pk.id], pz[9], 0.4 * pk.v * fa, 17);
     ctx.save();
     if (pz.sx !== undefined) {
       // Twirl: squash sideways to fake turning on the spot
