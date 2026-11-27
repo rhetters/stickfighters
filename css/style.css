@@ -1053,6 +1053,7 @@ body.padnav #ui select:focus {
 .chslot,
 .chtab,
 .chopt,
+.chdel,
 #ch-body .chrow > button,
 #ch-rnd {
   font:
@@ -1200,8 +1201,10 @@ body.padnav #ui select:focus {
   grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
   gap: 6px;
 }
+/* under the polaroid, on every page of the Character screen */
 .chdel {
-  margin-top: 6px;
+  flex: none;
+  margin-top: 2px;
   border-color: #b8202c !important;
   color: #b8202c !important;
 }
@@ -2190,6 +2193,13 @@ body.padnav .thcard:focus small {
   color: #8a3ffc;
   font-size: 18px;
 }
+.vnone i {
+  color: #e8212b;
+  font-size: 18px;
+}
+.vplus:empty {
+  display: none;
+}
 .vbtns .ptile {
   --ps: max(56px, min(calc(var(--wh, 440px) * 0.2), 96px));
   position: relative;
@@ -3033,6 +3043,12 @@ body.padnav #s-char #ch-skills:focus {
 .chcats[hidden] {
   display: none;
 }
+/* COLORS: its eight kinds in two rows of four */
+.chcats.paints {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: center;
+}
 #s-char .chnav .btn {
   width: auto;
   min-width: 0;
@@ -3583,4 +3599,28 @@ body.big .screen p {
 body.padnav .polar .pready.mine:focus {
   animation: none;
   transform: rotate(-10deg) scale(1.15);
+}
+
+/* the house builder's Furniture tab: room buttons before the furniture */
+.hsrooms {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 3px;
+  align-content: center;
+  margin-right: 4px;
+}
+.hsrooms button {
+  font:
+    800 11px 'Trebuchet MS',
+    sans-serif;
+  border: 2px solid #1c1626;
+  border-radius: 8px;
+  background: #fff8ee;
+  color: #1c1626;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.hsrooms button.on {
+  background: #ffd400;
 }

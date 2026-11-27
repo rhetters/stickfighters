@@ -19,6 +19,7 @@ function vsRound() {
   LV = buildLevel('arena');
   CAM.x = WB.l = WW.l = 0;
   WB.r = WW.r = W;
+  stageStart(VS.round > 1); // the stage (stages.js): the same one every round
   // free-for-all: spread across the arena; teams: team 1 starts on the left, team 2 on the right
   const order = VS.teams ? [...PL].sort((a, b) => a.team - b.team || a.slot - b.slot) : PL,
     n = order.length;
@@ -115,6 +116,7 @@ const VERSUS = {
   },
   update() {
     vsSep();
+    stageTick(); // a moving platform (stages.js)
     if (VS.phase !== 'fight') return;
     const alive = PL.filter(p => p.st !== 'dead'),
       sides = [...new Set(alive.map(vsKey))];
@@ -132,8 +134,7 @@ const VERSUS = {
   over() {
     if (VS.phase === 'fight') vsKO(null);
   },
-  bg: () => drawWoods(),
-  fg: () => drawWoodsFg(),
+  // bg, fg: the stage (stages.js)
   hud: vsHud,
   // after a KO nobody can move: the winner strikes their victory pose (patch 2, Rhett's request)
   locked: () => !!VS && (VS.phase === 'ko' || VS.phase === 'end'),

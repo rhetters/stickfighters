@@ -248,6 +248,10 @@ function drawF(f) {
     ds = f.s * (L ? L.ht : 1), // height (character creation) is drawing only
     fa = a * (1 - rA);
   if (!(rOn && R.blend >= 1)) {
+    // a pose in a colour bought for it glows while it's struck (economy.js, L.ptint)
+    const pk = L && L.ptint && LOOKK.get(f);
+    if (pk && pk.v > 0.15 && L.ptint[pk.id])
+      drawFig(f.x, f.y, f.face, pz, ds, L.ptint[pk.id], L.ptint[pk.id], pz[9], 0.4 * pk.v * fa, 17);
     ctx.save();
     if (pz.sx !== undefined) {
       // Twirl: squash sideways to fake turning on the spot
@@ -356,7 +360,8 @@ function drawF(f) {
   }
 }
 function bg() {
-  if (MODE.bg && state !== 'train') return MODE.bg();
+  // (a mode's drawing can hand back false: the plain notebook page below, Arcade's own)
+  if (MODE.bg && state !== 'train' && MODE.bg() !== false) return;
   ctx.fillStyle = '#fbfaf4';
   ctx.fillRect(-30, -30, W + 60, H + 60);
   ctx.drawImage(gridC, 0, 0, W, H);
@@ -910,7 +915,8 @@ function renderFrame() {
   for (const p of PL) drawPetOf(p); // pets trot along behind (pets.js)
   for (const p of PL) lifted(p.x, () => {
     // Surge glow while Surge is held (the sparkles that rise from it are made in updP)
-    if (inputOf(p).K.s && live() && p.st !== 'dead' && !p.stm.winded) {
+    // (in a car the car's outline glows instead: cars.js)
+    if (inputOf(p).K.s && live() && p.st !== 'dead' && !p.stm.winded && !p.car) {
       const pul = 0.45 + 0.2 * Math.sin(fr * 0.4),
         sc = surgeCol(p.look, fr >> 2),
         hs = p.s * (p.look ? p.look.ht : 1);

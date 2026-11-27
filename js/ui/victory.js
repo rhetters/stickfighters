@@ -8,17 +8,19 @@ const VIC_FIST =
   '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M6 14 q0 -6 6 -6 h10 q4 0 4 4 v6 q0 8 -8 8 h-4 q-8 0 -8 -8z" fill="#ffd9b0" stroke="#1c1626" stroke-width="2.5"/><path d="M12 8 v6 M17 8 v6 M22 9 v5" stroke="#1c1626" stroke-width="2"/><path d="M2 6 l4 3 M4 2 l3 5 M10 1 v5" stroke="#e8212b" stroke-width="2" stroke-linecap="round"/></svg>';
 const VIC_HEART =
   '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M15 26 C2 18 2 6 9 5 c3 0 5 2 6 4 c1 -2 3 -4 6 -4 c7 1 7 13 -6 21z" fill="#e8212b" stroke="#1c1626" stroke-width="2.5"/><path d="M15 9 l-3 6 l5 3 l-3 6" stroke="#fff8ee" stroke-width="2" fill="none"/></svg>';
+// Also after one of your own levels (MY LEVELS: no XP or stars) or a single level: PLAY AGAIN instead of THEME +1.
 function vicOpen() {
   VIC.ready = {};
   VIC.go = 0;
-  const ng = LV.run.ng || 0,
+  const run = LV.run,
+    ng = run ? run.ng || 0 : 0,
     cards = $('v-cards');
   $('v-h1').textContent = LV.def.name + ' CLEAR!';
   // THEME +1: the theme's picture with +1 (+2…) written in its corner
-  $('v-again').querySelector('.pimg').className = 'pimg i-' + LV.run.theme;
-  $('v-again').querySelector('b').textContent = THEMES[LV.run.theme].name;
-  $('v-again').querySelector('.vplus').textContent = '+' + (ng + 1);
-  $('v-again').setAttribute('aria-label', THEMES[LV.run.theme].name + ' +' + (ng + 1) + ', harder');
+  $('v-again').querySelector('.pimg').className = 'pimg ' + (run ? 'i-' + run.theme : LV.custom ? 'i-levels' : 'i-story');
+  $('v-again').querySelector('b').textContent = run ? THEMES[run.theme].name : 'PLAY AGAIN';
+  $('v-again').querySelector('.vplus').textContent = run ? '+' + (ng + 1) : '';
+  $('v-again').setAttribute('aria-label', run ? THEMES[run.theme].name + ' +' + (ng + 1) + ', harder' : 'Play again');
   cards.innerHTML = '';
   cards.style.setProperty('--n', PL.length);
   for (const p of [...PL].sort((a, b) => a.slot - b.slot)) {
@@ -52,7 +54,8 @@ function vicOpen() {
   $('v-lobby').querySelector('.pimg').className = 'pimg ' + li;
   $('v-lobby').querySelector('b').textContent = lt;
   $('v-title').querySelector('b').textContent = NET.match && !NET.host ? 'LEAVE' : 'MENU';
-  vicRewards();
+  if (LV.custom) $('v-st').innerHTML = '<span class="vgot vnone"><i>A level of your own: no XP or ninja stars</i></span>';
+  else vicRewards();
   show('s-victory');
   vicRefresh();
   const me = cards.querySelector('.vready:not([disabled])');
@@ -116,8 +119,9 @@ $('v-again').onclick = () => {
   if (!PL.every(p => p.left || vicIsReady(p.slot))) return;
   VIC.go = 1;
   cancelAnimationFrame(VIC.raf);
-  if (NET.match) netCmd('harder');
-  else replayLevel(true);
+  const h = !!LV.run; // a story goes one step harder; your own level or a single level just again
+  if (NET.match) netCmd(h ? 'harder' : 'again');
+  else replayLevel(h);
 };
 // The victory pose (the fighter's first pose-wheel pick), standing on a little shadow
 function vicDraw(cv, p, t) {
@@ -136,6 +140,7 @@ function vicDraw(cv, p, t) {
     ctx.beginPath();
     ctx.ellipse(60, 122, 26, 5, 0, 0, 7);
     ctx.fill();
+    if (L && L.ptint && L.ptint[id]) drawFig(60, 120, 1, pz, s, L.ptint[id], L.ptint[id], pz[9] || 0, 0.4, 17); // its glow
     if (L && L.pet) drawPet(L.pet, 24, L.pet.fly ? 40 + Math.sin(t * 0.08) * 3 : 121, 0.9, 1, 0, false, true); // their pet
     ctx.save();
     if (pz.sx !== undefined) {

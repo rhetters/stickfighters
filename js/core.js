@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 77;
+const GAME_VERSION = 78;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -28,7 +28,7 @@ let SET = { ...DEF },
   LAST = null;
 // Ninja stars and owned cosmetics. Change these only through economy.js (grantStars, spendStars, grantItem).
 //   stars = wallet, got = stars ever earned, own = item ids owned, seen = item ids already shown as NEW
-const ECO = { stars: 0, got: 0, own: [], seen: [] };
+const ECO = { stars: 0, got: 0, own: [], seen: [], tint: {} }; // tint: colours bought per item (economy.js)
 // Saved fighters: four slots, cur = the one Player 1 uses. A slot is null until it's created.
 const CHR = { cur: 0, list: [null, null, null, null] };
 // The house (see data/house.js for its shape). Checked with normHouse() before it's used.
@@ -66,7 +66,8 @@ const EDIT = { levels: [] };
 //   v16: fighters gain eq.pet (a pet that follows you; none to start)
 //   v17: adds edit = { levels: [] } (Rhett's levels from the level creator)
 //   v18: a level's place and parts ({ b, parts }) become places: [{ b, parts }] (up to three places in a level)
-const SAVE_VERSION = 18;
+//   v19: colours per item: eco.tint = { itemId: [colour ids bought for it] } and fighters gain tint = { itemId: colour }
+const SAVE_VERSION = 19;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -166,6 +167,11 @@ function migrate(s) {
       );
     s.saveVersion = 18;
   }
+  if (s.saveVersion === 18) {
+    if (s.eco && typeof s.eco === 'object' && !s.eco.tint) s.eco.tint = {};
+    if (s.chr && Array.isArray(s.chr.list)) for (const f of s.chr.list) if (f && !f.tint) f.tint = {};
+    s.saveVersion = 19;
+  }
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).
@@ -179,6 +185,10 @@ function loadSave(s) {
   ECO.got = Math.max(ECO.stars, Math.floor(+e.got || 0));
   ECO.own = ids(e.own);
   ECO.seen = ids(e.seen);
+  // colours bought per item (checked against the items and colours by economy.js)
+  ECO.tint = {};
+  if (e.tint && typeof e.tint === 'object' && !Array.isArray(e.tint))
+    for (const k of Object.keys(e.tint).slice(0, 500)) ECO.tint[k] = ids(e.tint[k]);
   const c = s.chr || {};
   CHR.list = [0, 1, 2, 3].map(i => (c.list && c.list[i] && typeof c.list[i] === 'object' ? c.list[i] : null));
   CHR.cur = [0, 1, 2, 3].includes(c.cur) ? c.cur : 0;

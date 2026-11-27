@@ -115,8 +115,10 @@ they're for the theme enemies to come. The rules for making enemies are at the t
 moment later where the enemy was aiming, with a shadow first, through the falling rocks (`LV.rk`): Pink Kong's Air
 Conditioner Throw. His Chest Pound pushes back anyone close in front.
 
-**Cars** (the City's Downtown): a car hitting an enemy at speed launches it, harder with the turbo; holding Surge
-drives faster. Players in cars can't be hurt.
+**Cars** (the City's Downtown): a car hitting an enemy at speed launches it; holding Surge drives faster and hits
+half again as hard. Punch bumps the hood into whoever is in front, Kick the trunk into whoever is behind; Jump hops,
+once more in the air; ULT (full meter) is each model's own move (CAR_ULTS in cars.js). Enemies hurt players in cars;
+a knockout throws them out.
 
 **Area hits** (quakes, slams) only reach fighters standing on the same level as the attacker.
 

@@ -17,18 +17,19 @@ ok(a1.seen&&a1.car!==null&&a1.car!==undefined&&a1.b==='city','the car park scene
 ok(a1.car===a2.car,'the same seed gives the same car (so it plays the same online)');
 const ms=await ev("(()=>{const s=new Set();for(let i=0;i<200;i++){const f={};carGive(f);s.add(f.car.m)}return s.size})()");
 ok(ms>=8,'cars are picked from all the models ('+ms+' seen)');
-// driving: cars hop, the turbo goes faster, ramming launches enemies and is credited to the driver; cars can't be hurt
-const dr=await ev(`(()=>{const P=PL[0],run=(n,t)=>{P.x=WB.l+60;P.vx=0;P.car.tb=0;P.car.tc=0;E.length=0;let m=0;setA('kb','r',1);if(t)setA('kb','p',1);for(let i=0;i<n;i++){fr++;update();if(t)setA('kb','p',0);m=Math.max(m,Math.abs(P.vx))}setA('kb','r',0);return m};
- const hp0=P.hp;hurtP(P,{dmg:30,kb:10,ef:'kd'},1);const safe=P.hp===hp0&&!!P.car;
+// driving: cars hop, Surge goes faster, ramming launches enemies and is credited to the driver; a hit on a car hurts
+// the driver, who stays in it
+const dr=await ev(`(()=>{const P=PL[0],run=(n,t)=>{P.x=WB.l+60;P.vx=0;P.car.tb=0;P.car.tc=0;E.length=0;let m=0;setA('kb','r',1);if(t)setA('kb','s',1);for(let i=0;i<n;i++){fr++;update();m=Math.max(m,Math.abs(P.vx))}setA('kb','r',0);setA('kb','s',0);return m};
+ P.inv=0;const hp0=P.hp;hurtP(P,{dmg:30,kb:10,ef:'kd'},1);const safe=P.hp<hp0&&!!P.car&&P.st==='free';P.hp=P.max;P.inv=0;
  const maxv=run(45,0),tmax=run(45,1);
  P.x=WB.l+60;P.vx=0;E.length=0;spawn({t:'g',x:P.x+300});spawn({t:'g',x:P.x+340});for(const e of E){e.y=G;e.st='free'}
  let flew=0;setA('kb','r',1);for(let i=0;i<60;i++){fr++;update();for(const e of E)if(e.st==='fly'||e.dying)flew|=1<<E.indexOf(e)}
  setA('kb','r',0);for(let i=0;i<30;i++){fr++;update()}
  setA('kb','j',1);fr++;update();setA('kb','j',0);let up=0;for(let i=0;i<20;i++){fr++;update();up=Math.max(up,G-P.y)}
  return {safe,flew,maxv,tmax,up}})()`);
-ok(dr.safe,'a hit on a player in a car does nothing');
+ok(dr.safe,'a hit on a player in a car hurts, and they stay in it');
 ok(dr.flew===3,'driving into the army sends them flying '+JSON.stringify(dr));
-ok(dr.tmax>dr.maxv+1,'Punch is a turbo: faster than top speed');
+ok(dr.tmax>dr.maxv+1,'Surge: faster than top speed');
 ok(dr.up>20,'Jump hops the car');
 const sg=await ev("(()=>{const P=PL[0];P.x=WB.l+60;P.vx=0;P.car.tb=0;E.length=0;let m=0;setA('kb','r',1);setA('kb','s',1);for(let i=0;i<45;i++){fr++;update();m=Math.max(m,Math.abs(P.vx))}setA('kb','r',0);setA('kb','s',0);return m})()");
 ok(sg>dr.maxv+1,'holding Surge speeds the car up ('+sg.toFixed(1)+' against '+dr.maxv.toFixed(1)+')');

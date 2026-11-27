@@ -47,7 +47,7 @@ ok(await ev("(()=>{NET.diff=2;const r=netRoomMsg().diff===2;NET.diff=1;return r}
 ok(await ev("(()=>{NET.match=true;NET.diff=2;const v=diffOf().id;NET.match=false;NET.diff=1;return v==='hard'})()"),'online, everyone plays the host\'s difficulty');
 await ev("SET.diff=1;openLobby();LB.mode='level';renderLobby()");await W(150);
 ok(await ev("$('lb-diff').children.length===3"),'the local room has the difficulty tiles for Story');
-await ev("LB.mode='vs';renderLobby()");ok(await ev("$('lb-diff').children.length===0"),'and none for Versus');
+await ev("LB.mode='vs';renderLobby()");ok(await ev("$('lb-diff').querySelectorAll('[data-diff]').length===0&&$('lb-diff').querySelectorAll('[data-stage]').length>0"),'and none for Versus (its stages sit there instead)');
 // the tutorial
 await ev("SET.tut=0;openSolo();$('b-start').click()");await W(150);
 ok(await ev("!$('s-learn').hidden&&SET.tut===1"),'the first time Story or Arcade is started, it offers to learn the moves first');
@@ -78,7 +78,7 @@ ok(await ev("CH.tab==='lower'&&!CH.sec&&$('ch-cats').children.length===5&&/LOWER
 await ev("document.querySelector('[data-k=sec-shorts]').click()");
 ok(await ev("CH.sec==='shorts'&&!$('ch-grid').hidden&&$('ch-grid').querySelectorAll('.chitem').length===ITEMS.filter(i=>i.sec==='shorts').length+1"),'SHORTS opens a shelf of every pair of shorts (and None)');
 await ev("chUp()");ok(await ev("CH.tab==='lower'&&!CH.sec"),'BACK goes up to the kinds');await ev("chUp()");ok(await ev("!CH.tab&&!$('ch-nav').hidden===false"),'and up to the parts of the body');
-await ev("chGo('colors')");ok(await ev("!$('ch-grid').hidden&&$('ch-grid').querySelectorAll('.chitem').length===ITEMS.filter(i=>i.sec==='color').length"),'a part with only one kind (Colors) goes straight to its shelf');
+await ev("chGo('colors');$('ch-cats').querySelector('[data-k=\"paint-body\"]').click()");ok(await ev("!$('ch-grid').hidden&&$('ch-grid').querySelectorAll('.chitem').length===ITEMS.filter(i=>i.sec==='color').length"),'Colors, then Body: the body colours');
 await ev("chGo('body')");ok(await ev("!$('ch-body').hidden&&$('ch-grid').hidden"),'BODY opens the body settings');
 ok(await ev("(()=>{const c=fighterNow();c.prog.xp=0;saveFighter(0,c);renderChar();const a=!$('ch-skills').classList.contains('has');c.prog.xp=5000;saveFighter(0,c);renderChar();return a&&$('ch-skills').classList.contains('has')&&!$('ch-pts').hidden&&getComputedStyle($('ch-skills')).animationName==='skglow'})()"),'the skills badge glows when there are points to spend');
 await ev("$('ch-skills').click()");await W(150);ok(await ev("!$('s-skills').hidden"),'and opens the skills');

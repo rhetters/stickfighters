@@ -42,11 +42,11 @@ await p.screenshot({path:S+'/shots/m8-grove.png'});
 ok(await ev("LV.encs[4].st===1&&LV.encs[4].list.includes('c')"),'final fight in the grove includes the Captain');
 // finish
 await ev("LV.encs[4].st=2;LV.cp=4;E=[];CAM.x=LV.len-W-50;levelWalls();PL[0].x=CAM.x+500");await p.keyboard.down('d');await W(2500);await p.keyboard.up('d');
-await p.waitForTimeout(2000);ok(await p.isVisible('#s-clear'),'walking through the arch at the end shows LEVEL CLEAR');
+await p.waitForTimeout(2000);ok(await p.isVisible('#s-victory')&&/CLEAR!/.test(await p.textContent('#v-h1')),'walking through the arch at the end shows the victory screen');
 await p.screenshot({path:S+'/shots/m8-clear.png'});
 const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))"),SV=await ev("SAVE_VERSION");
 ok(sv.saveVersion===SV&&sv.prog.woods1&&sv.prog.woods1.done===1,'progress saved with saveVersion 2 '+JSON.stringify(sv.prog));
-await p.click('#b-title2');await W(300);ok(await p.isVisible('#s-title'),'TITLE goes back to the title menu');
+await p.click('#v-title');await W(300);ok(await p.isVisible('#s-title'),'MENU goes back to the title menu');
 // arcade still works
 await p.evaluate('openSolo()');await p.click('#b-start');await W(1500);ok(await ev("MODE===ARCADE&&state==='play'&&CAM.x===0&&WB.r===W&&wave===1"),'Arcade still plays on one screen');
 await p.screenshot({path:S+'/shots/m8-arcade.png'});

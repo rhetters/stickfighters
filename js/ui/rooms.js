@@ -160,6 +160,77 @@ function roomTiles(box, opts) {
     b.onclick = o.pick;
   });
 }
+// ===== STAGES (Versus and Arcade), FIVE AT A TIME =====
+// '?' (a stage picked from the game's seed) and then the stages, paged five at a time like the stories.
+// o = { cur, pages ({ pg, sel }), pick(id), redraw(), disabled (a guest: only the host picks) }
+function stageRow(o) {
+  const pg = pageOf(o.pages, STAGES.map(s => s.id), o.cur),
+    d = o.disabled,
+    tiles = [
+      {
+        data: ['pg', 'stage'],
+        arrows: 1,
+        up: pg.up,
+        down: pg.down,
+        onUp: () => (o.pages.pg--, o.redraw()),
+        onDown: () => (o.pages.pg++, o.redraw())
+      },
+      { data: ['stage', '?'], img: 'i-q', label: '?', aria: 'A stage at random', on: o.cur === '?', disabled: d, pick: () => o.pick('?') }
+    ];
+  for (const id of pg.list)
+    tiles.push({
+      data: ['stage', id],
+      img: 'chpic',
+      pic: stageThumbURL(id),
+      label: STAGE[id].tag,
+      aria: STAGE[id].name,
+      on: o.cur === id,
+      disabled: d,
+      pick: () => o.pick(id)
+    });
+  return tiles;
+}
+// A stage's picture for its tile: its look and platforms, drawn small (kept once drawn)
+const STAGE_THUMB = {};
+function stageThumbURL(id) {
+  if (STAGE_THUMB[id]) return STAGE_THUMB[id];
+  const cv = document.createElement('canvas');
+  cv.width = 240;
+  cv.height = 160;
+  const k = cv.getContext('2d'),
+    keep = { st: STG.st, s: STG.s, cx: CAM.x, cy: CAM.y, cz: CAM.z };
+  try {
+    STG.st = STAGE[id];
+    STG.s = STG.st.plats.map(([x1, x2, h]) => ({ x1, x2, y1: G - h, y2: G - h }));
+    CAM.x = CAM.y = 0;
+    CAM.z = 1;
+    k.scale(240 / W, 160 / (G + 60));
+    withCtx(k, () => {
+      if (stageBg() === false) {
+        ctx.fillStyle = '#fbfaf4';
+        ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = '#cfe0ee';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let x = 0; x < W; x += 45) ctx.moveTo(x, 0), ctx.lineTo(x, H);
+        for (let y = 0; y < H; y += 45) ctx.moveTo(0, y), ctx.lineTo(W, y);
+        ctx.stroke();
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(0, G);
+        ctx.lineTo(W, G);
+        ctx.stroke();
+      }
+    });
+  } catch (e) {
+    console.warn('stage picture', id, e);
+  } finally {
+    Object.assign(STG, { st: keep.st, s: keep.s });
+    Object.assign(CAM, { x: keep.cx, y: keep.cy, z: keep.cz });
+  }
+  return (STAGE_THUMB[id] = cv.toDataURL());
+}
 // ===== STORIES AND MY LEVELS, FIVE AT A TIME =====
 // The Story screen, the Players screen and the online room show five stories (or, under MY LEVELS, five of the host's
 // levels) at a time, then '?' and MY LEVELS (or STORIES) always on the right; up and down arrows on the left page

@@ -44,6 +44,7 @@ function renderOnline() {
   $('on-b').textContent = ONC.b;
   $('b-onlineback').textContent = NET.on ? 'LEAVE ROOM' : 'BACK';
   $('on-start').hidden = !NET.on || !NET.host; // nothing to start until you host a room
+  $('on-nostar').hidden = true; // only a room on MY LEVELS shows it (below)
   if (!NET.on) return;
   const live = NET.players.filter(p => !p.left).length;
   // the sticky note: the room code, and the room size (the host's - and +, never below the players already in)
@@ -124,7 +125,9 @@ function renderOnline() {
         })
       : NET.mode === 'vs'
         ? teamTiles(NET.teams, v => ((NET.teams = v), netOptChanged()), !NET.host)
-        : []
+        : NET.mode === 'arcade'
+          ? stageRow(onStage())
+          : []
   );
   $('on-room').classList.toggle('nosub', !$('on-sub').children.length);
   // the difficulty for Story and Arcade (the host picks)
@@ -132,7 +135,9 @@ function renderOnline() {
     $('on-diff'),
     NET.mode === 'level' || NET.mode === 'arcade'
       ? diffTiles(NET.diff, v => ((NET.diff = v), netOptChanged()), !NET.host)
-      : []
+      : NET.mode === 'vs'
+        ? stageRow(onStage())
+        : []
   );
   const mine = NET.mode === 'level' && NET.theme === 'mine';
   $('on-nostar').hidden = !mine;
@@ -146,7 +151,16 @@ function renderOnline() {
     me && !me.ready ? 'Tap READY? on your card when you\'re ready to play!' : 'Waiting for ' + wait + (wait > 1 ? ' players' : ' player') + ' to tap READY…';
 }
 // The online room's story and level tiles' pages (this device's own: a guest can look through them too)
-const ONPAGES = newPages();
+const ONPAGES = newPages(),
+  ONSTAGES = { pg: 0, sel: null };
+// The room's stage row: the host picks
+const onStage = () => ({
+  cur: NET.stage || '?',
+  pages: ONSTAGES,
+  pick: v => ((NET.stage = v), netOptChanged()),
+  redraw: renderOnline,
+  disabled: !NET.host
+});
 // Change my fighter (my saved fighters, in order) and tell the room
 function onlineFighter(d) {
   const ids = CHR.list.map((c, i) => i).filter(i => CHR.list[i]);

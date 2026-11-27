@@ -22,8 +22,8 @@ await S.evaluate(()=>{[...$('th-cards').children].find(c=>/MY LEVELS/.test(c.tex
 ok(await S.evaluate(()=>MODE===LEVEL&&LV.custom==='bbb'&&LV.from==='menu'&&LV.def.name==='ICE DASH'),'picking a level plays it');
 const st0=await S.evaluate(()=>ECO.stars);
 await S.evaluate(()=>{cineEnd();levelClear()});await S.waitForTimeout(2200);
-ok(await S.evaluate(()=>SHOWN==='s-clear'&&/no XP or ninja stars/.test($('c-st').textContent)&&$('b-next').textContent==='PLAY AGAIN')&&await S.evaluate(()=>ECO.stars)===st0,'the end: no XP or ninja stars, and PLAY AGAIN');
-await S.evaluate(()=>$('b-next').click());await S.waitForTimeout(300);
+ok(await S.evaluate(()=>SHOWN==='s-victory'&&/no XP or ninja stars/.test($('v-st').textContent)&&/PLAY AGAIN/.test($('v-again').textContent))&&await S.evaluate(()=>ECO.stars)===st0,'the end: the victory screen, no XP or ninja stars, and PLAY AGAIN');
+await S.evaluate(()=>{vicReady(PL[0].slot);$('v-again').click()});await S.waitForTimeout(300);
 ok(await S.evaluate(()=>MODE===LEVEL&&LV.custom==='bbb'),'PLAY AGAIN plays it again');
 // no levels yet: one tile saying so
 await S.evaluate(()=>{openTitle();EDIT.levels=[];$('b-level').click();[...$('th-cards').children].find(c=>/MY LEVELS/.test(c.textContent)).click()});await S.waitForTimeout(200);

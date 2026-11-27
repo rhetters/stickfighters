@@ -107,6 +107,105 @@ function drawPet(it, x, y, u, face, t, mv, sit) {
       ctx.ellipse(hx + 8 * u, hy + 7.5 * u, 2 * u, 2.6 * u, 0, 0, Math.PI);
       ctx.fill();
     }
+  } else if (k === 'unicorn') {
+    // a chubby white pony with a rainbow mane and tail, a golden horn and rosy cheeks
+    const RB = ['#ff6b9a', '#ffb23f', '#ffe14d', '#6fd16f', '#5ab8ff', '#b07cff'],
+      swish = Math.sin(t * 2 + (mv ? 0 : performance.now() / 160)) * 0.25,
+      // the small bright bits get a thin outline so their colour shows
+      puff = (bx, by, rx, ry, col, rot = 0) => {
+        ctx.beginPath();
+        ctx.ellipse(bx, by, rx, ry, rot, 0, 7);
+        ctx.fillStyle = col;
+        ctx.fill();
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = lw * 0.5;
+        ctx.stroke();
+      };
+    // the rainbow tail: a fan of curls
+    RB.forEach((col, i) => {
+      ctx.save();
+      ctx.translate(-12 * u, -16 * u);
+      ctx.rotate(-1.25 + swish + i * 0.2);
+      puff(0, -6 * u, 3.4 * u, 7.5 * u, col);
+      ctx.restore();
+    });
+    if (sit) {
+      leg(-7 * u, 7 * u, 0, '#fff');
+      blob(-3 * u, -11 * u, 11 * u, 9.5 * u, c);
+      leg(6 * u, 11 * u, 0, '#fff');
+    } else {
+      leg(-9 * u, 9 * u, -sw, '#fff');
+      leg(8 * u, 9 * u, sw, '#fff');
+      blob(0, -14 * u, 13.5 * u, 8 * u, c);
+      leg(-6 * u, 9 * u, sw, '#fff');
+      leg(11 * u, 9 * u, -sw, '#fff');
+    }
+    // little pink hooves
+    for (const hx0 of sit ? [-7, 6] : [-9, 8, -6, 11]) {
+      ctx.fillStyle = '#ffb3d1';
+      ctx.beginPath();
+      ctx.ellipse(hx0 * u, -0.5 * u, 2.4 * u, 1.5 * u, 0, 0, 7);
+      ctx.fill();
+    }
+    const hx = sit ? 7 * u : 12 * u,
+      hy = sit ? -26 * u : -24 * u;
+    // the mane: rainbow puffs down the back of the head and neck
+    RB.slice(0, 4).forEach((col, i) => puff(hx - (6 + i * 1.6) * u, hy - 7 * u + i * 3.6 * u, 4.4 * u, 4 * u, col));
+    blob(hx, hy, 9 * u, 8.5 * u, c); // the head, big for a cute look
+    puff(hx + 7 * u, hy + 3.5 * u, 5 * u, 4 * u, '#ffe3ef'); // the muzzle
+    // the ear
+    ctx.beginPath();
+    ctx.moveTo(hx - 3 * u, hy - 6 * u);
+    ctx.lineTo(hx - 1 * u, hy - 13 * u);
+    ctx.lineTo(hx + 2 * u, hy - 6 * u);
+    ctx.closePath();
+    ctx.fillStyle = c;
+    ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = lw;
+    ctx.stroke();
+    // the golden horn, with its swirl
+    ctx.beginPath();
+    ctx.moveTo(hx + 1 * u, hy - 6.5 * u);
+    ctx.lineTo(hx + 7.5 * u, hy - 21 * u);
+    ctx.lineTo(hx + 7.5 * u, hy - 5.5 * u);
+    ctx.closePath();
+    ctx.fillStyle = '#ffd400';
+    ctx.fill();
+    ctx.lineWidth = lw * 0.5;
+    ctx.stroke();
+    ctx.strokeStyle = '#c98a00';
+    ctx.beginPath();
+    ctx.moveTo(hx + 2.8 * u, hy - 9.5 * u);
+    ctx.lineTo(hx + 7.4 * u, hy - 11 * u);
+    ctx.moveTo(hx + 4.6 * u, hy - 14.5 * u);
+    ctx.lineTo(hx + 7.4 * u, hy - 15.5 * u);
+    ctx.stroke();
+    eye(hx + 2.5 * u, hy - 1.5 * u, 2);
+    // a rosy cheek and a smile
+    ctx.fillStyle = 'rgba(255,120,170,0.55)';
+    ctx.beginPath();
+    ctx.ellipse(hx + 1 * u, hy + 3.5 * u, 2.4 * u, 1.6 * u, 0, 0, 7);
+    ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = lw * 0.7;
+    ctx.beginPath();
+    ctx.arc(hx + 8 * u, hy + 4 * u, 2 * u, 0.3, Math.PI - 0.6);
+    ctx.stroke();
+    nose(hx + 11 * u, hy + 2 * u);
+    // a sparkle now and then (looks only)
+    if ((performance.now() / 400) % 3 < 1) {
+      const sx = hx + 10 * u,
+        sy = hy - 20 * u;
+      ctx.strokeStyle = '#ffd400';
+      ctx.lineWidth = lw * 0.8;
+      ctx.beginPath();
+      ctx.moveTo(sx - 3 * u, sy);
+      ctx.lineTo(sx + 3 * u, sy);
+      ctx.moveTo(sx, sy - 3 * u);
+      ctx.lineTo(sx, sy + 3 * u);
+      ctx.stroke();
+    }
   } else if (k === 'cat') {
     const tw = Math.sin(performance.now() / 400) * 0.25;
     ctx.save();

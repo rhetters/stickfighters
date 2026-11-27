@@ -90,6 +90,7 @@ function start() {
   paused = false;
   releaseAll();
   show(null);
+  stageStart(); // Arcade's stage (stages.js)
   nextWave();
 }
 function startTrain() {

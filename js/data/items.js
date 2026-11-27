@@ -2,7 +2,7 @@
 // ===== ITEMS =====
 // Store items are cosmetic only: nothing here changes how a fighter plays.
 // An item: { id (never rename it, saves keep it), sec (shelf section), name, price in ninja stars, c / c2 colors,
-//   k (drawing style), how }
+//   k (drawing style), how, fx (a Surge style's effect: bolt, ink, snow, heart, flame, bubble, smoke, spark) }
 //   how missing     = buy it in the store for `price`
 //   how.free        = everyone owns it from the start
 //   how.lvl         = unlocked by clearing that level      how.combo = by landing a combo that long
@@ -106,6 +106,7 @@ const ITEMS = [
   { id: 'pet-armadillo', sec: 'pet', name: 'Armadillo', c: '#b9a28a', c2: '#7d6a58', k: 'armadillo', price: 350 },
   { id: 'pet-wolf', sec: 'pet', name: 'Wolf Pup', c: '#a8b4c4', c2: '#6c7a8e', k: 'wolf', price: 400 },
   { id: 'pet-owl', sec: 'pet', name: 'Owl', c: '#a8784a', c2: '#7a5230', k: 'owl', fly: 1, price: 450 },
+  { id: 'pet-unicorn', sec: 'pet', name: 'Unicorn', c: '#ffffff', k: 'unicorn', price: 500 },
   { id: 'pet-dragon', sec: 'pet', name: 'Baby Dragon', c: '#5ac46a', c2: '#e8572b', k: 'dragon', fly: 1, price: 600 },
   // face (k = the style, looks.js drawFace)
   { id: 'face-glasses', sec: 'face', name: 'Round Glasses', c: '#ffffff', c2: '#6b4420', k: 'round', price: 30 },
@@ -275,15 +276,15 @@ const ITEMS = [
     how: { drop: 1 }
   },
   // Surge styles: the glow and afterimages when you use Surge (the ids say "trail" for older saves)
-  { id: 'trail-ink', sec: 'surge', name: 'Ink Surge', c: '#1c1626', price: 60 },
-  { id: 'surge-toxic', sec: 'surge', name: 'Toxic Surge', c: '#62e000', price: 120 },
-  { id: 'trail-fire', sec: 'surge', name: 'Fire Surge', c: 'fire', price: 150 },
-  { id: 'trail-ice', sec: 'surge', name: 'Ice Surge', c: 'ice', price: 150 },
-  { id: 'surge-shadow', sec: 'surge', name: 'Shadow Surge', c: '#6a2fc9', price: 150 },
-  { id: 'trail-gold', sec: 'surge', name: 'Gold Surge', c: '#ff9f1a', price: 200 },
-  { id: 'surge-bolt', sec: 'surge', name: 'Lightning Surge', c: 'bolt', price: 250 },
+  { id: 'trail-ink', sec: 'surge', name: 'Ink Surge', c: '#1c1626', fx: 'ink', price: 60 },
+  { id: 'surge-toxic', sec: 'surge', name: 'Toxic Surge', c: '#62e000', fx: 'bubble', price: 120 },
+  { id: 'trail-fire', sec: 'surge', name: 'Fire Surge', c: 'fire', fx: 'flame', price: 150 },
+  { id: 'trail-ice', sec: 'surge', name: 'Ice Surge', c: 'ice', fx: 'snow', price: 150 },
+  { id: 'surge-shadow', sec: 'surge', name: 'Shadow Surge', c: '#6a2fc9', fx: 'smoke', price: 150 },
+  { id: 'trail-gold', sec: 'surge', name: 'Gold Surge', c: '#ff9f1a', fx: 'spark', price: 200 },
+  { id: 'surge-bolt', sec: 'surge', name: 'Lightning Surge', c: 'bolt', fx: 'bolt', price: 250 },
   { id: 'trail-rainbow', sec: 'surge', name: 'Rainbow Surge', c: 'rainbow', price: 300 },
-  { id: 'trail-hearts', sec: 'surge', name: 'Heart Surge', c: 'hearts', how: { drop: 1 } },
+  { id: 'trail-hearts', sec: 'surge', name: 'Heart Surge', c: 'hearts', fx: 'heart', how: { drop: 1 } },
   // poses: put up to 8 on your pose wheel (hold T, Select or POSE in a fight); the first is your victory pose
   { id: 'pose-flex', sec: 'pose', name: 'Flex', how: { free: 1 } },
   { id: 'pose-wave', sec: 'pose', name: 'Wave', how: { free: 1 } },
@@ -305,17 +306,52 @@ const ITEMS = [
   { id: 'hbg-sky', sec: 'hbg', name: 'Sky', k: 'sky', c: '#bfe6ff', c2: '#ffffff', price: 80 },
   { id: 'hbg-sunset', sec: 'hbg', name: 'Sunset', k: 'grad', c: '#ffcf6e', c2: '#ff7a8a', price: 120 },
   { id: 'hbg-night', sec: 'hbg', name: 'Starry Night', k: 'night', c: '#1d2350', c2: '#ffd400', price: 150 },
-  // House furniture
-  { id: 'hf-chair', sec: 'hfurn', name: 'Chair', k: 'chair', w: 1, h: 1, c: '#c98a4f', how: { free: 1 } },
-  { id: 'hf-table', sec: 'hfurn', name: 'Table', k: 'table', w: 2, h: 1, c: '#a96e3a', how: { free: 1 } },
-  { id: 'hf-bed', sec: 'hfurn', name: 'Bed', k: 'bed', w: 3, h: 1, c: '#3ec5ff', c2: '#ffffff', price: 100 },
-  { id: 'hf-couch', sec: 'hfurn', name: 'Couch', k: 'couch', w: 3, h: 1, c: '#ff7a00', price: 120 },
-  { id: 'hf-shelf', sec: 'hfurn', name: 'Bookshelf', k: 'shelf', w: 2, h: 3, c: '#8a5a33', price: 120 },
-  { id: 'hf-lamp', sec: 'hfurn', name: 'Lamp', k: 'lamp', w: 1, h: 2, c: '#ffd400', price: 50 },
-  { id: 'hf-tv', sec: 'hfurn', name: 'TV', k: 'tv', w: 2, h: 2, c: '#2a2a3a', price: 150 },
-  { id: 'hf-door', sec: 'hfurn', name: 'Door', k: 'door', w: 1, h: 2, c: '#a96e3a', price: 30 },
-  { id: 'hf-fridge', sec: 'hfurn', name: 'Fridge', k: 'fridge', w: 1, h: 3, c: '#eef3f6', price: 120 },
+  // House furniture. room = the Furniture tab's filter it's under; use = what Punch or Kick beside it does in the house
+  // (sit or lie down; Punch or Kick again to get up)
+  { id: 'hf-chair', sec: 'hfurn', name: 'Chair', k: 'chair', w: 1, h: 1, c: '#c98a4f', how: { free: 1 }, room: 'dining', use: 'sit' },
+  { id: 'hf-table', sec: 'hfurn', name: 'Table', k: 'table', w: 2, h: 1, c: '#a96e3a', how: { free: 1 }, room: 'dining' },
+  { id: 'hf-bed', sec: 'hfurn', name: 'Bed', k: 'bed', w: 3, h: 1, c: '#3ec5ff', c2: '#ffffff', price: 100, room: 'bedroom', use: 'lie' },
+  { id: 'hf-couch', sec: 'hfurn', name: 'Couch', k: 'couch', w: 3, h: 1, c: '#ff7a00', price: 120, room: 'living', use: 'sit' },
+  { id: 'hf-shelf', sec: 'hfurn', name: 'Bookshelf', k: 'shelf', w: 2, h: 3, c: '#8a5a33', price: 120, room: 'living' },
+  { id: 'hf-lamp', sec: 'hfurn', name: 'Lamp', k: 'lamp', w: 1, h: 2, c: '#ffd400', price: 50, room: 'living' },
+  { id: 'hf-tv', sec: 'hfurn', name: 'TV', k: 'tv', w: 2, h: 2, c: '#2a2a3a', price: 150, room: 'living' },
+  { id: 'hf-door', sec: 'hfurn', name: 'Door', k: 'door', w: 1, h: 2, c: '#a96e3a', price: 30, room: 'living' },
+  { id: 'hf-fridge', sec: 'hfurn', name: 'Fridge', k: 'fridge', w: 1, h: 3, c: '#eef3f6', price: 120, room: 'kitchen' },
+  // living room
+  { id: 'hf-armchair', sec: 'hfurn', name: 'Armchair', k: 'armchair', w: 1, h: 1, c: '#e8572b', price: 80, room: 'living', use: 'sit' },
+  { id: 'hf-beanbag', sec: 'hfurn', name: 'Beanbag', k: 'beanbag', w: 1, h: 1, c: '#a35cff', price: 60, room: 'living', use: 'sit' },
+  { id: 'hf-fireplace', sec: 'hfurn', name: 'Fireplace', k: 'fireplace', w: 2, h: 2, c: '#c8553d', price: 180, room: 'living' },
+  { id: 'hf-coffee', sec: 'hfurn', name: 'Coffee Table', k: 'coffee', w: 2, h: 1, c: '#a96e3a', price: 60, room: 'living' },
+  { id: 'hf-piano', sec: 'hfurn', name: 'Piano', k: 'piano', w: 2, h: 2, c: '#2b2533', price: 250, room: 'living' },
+  // bedroom
+  { id: 'hf-bunk', sec: 'hfurn', name: 'Bunk Bed', k: 'bunk', w: 3, h: 2, c: '#47b34a', price: 180, room: 'bedroom', use: 'lie' },
+  { id: 'hf-dresser', sec: 'hfurn', name: 'Dresser', k: 'dresser', w: 2, h: 2, c: '#c98a4f', price: 100, room: 'bedroom' },
+  { id: 'hf-wardrobe', sec: 'hfurn', name: 'Wardrobe', k: 'wardrobe', w: 2, h: 3, c: '#8a5a33', price: 140, room: 'bedroom' },
+  { id: 'hf-nightstand', sec: 'hfurn', name: 'Nightstand', k: 'nightstand', w: 1, h: 1, c: '#c98a4f', price: 40, room: 'bedroom' },
+  { id: 'hf-toybox', sec: 'hfurn', name: 'Toy Box', k: 'toybox', w: 1, h: 1, c: '#ff4fa3', price: 50, room: 'bedroom', use: 'sit' },
+  { id: 'hf-desk', sec: 'hfurn', name: 'Desk', k: 'desk', w: 2, h: 1, c: '#a96e3a', price: 80, room: 'bedroom' },
+  // kitchen
+  { id: 'hf-stove', sec: 'hfurn', name: 'Stove', k: 'stove', w: 1, h: 2, c: '#eef3f6', price: 120, room: 'kitchen' },
+  { id: 'hf-ksink', sec: 'hfurn', name: 'Kitchen Sink', k: 'ksink', w: 2, h: 2, c: '#d9d4de', c2: '#c98a4f', price: 100, room: 'kitchen' },
+  { id: 'hf-cupboard', sec: 'hfurn', name: 'Cupboards', k: 'cupboard', w: 2, h: 1, c: '#c98a4f', price: 80, room: 'kitchen' },
+  { id: 'hf-stool', sec: 'hfurn', name: 'Stool', k: 'stool', w: 1, h: 1, c: '#e8212b', price: 30, room: 'kitchen', use: 'sit' },
+  { id: 'hf-microwave', sec: 'hfurn', name: 'Microwave', k: 'microwave', w: 1, h: 1, c: '#d9d4de', price: 60, room: 'kitchen' },
+  // dining room
+  { id: 'hf-dining', sec: 'hfurn', name: 'Dining Table', k: 'dining', w: 3, h: 1, c: '#8a5a33', c2: '#ffffff', price: 100, room: 'dining' },
+  { id: 'hf-china', sec: 'hfurn', name: 'China Cabinet', k: 'china', w: 2, h: 3, c: '#a96e3a', price: 160, room: 'dining' },
+  { id: 'hf-candles', sec: 'hfurn', name: 'Candlestick', k: 'candles', w: 1, h: 1, c: '#ffd400', price: 40, room: 'dining' },
+  // bathroom
+  { id: 'hf-toilet', sec: 'hfurn', name: 'Toilet', k: 'toilet', w: 1, h: 1, c: '#ffffff', price: 60, room: 'bathroom', use: 'sit' },
+  { id: 'hf-tub', sec: 'hfurn', name: 'Bathtub', k: 'tub', w: 3, h: 1, c: '#ffffff', price: 150, room: 'bathroom', use: 'lie' },
+  { id: 'hf-bsink', sec: 'hfurn', name: 'Sink & Mirror', k: 'bsink', w: 1, h: 2, c: '#ffffff', price: 70, room: 'bathroom' },
+  { id: 'hf-shower', sec: 'hfurn', name: 'Shower', k: 'shower', w: 1, h: 3, c: '#cdeeff', price: 120, room: 'bathroom' },
+  // attic
+  { id: 'hf-trunk', sec: 'hfurn', name: 'Old Trunk', k: 'trunk', w: 2, h: 1, c: '#8a5a33', price: 70, room: 'attic', use: 'sit' },
+  { id: 'hf-boxes', sec: 'hfurn', name: 'Boxes', k: 'boxes', w: 1, h: 2, c: '#d9b27a', price: 30, room: 'attic' },
+  { id: 'hf-rocker', sec: 'hfurn', name: 'Rocking Chair', k: 'rocker', w: 1, h: 2, c: '#a96e3a', price: 90, room: 'attic', use: 'sit' },
+  { id: 'hf-mirror', sec: 'hfurn', name: 'Old Mirror', k: 'mirror', w: 1, h: 2, c: '#cdeeff', c2: '#a96e3a', price: 60, room: 'attic' },
   // House decorations
+  { id: 'hd-cobweb', sec: 'hdecor', name: 'Cobweb', k: 'cobweb', w: 1, h: 1, c: '#ffffff', price: 10 },
   { id: 'hd-plant', sec: 'hdecor', name: 'Plant', k: 'plant', w: 1, h: 1, c: '#3fae4a', how: { free: 1 } },
   { id: 'hd-tree', sec: 'hdecor', name: 'Tall Plant', k: 'tree', w: 1, h: 2, c: '#2f8f3a', price: 60 },
   { id: 'hd-rug', sec: 'hdecor', name: 'Rug', k: 'rug', w: 3, h: 1, c: '#e8212b', c2: '#ffd400', price: 60 },
@@ -360,6 +396,39 @@ const CODES = [
   { code: [1, 1, 1, 1], item: 'face-ninja' },
   { code: [3, 2, 2, 3], item: 'pet-frog' },
   { code: [2, 2, 2, 2], item: 'hd-teddy' }
+];
+// Colours for items (the Character screen's COLORS): every item can be bought in any of these, one at a time (a blue
+// cap and a blue mask are two buys). Body colours are the color items above.
+const TINTS = [
+  { id: 'red', name: 'Red', c: '#e8212b' },
+  { id: 'orange', name: 'Orange', c: '#ff7a00' },
+  { id: 'yellow', name: 'Yellow', c: '#ffd400' },
+  { id: 'lime', name: 'Lime', c: '#8fe000' },
+  { id: 'green', name: 'Green', c: '#2fa84f' },
+  { id: 'teal', name: 'Teal', c: '#0fa39a' },
+  { id: 'sky', name: 'Sky Blue', c: '#3ec5ff' },
+  { id: 'blue', name: 'Blue', c: '#2f5fe0' },
+  { id: 'navy', name: 'Navy', c: '#22306b' },
+  { id: 'purple', name: 'Purple', c: '#8a3ffc' },
+  { id: 'pink', name: 'Pink', c: '#ff5fb0' },
+  { id: 'white', name: 'White', c: '#ffffff' },
+  { id: 'grey', name: 'Grey', c: '#9a96a2' },
+  { id: 'black', name: 'Black', c: '#2b2533' },
+  { id: 'brown', name: 'Brown', c: '#8a5a33' },
+  { id: 'gold', name: 'Gold', c: '#e0a800' }
+];
+const TINT = Object.fromEntries(TINTS.map(t => [t.id, t]));
+const TINT_PRICE = 30; // stars for one colour on one item
+// The COLORS page's eight kinds: what's recoloured in each (Body = the body colours)
+const PAINTS = [
+  { id: 'body', name: 'Body', secs: ['color'] },
+  { id: 'head', name: 'Head', secs: ['hat', 'hair', 'band', 'face'] },
+  { id: 'neck', name: 'Neck', secs: ['scarf', 'tie'] },
+  { id: 'upper', name: 'Upper Body', secs: ['shirt', 'jacket', 'gloves'] },
+  { id: 'lower', name: 'Lower Body', secs: ['pants', 'shorts', 'skirt', 'dress', 'shoes'] },
+  { id: 'surge', name: 'Surge', secs: ['surge'] },
+  { id: 'poses', name: 'Poses', secs: ['pose'] },
+  { id: 'pets', name: 'Pets', secs: ['pet'] }
 ];
 const STANCES = [
   { id: 'classic', name: 'Classic', p: [6, 35, 75, 20, 90, 18, 20, -18, 12, 0] },

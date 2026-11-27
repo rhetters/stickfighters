@@ -35,6 +35,16 @@ function grantItem(id, reason) {
   ecoSave(true);
   return true;
 }
+// Colours per item (Character screen, COLORS): an item's original colours are free; any of TINTS can be bought for
+// one item at a time.
+const tintOwns = (id, t) => !!TINT[t] && Array.isArray(ECO.tint[id]) && ECO.tint[id].includes(t);
+function buyTint(id, t) {
+  if (!ITEM[id] || !TINT[t] || tintOwns(id, t) || !owns(id)) return false;
+  if (!spendStars(TINT_PRICE, id + ':' + t)) return false;
+  (ECO.tint[id] = ECO.tint[id] || []).push(t);
+  ecoSave(true);
+  return true;
+}
 // The store: only items with a price can be bought.
 function buyItem(id) {
   const it = ITEM[id];
@@ -121,8 +131,17 @@ function normFighter(c, any) {
     stance: STANCES.some(s => s.id === f.stance) ? f.stance : d.stance,
     eq,
     wheel: wheel.length ? wheel : ['pose-flex'],
+    tint: normTint(f.tint, any),
     prog: normProg(f.prog)
   };
+}
+// A fighter's colour per item: real items and colours they've bought (any: a fighter seen online, not checked)
+function normTint(t, any) {
+  const out = {};
+  if (t && typeof t === 'object' && !Array.isArray(t))
+    for (const id of Object.keys(t).slice(0, 200))
+      if (ITEM[id] && TINT[t[id]] && (any || tintOwns(id, t[id]))) out[id] = t[id];
+  return out;
 }
 // A house with every field valid: unknown squares, materials, solids and items dropped, everything kept on the land.
 // any = accept unlock-only items without checking ownership (a host's house shown to visitors online).
@@ -189,12 +208,22 @@ function lookRaw(f) {
       stance: f.stance,
       name: f.name
     };
-  for (const s of EQ) L[s] = f.eq[s] ? ITEM[f.eq[s]] : null;
+  for (const s of EQ) L[s] = f.eq[s] ? tinted(ITEM[f.eq[s]], f.tint) : null;
   L.wheel = f.wheel.map(id => ITEM[id]).filter(Boolean);
   L.pose = L.wheel[0] || ITEM['pose-flex'];
+  // a pose's colour: a glow while it's struck (render.js, victory.js)
+  L.ptint = {};
+  for (const p of L.wheel) if (f.tint && f.tint[p.id]) L.ptint[p.id] = TINT[f.tint[p.id]].c;
   return L;
 }
 const lookOf = c => lookRaw(normFighter(c));
+// An item in the colour bought for it: its colours (c, and c2 a shade darker); a Surge style keeps its kind of effect
+// and gets tc, the colour of its glow and effects
+function tinted(it, tint) {
+  const t = tint && TINT[tint[it.id]];
+  if (!t) return it;
+  return it.slot === 'surge' ? { ...it, tc: t.c } : { ...it, c: t.c, c2: shade(t.c, -0.28), tc: t.c };
+}
 function saveFighter(i, c) {
   CHR.list[i] = normFighter(c);
   ecoSave(true);

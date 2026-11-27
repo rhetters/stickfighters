@@ -2,7 +2,7 @@
 // Street (burbs): houses, lawns and picket fences. Downtown (city): the street everyone drives down (cars.js), shops
 // and the skyline. The Skyscraper (tower): the climb up its fire escape (a climb biome, like the Mountainside: the
 // game stays on flat ground and the drawing rises), the windows sliding by as you go up, Pink Kong on the roof.
-LOOKS.burbs = { bg: () => drawBurbs(), fg: () => drawWoodsFg() };
+LOOKS.burbs = { bg: () => drawBurbs(), fg: () => {} }; // nothing in front: a tidy street
 LOOKS.city = { bg: () => drawCity(), fg: () => {} };
 LOOKS.tower = { bg: () => drawTower(), fg: () => {} };
 // ===== SUBURBAN STREET =====
