@@ -149,10 +149,12 @@ function terrainStep(f, x0, y0) {
   } else if (f.vy > 0 && !f.drop && y0 < was - 0.5) put(surfCross(f.x, y0, f.y));
   else if (f.vy < 0) put(null);
 }
-// Walls: a fighter whose body overlaps a wall's height can't cross its line this step
+// Walls: a fighter whose body overlaps a wall's height can't cross its line this step. A body counts as T_TALL high
+// (a fighter is drawn about 80 tall), so a gap two house squares high (90, like a door) can be walked through.
+const T_TALL = 84;
 function terrainWalls(f, x0) {
   if (!TERRAIN.w.size || f.x === x0) return;
-  const top = f.y - 110 * (f.s || 1),
+  const top = f.y - T_TALL * (f.s || 1),
     c0 = Math.round(Math.min(x0, f.x) / TERRAIN.cell) - 1,
     c1 = Math.round(Math.max(x0, f.x) / TERRAIN.cell) + 1;
   for (let c = c0; c <= c1; c++)
