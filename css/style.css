@@ -2190,6 +2190,13 @@ body.padnav .thcard:focus small {
   color: #8a3ffc;
   font-size: 18px;
 }
+.vnone i {
+  color: #e8212b;
+  font-size: 18px;
+}
+.vplus:empty {
+  display: none;
+}
 .vbtns .ptile {
   --ps: max(56px, min(calc(var(--wh, 440px) * 0.2), 96px));
   position: relative;

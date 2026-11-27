@@ -280,7 +280,7 @@ function levelClear() {
     $('c-st').textContent = 'A level of your own: no XP or ninja stars.';
     $('b-next').textContent = 'PLAY AGAIN';
     setTimeout(() => {
-      if (state === 'clear' && MODE === LEVEL && LV.custom) LV.from === 'edit' ? edReturn() : show('s-clear');
+      if (state === 'clear' && MODE === LEVEL && LV.custom) LV.from === 'edit' ? edReturn() : vicOpen();
     }, 1800);
     return;
   }
@@ -308,10 +308,10 @@ function levelClear() {
   $('c-l3').textContent = 'Next: ' + LV.def.next;
   $('c-h1').textContent = LV.run ? LV.def.name + ' CLEAR!' : 'LEVEL CLEAR!';
   $('b-next').textContent = 'PLAY AGAIN';
-  // a moment to see your victory pose before the results (a campaign run: the victory screen, victory.js)
+  // a moment to see your victory pose before the victory screen (victory.js)
   bn(LV.run ? 'VICTORY!' : 'LEVEL CLEAR!');
   setTimeout(() => {
-    if (state === 'clear' && MODE === LEVEL) LV.run ? vicOpen() : show('s-clear');
+    if (state === 'clear' && MODE === LEVEL) vicOpen();
   }, 1800);
 }
 function levelFail() {

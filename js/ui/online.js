@@ -44,6 +44,7 @@ function renderOnline() {
   $('on-b').textContent = ONC.b;
   $('b-onlineback').textContent = NET.on ? 'LEAVE ROOM' : 'BACK';
   $('on-start').hidden = !NET.on || !NET.host; // nothing to start until you host a room
+  $('on-nostar').hidden = true; // only a room on MY LEVELS shows it (below)
   if (!NET.on) return;
   const live = NET.players.filter(p => !p.left).length;
   // the sticky note: the room code, and the room size (the host's - and +, never below the players already in)
