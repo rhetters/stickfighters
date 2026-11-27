@@ -16,6 +16,7 @@ function selfTest(n) {
   Object.assign(FEEL, SELFTEST_FEEL);
   SET.surge = 'hold';
   SET.vol = 0;
+  STG.st = null; // the flat arena, whatever stage was last played (stages.js)
   releaseAll();
   // forget earlier button presses: the frame count starts over, so a press remembered from earlier play would look new
   for (const I of INP) for (const k in I.press) I.press[k] = -99;

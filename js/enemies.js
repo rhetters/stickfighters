@@ -3,7 +3,9 @@
 // Is the floor under this fighter slippery? (a campaign run's biome: data/themes.js slick)
 const slick = f => MODE === LEVEL && LV && LV.segs && BIOMES[segAt(f.x).b].slick;
 // How fast up-and-down motion runs where f is (1 = normal; under 1 = low gravity)
-const lowG = f => (MODE === LEVEL && LV && LV.segs && BIOMES[segAt(f.x).b].lowg) || 1;
+// low gravity: a place with lowg, or a stage with it (the Moon Base, stages.js; Arcade and Versus)
+const lowG = f =>
+  (MODE === LEVEL ? LV && LV.segs && BIOMES[segAt(f.x).b].lowg : (MODE === ARCADE || MODE === VERSUS) && STG.st && STG.st.lowg) || 1;
 function updE(e) {
   e.t++;
   if (e.st === 'cine') return; // a boss arriving (run.js) waits for its scene to end

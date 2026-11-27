@@ -36,12 +36,15 @@ function stageTick() {
 function stageBg() {
   const st = STG.st;
   if (!st || st.look === 'paper' || !LOOKS[st.look]) return false;
-  stageLV(() => LOOKS[st.look].bg());
+  // the Castle Yard has one window, between its platforms
+  stageLV(() => (st.look === 'castle' ? drawCastle(W / 2) : LOOKS[st.look].bg()));
   for (const s of STG.s) stagePlat(s, st.look);
 }
 function stageFg() {
   const st = STG.st;
-  if (st && st.look !== 'paper' && LOOKS[st.look]) stageLV(() => LOOKS[st.look].fg());
+  if (!st || st.look === 'paper' || !LOOKS[st.look]) return;
+  stageLV(() => LOOKS[st.look].fg());
+  if (st.look === 'woods') stageLV(() => drawOaksFg(1)); // the Clearing: a big oak on each side
 }
 // Some looks read the level's scenery (the woods' trees); Arcade has no level, so they draw over the Versus arena's.
 // Drawing only: LV is put back straight after.
@@ -63,7 +66,7 @@ function stagePlat(s, look) {
     y = s.y1,
     st = {
       woods: ['#a96e3a', '#5aa04a'],
-      meadow: ['#a96e3a', '#5aa04a'],
+      meadow: ['#a96e3a', null], // plain planks
       castle: ['#b4b4bd', null],
       city: ['#6f7a8c', '#ffd400'],
       ship: ['#c98a4f', null],
@@ -106,7 +109,7 @@ function stagePlat(s, look) {
     ctx.lineTo(s.x2 - 4, y + 8);
     ctx.stroke();
   }
-  if (st[1] && (look === 'woods' || look === 'meadow')) {
+  if (st[1] && look === 'woods') {
     // a grass top
     ctx.fillStyle = st[1];
     ctx.strokeStyle = INK;

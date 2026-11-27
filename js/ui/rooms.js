@@ -175,7 +175,7 @@ function stageRow(o) {
         onUp: () => (o.pages.pg--, o.redraw()),
         onDown: () => (o.pages.pg++, o.redraw())
       },
-      { data: ['stage', '?'], img: 'i-q', label: '?', aria: 'A stage at random', on: o.cur === '?', disabled: d, pick: () => o.pick('?') }
+      { data: ['stage', '?'], img: 'i-q', label: 'RANDOM', aria: 'A stage at random', on: o.cur === '?', disabled: d, pick: () => o.pick('?') }
     ];
   for (const id of pg.list)
     tiles.push({
