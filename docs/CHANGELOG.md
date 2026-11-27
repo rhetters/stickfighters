@@ -2,6 +2,18 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Ron's list (November 27, 2026)
+Everything from Ron's notes after playing the City.
+- **Stages for Versus and Arcade:** Notebook, The Clearing, Treehouse (two low platforms and a high one), Castle Yard (a platform at each side), Rooftop (a platform that drifts from side to side, carrying whoever stands on it), Pirate Ship (decks at different heights) and Moon Base (a top platform that floats up and down). The rooms have a stage row (five at a time, and ? for a random one); online the host picks and everyone plays the same stage. Their layouts are borrowed from the best-liked fighting-game stages.
+- **Colours for every item:** COLORS on the Character screen shows eight kinds (Body, Head, Neck, Upper Body, Lower Body, Surge, Poses, Pets), each showing what you wear. Open one: the item you wear is at the top (tap it to pick another of yours) and every colour for it below. An item's own colours are free; any of 16 colours costs 30 stars for that item alone. Surge styles' effects take the colour (lightning, ink splats, clear crystal snowflakes, see-through hearts, flames, bubbles, smoke, sparkles), and a pose's colour glows around you while you strike it. Save version 19 (old saves come through with no colours bought).
+- **Cars:** a double jump; Punch headbutts with the hood and Kick with the trunk (that end bumps up); holding Surge goes faster, hits half again as hard and makes the car's outline glow (not the driver's); ULT with a full meter does each car's own move: the hatchback's POGO HOP, the sedan's CRUISE CONTROL, the sports car's NITRO, the pickup's BIG AIR, the van's MEGA HONK, the jeep's BARREL ROLL, the taxi's RUSH HOUR, the ice cream truck's SUNDAE STORM, the monster truck's WHEELIE and the bug's SPIN CYCLE. Enemies can now hurt you in your car (a knockout throws you out). A boss's entrance keeps you in your car, and you always get your own model back.
+- **The house:** 24 new pieces of furniture (living room, bedroom, kitchen, dining room, bathroom, attic) with room buttons on the Furniture tab, and a cobweb decoration. Walking around, Punch or Kick by a chair, couch, stool, toilet, trunk and the like sits on it, and by a bed, bunk bed or bathtub lies down; again to get up. A gap two squares high (a door's height) is now room enough to walk through (it took three).
+- **Your own levels** (and the single Wooded Trail level) end on the victory screen with PLAY AGAIN, not the old results. The NO XP OR NINJA STARS sticker no longer stays on the MULTIPLAYER screen after leaving a room.
+- **The Skyscraper:** knocked-down and knocked-out bodies stay on the floor they fell on (they used to vanish for a moment).
+- **A Unicorn pet**: white with a rainbow mane and tail and a golden horn.
+- Suburban Street has no grass in front. DELETE THIS FIGHTER is under the polaroid on every page of the Character screen.
+- Version 78.
+
 ## The Big Pink Teddy (November 26, 2026)
 - A new secret house decoration: the **Big Pink Teddy**, a big stuffed pink bear with a heart on its tummy (2 by 2 squares). Enter heart, heart, heart, heart in the treasure chest on the Character screen; then it's in the house builder's DECORATIONS, free to place.
 - Secret house items stay out of the DECORATIONS list until you have them, like secret store items.
