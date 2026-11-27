@@ -44,7 +44,8 @@ function renderOnline() {
   $('on-b').textContent = ONC.b;
   $('b-onlineback').textContent = NET.on ? 'LEAVE ROOM' : 'BACK';
   $('on-start').hidden = !NET.on || !NET.host; // nothing to start until you host a room
-  $('on-nostar').hidden = true; // only a room on MY LEVELS shows it (below)
+  $('on-nostar').hidden = true; // only a room on MY STORIES shows it (below)
+  $('on-wait').hidden = true; // only a room shows who it's waiting for (below)
   if (!NET.on) return;
   const live = NET.players.filter(p => !p.left).length;
   // the sticky note: the room code, and the room size (the host's - and +, never below the players already in)
@@ -142,9 +143,11 @@ function renderOnline() {
   // START can be pressed once everyone is ready (and Versus has its players; MY LEVELS needs a level)
   $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady()) || (mine && !edLevels(netLevels()).length);
   // who the room is waiting for
+  // (only with someone else in the room: a player who left doesn't count)
   const me = NET.players.find(p => p.slot === NET.mySlot),
-    wait = NET.players.filter(p => !p.ready && !p.left).length;
-  $('on-wait').hidden = !wait || !NET.players.length || NET.players.length < 2;
+    inRoom = NET.players.filter(p => !p.left),
+    wait = inRoom.filter(p => !p.ready).length;
+  $('on-wait').hidden = !wait || inRoom.length < 2;
   $('on-wait').textContent =
     me && !me.ready ? 'Tap READY? on your card when you\'re ready to play!' : 'Waiting for ' + wait + (wait > 1 ? ' players' : ' player') + ' to tap READY…';
 }

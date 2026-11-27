@@ -2449,6 +2449,10 @@ body.padnav .ptile:focus b {
 .ptile:disabled .pimg {
   opacity: 0.5;
 }
+/* what the host picked stays clear for the guests (they can't pick, but they should see it) */
+.ptile.on:disabled .pimg {
+  opacity: 1;
+}
 .i-solo { background-image: url(../img/menu-solo.svg); }
 .i-multi { background-image: url(../img/menu-multi.svg); }
 .i-cust { background-image: url(../img/menu-custom.svg); }
@@ -3336,13 +3340,25 @@ body.big .screen p {
   display: grid;
 }
 .edtop {
+  /* DONE, the name and DELETE on one row; the tabs under them; the help under those (clear of PLAY on the right) */
   position: absolute;
   left: 6px;
-  right: 96px;
+  right: max(118px, 31%); /* clear of PLAY and the place / part label under it */
   top: 6px;
   display: flex;
-  gap: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  pointer-events: none;
+}
+.edtop > * {
+  pointer-events: auto;
+}
+.edrow {
+  display: flex;
+  gap: 8px;
   align-items: center;
+  max-width: 100%;
 }
 .edtop .btn,
 .edplay .btn {
@@ -3350,12 +3366,47 @@ body.big .screen p {
   padding: 5px 12px;
   font-size: 14px;
 }
+/* the name: a pencil and a dashed underline, like the fighter's name, so it reads as something to tap and change */
 .edname {
-  flex: 0 1 170px;
-  min-width: 90px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 120px;
+  max-width: 260px;
+  padding: 2px 8px 1px 4px;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 3px dashed #c9bfae;
+  background: rgba(255, 255, 255, 0.85);
+  cursor: text;
 }
 .edname input {
-  font-size: 16px;
+  flex: 1;
+  min-width: 0;
+  width: 190px;
+  border: 0;
+  background: none;
+  padding: 2px 0;
+  font:
+    900 20px Impact,
+    'Arial Black',
+    sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ink, #1c1626);
+}
+.edname input:focus {
+  outline: none;
+}
+.edname:focus-within {
+  border-bottom-color: #ff7a00;
+}
+.edtop .eddel {
+  font-size: 12px;
+  color: #a21d2b;
+}
+.edtop .eddel.warn {
+  background: #e8212b;
+  color: #fff;
 }
 .edplay {
   position: absolute;
@@ -3384,10 +3435,7 @@ body.big .screen p {
   font-size: 12px;
 }
 #ed-msg {
-  position: absolute;
-  left: 8px;
-  top: 50px;
-  max-width: 55%;
+  max-width: 100%;
   margin: 0;
   padding: 3px 8px;
   border-radius: 8px;
@@ -3425,6 +3473,7 @@ body.big .screen p {
 }
 #ed-tabs {
   display: flex;
+  max-width: 100%;
   gap: 3px;
   flex-wrap: wrap;
   min-width: 0;

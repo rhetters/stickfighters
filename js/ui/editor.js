@@ -40,7 +40,7 @@ const ED_HELP = {
   flag: 'Tap where the fight should stop the screen.',
   boss: 'Pick a boss, then tap where he waits. One boss, in the very last part.',
   erase: 'Tap or drag to take things away.',
-  parts: 'A level is up to 3 places, each up to 6 parts.'
+  parts: 'A story is up to 3 places, each up to 6 parts.'
 };
 const ED_COLS = W / ED_CELL; // squares across the view (15)
 const edLevel = () => EDIT.levels[EDS.i];
@@ -217,12 +217,12 @@ function openLevels() {
   state = 'menu';
   const box = $('ed-list'),
     opts = [
-      { k: 'new', label: 'NEW LEVEL', pic: () => edPlusPic(), pick: () => openPlaces() },
+      { k: 'new', label: 'NEW STORY', pic: () => edPlusPic(), pick: () => openPlaces() },
       // a map: one screen for Versus and Arcade (a stage of your own)
-      { k: 'newmap', label: 'NEW MAP', pic: () => edPlusPic('#3ec5ff'), pick: () => openPlaces(false, true) },
+      { k: 'newmap', label: 'NEW ARENA', pic: () => edPlusPic('#3ec5ff'), pick: () => openPlaces(false, true) },
       ...EDIT.levels.map((L, i) => ({
         k: 'lv' + i + ':' + JSON.stringify(L).length,
-        label: (L.map ? 'MAP: ' : '') + L.name,
+        label: (L.map ? 'ARENA: ' : '') + L.name,
         pic: edThumb(L),
         pick: () => openEdit(i)
       }))
@@ -300,7 +300,7 @@ function openPlaces(add = false, map = false) {
       t.onclick = () => (add ? edAddPlace(b) : edNew(b, map));
       box.appendChild(t);
     }
-  $('s-edpick').querySelector('h2').textContent = add ? 'ADD A PLACE' : map ? 'A PLACE FOR YOUR MAP' : 'PICK A PLACE';
+  $('s-edpick').querySelector('h2').textContent = add ? 'ADD A PLACE' : map ? 'A PLACE FOR YOUR ARENA' : 'PICK A PLACE';
   show('s-edpick');
   box.firstChild.focus({ preventScroll: true });
 }
@@ -309,8 +309,8 @@ function edNew(b, map) {
   EDIT.levels.push(
     normLevel(
       map
-        ? { places: [{ b }], name: 'MAP ' + (edMaps().length + 1), map: 1 }
-        : { places: [{ b }], name: 'LEVEL ' + (edLevels().length + 1) }
+        ? { places: [{ b }], name: 'ARENA ' + (edMaps().length + 1), map: 1 }
+        : { places: [{ b }], name: 'STORY ' + (edLevels().length + 1) }
     )
   );
   save();
@@ -411,6 +411,11 @@ addEventListener('pointerup', () => (EDS.paint = false));
 addEventListener('pointercancel', () => (EDS.paint = false));
 // Square c (from the part's start), row r (0 = the ground row) with the current tool
 function edAct(c, r) {
+  if (EDS.del) {
+    // anything else keeps the story
+    EDS.del = 0;
+    edDelBtn();
+  }
   const p = edPart(),
     x0 = c * ED_CELL,
     mid = x0 + ED_CELL / 2;
@@ -649,13 +654,8 @@ function edPal() {
       edBtn(box, EDS.delPlace ? 'TAP AGAIN TO DELETE' : 'DELETE THIS PLACE', edDelPlace).classList.toggle('warn', !!EDS.delPlace);
     edBtn(box, 'SHORTER', () => edWidth(-5), p.w <= ED_LIM.cols[0] * ED_CELL);
     edBtn(box, 'LONGER', () => edWidth(5), p.w >= ED_LIM.cols[1] * ED_CELL);
-    edBtn(box, EDS.del ? 'TAP AGAIN TO DELETE' : 'DELETE LEVEL', edDelLevel).classList.toggle('warn', !!EDS.del);
-  } else {
-    const k = EDS.tab;
-    edMsg(ED_HELP[k]);
-    // a map has no PARTS tab: deleting it is here
-    if (L.map && k === 'erase') edBtn(box, EDS.del ? 'TAP AGAIN TO DELETE' : 'DELETE MAP', edDelLevel).classList.toggle('warn', !!EDS.del);
-  }
+  } else edMsg(ED_HELP[EDS.tab]);
+  edDelBtn();
 }
 // To the part d parts on (across places: the last part of a place leads to the first of the next)
 function edGoPart(d) {
@@ -730,10 +730,18 @@ function edWidth(d) {
   edPal();
   edDraw();
 }
+// DELETE (top row, beside the name): the whole story or arena, after a second tap
+function edDelBtn() {
+  const b = $('ed-del');
+  b.textContent = EDS.del ? 'TAP AGAIN TO DELETE' : edLevel().map ? 'DELETE ARENA' : 'DELETE STORY';
+  b.classList.toggle('warn', !!EDS.del);
+}
+$('ed-del').onclick = () => edDelLevel();
 function edDelLevel() {
   if (!EDS.del) {
     EDS.del = 1;
-    return edPal();
+    edDelBtn();
+    return edMsg('Tap it again to delete ' + edLevel().name + ' for good, or anything else to keep it.');
   }
   EDIT.levels.splice(EDS.i, 1);
   EDS.i = -1;

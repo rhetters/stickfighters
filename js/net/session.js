@@ -182,7 +182,13 @@ const netDevKind = () =>
       : 'kb';
 const netUnready = () => NET.players.forEach(q => (q.ready = false));
 // The host changed a room option (mode, story, teams, room size): everyone readies up again
+// The room's choices as one string: picking what's already picked changes nothing, so nobody is unreadied
+const netOptKey = () => [NET.mode, NET.theme, NET.lvl, NET.stage, NET.diff, NET.teams, NET.max].join('|');
 function netOptChanged() {
+  if (netOptKey() === NET.optKey) {
+    if (typeof renderOnline === 'function') renderOnline();
+    return;
+  }
   netUnready();
   netRoomChanged();
 }
@@ -211,6 +217,7 @@ function netSetTeam(slot) {
   } else if (slot === NET.mySlot) netSend(NET.hostId, { t: 'team', team: p.team ? 0 : 1 });
 }
 function netRoomChanged() {
+  NET.optKey = netOptKey(); // what everyone was last told
   netColours();
   netAll(netRoomMsg());
   if (typeof renderOnline === 'function') renderOnline();

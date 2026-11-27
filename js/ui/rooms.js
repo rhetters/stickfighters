@@ -197,8 +197,8 @@ function stageRow(o) {
       {
         data: ['stage', 'mine'],
         img: 'i-levels',
-        label: 'MY LEVELS',
-        aria: o.maps.length ? 'Your own maps' : 'No maps yet: make one in Customize, Levels, NEW MAP',
+        label: 'MY ARENAS',
+        aria: o.maps.length ? 'Your own arenas' : 'No arenas yet: make one in Customize, My Stories, NEW ARENA',
         disabled: d || !o.maps.length,
         pick: () => o.pick('my:' + o.maps[0].id)
       }
@@ -314,9 +314,9 @@ function storyRow(o) {
         pick: () => o.pick(id)
       });
     tiles.push(
-      { data: ['theme', '?'], img: 'i-q', label: '?', aria: 'Surprise story: more XP and stars', on: o.cur === '?', disabled: d, pick: () => o.pick('?') },
-      // the host's own levels from the level creator (no XP or ninja stars)
-      { data: ['theme', 'mine'], img: 'i-levels', label: 'MY LEVELS', aria: 'Levels you made (no XP or ninja stars)', disabled: d, pick: o.toMine }
+      { data: ['theme', '?'], img: 'i-q', label: 'RANDOM', aria: 'Random story: more XP and stars', on: o.cur === '?', disabled: d, pick: () => o.pick('?') },
+      // the host's own stories from the level creator (no XP or ninja stars)
+      { data: ['theme', 'mine'], img: 'i-levels', label: 'MY STORIES', aria: 'Stories you made (no XP or ninja stars)', disabled: d, pick: o.toMine }
     );
     return tiles;
   }
@@ -325,9 +325,9 @@ function storyRow(o) {
     tiles.push({ data: ['lvl', id], img: 'chpic', pic: edThumbURL(L), label: L.name, on: o.cur === id, disabled: d, pick: () => o.pick(id) });
   }
   if (!o.levels.length)
-    tiles.push({ data: ['lvl', 'none'], img: 'i-levels', label: 'NONE YET', aria: 'No levels yet: make one in Customize, then Levels', disabled: true, pick: () => 0 });
+    tiles.push({ data: ['lvl', 'none'], img: 'i-levels', label: 'NONE YET', aria: 'No stories yet: make one in Customize, then My Stories', disabled: true, pick: () => 0 });
   tiles.push(
-    { data: ['lvl', '?'], img: 'i-q', label: '?', aria: 'A random one of your levels', on: o.cur === '?', disabled: d || !o.levels.length, pick: () => o.pick('?') },
+    { data: ['lvl', '?'], img: 'i-q', label: 'RANDOM', aria: 'A random one of your stories', on: o.cur === '?', disabled: d || !o.levels.length, pick: () => o.pick('?') },
     { data: ['lvl', '<'], img: 'i-story', label: 'STORIES', aria: 'Back to the stories', disabled: d, pick: o.toStories }
   );
   return tiles;

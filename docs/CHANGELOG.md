@@ -2,6 +2,13 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## The level creator's top bar, stories and arenas, room fixes (November 27, 2026)
+- **The level creator's top bar:** DONE, the name and **DELETE STORY** (or DELETE ARENA) on one row, the tabs under them, the help under those, so nothing overlaps any more (on an iPad or a phone). The name has a pencil and a dashed underline, so it looks like something you can tap and rename. Delete moved out of PARTS; it still asks for a second tap, and tapping anything else keeps it.
+- **New names:** NEW STORY and NEW ARENA (for NEW LEVEL and NEW MAP); MY STORIES everywhere for MY LEVELS (Customize, the Story screen, the rooms), and MY ARENAS on the stage rows, where your arenas are. New ones are called STORY 1, ARENA 1… (yours keep their names).
+- **RANDOM** instead of "?" on the Story screen and in the rooms (local and online).
+- **The online room:** the host tapping what's already picked no longer unreadies everyone (only a real change does); a guest sees the host's pick clearly (only the other tiles are faded); the "Tap READY?" note no longer stays on the Multiplayer screen after the room closes, or shows when you're alone in the room.
+- Version 84.
+
 ## COLORS: sub-categories and None (November 27, 2026)
 - In COLORS, a kind with more than one part (Head, Neck, Upper Body, Lower Body) first shows its sub-categories, like the clothes pages do (Upper Body: Shirts, Jackets, Gloves). Picking one shows what you wear there with **None** beside it, then its colours.
 - Tap the item to wear another of that sub-category (or None); None takes it off (Pants' None leaves your shorts on). Surge and Pets go straight to theirs, with None too; Poses and Body are as before.
