@@ -619,24 +619,19 @@ function renderPaint(c, base) {
       'cur-' + it.id
     );
     // its colours: the original, then every colour
+    if (!tintable(it)) {
+      shelf('This item cannot be recolored.');
+      g.scrollTop = top;
+      return;
+    }
     const rc = shelf('Colours for ' + it.name + ': ' + TINT_PRICE + ' stars each, for this item only');
-    const cur = c.tint[it.id] || null,
-      sw = (col, draw) => () => {
-        ctx.fillStyle = col || '#fbfaf4';
-        ctx.strokeStyle = '#1c1626';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(54, 12, 8, 0, 7);
-        ctx.fill();
-        ctx.stroke();
-        draw();
-      };
+    const cur = c.tint[it.id] || null;
     card(
       rc,
       'own' + (!cur && !CH.tryTint ? ' on' : ''),
       'Original',
       !cur ? 'WEARING' : 'FREE',
-      sw(null, () => drawItemIcon(it, 32, 26, 56, base)),
+      () => drawItemIcon(it, 32, 26, 56, base),
       () => {
         CH.tryTint = null;
         CH.msg = '';
@@ -652,7 +647,7 @@ function renderPaint(c, base) {
         (own ? 'own' : '') + (cur === t.id ? ' on' : '') + (trying ? ' try' : ''),
         t.name,
         own ? (cur === t.id ? 'WEARING' : 'OWNED') : TINT_PRICE,
-        sw(t.c, () => drawItemIcon(tinted(it, { [it.id]: t.id }), 32, 26, 56, base)),
+        () => drawItemIcon(tinted(it, { [it.id]: t.id }), 32, 26, 56, base),
         () => paintTap(it, t),
         'tint-' + t.id
       );

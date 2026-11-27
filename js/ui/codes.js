@@ -1,4 +1,4 @@
-// StickFighters: the treasure chest (Character screen): enter a code of four icons, like the old arcade cheat-code
+// StickFighters: the treasure chest (on the Customize page, above HOUSE): enter a code of four icons, like the old arcade cheat-code
 // screens. Tap a slot to change its icon; REDEEM checks it against CODES (data/items.js). A right code gives its
 // item (through the inventory: grantItem) with a cha-ching and shows it in a window; a wrong one buzzes.
 const CD = { code: [0, 0, 0, 0] };
@@ -155,9 +155,21 @@ function codeIcon(k, id, x, y, r) {
     }
   });
 }
-$('ch-chest').onclick = openCodes;
+$('cu-chest').onclick = openCodes;
+// The chest sits up between the clouds, a little above the HOUSE picture
+function placeChest() {
+  const sc = $('s-cust'),
+    h = $('b-house');
+  if (sc.hidden) return;
+  const a = sc.getBoundingClientRect(),
+    b = h.getBoundingClientRect(),
+    c = $('cu-chest');
+  c.style.left = b.left - a.left + b.width / 2 - c.offsetWidth / 2 + 'px';
+  c.style.top = Math.max(6, b.top - a.top - c.offsetHeight - 26) + 'px';
+}
+addEventListener('resize', placeChest);
 $('cd-redeem').onclick = redeemCode;
-$('cd-back').onclick = openChar;
+$('cd-back').onclick = () => openCust(); // main.js loads later
 $('cd-popback').onclick = () => {
   $('cd-pop').hidden = true;
   $('cd-redeem').focus({ preventScroll: true });

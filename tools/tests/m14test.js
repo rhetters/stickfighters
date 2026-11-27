@@ -58,9 +58,9 @@ ok(hb.every(o=>o.right<=o.W-140&&o.heads),'the player bars fit 1 to 6 players le
 ok(await ev("typeof hudPlayers==='undefined'&&!/segAt|BIOMES/.test(levelHud.toString())"),'the old bars and the map line are gone');
 // the treasure chest: codes give secret items
 await ev("ECO.own=ECO.own.filter(i=>i!=='shirt-rhett');openTitle();openChar();chGo('upper','shirt');");
-ok(await ev("!$('ch-chest').hidden&&!ITEMS.filter(i=>i.how&&i.how.code).some(i=>owns(i.id))"),'a chest on the Character screen; the secret shirt isn\'t yours yet');
-ok(await ev("!/Rhett/.test($('s-char').textContent)&&/White Tee/.test($('s-char').textContent)"),'Rhett\'s Shirt isn\'t on any shelf before it\'s redeemed');
-await ev("$('ch-chest').click()");
+ok(await ev("!ITEMS.filter(i=>i.how&&i.how.code).some(i=>owns(i.id))"),'the secret shirt isn\'t yours yet');
+ok(await ev("!/Rhett/.test($('s-char').textContent)&&/T-Shirt/.test($('s-char').textContent)"),'Rhett\'s Shirt isn\'t on any shelf before it\'s redeemed');
+await ev("openCust()");ok(await ev("!$('cu-chest').hidden&&$('cu-chest').getBoundingClientRect().width>0"),'a chest on the Customize page');await ev("$('cu-chest').click()");
 ok(await ev("!$('s-codes').hidden&&$('cd-slots').children.length===4&&[...$('cd-slots').children].every(b=>b.dataset.icon==='star')"),'the chest opens the code screen: four slots, all stars');
 await ev("document.querySelectorAll('.cdslot')[2].click()");
 ok(await ev("$('cd-slots').children[2].dataset.icon==='shuriken'"),'tapping a slot changes its icon');
@@ -69,7 +69,7 @@ await ev("for(let i=1;i<CODE_ICONS.length;i++)document.querySelectorAll('.cdslot
 await ev("$('cd-redeem').click()");
 ok(await ev("owns('shirt-rhett')&&!$('cd-pop').hidden&&$('cd-name').textContent===\"Rhett's Shirt\""),'four stars give Rhett\'s Shirt, shown in a window');
 await ev("$('cd-popback').click();$('cd-back').click()");
-ok(await ev("!$('s-char').hidden&&$('cd-pop').hidden"),'BACK closes the window, then returns to the Character screen');
+ok(await ev("!$('s-cust').hidden&&$('cd-pop').hidden"),'BACK closes the window, then returns to the Customize page');
 ok(await ev("(()=>{chGo('upper','shirt');return /Rhett/.test($('s-char').textContent)})()"),'the shirt is on its shelf now');
 ok(await ev("selfTest().hash===SELFTEST_EXPECT.arcade"),'self-test unchanged (looks are drawing only)');
 ok(errs.length===0,'no errors '+errs.join(' | '));console.log(fails?fails+' FAILED':'ALL PASS');await b.close()})();

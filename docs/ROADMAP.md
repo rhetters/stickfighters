@@ -31,6 +31,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M19 | The City | Next | L | M13, M15 | A sixth story: the suburbs, a car smash through the city streets, and the climb up a skyscraper to Pink Kong |
 | M20 | Ron's list | Next | L | M18, M19 | Stages for Versus and Arcade, colours for every item, furniture for every room you can sit and lie on, car moves, a Unicorn |
 | M21 | Ron's stage notes | Next | M | M20 | Smoother online play, your own Versus and Arcade maps, Solo Arcade picks a stage, stage fixes (Moon low gravity) |
+| M22 | Ron's notes on version 79 | Next | M | M21 | Versus ends on the victory screen, one item per style (colours do the rest), the chest on the Customize page, City and Pink Kong fixes |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
@@ -104,6 +105,14 @@ photos: five, RANDOM, MY LEVELS) with FREE-FOR-ALL / TEAMS on top.
 
 Built (version 79, see the CHANGELOG). Still to do: play online between houses to check the stutter is gone, and the
 kids try making maps on the iPad.
+
+### M22 · Ron's notes on version 79
+Ron's notes (November 27): Versus' old orange results; the dot on the colour tiles; grey stripes on plain items in a
+colour; items that were only colours of another item (one per style now, Rainbow protected); the treasure chest on
+the Customize page; Surge in the City's cars; Pink Kong's health bar and camera, everyone's view when someone reaches
+the roof first, and the ending that skipped the slow motion.
+
+Built (version 80, see the CHANGELOG). Still to do: the kids try it on the iPad.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 

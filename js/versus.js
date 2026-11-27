@@ -5,7 +5,7 @@ let VS = null;
 function startVersus() {
   closePanels();
   newSeed();
-  VS = { round: 1, wins: {}, phase: 'count', t: 0, time: 3600, teams: ROSTER.some(r => r.team != null) };
+  VS = { round: 1, wins: {}, stats: {}, phase: 'count', t: 0, time: 3600, teams: ROSTER.some(r => r.team != null) };
   vsRound();
   paused = false;
   releaseAll();
@@ -50,29 +50,15 @@ function vsNext() {
 }
 function vsEnd(w) {
   VS.phase = 'end';
+  VS.champ = vsKey(w);
   state = 'clear';
-  $('c-h1').textContent = vsName(w) + ' WINS!';
-  $('c-l1').textContent = VS.teams
-    ? [0, 1]
-        .map(
-          t =>
-            'TEAM ' +
-            (t + 1) +
-            ' (' +
-            PL.filter(p => p.team === t)
-              .map(p => p.name)
-              .join(' + ') +
-            '): ' +
-            (VS.wins['T' + t] || 0)
-        )
-        .join(' · ')
-    : PL.map(p => 'P' + (p.slot + 1) + ' ' + p.name + ': ' + (VS.wins['P' + p.slot] || 0)).join(' · ');
-  $('c-l2').textContent = 'Best combo ' + VS.maxc + ' hits';
-  $('c-l3').textContent = '';
-  runEnd('c-st', { vs: { rounds: VS.round, win: PL.filter(p => vsKey(p) === vsKey(w)) } });
-  $('b-next').textContent = 'REMATCH';
+  runEnd('v-st', { vs: { rounds: VS.round, win: PL.filter(p => vsKey(p) === vsKey(w)) } });
   sfx(520, 0.5, 'square', 0.05, 500);
-  show('s-clear');
+  bn(vsName(w) + ' WINS!');
+  // a moment to see the winner's victory pose, then the victory screen (ui/victory.js), like a story's end
+  setTimeout(() => {
+    if (state === 'clear' && MODE === VERSUS) vicOpen();
+  }, 1800);
 }
 function vsHud() {
   const s = Math.max(0, Math.ceil(VS.time / 60));
@@ -102,6 +88,12 @@ function vsSep() {
 const VERSUS = {
   id: 'versus',
   pvp: 1,
+  // each player's damage for the victory screen, over every round
+  tally(p, k, n) {
+    if (k !== 'dealt' && k !== 'taken') return;
+    const s = VS.stats[p.slot] || (VS.stats[p.slot] = { dealt: 0, taken: 0 });
+    s[k] += n;
+  },
   // runs before the simulation each step; true = everyone holds still (the countdown)
   pre() {
     if (VS.phase === 'count') {

@@ -25,9 +25,10 @@ await ev("PL[0].x=400;PL[1].x=445;PL[0].face=1;PL[1].face=-1;PL[1].hp=2;PL[1].in
 ok(await ev("VS.phase==='ko'&&VS.wins.P0===1"),'KO: P1 wins round 1');
 await W(3400);ok(await ev("VS.round===2&&VS.phase!=='ko'&&PL.every(p=>p.hp===100)"),'round 2 starts fresh');
 await W(1500);await ev("PL[0].x=400;PL[1].x=445;PL[0].face=1;PL[1].face=-1;PL[1].hp=2;PL[1].inv=0;PL[1].st='free'");await tap(0,2,60);await W(4200);
-ok(await p.isVisible('#s-clear')&&/ORANGE WINS/.test(await p.textContent('#c-h1')),'two rounds = ORANGE WINS! screen');
+await p.waitForSelector('#s-victory',{state:'visible',timeout:9000}).catch(()=>0);ok(await p.isVisible('#s-victory')&&/ORANGE WINS/.test(await p.textContent('#v-h1'))&&await ev("!!document.querySelector('#v-cards .vwin')"),'two rounds = the victory screen: ORANGE WINS!, a WINNER sticker');
 await p.screenshot({path:S+'/shots/m9-vswin.png'});
-await p.click('#b-next');await W(300);ok(await ev("MODE===VERSUS&&VS.round===1&&!VS.wins.P0"),'REMATCH starts a new match');
+ok(await ev("/REMATCH/.test($('v-again').textContent)&&$('v-again').disabled"),'REMATCH waits until everyone is ready');
+await ev("$('v-cards').querySelectorAll('.vready').forEach(b=>b.click())");await p.click('#v-again');await W(300);ok(await ev("MODE===VERSUS&&VS.round===1&&!VS.wins.P0"),'REMATCH starts a new match');
 // timer
 await W(1500);await ev("VS.time=2;PL[0].hp=80;PL[1].hp=50");await W(300);ok(await ev("VS.phase==='ko'&&VS.wins.P0===1"),'time up: most health wins the round');
 // co-op: revive
