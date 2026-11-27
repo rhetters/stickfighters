@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 80;
+const GAME_VERSION = 81;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -69,7 +69,8 @@ const EDIT = { levels: [] };
 //   v19: colours per item: eco.tint = { itemId: [colour ids bought for it] } and fighters gain tint = { itemId: colour }
 //   v20: a level can be a map for Versus and Arcade (map: 1, one screen; levels from before stay levels)
 //   v21: items that were only a colour of another item merge into it, with that colour owned (ITEM_MERGED)
-const SAVE_VERSION = 21;
+//   v22: house items can be turned (r: quarter turns, 1-3) and mirrored (f: 1); items from before are neither
+const SAVE_VERSION = 22;
 // Items that were only another item in a different colour (save version 21 merged them; kept here because the save's
 // migration runs before data/items.js loads): each old id becomes the item it was a colour of, with that colour owned
 // (and worn, if it was worn). Never reuse these ids.
@@ -232,6 +233,7 @@ function migrate(s) {
       }
     s.saveVersion = 21;
   }
+  if (s.saveVersion === 21) s.saveVersion = 22; // nothing to change: no item was turned or mirrored before
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).

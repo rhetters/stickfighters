@@ -195,12 +195,22 @@ function normHouse(h, any) {
   for (const it of Array.isArray(src.items) ? src.items.slice(0, HOUSE_MAX_ITEMS) : []) {
     const d = it && ITEM[it.id];
     if (!d || (d.sec !== 'hfurn' && d.sec !== 'hdecor') || !(any || d.price || owns(d.id))) continue;
-    const y0 = Math.floor(+it.y || 0),
-      x = Math.max(0, Math.min(HGRID.maxCols - d.w, Math.floor(+it.x || 0))),
-      y = Math.max(0, Math.min(HGRID.maxRows - d.h, flip ? 7 - (y0 + d.h) : y0));
-    out.items.push({ id: d.id, x, y });
+    // r: quarter turns (0-3), f: mirrored (the House screen's TOOLS)
+    const r = [1, 2, 3].includes(it.r) ? it.r : 0,
+      o = { id: d.id, x: 0, y: 0 },
+      [w, h] = houseFoot({ r }, d),
+      y0 = Math.floor(+it.y || 0);
+    o.x = Math.max(0, Math.min(HGRID.maxCols - w, Math.floor(+it.x || 0)));
+    o.y = Math.max(0, Math.min(HGRID.maxRows - h, flip ? 7 - (y0 + h) : y0));
+    if (r) o.r = r;
+    if (it.f === 1 || it.f === true) o.f = 1;
+    out.items.push(o);
   }
   return out;
+}
+// A placed house item's size in squares: a quarter turn swaps its width and height
+function houseFoot(it, d) {
+  return it.r & 1 ? [d.h, d.w] : [d.w, d.h];
 }
 // Stars given back for something taken back (erasing in the house). Not counted as stars earned.
 function refundStars(n, reason) {

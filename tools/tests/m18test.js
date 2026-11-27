@@ -47,13 +47,13 @@ ok(await ev("JSON.stringify(normHouse({bg:'nope',cells:{'999,1':'wood','1,1':'la
 // barriers and layering: wood wall, then stairs, then stone fills just the steps; erase goes stone, stairs, wood
 await ev(`titleOpenAll();$('b-house').click();HS.ox=0;HS.oy=0;HS.zi=0;houseCells();houseDraw();HS.tab='walls';HS.tile='wood';houseAct(2,2);HS.tab='solids';HS.solid='stairR';houseAct(2,2);HS.tab='walls';HS.tile='stone';houseAct(2,2)`);
 ok(await ev("HOUSE.cells['2,2']==='wood'&&HOUSE.solids['2,2']==='stairR'&&HOUSE.fills['2,2']==='stone'"),'a wall on stairs fills just the steps; the wall behind stays');
-const st0=await ev('ECO.stars');await ev("HS.tab='erase';houseAct(2,2)");ok(await ev("!HOUSE.fills['2,2']&&HOUSE.solids['2,2']==='stairR'&&ECO.stars==="+(st0+3)),'erase takes the stone fill first (refund 3)');
+const st0=await ev('ECO.stars');await ev("HS.tab='tools';HS.tool='erase';houseAct(2,2)");ok(await ev("!HOUSE.fills['2,2']&&HOUSE.solids['2,2']==='stairR'&&ECO.stars==="+(st0+3)),'erase takes the stone fill first (refund 3)');
 await ev("houseAct(2,2)");ok(await ev("!HOUSE.solids['2,2']&&HOUSE.cells['2,2']==='wood'"),'then the stairs');
 await ev("houseAct(2,2)");ok(await ev("!HOUSE.cells['2,2']"),'then the wood wall');
 await ev("HS.tab='solids';HS.solid='side';houseAct(4,1);HS.solid='floor';houseAct(4,1)");ok(await ev("HOUSE.sides['4,1']==='side'&&HOUSE.floors['4,1']==='floor'"),'a square can hold a floor and a side wall');
-await ev("HS.tab='erase';houseAct(4,1);houseAct(4,1)");ok(await ev("!HOUSE.sides['4,1']&&!HOUSE.floors['4,1']"),'erase takes the side wall, then the floor');
+await ev("HS.tab='tools';HS.tool='erase';houseAct(4,1);houseAct(4,1)");ok(await ev("!HOUSE.sides['4,1']&&!HOUSE.floors['4,1']"),'erase takes the side wall, then the floor');
 await ev("HS.tab='solids';HS.solid='stairR';houseAct(14,5);HS.solid='floor';houseAct(14,5)");ok(await ev("HOUSE.solids['14,5']==='stairR'&&HOUSE.floors['14,5']==='floor'"),'a floor and stairs can share a square');
-await ev("HS.tab='erase';houseAct(14,5);houseAct(14,5)");ok(await ev("!HOUSE.solids['14,5']&&!HOUSE.floors['14,5']"),'erase takes the floor, then the stairs');
+await ev("HS.tab='tools';HS.tool='erase';houseAct(14,5);houseAct(14,5)");ok(await ev("!HOUSE.solids['14,5']&&!HOUSE.floors['14,5']"),'erase takes the floor, then the stairs');
 ok(await ev("$('hs-tabs').children[1].textContent==='BARRIERS'&&[...$('hs-pal').children].length>=0"),'the tab is called BARRIERS');
 ok(await ev("getComputedStyle($('hs-cv')).position==='absolute'&&$('hs-cv').getBoundingClientRect().width>=$('s-house').getBoundingClientRect().width-2"),'the house fills the whole frame');
 await ev("$('b-houseback').click();$('b-char').click()");ok(await ev("getComputedStyle(document.querySelector('.hsdpad')).display!=='none'?!document.querySelector('.hsdpad').offsetParent:true"),'the house buttons are gone on other screens');

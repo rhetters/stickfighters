@@ -14,7 +14,8 @@ const HS = {
   last: '',
   ox: 0,
   oy: 0,
-  zi: 0 // zoom level: index into HS_ZOOM
+  zi: 0, // zoom level: index into HS_ZOOM
+  tool: 'erase' // TOOLS: rotate, flip or erase
 };
 const HS_FLOOR = 270; // where the floor line sits in the editor (lower than in play, to leave room for the pieces)
 // Zoom levels for the editor: 1 = 20 x 6 squares, then 40 x 12 and 60 x 18 (every square in view is still a button)
@@ -28,7 +29,13 @@ const HS_TABS = [
   ['hfurn', 'FURNITURE'],
   ['hdecor', 'DECORATIONS'],
   ['hbg', 'BACKGROUND'],
-  ['erase', 'ERASE']
+  ['tools', 'TOOLS']
+];
+// TOOLS: turn a thing a quarter turn, mirror it so it faces the other way, or erase
+const HS_TOOLS = [
+  ['rotate', 'ROTATE', 'Tap a thing to turn it a quarter turn.'],
+  ['flip', 'FLIP', 'Tap a thing to flip it so it faces the other way.'],
+  ['erase', 'ERASE', 'Tap or drag to remove things, front first. You get all their stars back.']
 ];
 const HS_HELP = {
   walls: 'Pick a material, then tap or drag. On stairs it fills just the steps.',
@@ -37,8 +44,9 @@ const HS_HELP = {
   hfurn: 'Pick one, then tap where its bottom-left corner goes.',
   hdecor: 'Pick one, then tap where its bottom-left corner goes.',
   hbg: 'Tap a background to use it.',
-  erase: 'Tap or drag to remove things, front first. You get all their stars back.'
+  tools: 'Pick a tool, then tap a thing in your house.'
 };
+const hsToolHelp = () => HS_TOOLS.find(t => t[0] === HS.tool)[2];
 function houseMsg(t) {
   $('hs-msg').textContent = t || '';
 }
@@ -176,7 +184,7 @@ $('hs-cells').addEventListener('pointerdown', e => {
   const v = houseAt(e);
   if (!v) return;
   e.preventDefault();
-  HS.paint = HS.tab === 'walls' || HS.tab === 'solids' || HS.tab === 'erase';
+  HS.paint = HS.tab === 'walls' || HS.tab === 'solids' || (HS.tab === 'tools' && HS.tool === 'erase');
   HS.last = v;
   houseActV(v);
 });
@@ -220,7 +228,26 @@ function houseAct(c, r) {
       HOUSE.fills = { ...HOUSE.fills };
       delete HOUSE.fills[k];
     }
-  } else if (HS.tab === 'erase') {
+  } else if (HS.tab === 'tools' && HS.tool !== 'erase') {
+    const i = houseItemAt(c, r);
+    if (i < 0) return houseMsg('Tap a piece of furniture or a decoration to ' + (HS.tool === 'flip' ? 'flip' : 'turn') + ' it.');
+    const it = { ...HOUSE.items[i] },
+      d = ITEM[it.id];
+    if (HS.tool === 'flip') {
+      if (it.f) delete it.f;
+      else it.f = 1;
+    } else {
+      it.r = ((it.r || 0) + 1) % 4;
+      if (!it.r) delete it.r;
+      // it stays on the land
+      const [w, h] = houseFoot(it, d);
+      it.x = Math.min(it.x, HGRID.maxCols - w);
+      it.y = Math.min(it.y, HGRID.maxRows - h);
+    }
+    HOUSE.items = HOUSE.items.map((q, k) => (k === i ? it : q));
+    sfx(HS.tool === 'flip' ? 620 : 540, 0.06, 'triangle', 0.03, 150);
+    done = true;
+  } else if (HS.tab === 'tools') {
     // front to back: a thing, the stairs' fill, a side wall, a ladder or spiral stairs, a floor, stairs, the wall
     const i = houseItemAt(c, r),
       take = (layer, list) => {
@@ -259,8 +286,8 @@ function houseAct(c, r) {
 function houseItemAt(c, r) {
   for (let i = HOUSE.items.length - 1; i >= 0; i--) {
     const it = HOUSE.items[i],
-      d = ITEM[it.id];
-    if (c >= it.x && c < it.x + d.w && r >= it.y && r < it.y + d.h) return i;
+      [w, h] = houseFoot(it, ITEM[it.id]);
+    if (c >= it.x && c < it.x + w && r >= it.y && r < it.y + h) return i;
   }
   return -1;
 }
@@ -274,7 +301,7 @@ function houseTabs() {
     b.onclick = () => {
       HS.tab = id;
       HS.arm = null;
-      houseMsg(HS_HELP[id]);
+      houseMsg(id === 'tools' ? hsToolHelp() : HS_HELP[id]);
       houseTabs();
       housePal();
       $('hs-tabs')
@@ -332,6 +359,20 @@ function housePal() {
         () => houseSolid(t.id, 12, 2, 40),
         () => {
           HS.solid = t.id;
+          housePal();
+        }
+      );
+  if (HS.tab === 'tools')
+    for (const [id, name, help] of HS_TOOLS)
+      card(
+        HS.tool === id,
+        true,
+        name,
+        '',
+        () => houseToolPic(id),
+        () => {
+          HS.tool = id;
+          houseMsg(help);
           housePal();
         }
       );
@@ -403,6 +444,54 @@ function housePal() {
         }
       );
     }
+}
+// The TOOLS pictures (in the card's 64 x 52 box): a chair with a turning arrow, a chair and its mirror image, an eraser
+function houseToolPic(id) {
+  const chair = ITEM['hf-chair'];
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = INK;
+  ctx.lineCap = ctx.lineJoin = 'round';
+  if (id === 'rotate') {
+    ctx.save();
+    ctx.translate(32, 28);
+    ctx.rotate(Math.PI / 2);
+    houseThing(chair, -13, -13, 26, 26);
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(32, 28, 21, -Math.PI * 0.9, -Math.PI * 0.2);
+    ctx.stroke();
+    ctx.fillStyle = INK;
+    ctx.beginPath();
+    ctx.moveTo(52, 14);
+    ctx.lineTo(54, 25);
+    ctx.lineTo(44, 21);
+    ctx.fill();
+  } else if (id === 'flip') {
+    houseThing(chair, 6, 16, 22, 28);
+    ctx.save();
+    ctx.translate(58, 0);
+    ctx.scale(-1, 1);
+    houseThing(chair, 0, 16, 22, 28);
+    ctx.restore();
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath();
+    ctx.moveTo(32, 6);
+    ctx.lineTo(32, 48);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  } else {
+    ctx.save();
+    ctx.translate(32, 28);
+    ctx.rotate(-0.5);
+    houseBox(-18, -9, 22, 18, '#ff8fb0');
+    houseBox(4, -9, 14, 18, '#3ec5ff');
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(28,22,38,.5)';
+    ctx.beginPath();
+    ctx.moveTo(8, 46);
+    ctx.lineTo(40, 46);
+    ctx.stroke();
+  }
 }
 // Backgrounds are bought once (tap twice to buy), then used as often as you like
 function houseBgPick(it) {
