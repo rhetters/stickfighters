@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## House TOOLS: rotate, flip and erase (November 27, 2026)
+- The House screen's last tab is now **TOOLS** (where ERASE was): **ROTATE** turns a piece of furniture or a decoration a quarter turn each tap, **FLIP** mirrors it so it faces the other way, and **ERASE** works as before (tap or drag, all the stars back).
+- A flipped bed puts your head on the other end when you lie down; a chair turned on its side can't be sat on.
+- Turned and flipped things are saved (save version 22) and look the same to friends who visit.
+- Version 81.
+
 ## Versus victory screen, one item per style, the chest moves, City fixes (November 27, 2026)
 Ron's notes after playing version 79.
 - **Versus ends on the victory screen**: everyone's victory pose, a WINNER sticker on the winner's polaroid, rounds won and damage done, then ready up for REMATCH (no more orange results text).

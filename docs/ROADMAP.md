@@ -32,6 +32,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M20 | Ron's list | Next | L | M18, M19 | Stages for Versus and Arcade, colours for every item, furniture for every room you can sit and lie on, car moves, a Unicorn |
 | M21 | Ron's stage notes | Next | M | M20 | Smoother online play, your own Versus and Arcade maps, Solo Arcade picks a stage, stage fixes (Moon low gravity) |
 | M22 | Ron's notes on version 79 | Next | M | M21 | Versus ends on the victory screen, one item per style (colours do the rest), the chest on the Customize page, City and Pink Kong fixes |
+| M23 | House tools | Next | S | M18 | TOOLS in the house builder: rotate, flip and erase |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
@@ -113,6 +114,12 @@ the Customize page; Surge in the City's cars; Pink Kong's health bar and camera,
 the roof first, and the ending that skipped the slow motion.
 
 Built (version 80, see the CHANGELOG). Still to do: the kids try it on the iPad.
+
+### M23 · House tools
+Ron's ask (November 27): a TOOLS tab in the house builder where ERASE was, with rotate, flip (mirror, so a chair can
+face the other way) and erase.
+
+Built (version 81, see the CHANGELOG). Still to do: the kids try it on the iPad.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 

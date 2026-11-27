@@ -776,9 +776,9 @@ function houseExt(h) {
     rows = Math.max(rows, r + 1);
   }
   for (const it of h.items) {
-    const d = ITEM[it.id];
-    cols = Math.max(cols, it.x + d.w);
-    rows = Math.max(rows, it.y + d.h);
+    const [w, hh] = houseFoot(it, ITEM[it.id]);
+    cols = Math.max(cols, it.x + w);
+    rows = Math.max(rows, it.y + hh);
   }
   return { cols, rows };
 }
@@ -832,7 +832,22 @@ function drawHouse(h, cx, cy, z = 1) {
   ctx.fillRect(cx - 30, G, vw + 60, 3);
   for (const it of h.items) {
     const d = ITEM[it.id];
-    if (d && seen(it.x, it.y, d.w, d.h)) houseThing(d, HX(it.x), HY(it.y + d.h - 1), d.w * s, d.h * s);
+    if (!d) continue;
+    const [w, hh] = houseFoot(it, d);
+    if (!seen(it.x, it.y, w, hh)) continue;
+    if (!it.r && !it.f) {
+      houseThing(d, HX(it.x), HY(it.y + hh - 1), w * s, hh * s);
+      continue;
+    }
+    // turned and / or mirrored about the middle of the squares it covers
+    const x = HX(it.x),
+      y = HY(it.y + hh - 1);
+    ctx.save();
+    ctx.translate(x + (w * s) / 2, y + (hh * s) / 2);
+    ctx.rotate((it.r || 0) * (Math.PI / 2));
+    if (it.f) ctx.scale(-1, 1);
+    houseThing(d, (-d.w * s) / 2, (-d.h * s) / 2, d.w * s, d.h * s);
+    ctx.restore();
   }
   const sol = h.solids || {};
   for (const [c, r, t] of L.fills)
@@ -910,7 +925,7 @@ function houseUseAt(f) {
   const s = HGRID.cell;
   for (const it of HVIEW.items) {
     const d = ITEM[it.id];
-    if (!d || !d.use) continue;
+    if (!d || !d.use || it.r) continue; // turned on its side or upside down, it can't be used
     const x1 = it.x * s,
       x2 = (it.x + d.w) * s,
       fy = G - it.y * s;
@@ -949,8 +964,8 @@ function houseUse(f, I) {
   const lie = A.d.use === 'lie',
     // one seat chairs and beds: the middle; a couch, a bench or a trunk: where you are on it
     x = lie || A.d.w === 1 ? (A.x1 + A.x2) / 2 : Math.max(A.x1 + 16, Math.min(A.x2 - 16, f.x));
-  // lying: head on the pillow (beds have theirs on the left; a tub's tap is on the right)
-  f.use = { k: A.d.use, x, y: lie ? A.fy + 2 : A.fy, fy: A.fy, face: lie ? -1 : f.face };
+  // lying: head on the pillow (beds have theirs on the left, or the right when mirrored; a tub's tap is opposite)
+  f.use = { k: A.d.use, x, y: lie ? A.fy + 2 : A.fy, fy: A.fy, face: lie ? (A.it.f ? 1 : -1) : f.face };
   f.vx = 0;
   sfx(lie ? 300 : 420, 0.08, 'triangle', 0.03, -100);
   return true;
