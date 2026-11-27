@@ -48,7 +48,7 @@ const sv=await ev("JSON.parse(localStorage.getItem('orangeArmy.v1'))"),SV=await 
 ok(sv.saveVersion===SV&&sv.prog.woods1&&sv.prog.woods1.done===1,'progress saved with saveVersion 2 '+JSON.stringify(sv.prog));
 await p.click('#v-title');await W(300);ok(await p.isVisible('#s-title'),'MENU goes back to the title menu');
 // arcade still works
-await p.evaluate('openSolo()');await p.click('#b-start');await W(1500);ok(await ev("MODE===ARCADE&&state==='play'&&CAM.x===0&&WB.r===W&&wave===1"),'Arcade still plays on one screen');
+await p.evaluate('openSolo()');await p.click('#b-start');await p.evaluate("SHOWN==='s-themes'&&THS.kind==='stage'&&THS.go('?')");await W(1500);ok(await ev("MODE===ARCADE&&state==='play'&&CAM.x===0&&WB.r===W&&wave===1"),'Arcade still plays on one screen');
 await p.screenshot({path:S+'/shots/m8-arcade.png'});
 // migration from an old (v1) save
 await ev("localStorage.setItem('orangeArmy.v1',JSON.stringify({set:{vol:0.4,surge:'toggle'},best:{score:4321,wave:7,combo:22}}))");await p.reload();await p.waitForTimeout(150);await p.evaluate("typeof titleOpenAll==='function'&&titleOpenAll()");await W(400);

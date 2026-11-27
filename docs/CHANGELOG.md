@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Smoother online play, your own maps, stage fixes (November 27, 2026)
+Ron's notes after the first try of the stages.
+- **Online stutter fixed:** the game sent everyone's buttons on a channel that delivers everything in order, so one lost Wi-Fi packet held up the game until it was sent again (the freeze, then the jump). Buttons now also go on a second, fast channel, eight frames at a time, so a lost one is covered by the next. The game also allows a little more time for the slowest recent ping (about 2 frames more input delay, hardly noticeable).
+- **Your own maps:** the level creator has NEW MAP, a stage of your own for Versus and Arcade: one screen of one of the 18 places, with platforms and scenery. PLAY tries it in Arcade. In the rooms and on Solo Arcade's cards, MY LEVELS shows your maps (with RANDOM among them); online, everyone plays the host's. Save version 20 (old levels stay levels).
+- **Solo Arcade picks a stage** on cards like Story's: five stages, RANDOM, then MY LEVELS. The wave count is now in the top right, under the pause button and the stars.
+- **The rooms:** Arcade and Versus show the stages under the players' photos (five, RANDOM, MY LEVELS); Versus' FREE-FOR-ALL and TEAMS moved to the top, beside the sticky note.
+- **Stages:** the tiles say RANDOM, CITY and MEADOW. The Meadow's platforms have no spiky grass; The Clearing has a big oak on each side; Castle Yard has one window, between its two platforms; Moon Base has low gravity and everyone wears a space helmet.
+- Version 79.
+
 ## Ron's list (November 27, 2026)
 Everything from Ron's notes after playing the City.
 - **Stages for Versus and Arcade:** Notebook, The Clearing, Treehouse (two low platforms and a high one), Castle Yard (a platform at each side), Rooftop (a platform that drifts from side to side, carrying whoever stands on it), Pirate Ship (decks at different heights) and Moon Base (a top platform that floats up and down). The rooms have a stage row (five at a time, and ? for a random one); online the host picks and everyone plays the same stage. Their layouts are borrowed from the best-liked fighting-game stages.

@@ -17,7 +17,7 @@ ok(await ev("normLevel(null).places[0].parts.length===1&&normPart({foes:[]},'woo
 await ev("openCust()");await W(100);
 ok(await ev("[...$('s-cust').querySelectorAll('.ptile')].map(b=>b.id).join()==='b-char,b-levels,b-house'"),'Customize: CHARACTER, LEVELS, HOUSE');
 await p.click('#b-levels');await W(300);
-ok(await ev("SHOWN==='s-levels'&&$('ed-list').children.length===1"),'MY LEVELS: NEW LEVEL and no levels yet');
+ok(await ev("SHOWN==='s-levels'&&$('ed-list').children.length===2"),'MY LEVELS: NEW LEVEL, NEW MAP and no levels yet');
 await p.click('#ed-list .ptile');await W(800);
 ok(await ev("SHOWN==='s-edpick'&&$('ed-places').children.length===18"),'NEW LEVEL: pick one of the 18 places');
 await p.click('#ed-places .ptile:nth-child(7)');await W(400); // row 2, column 1: the Sewer Tunnels
@@ -61,7 +61,7 @@ ok(await ev("SHOWN==='s-edit'"),'clearing the level goes back to the editor');
 await p.click('#ed-play');await W(300);await ev("cineEnd();levelFail()");await W(100);
 ok(await ev("$('b-title').textContent==='EDIT'"),'knocked out: EDIT (or try again)');
 await ev("$('b-title').click()");await W(200);ok(await ev("SHOWN==='s-edit'"),'EDIT goes back to the editor');
-await p.keyboard.press('Escape');await W(200);ok(await ev("SHOWN==='s-levels'&&$('ed-list').children.length===2"),'Esc (DONE) goes back to MY LEVELS, with the level on it');
+await p.keyboard.press('Escape');await W(200);ok(await ev("SHOWN==='s-levels'&&$('ed-list').children.length===3"),'Esc (DONE) goes back to MY LEVELS, with the level on it');
 // stories are never changed by your levels
 ok(await ev("typeof edPool==='undefined'&&genRun.length===2&&(()=>{SET.seed='9';startRun('castle');return !('pool' in LV.run)})()"),'stories are made as before: your levels never go into them');
 ok(await ev("(()=>{startCustom(normLevel({b:'woods',parts:[{w:1200,plats:[{x1:120,x2:600,h:3}]}]}));cineEnd();CAM.x=900;CAM.y=0;let l=[];const a=[],b=[],o=ctx.translate.bind(ctx),hit=q=>q.some(y=>Math.abs(y-160*CAM.z)<1);ctx.translate=(x,y)=>{l.push(y);o(x,y)};l=a;drawLevelFg();CAM.y=-160;l=b;drawLevelFg();ctx.translate=o;CAM.y=0;return !hit(a)&&hit(b)})()"),'the foreground (the oaks in front) sinks with the camera too');

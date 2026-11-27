@@ -30,6 +30,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M18 | House builder and visiting | Done | L | M10, M11 | Build a house with stars, invite friends over |
 | M19 | The City | Next | L | M13, M15 | A sixth story: the suburbs, a car smash through the city streets, and the climb up a skyscraper to Pink Kong |
 | M20 | Ron's list | Next | L | M18, M19 | Stages for Versus and Arcade, colours for every item, furniture for every room you can sit and lie on, car moves, a Unicorn |
+| M21 | Ron's stage notes | Next | M | M20 | Smoother online play, your own Versus and Arcade maps, Solo Arcade picks a stage, stage fixes (Moon low gravity) |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
@@ -93,6 +94,16 @@ Versus and Arcade stages (layouts from the best-liked fighting-game stages); and
 version 19). The Big Pink Teddy came first (version 77).
 
 Built (version 78, see the CHANGELOG). Still to do: the kids try it on the iPad.
+
+### M21 · Ron's stage notes
+Ron's notes after trying the stages (November 27): the online stutter (the screen freezing and jumping, with
+different hosts); custom Versus maps in the level creator; Solo Arcade picking a stage like Versus, and its wave count
+moved to the top right; the stage names (RANDOM, CITY, MEADOW); no spiky grass on the Meadow, a big oak on each side
+of the Woods, one castle window, low gravity and helmets on the Moon; the rooms laid out like Story (stages under the
+photos: five, RANDOM, MY LEVELS) with FREE-FOR-ALL / TEAMS on top.
+
+Built (version 79, see the CHANGELOG). Still to do: play online between houses to check the stutter is gone, and the
+kids try making maps on the iPad.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 

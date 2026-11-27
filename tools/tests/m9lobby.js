@@ -26,7 +26,7 @@ await W(300);await p.screenshot({path:S+'/shots/m9-coop2.png'});
 await tap(1,9);await W(150);ok(await ev("paused"),"Player 2's Start pauses");await tap(1,1);await W(150);ok(await ev("!paused"),'Player 2 resumes (Switch: A = right button)');
 await ev("pause(true)");await p.click('#b-quit');await W(200);ok(await ev("ROSTER.length===0&&PL.length===1"),'back to title = one player again');
 // single player: any one controller drives Orange like before
-await p.evaluate('openSolo()');await p.click('#b-start');await W(500);const s0=await ev("PL[0].x");await ev("__pads[2].buttons[14].pressed=true");await W(400);await ev("__pads[2].buttons[14].pressed=false");
+await p.evaluate('openSolo()');await p.click('#b-start');await p.evaluate("SHOWN==='s-themes'&&THS.kind==='stage'&&THS.go('?')");await W(500);const s0=await ev("PL[0].x");await ev("__pads[2].buttons[14].pressed=true");await W(400);await ev("__pads[2].buttons[14].pressed=false");
 ok(await ev("PL[0].x")<s0-30||true,'(single player uses the first controller)');
 const s1=await ev("PL[0].x");await ev("__pads[0].buttons[14].pressed=true");await W(400);await ev("__pads[0].buttons[14].pressed=false");ok(await ev("PL[0].x")<s1-30,'single player: controller 1 drives Orange');
 ok(errs.length===0,'no page errors '+errs.join('|'));await b.close();console.log(fails?fails+' FAILED':'ALL PASS')})();

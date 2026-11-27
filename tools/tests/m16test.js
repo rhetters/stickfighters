@@ -47,7 +47,7 @@ ok(await ev("(()=>{NET.diff=2;const r=netRoomMsg().diff===2;NET.diff=1;return r}
 ok(await ev("(()=>{NET.match=true;NET.diff=2;const v=diffOf().id;NET.match=false;NET.diff=1;return v==='hard'})()"),'online, everyone plays the host\'s difficulty');
 await ev("SET.diff=1;openLobby();LB.mode='level';renderLobby()");await W(150);
 ok(await ev("$('lb-diff').children.length===3"),'the local room has the difficulty tiles for Story');
-await ev("LB.mode='vs';renderLobby()");ok(await ev("$('lb-diff').querySelectorAll('[data-diff]').length===0&&$('lb-diff').querySelectorAll('[data-stage]').length>0"),'and none for Versus (its stages sit there instead)');
+await ev("LB.mode='vs';renderLobby()");ok(await ev("$('lb-diff').querySelectorAll('[data-diff]').length===0&&$('lb-diff').querySelectorAll('[data-teams]').length===2"),'and none for Versus (FREE-FOR-ALL and TEAMS sit there instead)');
 // the tutorial
 await ev("SET.tut=0;openSolo();$('b-start').click()");await W(150);
 ok(await ev("!$('s-learn').hidden&&SET.tut===1"),'the first time Story or Arcade is started, it offers to learn the moves first');
