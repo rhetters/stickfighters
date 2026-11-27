@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## COLORS: sub-categories and None (November 27, 2026)
+- In COLORS, a kind with more than one part (Head, Neck, Upper Body, Lower Body) first shows its sub-categories, like the clothes pages do (Upper Body: Shirts, Jackets, Gloves). Picking one shows what you wear there with **None** beside it, then its colours.
+- Tap the item to wear another of that sub-category (or None); None takes it off (Pants' None leaves your shorts on). Surge and Pets go straight to theirs, with None too; Poses and Body are as before.
+- Version 83.
+
 ## Combo fix, new City music, MOVE and DUPLICATE (November 27, 2026)
 - The combo counter's timer bar ran through the number since it moved under the wave count; it's back underneath.
 - **New City music**, quirky and jazzy (seventh chords, a bouncing bass, marimba, bells, a little organ), all original tunes: a lazy shuffle for Suburban Street, a bouncy ragtime-flavoured groove for Downtown, a climbing music-box tune for the Skyscraper, and the City's own boss song for Pink Kong (the other stories' bosses keep theirs).
