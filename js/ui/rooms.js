@@ -216,8 +216,10 @@ function stageRow(o) {
   return tiles;
 }
 // A stage pick that makes sense: a stage, '?', or one of the maps offered (else '?')
-const stageOk = (v, maps) =>
-  v === '?' || !!STAGE[v] || (v === 'my:?' && maps.length > 0) || (typeof v === 'string' && maps.some(L => 'my:' + L.id === v)) ? v : '?';
+function stageOk(v, maps) {
+  const ok = v === '?' || !!STAGE[v] || (v === 'my:?' && maps.length > 0) || (typeof v === 'string' && maps.some(L => 'my:' + L.id === v));
+  return ok ? v : '?';
+}
 // A stage's picture for its tile: its look and platforms, drawn small (kept once drawn)
 const STAGE_THUMB = {};
 function stageThumbURL(id) {

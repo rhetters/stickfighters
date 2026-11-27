@@ -5,7 +5,9 @@
 //   room        who's in (up to the room size, 2 to 6), their fighters, the mode; the host decides and tells everyone
 //   lockstep    every device runs the same simulation (VISION.md rule R2) and only button presses travel.
 // Lockstep (direct): each device sends its buttons for frame f + D straight to every other device
-// (D = input delay, from the measured lag; one trip, not a round trip through the host). Guests connect to each
+// (D = input delay, from the slowest recent lag plus some slack; one trip, not a round trip through the host).
+// Buttons travel on two channels (rtc.js): a fast one that never waits for lost packets (each message repeats the
+// last few frames) and the reliable one. Guests connect to each
 // other too; where two guests can't, the host passes their buttons along. A device simulates frame f once it has
 // everyone's buttons for it. Every 2 seconds the guests send a fingerprint of the game state to the host, which
 // checks that everyone still matches. The host still decides the room, starts and ends matches, and when a player
@@ -31,6 +33,8 @@ const NET = {
   epoch: 0, // which match (messages from an older match are ignored)
   seed: 0,
   D: 4,
+  mine: new Map(), // my own buttons for the last few frames (the fast channel repeats them)
+  rtts: [], // my last few round trips to the host (the slowest is what's reported)
   simF: 0, // next frame to simulate
   sendF: 0, // next frame to send my buttons for
   tab: new Map(), // frame -> { slot: buttons } received so far
@@ -324,6 +328,7 @@ RTC.on.err = e => {
 RTC.on.stage = t => NET.joinWait && typeof onlineMsg === 'function' && onlineMsg(t);
 RTC.on.msg = (id, m) => {
   if (!NET.on) return;
+  if (m.t === 'iw') return netGotWindow(m); // buttons on the fast channel (rtc.js), from anyone
   if (NET.host) netHostMsg(id, m);
   else if (id === NET.hostId) netClientMsg(m);
   else if (m.t === 'i') netGotInput(m); // buttons straight from another guest
@@ -447,7 +452,12 @@ function netClientMsg(m) {
       if (q) q.ready = r;
     }
     netReadyUI();
-  } else if (m.t === 'pong') NET.rtt = performance.now() - m.ts;
+  } else if (m.t === 'pong') {
+    // report the slowest of the last few: Wi-Fi hiccups are what the input delay has to cover
+    NET.rtts.push(performance.now() - m.ts);
+    if (NET.rtts.length > 8) NET.rtts.shift();
+    NET.rtt = Math.max(...NET.rtts);
+  }
   else if (m.t === 'start') netStartLocal(m);
   else if (m.t === 'i') netGotInput(m);
   else if (m.t === 'drop') netDropLocal(m);
@@ -482,7 +492,8 @@ function netStart() {
   if (NET.mode === 'level' && NET.theme === 'mine' && !mine) return false;
   const r = live.map(p => p.rtt || 0).sort((a, b) => b - a),
     oneWay = ((r[0] || 0) + (r[1] || 0)) / 2,
-    D = Math.max(2, Math.min(10, Math.ceil(oneWay / 16.67) + 1)),
+    // a frame or two of slack beyond the slowest recent trip, so a hiccup doesn't freeze the game
+    D = Math.max(3, Math.min(12, Math.ceil(oneWay / 16.67) + 2)),
     msg = {
       t: 'start',
       e: NET.epoch + 1,
@@ -508,7 +519,7 @@ function netStart() {
 }
 // Fresh lockstep state for a match (start, play again, continue)
 function netFresh(e) {
-  Object.assign(NET, { epoch: e, simF: 0, sendF: NET.D, wait: 0 });
+  Object.assign(NET, { epoch: e, simF: 0, sendF: NET.D, wait: 0, mine: new Map() });
   NET.tab.clear();
   NET.hashes.clear();
   NET.hist = {};
@@ -635,15 +646,32 @@ function netReady() {
   const row = NET.tab.get(NET.simF);
   return !!row && netNeed(NET.simF).every(p => p.slot in row);
 }
-// Send my buttons for a frame to everyone: the host to all guests; a guest to the host and the guests it reaches
+// Send my buttons for a frame to everyone: the host to all guests; a guest to the host and the guests it reaches.
+// They go twice: on the fast channel with my last NET_WIN frames (so a lost packet is covered by the next one), and on
+// the reliable game channel (so nothing is ever missing).
+const NET_WIN = 8;
 function netSendInput(f, m) {
   const msg = { t: 'i', e: NET.epoch, f, s: NET.mySlot, m };
   netStore(f, NET.mySlot, m);
+  NET.mine.set(f, m | 0);
+  NET.mine.delete(f - NET_WIN);
+  const ms = [];
+  for (let k = f - NET_WIN + 1; k <= f; k++) ms.push(NET.mine.has(k) ? NET.mine.get(k) : -1);
+  const win = { t: 'iw', e: NET.epoch, f, s: NET.mySlot, ms },
+    to = NET.host ? NET.players.filter(p => p.id !== 'host' && !p.left).map(p => p.id) : [NET.hostId, ...NET.links];
+  for (const id of to) rtcSendFast(id, win);
   if (NET.host) netAll(msg);
   else {
     netSend(NET.hostId, msg);
     for (const id of NET.links) netSend(id, msg);
   }
+}
+// A window of someone's buttons from the fast channel: the frames it covers (-1 = not sent yet)
+function netGotWindow(m) {
+  if (!Array.isArray(m.ms) || m.ms.length > 16 || !Number.isInteger(m.f) || !Number.isInteger(m.s)) return;
+  m.ms.forEach((b, k) => {
+    if (Number.isInteger(b) && b >= 0) netGotInput({ e: m.e, f: m.f - m.ms.length + 1 + k, s: m.s, m: b });
+  });
 }
 // Every 1/60 s during an online match: send my buttons, then simulate whatever frames are ready.
 function netTick() {
