@@ -47,8 +47,8 @@ function stageCards(box, card, focus) {
     }
     const q = card('A stage at random', '<span class="thpic th-q"></span><b>RANDOM</b><small>A STAGE AT RANDOM</small>', () => themeBurst(q, () => THS.go('?')), 'thq');
     const m = card(
-      maps.length ? 'Your own maps' : 'No maps yet: make one in Customize, Levels, NEW MAP',
-      '<span class="thpic th-levels"></span><b>MY LEVELS</b><small>' + (maps.length ? 'YOUR MAPS' : 'MAKE A MAP FIRST') + '</small>',
+      maps.length ? 'Your own arenas' : 'No arenas yet: make one in Customize, My Stories, NEW ARENA',
+      '<span class="thpic th-levels"></span><b>MY ARENAS</b><small>' + (maps.length ? 'YOUR ARENAS' : 'MAKE AN ARENA FIRST') + '</small>',
       () => {
         if (!maps.length) return;
         THS.mine = true;
@@ -60,7 +60,7 @@ function stageCards(box, card, focus) {
   } else {
     for (const id of pg.list) {
       const L = maps.find(q => 'my:' + q.id === id),
-        b = card(L.name, '<span class="thpic th-mine"></span><b></b><small>YOUR MAP</small>', () => themeBurst(b, () => THS.go(id)));
+        b = card(L.name, '<span class="thpic th-mine"></span><b></b><small>YOUR ARENA</small>', () => themeBurst(b, () => THS.go(id)));
       b.querySelector('b').textContent = L.name;
       pic(b, edThumbURL(L));
     }
@@ -117,8 +117,8 @@ function themeCards(focus) {
       b.querySelector('.thpic').style.backgroundImage = 'url(' + edThumbURL(L) + ')';
     }
     if (!edLevels().length)
-      card('No levels yet: make one in Customize, then Levels', '<span class="thpic th-levels"></span><b>NONE YET</b><small>MAKE ONE IN CUSTOMIZE</small>', () => 0);
-    const q = card('A random one of your levels', '<span class="thpic th-q"></span><b>?</b><small>ONE OF YOURS</small>', () => {
+      card('No stories yet: make one in Customize, then My Stories', '<span class="thpic th-levels"></span><b>NONE YET</b><small>MAKE ONE IN CUSTOMIZE</small>', () => 0);
+    const q = card('A random one of your stories', '<span class="thpic th-q"></span><b>RANDOM</b><small>ONE OF YOURS</small>', () => {
       if (edLevels().length) themeBurst(q, () => startCustom(levelToPlay(edLevels(), '?'), 'menu'));
     }, 'thq');
     q.disabled = !edLevels().length;
@@ -136,12 +136,12 @@ function themeCards(focus) {
       b.style.setProperty('--tc', th.c);
     }
     const q = card(
-      'A surprise story: more XP and stars',
-      '<span class="thpic th-q"></span><b>?</b><small>+' + Math.round(SURPRISE_BONUS * 100) + '% XP & STARS</small>',
+      'A random story: more XP and stars',
+      '<span class="thpic th-q"></span><b>RANDOM</b><small>+' + Math.round(SURPRISE_BONUS * 100) + '% XP & STARS</small>',
       () => themeBurst(q, () => THS.go(surpriseTheme(), true)),
       'thq'
     );
-    card('My levels: the levels you made (no XP or ninja stars)', '<span class="thpic th-levels"></span><b>MY LEVELS</b><small>NO XP OR STARS</small>', () => swap(true), 'thmy');
+    card('My stories: the stories you made (no XP or ninja stars)', '<span class="thpic th-levels"></span><b>MY STORIES</b><small>NO XP OR STARS</small>', () => swap(true), 'thmy');
   }
   (box.querySelector(focus || '.thcard') || box.querySelector('.thcard')).focus({ preventScroll: true });
 }

@@ -28,7 +28,7 @@ const wv=await ev("(()=>{const o=ctx.fillText.bind(ctx),hits=[];ctx.fillText=(t,
 ok(wv.length&&wv[0][0]>860&&wv[0][1]<90&&wv[0][2]==='right','the wave count sits at the top right '+JSON.stringify(wv));
 // ===== maps in the level creator =====
 await ev("init();titleOpenAll();openLevels()");await p.waitForTimeout(150);
-ok(await ev("[...$('ed-list').children].some(b=>/NEW MAP/.test(b.textContent))"),'the level creator offers NEW MAP');
+ok(await ev("[...$('ed-list').children].some(b=>/NEW ARENA/.test(b.textContent))"),'the level creator offers NEW MAP');
 await ev("edNew('castle',true)");await p.waitForTimeout(150);
 ok(await ev("(()=>{const L=EDIT.levels[EDIT.levels.length-1];return L.map===1&&L.places.length===1&&L.places[0].parts.length===1&&L.places[0].parts[0].w===W&&!L.boss&&edMaps().length===1&&edLevels().length===1})()"),'a new map: one place one screen wide, no boss');
 ok(await ev("edTabList().map(t=>t[0]).join()==='plat,prop,erase'"),'a map has platforms and scenery only (no enemies)');

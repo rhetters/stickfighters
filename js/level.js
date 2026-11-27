@@ -281,7 +281,7 @@ function levelClear() {
     $('c-h1').textContent = LV.def.name + ' CLEAR!';
     $('c-l1').textContent = 'Time ' + fmtT(LV.t) + ' · Best combo ' + maxc;
     $('c-l2').textContent = $('c-l3').textContent = '';
-    $('c-st').textContent = 'A level of your own: no XP or ninja stars.';
+    $('c-st').textContent = 'A story of your own: no XP or ninja stars.';
     $('b-next').textContent = 'PLAY AGAIN';
     setTimeout(() => {
       if (state === 'clear' && MODE === LEVEL && LV.custom) LV.from === 'edit' ? edReturn() : vicOpen();

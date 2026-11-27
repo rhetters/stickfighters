@@ -66,7 +66,7 @@ function vicOpen() {
   $('v-lobby').querySelector('.pimg').className = 'pimg ' + li;
   $('v-lobby').querySelector('b').textContent = lt;
   $('v-title').querySelector('b').textContent = NET.match && !NET.host ? 'LEAVE' : 'MENU';
-  if (!vs && LV.custom) $('v-st').innerHTML = '<span class="vgot vnone"><i>A level of your own: no XP or ninja stars</i></span>';
+  if (!vs && LV.custom) $('v-st').innerHTML = '<span class="vgot vnone"><i>A story of your own: no XP or ninja stars</i></span>';
   else vicRewards();
   show('s-victory');
   vicRefresh();
