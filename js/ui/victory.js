@@ -6,37 +6,49 @@
 const VIC = { ready: {}, raf: 0, t: 0, go: 0 };
 const VIC_FIST =
   '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M6 14 q0 -6 6 -6 h10 q4 0 4 4 v6 q0 8 -8 8 h-4 q-8 0 -8 -8z" fill="#ffd9b0" stroke="#1c1626" stroke-width="2.5"/><path d="M12 8 v6 M17 8 v6 M22 9 v5" stroke="#1c1626" stroke-width="2"/><path d="M2 6 l4 3 M4 2 l3 5 M10 1 v5" stroke="#e8212b" stroke-width="2" stroke-linecap="round"/></svg>';
+const VIC_CUP =
+  '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M8 4 h14 v7 q0 8 -7 8 q-7 0 -7 -8z" fill="#ffc83a" stroke="#1c1626" stroke-width="2.5"/><path d="M8 7 h-4 q0 6 5 7 M22 7 h4 q0 6 -5 7" fill="none" stroke="#1c1626" stroke-width="2"/><path d="M15 19 v4 M9 26 h12 v-3 h-12z" fill="#ffc83a" stroke="#1c1626" stroke-width="2.5"/></svg>';
 const VIC_HEART =
   '<svg viewBox="0 0 30 30" aria-hidden="true"><path d="M15 26 C2 18 2 6 9 5 c3 0 5 2 6 4 c1 -2 3 -4 6 -4 c7 1 7 13 -6 21z" fill="#e8212b" stroke="#1c1626" stroke-width="2.5"/><path d="M15 9 l-3 6 l5 3 l-3 6" stroke="#fff8ee" stroke-width="2" fill="none"/></svg>';
 // Also after one of your own levels (MY LEVELS: no XP or stars) or a single level: PLAY AGAIN instead of THEME +1.
+// And after Versus (VS.champ set): the winner's name, rounds won and damage done, a WINNER sticker, and REMATCH.
 function vicOpen() {
   VIC.ready = {};
   VIC.go = 0;
-  const run = LV.run,
+  const vs = MODE === VERSUS && VS && VS.champ,
+    run = !vs && LV.run,
     ng = run ? run.ng || 0 : 0,
-    cards = $('v-cards');
-  $('v-h1').textContent = LV.def.name + ' CLEAR!';
+    cards = $('v-cards'),
+    champ = vs ? PL.find(p => vsKey(p) === VS.champ) : null;
+  $('v-h1').textContent = vs ? vsName(champ) + ' WINS!' : LV.def.name + ' CLEAR!';
   // THEME +1: the theme's picture with +1 (+2…) written in its corner
-  $('v-again').querySelector('.pimg').className = 'pimg ' + (run ? 'i-' + run.theme : LV.custom ? 'i-levels' : 'i-story');
-  $('v-again').querySelector('b').textContent = run ? THEMES[run.theme].name : 'PLAY AGAIN';
+  $('v-again').querySelector('.pimg').className =
+    'pimg ' + (vs ? 'i-versus' : run ? 'i-' + run.theme : LV.custom ? 'i-levels' : 'i-story');
+  $('v-again').querySelector('b').textContent = vs ? 'REMATCH' : run ? THEMES[run.theme].name : 'PLAY AGAIN';
   $('v-again').querySelector('.vplus').textContent = run ? '+' + (ng + 1) : '';
-  $('v-again').setAttribute('aria-label', run ? THEMES[run.theme].name + ' +' + (ng + 1) + ', harder' : 'Play again');
+  $('v-again').setAttribute('aria-label', vs ? 'Rematch' : run ? THEMES[run.theme].name + ' +' + (ng + 1) + ', harder' : 'Play again');
   cards.innerHTML = '';
   cards.style.setProperty('--n', PL.length);
   for (const p of [...PL].sort((a, b) => a.slot - b.slot)) {
-    const s = (LV.stats && LV.stats[p.slot]) || { dealt: 0, taken: 0 },
+    const s = ((vs ? VS.stats : LV.stats) || {})[p.slot] || { dealt: 0, taken: 0 },
       c = document.createElement('div'),
       mine = !NET.match || p.slot === NET.mySlot;
     // a polaroid: the pose, the name, and the stats as pictures (a fist for damage done, a cracked heart for taken)
-    c.className = 'pcard polar in vcard';
+    c.className = 'pcard polar in vcard' + (vs && vsKey(p) === VS.champ ? ' vwin' : '');
     c.style.setProperty('--pc', p.col);
     c.style.setProperty('--tilt', [-2, 1.5, -1, 2, -1.5, 1][p.slot % 6] + 'deg');
     c.innerHTML =
       '<div class="pph"><canvas width="240" height="224"></canvas></div><b class="pnm vname"></b><ul class="vstats">' +
-      [
-        ['Damage Done', Math.round(s.dealt), VIC_FIST],
-        ['Damage Taken', Math.round(s.taken), VIC_HEART]
-      ]
+      (vs
+        ? [
+            ['Rounds Won', VS.wins[vsKey(p)] || 0, VIC_CUP],
+            ['Damage Done', Math.round(s.dealt), VIC_FIST]
+          ]
+        : [
+            ['Damage Done', Math.round(s.dealt), VIC_FIST],
+            ['Damage Taken', Math.round(s.taken), VIC_HEART]
+          ]
+      )
         .map(([k, v, svg]) => '<li><span class="vh">' + k + '</span>' + svg + '<b>' + v + '</b></li>')
         .join('') +
       '</ul><button class="pready vready"></button>';
@@ -54,7 +66,7 @@ function vicOpen() {
   $('v-lobby').querySelector('.pimg').className = 'pimg ' + li;
   $('v-lobby').querySelector('b').textContent = lt;
   $('v-title').querySelector('b').textContent = NET.match && !NET.host ? 'LEAVE' : 'MENU';
-  if (LV.custom) $('v-st').innerHTML = '<span class="vgot vnone"><i>A level of your own: no XP or ninja stars</i></span>';
+  if (!vs && LV.custom) $('v-st').innerHTML = '<span class="vgot vnone"><i>A level of your own: no XP or ninja stars</i></span>';
   else vicRewards();
   show('s-victory');
   vicRefresh();
@@ -78,7 +90,7 @@ function vicRewards() {
   const box = $('v-st'),
     xp = RUN.last.reduce((m, r) => Math.max(m, r.xp), 0),
     up = RUN.last.reduce((m, r) => Math.max(m, r.to > r.from ? r.to : 0), 0),
-    items = [...new Set(RUN.items)].map(id => ITEM[id].name);
+    items = [...new Set(RUN.items)].map(rewardName);
   box.innerHTML =
     '<span class="vgot" aria-label="Ninja stars earned">' +
     VIC_STAR +
@@ -119,8 +131,10 @@ $('v-again').onclick = () => {
   if (!PL.every(p => p.left || vicIsReady(p.slot))) return;
   VIC.go = 1;
   cancelAnimationFrame(VIC.raf);
-  const h = !!LV.run; // a story goes one step harder; your own level or a single level just again
+  const vs = MODE === VERSUS,
+    h = !vs && !!LV.run; // a story goes one step harder; your own level, a single level or Versus just again
   if (NET.match) netCmd(h ? 'harder' : 'again');
+  else if (vs) startVersus();
   else replayLevel(h);
 };
 // The victory pose (the fighter's first pose-wheel pick), standing on a little shadow

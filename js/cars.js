@@ -56,9 +56,15 @@ function carTick(f, I) {
   f.att = null;
   const dir = (K.r ? 1 : 0) - (K.l ? 1 : 0),
     ground = f.y >= f.gy - 1,
-    surge = !!K.s,
+    // Surge uses the Surge bar like a Surge run (only while it's speeding you up); winded, it stops working
+    surge = !!K.s && canSurge(f) && !(C.ut > 0),
     top = M.top * (surge ? CAR_SURGE : 1);
   C.sg = surge; // drawn as the glowing outline, and flames when moving
+  if (surge && (dir || Math.abs(f.vx) > 1) && !infS()) {
+    f.stm.v -= SURGE.runDrain / 60;
+    f.stm.last = fr;
+    if (f.stm.v <= 0) wind(f);
+  }
   if (ground) C.dj = 0;
   if (C.ut > 0) carUlt(f, C, M);
   else {

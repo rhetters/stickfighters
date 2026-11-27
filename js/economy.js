@@ -37,9 +37,11 @@ function grantItem(id, reason) {
 }
 // Colours per item (Character screen, COLORS): an item's original colours are free; any of TINTS can be bought for
 // one item at a time.
+// Rainbow items keep their rainbow: they can't be recoloured (and rainbow is never one of the colours)
+const tintable = it => !!it && it.c !== 'rainbow';
 const tintOwns = (id, t) => !!TINT[t] && Array.isArray(ECO.tint[id]) && ECO.tint[id].includes(t);
 function buyTint(id, t) {
-  if (!ITEM[id] || !TINT[t] || tintOwns(id, t) || !owns(id)) return false;
+  if (!tintable(ITEM[id]) || !TINT[t] || tintOwns(id, t) || !owns(id)) return false;
   if (!spendStars(TINT_PRICE, id + ':' + t)) return false;
   (ECO.tint[id] = ECO.tint[id] || []).push(t);
   ecoSave(true);
@@ -79,7 +81,23 @@ function checkUnlocks(extra) {
       (h.vs && x.vs);
     if (ok && grantItem(it.id, 'unlock')) got.push(it.id);
   }
+  // colours earned the same way (TINT_GIFTS): yours for that item, even before you own it
+  for (const g of TINT_GIFTS) {
+    const h = g.how;
+    if (SELFTESTING || tintOwns(g.id, g.t)) continue;
+    if ((h.combo && Math.max(BEST.combo || 0, x.combo || 0) >= h.combo) || (h.wave && Math.max(BEST.wave || 0, x.wave || 0) >= h.wave)) {
+      (ECO.tint[g.id] = ECO.tint[g.id] || []).push(g.t);
+      RUN.items.push('tint:' + g.id + ':' + g.t);
+      got.push('tint:' + g.id + ':' + g.t);
+      ecoSave(true);
+    }
+  }
   return got;
+}
+// A reward's name: an item's, or a colour earned for one ('tint:<item>:<colour>': "Gold Headband")
+function rewardName(id) {
+  const [k, i, t] = id.split(':');
+  return k === 'tint' && ITEM[i] && TINT[t] ? TINT[t].name + ' ' + ITEM[i].name : ITEM[id] ? ITEM[id].name : id;
 }
 const giftPool = () => ITEMS.filter(i => i.how && i.how.drop && !owns(i.id));
 // A gift from a Captain: the item chosen when it dropped (pickups.js), or 40 stars if there was none left to give
@@ -140,7 +158,7 @@ function normTint(t, any) {
   const out = {};
   if (t && typeof t === 'object' && !Array.isArray(t))
     for (const id of Object.keys(t).slice(0, 200))
-      if (ITEM[id] && TINT[t[id]] && (any || tintOwns(id, t[id]))) out[id] = t[id];
+      if (tintable(ITEM[id]) && TINT[t[id]] && (any || tintOwns(id, t[id]))) out[id] = t[id];
   return out;
 }
 // A house with every field valid: unknown squares, materials, solids and items dropped, everything kept on the land.
@@ -220,9 +238,13 @@ const lookOf = c => lookRaw(normFighter(c));
 // An item in the colour bought for it: its colours (c, and c2 a shade darker); a Surge style keeps its kind of effect
 // and gets tc, the colour of its glow and effects
 function tinted(it, tint) {
-  const t = tint && TINT[tint[it.id]];
+  const t = tint && tintable(it) && TINT[tint[it.id]];
   if (!t) return it;
-  return it.slot === 'surge' ? { ...it, tc: t.c } : { ...it, c: t.c, c2: shade(t.c, -0.28), tc: t.c };
+  if (it.slot === 'surge') return { ...it, tc: t.c };
+  // a second colour (stripes, trim) only where the item has one: a plain item stays plain
+  const o = { ...it, c: t.c, tc: t.c };
+  if (it.c2) o.c2 = shade(t.c, -0.28);
+  return o;
 }
 function saveFighter(i, c) {
   CHR.list[i] = normFighter(c);
@@ -246,7 +268,7 @@ function runEnd(el, extra) {
   if (extra && extra.bonus && RUN.stars) grantStars(Math.round(RUN.stars * extra.bonus), 'surprise');
   const got = checkUnlocks(extra);
   ecoSave(true);
-  const items = [...new Set(RUN.items)].map(id => ITEM[id].name);
+  const items = [...new Set(RUN.items)].map(rewardName);
   $(el).textContent =
     (RUN.stars
       ? '+' + RUN.stars + ' ninja stars (you have ' + ECO.stars + ')'

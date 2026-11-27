@@ -2,6 +2,15 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Versus victory screen, one item per style, the chest moves, City fixes (November 27, 2026)
+Ron's notes after playing version 79.
+- **Versus ends on the victory screen**: everyone's victory pose, a WINNER sticker on the winner's polaroid, rounds won and damage done, then ready up for REMATCH (no more orange results text).
+- **Colours:** the colour tiles no longer have a little dot (the item already shows the colour). A plain item stays plain in a new colour (no grey stripes). Rainbow items can't be recoloured: COLORS says "This item cannot be recolored."
+- **One item per style:** items that were only another item in a different colour are gone, now that any item can be coloured: one Headband, a Traditional Scarf (plus a new Knitted Scarf and Long Scarf), a Straight Tie, one Bow Tie, a T-Shirt, Dot Gloves, Boxing Gloves, one Dress, Sneakers and Shades. Anything you had comes through as that item in the colour you had, already yours and still worn (save version 21). A 20-hit combo now earns Gold for the Headband (it used to give the Gold Band). Some names lost their colour too: Shorts, Skirt, Dot Shoes, Boots, Spark Surge.
+- **The treasure chest** moved from the Character screen to the Customize page, up between the clouds above HOUSE; it's grey until highlighted.
+- **The City:** Surge in a car uses the Surge bar (and stops when you're winded). Pink Kong: the camera frames him whole, his health shows only in the big bar at the top, and if someone reaches the roof first, everyone's view comes up for his entrance. Beating him plays the slow motion and victory poses before the victory screen (standing at the roof's right edge used to end it at once).
+- Version 80.
+
 ## Smoother online play, your own maps, stage fixes (November 27, 2026)
 Ron's notes after the first try of the stages.
 - **Online stutter fixed:** the game sent everyone's buttons on a channel that delivers everything in order, so one lost Wi-Fi packet held up the game until it was sent again (the freeze, then the jump). Buttons now also go on a second, fast channel, eight frames at a time, so a lost one is covered by the next. The game also allows a little more time for the slowest recent ping (about 2 frames more input delay, hardly noticeable).

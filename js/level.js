@@ -170,6 +170,8 @@ function levelTick() {
   if (LV.cine) {
     // a scene is playing (run.js): it moves the players; fights and the camera wait
     cineTick();
+    // up the Skyscraper the view keeps following the players a scene brought up (Pink Kong's leap onto the roof)
+    if (LV.shaft && LV.terr) levelCamUp(ownView() ? PL.filter(p => p.st !== 'dead' && p.slot === NET.mySlot) : PL.filter(p => p.st !== 'dead'));
     levelWalls();
     return;
   }
@@ -258,9 +260,11 @@ function levelTick() {
       }
   }
   for (const e of E) if (e.x < CAM.x - 120) e.gone = 1; // bodies left behind as the trail scrolls on
-  // the end of the level, or (the volcano) a moment after the boss falls at the rim
-  // (the Skyscraper) a moment after the boss falls on the roof
-  if (!ne && !ae && (lead > LV.len - 150 || ((LV.esc || LV.shaft) && LV.fin && LV.go < 120))) levelClear();
+  // the end of the level, or (the volcano) a moment after the boss falls at the rim, or (the Skyscraper) a moment
+  // after the boss falls on the roof: there the slow motion and the victory poses play out first (the roof reaches
+  // the level's end, so someone standing at its right edge must not end it at once)
+  const atEnd = LV.esc || LV.shaft ? LV.fin && LV.go < 120 : lead > LV.len - 150;
+  if (!ne && !ae && atEnd) levelClear();
 }
 function fmtT(fr_) {
   const s = Math.floor(fr_ / 60);
@@ -413,6 +417,10 @@ function levelCamUp(alive) {
     tz = 1;
   if (alive.length && CAM.x + W > x0 && CAM.x < x1) {
     let top = Math.min(...alive.map(p => p.y)) - 110; // headroom above the highest player
+    // on the Skyscraper's roof, Pink Kong's head too (he's tall)
+    if (LV.shaft)
+      for (const e of E)
+        if (e.T.boss && !e.gone && !e.hide && e.y <= LV.shaft.roof + 1) top = Math.min(top, e.y - 125 * e.s);
     // up the Skyscraper, a floor's ambush shows its shut hatch (city.js)
     const af = LV.shaft && LV.encs.find(e => e.st === 1 && e.fy !== undefined && e.fy !== LV.shaft.roof);
     if (af) top = Math.min(top, af.fy - SHAFT_CEIL - 40);

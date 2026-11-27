@@ -291,6 +291,7 @@ function soloDiff() {
 }
 function openCust() {
   show('s-cust');
+  placeChest(); // ui/codes.js
   $('b-char').focus({ preventScroll: true });
 }
 const pressMode = () => !$('s-title').hidden && !$('ui').hidden && !TITLE.ready;

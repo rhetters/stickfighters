@@ -298,14 +298,16 @@ function drawF(f) {
   }
   if (f.trail) f.trail = f.trail.filter(q => fr - q[2] < 8);
   if (!f.pl) {
-    if (f.hp < f.max && !f.dying) {
+    // a boss's health and poise are in the big bar at the top of the screen (hud), not over his head
+    const hb = !!f.T.boss;
+    if (f.hp < f.max && !f.dying && !hb) {
       const w = 34 * f.s;
       ctx.fillStyle = INK;
       ctx.fillRect(f.x - w / 2 - 2, f.y - 98 * f.s - 2, w + 4, 7);
       ctx.fillStyle = '#ff4fa3';
       ctx.fillRect(f.x - w / 2, f.y - 98 * f.s, w * Math.max(0, f.hp / f.max), 3);
     }
-    if (f.pmax && !f.dying) {
+    if (f.pmax && !f.dying && !hb) {
       const w = 34 * f.s,
         y = f.y - 98 * f.s + 6;
       ctx.fillStyle = INK;

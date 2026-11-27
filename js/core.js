@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 // The game's version. Online play only connects devices with the same version (their games must play out
 // identically). Bump it with the ?v= cache-buster in index.html on every release.
-const GAME_VERSION = 79;
+const GAME_VERSION = 80;
 const SAVE_KEY = 'orangeArmy.v1';
 const DEF = {
   vol: 1,
@@ -68,7 +68,33 @@ const EDIT = { levels: [] };
 //   v18: a level's place and parts ({ b, parts }) become places: [{ b, parts }] (up to three places in a level)
 //   v19: colours per item: eco.tint = { itemId: [colour ids bought for it] } and fighters gain tint = { itemId: colour }
 //   v20: a level can be a map for Versus and Arcade (map: 1, one screen; levels from before stay levels)
-const SAVE_VERSION = 20;
+//   v21: items that were only a colour of another item merge into it, with that colour owned (ITEM_MERGED)
+const SAVE_VERSION = 21;
+// Items that were only another item in a different colour (save version 21 merged them; kept here because the save's
+// migration runs before data/items.js loads): each old id becomes the item it was a colour of, with that colour owned
+// (and worn, if it was worn). Never reuse these ids.
+const ITEM_MERGED = {
+  'band-blue': ['band-red', 'blue'],
+  'band-white': ['band-red', 'white'],
+  'band-black': ['band-red', 'black'],
+  'band-gold': ['band-red', 'gold'],
+  'scarf-blue': ['scarf-red', 'blue'],
+  'scarf-green': ['scarf-red', 'green'],
+  'scarf-gold': ['scarf-red', 'gold'],
+  'tie-blue': ['tie-red', 'blue'],
+  'tie-gold': ['tie-red', 'gold'],
+  'tie-bowred': ['tie-bow', 'red'],
+  'shirt-red': ['shirt-white', 'red'],
+  'shirt-blue': ['shirt-white', 'blue'],
+  'gloves-dotred': ['gloves-white', 'red'],
+  'gloves-blue': ['gloves-red', 'blue'],
+  'gloves-gold': ['gloves-red', 'gold'],
+  'pants-black': ['pants-khaki', 'black'],
+  'dress-yellow': ['dress-red', 'yellow'],
+  'shoes-blue': ['shoes-red', 'blue'],
+  'shoes-gold': ['shoes-red', 'gold'],
+  'face-pinkshades': ['face-shades', 'pink']
+};
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -174,6 +200,38 @@ function migrate(s) {
     s.saveVersion = 19;
   }
   if (s.saveVersion === 19) s.saveVersion = 20; // nothing to change: no level was a map before
+  if (s.saveVersion === 20) {
+    const to = id => (ITEM_MERGED[id] ? ITEM_MERGED[id][0] : id),
+      e = s.eco && typeof s.eco === 'object' ? s.eco : null;
+    if (e) {
+      const tint = (e.tint = e.tint && typeof e.tint === 'object' && !Array.isArray(e.tint) ? e.tint : {}),
+        addT = (id, t) => {
+          const l = (tint[id] = Array.isArray(tint[id]) ? tint[id] : []);
+          if (!l.includes(t)) l.push(t);
+        };
+      for (const id of Array.isArray(e.own) ? e.own : []) if (ITEM_MERGED[id]) addT(...ITEM_MERGED[id]);
+      for (const k of Object.keys(tint))
+        if (ITEM_MERGED[k]) {
+          for (const t of Array.isArray(tint[k]) ? tint[k] : []) addT(to(k), t);
+          delete tint[k];
+        }
+      if (Array.isArray(e.own)) e.own = [...new Set(e.own.map(to))];
+      if (Array.isArray(e.seen)) e.seen = [...new Set(e.seen.map(to))];
+    }
+    if (s.chr && Array.isArray(s.chr.list))
+      for (const f of s.chr.list) {
+        if (!f || !f.eq || typeof f.eq !== 'object') continue;
+        f.tint = f.tint && typeof f.tint === 'object' ? f.tint : {};
+        for (const k of Object.keys(f.eq)) {
+          const m = ITEM_MERGED[f.eq[k]];
+          if (!m) continue;
+          f.tint[m[0]] = f.tint[f.eq[k]] || m[1]; // the colour it had (or one bought for it)
+          delete f.tint[f.eq[k]];
+          f.eq[k] = m[0];
+        }
+      }
+    s.saveVersion = 21;
+  }
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).

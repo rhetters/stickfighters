@@ -957,12 +957,24 @@ function drawLook(f, J, a, ph) {
 function lookScarf(f, J, L, r, w, wv) {
   headFrame(J, J.nk, () => {
     // the tail hangs down when standing and streams out behind when moving fast
+    // k: 'long' = two long tails; 'knit' = a chunky knit with ribs and a fringe
     const c = L.scarf.c,
+      k = L.scarf.k,
+      ln = k === 'long' ? 1.55 : 1,
       m = Math.min(1, Math.abs(f.vx || 0) / 6),
-      ex = -(1.3 + 1.3 * m) * r,
-      ey = (1.75 - 1.2 * m + wv * 0.6) * r,
+      ex = -(1.3 + 1.3 * m) * r * ln,
+      ey = (1.75 - 1.2 * m + wv * 0.6) * r * ln,
       cx = -(0.9 + 0.5 * m) * r,
       cy = (0.35 + wv * 0.5) * r;
+    if (k === 'long')
+      inked(
+        [
+          [-0.1 * r, 0.3 * r],
+          [cx * 0.8, cy + 0.3 * r, ex * 0.8, ey * 0.92]
+        ],
+        0.45 * r,
+        shade(c, -0.15)
+      );
     inked(
       [
         [-0.3 * r, 0.25 * r],
@@ -984,6 +996,21 @@ function lookScarf(f, J, L, r, w, wv) {
     ctx.beginPath();
     ctx.ellipse(0, 0.25 * r, 0.75 * r, 0.32 * r, 0, 0, 7);
     shapeDo(c, w);
+    if (k === 'knit') {
+      // ribs across the wrap and a fringe at the end of the tail
+      ctx.strokeStyle = shade(c, -0.35);
+      ctx.lineWidth = Math.max(1, 0.08 * r);
+      ctx.beginPath();
+      for (let i = -2; i <= 2; i++) {
+        ctx.moveTo(i * 0.26 * r, 0.02 * r);
+        ctx.lineTo(i * 0.26 * r, 0.48 * r);
+      }
+      for (let i = -1; i <= 1; i++) {
+        ctx.moveTo(ex + i * 0.14 * r, ey);
+        ctx.lineTo(ex + i * 0.18 * r, ey + 0.35 * r);
+      }
+      ctx.stroke();
+    }
   });
 }
 function lookHead(f, J, L, r, w, wv) {

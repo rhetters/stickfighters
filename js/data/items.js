@@ -89,12 +89,10 @@ const ITEMS = [
   { id: 'hat-halo', sec: 'hat', name: 'Halo', c: '#ffd400', open: 1, how: { wave: 10 } },
   { id: 'hat-viking', sec: 'hat', name: 'Viking Helmet', c: '#9aa3b5', c2: '#f4ead2', how: { drop: 1 } },
   { id: 'hat-propeller', sec: 'hat', name: 'Propeller Cap', c: '#ff7a00', c2: '#2fb5ff', how: { drop: 1 } },
-  // headbands: a band and two tails that flutter behind
-  { id: 'band-red', sec: 'band', name: 'Red Band', c: '#e8212b', price: 25 },
-  { id: 'band-blue', sec: 'band', name: 'Blue Band', c: '#2a55c9', price: 25 },
-  { id: 'band-white', sec: 'band', name: 'White Band', c: '#ffffff', price: 35 },
-  { id: 'band-black', sec: 'band', name: 'Ninja Band', c: '#2b2533', price: 50 },
-  { id: 'band-gold', sec: 'band', name: 'Gold Band', c: '#ffd400', how: { combo: 20 } },
+  // headbands: a band and two tails that flutter behind. No item is just another item in a different colour: colours
+  // are bought for an item (TINTS below; the old colour items are in core.js ITEM_MERGED). Rainbow is the one colour
+  // that's an item's own and can't be changed.
+  { id: 'band-red', sec: 'band', name: 'Headband', c: '#e8212b', price: 25 },
   { id: 'band-rainbow', sec: 'band', name: 'Rainbow Band', c: 'rainbow', how: { drop: 1 } },
   // pets: a little friend who follows you (k = the animal, pets.js; fly = flies over your shoulder)
   // secret: only from a code in the treasure chest (crown, heart, heart, crown)
@@ -112,7 +110,6 @@ const ITEMS = [
   { id: 'face-glasses', sec: 'face', name: 'Round Glasses', c: '#ffffff', c2: '#6b4420', k: 'round', price: 30 },
   { id: 'face-nerd', sec: 'face', name: 'Nerd Glasses', c: '#ffffff', c2: '#1c1626', k: 'nerd', price: 40 },
   { id: 'face-shades', sec: 'face', name: 'Shades', c: '#1c1626', c2: '#1c1626', k: 'shades', price: 60 },
-  { id: 'face-pinkshades', sec: 'face', name: 'Pink Shades', c: '#ff4fa3', c2: '#ffffff', k: 'shades', price: 70 },
   { id: 'face-3d', sec: 'face', name: '3D Glasses', c: '#ffffff', c2: '#f4ead2', k: 'threed', price: 80 },
   { id: 'face-aviators', sec: 'face', name: 'Aviators', c: '#3f6f5a', c2: '#d9a400', k: 'aviator', price: 120 },
   { id: 'face-starshades', sec: 'face', name: 'Star Shades', c: '#ffd400', c2: '#e8212b', k: 'star', price: 150 },
@@ -126,23 +123,17 @@ const ITEMS = [
   // secret: only from a code in the treasure chest (four ninja stars)
   { id: 'face-ninja', sec: 'face', name: 'Ninja Mask', c: '#2b2533', k: 'ninja', how: { code: 1 } },
   // scarves
-  { id: 'scarf-red', sec: 'scarf', name: 'Red Scarf', c: '#e8212b', price: 50 },
-  { id: 'scarf-blue', sec: 'scarf', name: 'Blue Scarf', c: '#2a55c9', price: 50 },
-  { id: 'scarf-green', sec: 'scarf', name: 'Green Scarf', c: '#3ccf6e', price: 50 },
+  { id: 'scarf-red', sec: 'scarf', name: 'Traditional Scarf', c: '#e8212b', price: 50 },
+  { id: 'scarf-knit', sec: 'scarf', name: 'Knitted Scarf', c: '#2fa84f', k: 'knit', price: 80 },
+  { id: 'scarf-long', sec: 'scarf', name: 'Long Scarf', c: '#2a55c9', k: 'long', price: 80 },
   { id: 'scarf-stripe', sec: 'scarf', name: 'Striped Scarf', c: '#ffffff', c2: '#e8212b', price: 100 },
-  { id: 'scarf-gold', sec: 'scarf', name: 'Gold Scarf', c: '#ffd400', price: 250 },
   { id: 'scarf-royal', sec: 'scarf', name: 'Royal Scarf', c: '#6a2fc9', c2: '#ffd400', how: { drop: 1 } },
   // ties
-  { id: 'tie-red', sec: 'tie', name: 'Red Tie', c: '#e8212b', k: 'tie', price: 30 },
-  { id: 'tie-blue', sec: 'tie', name: 'Blue Tie', c: '#2a55c9', k: 'tie', price: 30 },
+  { id: 'tie-red', sec: 'tie', name: 'Straight Tie', c: '#e8212b', k: 'tie', price: 30 },
   { id: 'tie-stripe', sec: 'tie', name: 'Striped Tie', c: '#3ccf6e', c2: '#ffd400', k: 'tie', price: 60 },
-  { id: 'tie-gold', sec: 'tie', name: 'Gold Tie', c: '#ffd400', k: 'tie', price: 150 },
   { id: 'tie-bow', sec: 'tie', name: 'Bow Tie', c: '#2b2533', k: 'bow', price: 40 },
-  { id: 'tie-bowred', sec: 'tie', name: 'Red Bow Tie', c: '#e8212b', k: 'bow', price: 40 },
   // shirts
-  { id: 'shirt-white', sec: 'shirt', name: 'White Tee', c: '#ffffff', k: 'tee', price: 30 },
-  { id: 'shirt-red', sec: 'shirt', name: 'Red Tee', c: '#e8212b', k: 'tee', price: 30 },
-  { id: 'shirt-blue', sec: 'shirt', name: 'Blue Tee', c: '#2a55c9', k: 'tee', price: 30 },
+  { id: 'shirt-white', sec: 'shirt', name: 'T-Shirt', c: '#ffffff', k: 'tee', price: 30 },
   { id: 'shirt-stripe', sec: 'shirt', name: 'Striped Tee', c: '#ffffff', c2: '#2a55c9', k: 'tee', price: 60 },
   { id: 'shirt-tank', sec: 'shirt', name: 'Tank Top', c: '#3ccf6e', k: 'tank', price: 40 },
   // secret: only from a code in the treasure chest, and not shown on the shelves until it's yours
@@ -165,8 +156,7 @@ const ITEMS = [
   },
   { id: 'jacket-cape', sec: 'jacket', name: 'Hero Cape', c: '#e8212b', c2: '#ffd400', k: 'cape', price: 200 },
   // gloves
-  { id: 'gloves-white', sec: 'gloves', name: 'White Dots', c: '#ffffff', k: 'dot', price: 20 },
-  { id: 'gloves-dotred', sec: 'gloves', name: 'Red Dots', c: '#e8212b', k: 'dot', price: 20 },
+  { id: 'gloves-white', sec: 'gloves', name: 'Dot Gloves', c: '#ffffff', k: 'dot', price: 20 },
   {
     id: 'gloves-mitten',
     sec: 'gloves',
@@ -179,13 +169,10 @@ const ITEMS = [
   { id: 'gloves-wrap', sec: 'gloves', name: 'Hand Wraps', c: '#ffffff', k: 'wrap', price: 50 },
   { id: 'gloves-work', sec: 'gloves', name: 'Work Gloves', c: '#e8b02a', k: 'work', price: 50 },
   { id: 'gloves-drive', sec: 'gloves', name: 'Driving Gloves', c: '#7a4a22', k: 'drive', price: 70 },
-  { id: 'gloves-red', sec: 'gloves', name: 'Red Boxing Gloves', c: '#e8212b', k: 'boxing', price: 60 },
-  { id: 'gloves-blue', sec: 'gloves', name: 'Blue Boxing Gloves', c: '#2a55c9', k: 'boxing', price: 60 },
-  { id: 'gloves-gold', sec: 'gloves', name: 'Gold Boxing Gloves', c: '#ffd400', k: 'boxing', price: 250 },
+  { id: 'gloves-red', sec: 'gloves', name: 'Boxing Gloves', c: '#e8212b', k: 'boxing', price: 60 },
   { id: 'gloves-slime', sec: 'gloves', name: 'Slime Mitts', c: '#8cc800', k: 'mitten', how: { drop: 1 } },
   // pants, shorts, skirts, dresses (one at a time)
   { id: 'pants-jeans', sec: 'pants', name: 'Jeans', c: '#3d63a8', k: 'pants', price: 50 },
-  { id: 'pants-black', sec: 'pants', name: 'Black Pants', c: '#2b2533', k: 'pants', price: 50 },
   { id: 'pants-khaki', sec: 'pants', name: 'Khakis', c: '#c9a86a', k: 'pants', price: 40 },
   {
     id: 'pants-track',
@@ -197,7 +184,7 @@ const ITEMS = [
     price: 80
   },
   { id: 'pants-gi', sec: 'pants', name: 'Gi Pants', c: '#ffffff', k: 'pants', price: 60 },
-  { id: 'shorts-blue', sec: 'shorts', name: 'Blue Shorts', c: '#2a55c9', k: 'shorts', price: 30 },
+  { id: 'shorts-blue', sec: 'shorts', name: 'Shorts', c: '#2a55c9', k: 'shorts', price: 30 },
   {
     id: 'shorts-red',
     sec: 'shorts',
@@ -217,7 +204,7 @@ const ITEMS = [
     k: 'shorts',
     price: 120
   },
-  { id: 'skirt-blue', sec: 'skirt', name: 'Blue Skirt', c: '#2a55c9', k: 'skirt', price: 40 },
+  { id: 'skirt-blue', sec: 'skirt', name: 'Skirt', c: '#2a55c9', k: 'skirt', price: 40 },
   {
     id: 'skirt-plaid',
     sec: 'skirt',
@@ -228,8 +215,7 @@ const ITEMS = [
     price: 70
   },
   { id: 'skirt-tutu', sec: 'skirt', name: 'Tutu', c: '#b98cff', k: 'tutu', price: 90 },
-  { id: 'dress-red', sec: 'dress', name: 'Red Dress', c: '#e8212b', k: 'dress', price: 80 },
-  { id: 'dress-yellow', sec: 'dress', name: 'Sunny Dress', c: '#ffd400', k: 'dress', price: 80 },
+  { id: 'dress-red', sec: 'dress', name: 'Dress', c: '#e8212b', k: 'dress', price: 80 },
   {
     id: 'dress-dots',
     sec: 'dress',
@@ -241,9 +227,8 @@ const ITEMS = [
   },
   { id: 'dress-gown', sec: 'dress', name: 'Royal Gown', c: '#6a2fc9', c2: '#ffd400', k: 'dress', price: 200 },
   // shoes
-  { id: 'shoes-dot', sec: 'shoes', name: 'Black Dots', c: '#2b2533', k: 'dot', price: 20 },
-  { id: 'shoes-red', sec: 'shoes', name: 'Red Sneakers', c: '#e8212b', k: 'sneaker', price: 30 },
-  { id: 'shoes-blue', sec: 'shoes', name: 'Blue Sneakers', c: '#2a55c9', k: 'sneaker', price: 30 },
+  { id: 'shoes-dot', sec: 'shoes', name: 'Dot Shoes', c: '#2b2533', k: 'dot', price: 20 },
+  { id: 'shoes-red', sec: 'shoes', name: 'Sneakers', c: '#e8212b', k: 'sneaker', price: 30 },
   {
     id: 'shoes-hightop',
     sec: 'shoes',
@@ -255,7 +240,7 @@ const ITEMS = [
   },
   { id: 'shoes-sandal', sec: 'shoes', name: 'Sandals', c: '#a8743e', k: 'sandal', price: 30 },
   { id: 'shoes-slipper', sec: 'shoes', name: 'Fuzzy Slippers', c: '#d9c8ff', k: 'slipper', price: 70 },
-  { id: 'shoes-black', sec: 'shoes', name: 'Black Boots', c: '#2b2533', k: 'boot', price: 50 },
+  { id: 'shoes-black', sec: 'shoes', name: 'Boots', c: '#2b2533', k: 'boot', price: 50 },
   {
     id: 'shoes-cowboy',
     sec: 'shoes',
@@ -265,7 +250,6 @@ const ITEMS = [
     k: 'boot',
     price: 90
   },
-  { id: 'shoes-gold', sec: 'shoes', name: 'Gold Sneakers', c: '#ffd400', k: 'sneaker', price: 250 },
   {
     id: 'shoes-rocket',
     sec: 'shoes',
@@ -281,7 +265,7 @@ const ITEMS = [
   { id: 'trail-fire', sec: 'surge', name: 'Fire Surge', c: 'fire', fx: 'flame', price: 150 },
   { id: 'trail-ice', sec: 'surge', name: 'Ice Surge', c: 'ice', fx: 'snow', price: 150 },
   { id: 'surge-shadow', sec: 'surge', name: 'Shadow Surge', c: '#6a2fc9', fx: 'smoke', price: 150 },
-  { id: 'trail-gold', sec: 'surge', name: 'Gold Surge', c: '#ff9f1a', fx: 'spark', price: 200 },
+  { id: 'trail-gold', sec: 'surge', name: 'Spark Surge', c: '#ff9f1a', fx: 'spark', price: 200 },
   { id: 'surge-bolt', sec: 'surge', name: 'Lightning Surge', c: 'bolt', fx: 'bolt', price: 250 },
   { id: 'trail-rainbow', sec: 'surge', name: 'Rainbow Surge', c: 'rainbow', price: 300 },
   { id: 'trail-hearts', sec: 'surge', name: 'Heart Surge', c: 'hearts', fx: 'heart', how: { drop: 1 } },
@@ -419,6 +403,8 @@ const TINTS = [
 ];
 const TINT = Object.fromEntries(TINTS.map(t => [t.id, t]));
 const TINT_PRICE = 30; // stars for one colour on one item
+// Colours earned instead of bought (checked with the item unlocks; `how` as for items)
+const TINT_GIFTS = [{ id: 'band-red', t: 'gold', how: { combo: 20 } }];
 // The COLORS page's eight kinds: what's recoloured in each (Body = the body colours)
 const PAINTS = [
   { id: 'body', name: 'Body', secs: ['color'] },
