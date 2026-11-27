@@ -130,12 +130,12 @@ function carSmash(f, x, y, r, dmg, dir) {
   if (n) carHitFx(f);
   return n;
 }
-const carHitFx = f => {
+function carHitFx(f) {
   f.car.sh = 6;
   shake = Math.max(shake, 7);
   sfx(120, 0.2, 'sawtooth', 0.08, -60);
   noise(0.15, 0.1, 500);
-};
+}
 // Driving into enemies: anyone in front of a moving car is sent flying, harder the faster it goes (Surge hits
 // hardest)
 function carRam(f, C, M) {

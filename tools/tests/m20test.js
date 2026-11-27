@@ -64,7 +64,7 @@ ok(cr.dj,'cars jump again in the air');
 ok(cr.hood&&cr.trunk,'Punch bumps the hood into whoever is in front, Kick the trunk into whoever is behind '+JSON.stringify([cr.hood,cr.trunk]));
 ok(cr.glow&&cr.ults,'Surge makes the car glow; every model has its own ULT');
 const ul=await ev(`(()=>{const P=PL[0],out={};for(let m=0;m<CARS.length;m++){P.car.m=m;P.car.ut=0;P.car.rot=0;P.car.tilt=0;P.x=(WB.l+WB.r)/2;P.y=G;P.vx=P.vy=0;E.length=0;for(let i=0;i<6;i++)spawn({t:'g',x:WB.l+80+i*140});for(const e of E){e.y=G;e.st='free'}
- for(let i=0;i<30&&stop>0;i++){fr++;update()}P.meter=100;setA('kb','x',1);fr++;update();setA('kb','x',0);const used=P.meter===0&&P.car.ut>0;for(let i=0;i<240;i++){fr++;update();P.hp=P.max}out[CARS[m].ult]=used&&E.some(e=>e.hp<e.max||e.dying)&&!P.car.ut}return out})()`);
+ for(let i=0;i<60&&(stop>0||P.y<G-1);i++){fr++;update()}P.meter=100;setA('kb','x',1);let used=false;for(let i=0;i<30&&!used;i++){fr++;update();used=P.meter===0&&P.car.ut>0}setA('kb','x',0);for(let i=0;i<240;i++){fr++;update();P.hp=P.max}out[CARS[m].ult]=used&&E.some(e=>e.hp<e.max||e.dying)&&!P.car.ut}return out})()`);
 ok(Object.values(ul).every(Boolean),'ULT in a car (full meter): each model\'s move hits '+JSON.stringify(ul));
 // ===== the house: a door two squares high, furniture by room, sitting and lying =====
 const hs=await ev(`(()=>{const out={};for(const gap of [1,2]){const h={bg:null,cells:{},solids:{},floors:{},fills:{},climbs:{},sides:{},items:[]};for(let r=gap;r<7;r++)h.sides['6,'+r]='side';startHouse(h);const P=PL[0];P.x=3*45;P.y=G;for(let i=0;i<150;i++){setA('kb','r',1);fr++;update()}setA('kb','r',0);out[gap]=P.x>7*45}return out})()`);
