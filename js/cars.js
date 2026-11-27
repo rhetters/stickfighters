@@ -6,8 +6,10 @@
 // ===== GETTING IN AND OUT =====
 // A sitting pose for the driver: hands forward on the wheel, knees bent
 const SEAT = [4, 70, 70, 60, 80, 85, 0, 80, 5, 0];
+// Each player keeps the model they were first given for the whole run (carM), so a car handed back is their own
 function carGive(f) {
-  f.car = { m: Math.floor(rnd() * CARS.length), tb: 0, tc: 0, sh: 0 };
+  if (f.carM === undefined) f.carM = Math.floor(rnd() * CARS.length);
+  f.car = { m: f.carM, tb: 0, tc: 0, sh: 0 };
   f.att = null;
   f.st = 'free';
   f.vx = 0;
@@ -17,15 +19,16 @@ function carTake(f) {
   f.car = null;
   f.vy = -6; // hops out
 }
-// Once a step: everyone in a driving place has a car, everyone out of one doesn't (a scene moving a player out of
-// Downtown takes the car away as it starts; the car park scene hands them out itself)
+// Once a step: everyone in a driving place has a car, everyone out of one doesn't (a transition scene moving a
+// player out of Downtown takes the car away as it starts; the car park scene hands them out itself; a boss's
+// entrance leaves you in your car)
 function carsTick() {
   if (!LV || !LV.segs) return;
   for (const p of PL) {
     if (p.st === 'dead') continue;
     const drive = !!BIOMES[segAt(p.x).b].drive;
     if (p.st === 'cine') {
-      if (p.car && LV.cine && LV.cine.k !== 'park' && LV.cine.k !== 'cars') p.car = null;
+      if (p.car && LV.cine && TRANSITIONS[LV.cine.k] && LV.cine.k !== 'park' && LV.cine.k !== 'cars') p.car = null;
       continue;
     }
     if (drive && !p.car) {
@@ -124,9 +127,17 @@ function carRam(f, C, M) {
   }
 }
 // An enemy's hit on a player in a car does nothing but rock it a little
-function carBump(q) {
-  q.car.sh = 8;
-  sfx(200, 0.06, 'square', 0.03);
+// A hit on a car: the hit's damage (combat.js), then the car rocks and is pushed back a little, safe for a moment
+function carHit(q, dr) {
+  q.car.sh = 12;
+  q.inv = 50;
+  q.flash = 4;
+  q.vx = dr * 4;
+  if (q.y >= q.gy - 1) q.vy = -3;
+  shake = 6;
+  spark(q.x, q.y - 50, 20, '#ff4fa3');
+  sfxHit('M');
+  sfx(200, 0.08, 'square', 0.04);
 }
 // ===== DRAWING =====
 // The driver (drawn sitting, a bit smaller), then the car around them: the painted shell with the window cut out, the

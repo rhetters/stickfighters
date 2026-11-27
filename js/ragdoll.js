@@ -123,7 +123,7 @@ function ragStep(R, s) {
     for (let i = 0; i < 13; i++) {
       const p = P_[i],
         r = i === 0 ? 9 * s : 2.5,
-        gy = groundY(p.x);
+        gy = groundY(p.x, p.py, p.y, r);
       if (p.y > gy - r) {
         const vy = p.y - p.py;
         p.y = gy - r;
@@ -300,9 +300,9 @@ function corpseTick(f, dissolve) {
         const wallDir = R.p[4].x < (WB.l + WB.r) / 2 ? 1 : -1,
           dir = k === 'slump' || k === 'legsup' ? wallDir : f.ddir || f.face || 1,
           ax = k === 'slump' || k === 'legsup' ? (wallDir > 0 ? WB.l + 16 : WB.r - 16) : R.p[4].x;
-        R.tpl = DPOSE[k].map(([x, y]) => ({ x: ax + x * dir * f.s, y: G + y * f.s }));
+        R.tpl = DPOSE[k].map(([x, y]) => ({ x: ax + x * dir * f.s, y: fgy(f) + y * f.s })); // on its own floor
         R.pose = k;
-        if (state === 'train') txt(R.p[4].x, G - 70, DPNAME[k], '#7a6e80', 14);
+        if (state === 'train') txt(R.p[4].x, fgy(f) - 70, DPNAME[k], '#7a6e80', 14);
       }
     }
   } else if (!R.frozen) {
@@ -349,10 +349,12 @@ function corpseTick(f, dissolve) {
     }
     if (R.dis > 32) {
       f.gone = 1;
-      dust(R.p[3].x, G, 4);
+      dust(R.p[3].x, fgy(f), 4);
     }
   }
 }
+// The floor a fighter is on (a platform's, or the floor line)
+const fgy = f => (f.gy === undefined ? G : f.gy);
 function ragTick(f) {
   if (RS(f)) {
     if (!f.rag) {
@@ -376,7 +378,7 @@ function ragTick(f) {
     R.pin = 1;
     const m = R.p[3],
       tx = f.st === 'down' ? f.x : f.st === 'splat' ? f.x + f.face * 8 * f.s : f.x,
-      ty = f.st === 'down' ? G - 5 * f.s : f.y - 30 * f.s;
+      ty = f.st === 'down' ? fgy(f) - 5 * f.s : f.y - 30 * f.s;
     m.x = tx;
     m.y = ty;
     m.px = tx - f.vx;

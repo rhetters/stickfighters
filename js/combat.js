@@ -713,7 +713,6 @@ function blockHit(q, d, dr) {
 const STR_INV = 8, // frames safe between hits of one string
   STR_GAP = 45; // a string's next hit must come this soon after the last, or it's a new string
 function hurtP(q, d, dr, src) {
-  if (q.car) return carBump(q); // nothing hurts a player in a car (cars.js)
   if (q.blk && dr === -q.face && q.st === 'free' && !q.inv) return blockHit(q, d, dr);
   if (state === 'train' && TR.god) return;
   if (q.inv > 0 || q.st === 'dead' || (q.att && q.att.d.invul)) return;
@@ -729,6 +728,11 @@ function hurtP(q, d, dr, src) {
   const hd = d.dmg * (1 - modOf(q, 'arm')) * (1 + 0.2 * hardScale()) * diffOf().dmg; // Tough Skin, Thick Skin (skill tree)
   tally(q, 'taken', Math.min(hd, Math.max(0, q.hp)));
   q.hp -= hd;
+  if (q.car) {
+    // in a car (cars.js): it rocks and bounces back a little; a knockout throws you out of it
+    if (q.hp > 0) return carHit(q, dr);
+    q.car = null;
+  }
   const D = diffOf(),
     by = src ? src.uid || 0 : 0,
     S = q.str && q.str.by === by && fr - q.str.t <= STR_GAP ? q.str : (q.str = { by, n: 0, dmg: 0, t: fr });
@@ -903,8 +907,18 @@ function sep() {
     }
   }
 }
-// The floor line under x (ragdolls still use only this; fighters stand on f.gy, see terrain.js).
-const groundY = x => G;
+// The ground a ragdoll's point (radius r) comes down on at x, moving from py to y: the highest platform or floor it
+// was above and has reached (platforms, the Skyscraper's floors, a house's floors; terrain.js), else the floor line G.
+// Fighters themselves stand on f.gy (terrain.js).
+function groundY(x, py, y, r) {
+  if (!TERRAIN.n) return G;
+  let gy = G;
+  for (const s of surfAt(x)) {
+    const sy = surfY(s, x);
+    if (py <= sy - r + 6 && y > sy - r && sy < gy) gy = sy; // (a little slack: a resting point bounces)
+  }
+  return gy;
+}
 function phys(f) {
   // low gravity (the moon): the up-and-down motion runs slower, so jumps and launches float, and reach a little higher
   const lg = lowG(f);
