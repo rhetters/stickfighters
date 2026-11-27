@@ -106,6 +106,7 @@ const ITEMS = [
   { id: 'pet-armadillo', sec: 'pet', name: 'Armadillo', c: '#b9a28a', c2: '#7d6a58', k: 'armadillo', price: 350 },
   { id: 'pet-wolf', sec: 'pet', name: 'Wolf Pup', c: '#a8b4c4', c2: '#6c7a8e', k: 'wolf', price: 400 },
   { id: 'pet-owl', sec: 'pet', name: 'Owl', c: '#a8784a', c2: '#7a5230', k: 'owl', fly: 1, price: 450 },
+  { id: 'pet-unicorn', sec: 'pet', name: 'Unicorn', c: '#ffffff', k: 'unicorn', price: 500 },
   { id: 'pet-dragon', sec: 'pet', name: 'Baby Dragon', c: '#5ac46a', c2: '#e8572b', k: 'dragon', fly: 1, price: 600 },
   // face (k = the style, looks.js drawFace)
   { id: 'face-glasses', sec: 'face', name: 'Round Glasses', c: '#ffffff', c2: '#6b4420', k: 'round', price: 30 },
