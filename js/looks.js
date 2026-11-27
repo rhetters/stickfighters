@@ -1296,6 +1296,7 @@ function lookPose(f) {
   LOOKK.set(f, k);
   const idle =
       f.st === 'free' &&
+      !f.use && // sitting or lying on furniture (house.js)
       f.y >= f.gy - 1 &&
       Math.abs(f.vx) < 0.9 &&
       !f.blk &&

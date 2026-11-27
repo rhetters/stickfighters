@@ -285,6 +285,15 @@ function houseTabs() {
   }
 }
 // The cards under the tabs: wall materials, floors and stairs, or the store items of that section
+const HS_ROOMS = [
+  ['all', 'ALL'],
+  ['living', 'LIVING'],
+  ['bedroom', 'BEDROOM'],
+  ['kitchen', 'KITCHEN'],
+  ['dining', 'DINING'],
+  ['bathroom', 'BATHROOM'],
+  ['attic', 'ATTIC']
+];
 function housePal() {
   const box = $('hs-pal');
   box.innerHTML = '';
@@ -350,9 +359,30 @@ function housePal() {
         () => houseBgPick(it)
       );
     }
+  // Furniture by room: a little column of room buttons first (ALL shows everything)
+  if (HS.tab === 'hfurn') {
+    const r = document.createElement('div');
+    r.className = 'hsrooms';
+    for (const [id, name] of HS_ROOMS) {
+      const b = document.createElement('button');
+      b.textContent = name;
+      b.className = (HS.room || 'all') === id ? 'on' : '';
+      b.onclick = () => {
+        HS.room = id;
+        housePal();
+      };
+      r.appendChild(b);
+    }
+    box.appendChild(r);
+  }
   if (HS.tab === 'hfurn' || HS.tab === 'hdecor')
     // a secret (a chest code) shows only once you have it
-    for (const it of ITEMS.filter(i => i.sec === HS.tab && !(i.how && i.how.code && !owns(i.id)))) {
+    for (const it of ITEMS.filter(
+      i =>
+        i.sec === HS.tab &&
+        !(i.how && i.how.code && !owns(i.id)) &&
+        (HS.tab !== 'hfurn' || !HS.room || HS.room === 'all' || i.room === HS.room)
+    )) {
       const can = !!it.price || owns(it.id);
       card(
         HS.item === it.id,

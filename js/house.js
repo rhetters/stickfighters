@@ -98,6 +98,15 @@ function houseBox(x, y, w, h, fill, r) {
   ctx.fill();
   ctx.stroke();
 }
+function houseOval(cx, cy, rx, ry, fill) {
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, 7);
+  ctx.fill();
+  ctx.stroke();
+}
 // One furniture or decoration item, filling the box (x, y, w, h) in pixels
 function houseThing(it, x, y, w, h) {
   const c = it.c,
@@ -320,6 +329,285 @@ function houseThing(it, x, y, w, h) {
     ctx.restore();
     ctx.stroke();
     houseBox(cx - w * 0.16, b - h * 0.16 + bob, w * 0.32, h * 0.15, '#a96e3a');
+  } else if (k === 'armchair') {
+    houseBox(x + w * 0.08, b - h * 0.92, w * 0.84, h * 0.6, c2, 10); // the back
+    houseBox(x + w * 0.04, b - h * 0.5, w * 0.92, h * 0.32, c, 8); // the seat
+    houseBox(x, b - h * 0.62, w * 0.18, h * 0.5, c, 6); // arms
+    houseBox(x + w * 0.82, b - h * 0.62, w * 0.18, h * 0.5, c, 6);
+    houseBox(x + w * 0.1, b - h * 0.18, w * 0.1, h * 0.18, '#5a3a22', 2);
+    houseBox(x + w * 0.8, b - h * 0.18, w * 0.1, h * 0.18, '#5a3a22', 2);
+  } else if (k === 'beanbag') {
+    houseOval(x + w / 2, b - h * 0.3, w * 0.48, h * 0.3, c);
+    houseOval(x + w * 0.42, b - h * 0.52, w * 0.3, h * 0.24, shade(c, 0.15));
+  } else if (k === 'fireplace') {
+    houseBox(x, b - h * 0.9, w, h * 0.9, c, 4);
+    // bricks
+    ctx.strokeStyle = 'rgba(28,22,38,0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let r = 1; r < 5; r++) {
+      ctx.moveTo(x + 2, b - h * 0.9 + (r * h * 0.9) / 5);
+      ctx.lineTo(x + w - 2, b - h * 0.9 + (r * h * 0.9) / 5);
+    }
+    ctx.stroke();
+    houseBox(x - w * 0.04, b - h, w * 1.08, h * 0.12, '#8a5a33', 3); // the mantel
+    houseBox(x + w * 0.22, b - h * 0.55, w * 0.56, h * 0.55, '#2b2533', 3);
+    // the fire (it flickers)
+    const fl = Math.sin(performance.now() / 120) * 0.08;
+    for (const [fx, fh, col] of [
+      [0.38, 0.32 + fl, '#ff7a00'],
+      [0.52, 0.4 - fl, '#e8212b'],
+      [0.62, 0.28 + fl, '#ffb000'],
+      [0.5, 0.2, '#ffd400']
+    ]) {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.moveTo(x + w * (fx - 0.09), b - 3);
+      ctx.quadraticCurveTo(x + w * fx, b - h * fh * 1.4, x + w * (fx + 0.09), b - 3);
+      ctx.fill();
+    }
+  } else if (k === 'coffee') {
+    houseBox(x + 4, b - h * 0.5, w - 8, h * 0.12, c);
+    houseBox(x + w * 0.1, b - h * 0.4, w * 0.06, h * 0.4, c2);
+    houseBox(x + w * 0.84, b - h * 0.4, w * 0.06, h * 0.4, c2);
+    houseBox(x + w * 0.35, b - h * 0.62, w * 0.14, h * 0.12, '#ffffff', 3); // a mug
+  } else if (k === 'piano') {
+    houseBox(x + 2, b - h * 0.95, w - 4, h * 0.6, c, 6);
+    houseBox(x + 2, b - h * 0.4, w - 4, h * 0.12, '#ffffff', 2); // the keys
+    ctx.fillStyle = INK;
+    for (let i = 1; i < 9; i++) if (i % 4 !== 3) ctx.fillRect(x + 2 + ((w - 4) * i) / 9 - 2, b - h * 0.4, 4, h * 0.07);
+    houseBox(x + w * 0.08, b - h * 0.28, w * 0.07, h * 0.28, c);
+    houseBox(x + w * 0.85, b - h * 0.28, w * 0.07, h * 0.28, c);
+    houseBox(x + w * 0.4, b - h * 0.85, w * 0.2, h * 0.16, '#fff8ee', 2); // the music
+  } else if (k === 'bunk') {
+    for (const lv of [0, 1]) {
+      const by0 = b - lv * h * 0.5;
+      houseBox(x + 4, by0 - h * 0.2, w - 8, h * 0.1, '#ffffff', 3);
+      houseBox(x + w * 0.25, by0 - h * 0.26, w * 0.72, h * 0.1, c, 3);
+      houseBox(x + w * 0.06, by0 - h * 0.28, w * 0.16, h * 0.08, '#ffffff', 3);
+    }
+    houseBox(x, b - h, w * 0.05, h, '#8a5a33', 2);
+    houseBox(x + w * 0.95, b - h, w * 0.05, h, '#8a5a33', 2);
+    // the ladder
+    ctx.strokeStyle = '#8a5a33';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for (let r = 1; r < 5; r++) {
+      ctx.moveTo(x + w * 0.82, b - (r * h) / 5);
+      ctx.lineTo(x + w * 0.93, b - (r * h) / 5);
+    }
+    ctx.stroke();
+  } else if (k === 'dresser') {
+    houseBox(x + 3, b - h * 0.78, w - 6, h * 0.74, c, 4);
+    for (let r = 0; r < 3; r++) {
+      houseBox(x + 8, b - h * 0.74 + r * h * 0.23, w - 16, h * 0.19, shade(c, 0.1), 3);
+      houseOval(x + w / 2, b - h * 0.645 + r * h * 0.23, 3, 3, '#ffd400');
+    }
+    houseBox(x + w * 0.62, b - h * 0.98, w * 0.18, h * 0.2, '#cdeeff', 3); // a little mirror
+  } else if (k === 'wardrobe') {
+    houseBox(x + 3, b - h * 0.98, w - 6, h * 0.95, c, 4);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + w / 2, b - h * 0.94);
+    ctx.lineTo(x + w / 2, b - h * 0.08);
+    ctx.stroke();
+    houseOval(x + w / 2 - 7, b - h * 0.5, 3, 5, '#ffd400');
+    houseOval(x + w / 2 + 7, b - h * 0.5, 3, 5, '#ffd400');
+  } else if (k === 'nightstand') {
+    houseBox(x + w * 0.15, b - h * 0.55, w * 0.7, h * 0.52, c, 3);
+    houseOval(x + w / 2, b - h * 0.32, 3, 3, '#ffd400');
+    houseBox(x + w * 0.38, b - h * 0.85, w * 0.24, h * 0.3, '#ffd400', 6); // a little lamp
+  } else if (k === 'toybox') {
+    houseBox(x + w * 0.06, b - h * 0.62, w * 0.88, h * 0.6, c, 4);
+    houseBox(x + w * 0.02, b - h * 0.72, w * 0.96, h * 0.14, shade(c, -0.2), 4);
+    ctx.fillStyle = '#ffd400';
+    ctx.font = '900 ' + Math.round(h * 0.3) + 'px Impact,"Arial Black",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TOYS', x + w / 2, b - h * 0.2);
+  } else if (k === 'desk') {
+    houseBox(x + 2, b - h * 0.72, w - 4, h * 0.12, c);
+    houseBox(x + w * 0.6, b - h * 0.6, w * 0.36, h * 0.6, shade(c, -0.1), 3); // drawers
+    houseBox(x + w * 0.06, b - h * 0.6, w * 0.06, h * 0.6, c);
+    houseBox(x + w * 0.2, b - h * 1.05, w * 0.26, h * 0.3, '#2b2533', 3); // a computer
+    houseBox(x + w * 0.23, b - h * 1.0, w * 0.2, h * 0.2, '#7fc4ee', 2);
+  } else if (k === 'stove') {
+    houseBox(x + 3, b - h * 0.5, w - 6, h * 0.5, c, 3);
+    houseBox(x + w * 0.15, b - h * 0.4, w * 0.7, h * 0.28, '#2b2533', 3); // the oven window
+    houseBox(x + 3, b - h * 0.58, w - 6, h * 0.08, '#6f6a78', 2);
+    houseBox(x + w * 0.25, b - h * 0.78, w * 0.5, h * 0.18, '#8a8494', 3); // a pot
+    houseBox(x + w * 0.18, b - h * 0.8, w * 0.64, h * 0.04, '#6f6a78', 2);
+  } else if (k === 'ksink') {
+    houseBox(x + 2, b - h * 0.48, w - 4, h * 0.48, c2, 3); // cupboards
+    houseBox(x + 2, b - h * 0.52, w - 4, h * 0.06, '#d9d4de', 2); // the counter
+    houseBox(x + w * 0.3, b - h * 0.52, w * 0.4, h * 0.05, '#9a96a2', 2); // the sink
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.5, b - h * 0.52);
+    ctx.lineTo(x + w * 0.5, b - h * 0.7);
+    ctx.lineTo(x + w * 0.42, b - h * 0.7);
+    ctx.stroke();
+    houseBox(x + w * 0.08, b - h * 0.96, w * 0.84, h * 0.3, '#c98a4f', 3); // the cabinet above
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.5, b - h * 0.96);
+    ctx.lineTo(x + w * 0.5, b - h * 0.66);
+    ctx.stroke();
+  } else if (k === 'cupboard') {
+    houseBox(x + 2, b - h * 0.85, w - 4, h * 0.85, c, 3);
+    houseBox(x, b - h * 0.95, w, h * 0.12, '#d9d4de', 2);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + w / 2, b - h * 0.82);
+    ctx.lineTo(x + w / 2, b - 3);
+    ctx.stroke();
+    houseOval(x + w / 2 - 6, b - h * 0.5, 2.5, 4, '#ffd400');
+    houseOval(x + w / 2 + 6, b - h * 0.5, 2.5, 4, '#ffd400');
+  } else if (k === 'stool') {
+    houseOval(x + w / 2, b - h * 0.62, w * 0.3, h * 0.08, c);
+    houseBox(x + w * 0.3, b - h * 0.58, w * 0.06, h * 0.58, '#8a8494', 2);
+    houseBox(x + w * 0.64, b - h * 0.58, w * 0.06, h * 0.58, '#8a8494', 2);
+  } else if (k === 'microwave') {
+    houseBox(x + 2, b - h * 0.6, w - 4, h * 0.56, c, 4);
+    houseBox(x + w * 0.1, b - h * 0.5, w * 0.55, h * 0.38, '#2b2533', 3);
+    for (let i = 0; i < 3; i++) houseOval(x + w * 0.8, b - h * 0.48 + i * h * 0.13, 3, 3, '#ffd400');
+  } else if (k === 'dining') {
+    houseBox(x + 2, b - h * 0.7, w - 4, h * 0.1, c2, 2); // the tablecloth
+    houseBox(x + 2, b - h * 0.62, w - 4, h * 0.12, c);
+    houseBox(x + w * 0.06, b - h * 0.5, w * 0.05, h * 0.5, c);
+    houseBox(x + w * 0.89, b - h * 0.5, w * 0.05, h * 0.5, c);
+    for (const px of [0.25, 0.5, 0.75]) houseOval(x + w * px, b - h * 0.75, w * 0.07, h * 0.04, '#ffffff'); // plates
+  } else if (k === 'china') {
+    houseBox(x + 3, b - h * 0.98, w - 6, h * 0.95, c, 4);
+    houseBox(x + 8, b - h * 0.92, w - 16, h * 0.5, '#cdeeff', 3); // glass doors
+    for (let r = 0; r < 2; r++)
+      for (let i = 0; i < 3; i++)
+        houseOval(x + 16 + i * ((w - 32) / 2), b - h * 0.78 + r * h * 0.22, 5, 7, ['#3ec5ff', '#ffffff', '#ff4fa3'][(i + r) % 3]);
+    houseBox(x + 8, b - h * 0.38, w - 16, h * 0.32, shade(c, 0.1), 3);
+  } else if (k === 'candles') {
+    houseBox(x + w * 0.3, b - h * 0.1, w * 0.4, h * 0.08, c, 2);
+    houseBox(x + w * 0.46, b - h * 0.5, w * 0.08, h * 0.42, c, 2);
+    houseBox(x + w * 0.22, b - h * 0.5, w * 0.56, h * 0.05, c, 2);
+    for (const cx of [0.27, 0.5, 0.73]) {
+      houseBox(x + w * cx - 3, b - h * 0.75, 6, h * 0.25, '#ffffff', 2);
+      ctx.fillStyle = '#ff7a00';
+      ctx.beginPath();
+      ctx.ellipse(x + w * cx, b - h * 0.82, 3, 5 + Math.sin(performance.now() / 150 + cx * 9), 0, 0, 7);
+      ctx.fill();
+    }
+  } else if (k === 'toilet') {
+    houseBox(x + w * 0.62, b - h * 0.95, w * 0.3, h * 0.45, c, 5); // the tank
+    houseBox(x + w * 0.12, b - h * 0.55, w * 0.62, h * 0.12, c, 6); // the seat
+    houseBox(x + w * 0.22, b - h * 0.45, w * 0.42, h * 0.45, c, 6); // the bowl
+    houseBox(x + w * 0.7, b - h * 0.85, w * 0.1, h * 0.05, '#c0c0c8', 2);
+  } else if (k === 'tub') {
+    houseBox(x + 4, b - h * 0.7, w - 8, h * 0.6, c, 14);
+    ctx.fillStyle = '#9fd8ff';
+    ctx.fillRect(x + 8, b - h * 0.66, w - 16, h * 0.1);
+    // bubbles
+    for (const [bx, br] of [
+      [0.2, 6],
+      [0.3, 9],
+      [0.45, 5],
+      [0.62, 8],
+      [0.78, 6]
+    ])
+      houseOval(x + w * bx, b - h * 0.72, br, br * 0.8, '#ffffff');
+    houseBox(x + w * 0.12, b - h * 0.12, w * 0.06, h * 0.12, '#ffd400', 2); // feet
+    houseBox(x + w * 0.82, b - h * 0.12, w * 0.06, h * 0.12, '#ffd400', 2);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.9, b - h * 0.7);
+    ctx.lineTo(x + w * 0.9, b - h * 0.95);
+    ctx.lineTo(x + w * 0.83, b - h * 0.95);
+    ctx.stroke();
+  } else if (k === 'bsink') {
+    houseBox(x + w * 0.2, b - h * 0.95, w * 0.6, h * 0.36, '#cdeeff', 4); // the mirror
+    houseBox(x + w * 0.08, b - h * 0.5, w * 0.84, h * 0.12, c, 6); // the basin
+    houseBox(x + w * 0.4, b - h * 0.38, w * 0.2, h * 0.38, c, 3); // the stand
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.5, b - h * 0.5);
+    ctx.lineTo(x + w * 0.5, b - h * 0.58);
+    ctx.stroke();
+  } else if (k === 'shower') {
+    houseBox(x + 2, b - h * 0.98, w - 4, h * 0.96, 'rgba(205,238,255,0.55)', 4);
+    houseBox(x, b - h * 0.06, w, h * 0.06, '#ffffff', 2);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.8, b - h * 0.98);
+    ctx.lineTo(x + w * 0.8, b - h * 0.85);
+    ctx.lineTo(x + w * 0.55, b - h * 0.85);
+    ctx.stroke();
+    houseOval(x + w * 0.5, b - h * 0.84, w * 0.12, h * 0.02, '#c0c0c8');
+    ctx.strokeStyle = 'rgba(62,197,255,0.6)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < 4; i++) {
+      ctx.moveTo(x + w * (0.4 + i * 0.07), b - h * 0.8);
+      ctx.lineTo(x + w * (0.35 + i * 0.08), b - h * 0.4);
+    }
+    ctx.stroke();
+  } else if (k === 'trunk') {
+    houseBox(x + 3, b - h * 0.6, w - 6, h * 0.58, c, 4);
+    houseBox(x + 2, b - h * 0.78, w - 4, h * 0.22, shade(c, -0.15), 10);
+    houseBox(x + w * 0.2, b - h * 0.78, w * 0.06, h * 0.76, '#ffd400', 1);
+    houseBox(x + w * 0.74, b - h * 0.78, w * 0.06, h * 0.76, '#ffd400', 1);
+    houseBox(x + w * 0.45, b - h * 0.62, w * 0.1, h * 0.14, '#ffd400', 2);
+  } else if (k === 'boxes') {
+    houseBox(x + 3, b - h * 0.45, w - 6, h * 0.44, c, 2);
+    houseBox(x + 7, b - h * 0.82, w - 12, h * 0.37, shade(c, 0.08), 2);
+    ctx.strokeStyle = '#a07a46';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + w / 2, b - h * 0.45);
+    ctx.lineTo(x + w / 2, b - h * 0.32);
+    ctx.moveTo(x + w / 2, b - h * 0.82);
+    ctx.lineTo(x + w / 2, b - h * 0.7);
+    ctx.stroke();
+  } else if (k === 'rocker') {
+    houseBox(x + w * 0.6, b - h * 0.92, w * 0.12, h * 0.68, c, 3); // the back
+    houseBox(x + w * 0.15, b - h * 0.32, w * 0.6, h * 0.07, c, 3); // the seat
+    houseBox(x + w * 0.2, b - h * 0.25, w * 0.07, h * 0.18, c, 2);
+    houseBox(x + w * 0.62, b - h * 0.25, w * 0.07, h * 0.18, c, 2);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(x + w * 0.45, b - h * 0.6, h * 0.55, Math.PI * 0.3, Math.PI * 0.72); // the rocker
+    ctx.stroke();
+  } else if (k === 'mirror') {
+    houseBox(x + w * 0.18, b - h * 0.98, w * 0.64, h * 0.82, c2, 20);
+    houseBox(x + w * 0.25, b - h * 0.92, w * 0.5, h * 0.7, c, 16);
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.35, b - h * 0.8);
+    ctx.lineTo(x + w * 0.45, b - h * 0.86);
+    ctx.stroke();
+    houseBox(x + w * 0.3, b - h * 0.16, w * 0.06, h * 0.16, c2, 2);
+    houseBox(x + w * 0.64, b - h * 0.16, w * 0.06, h * 0.16, c2, 2);
+  } else if (k === 'cobweb') {
+    ctx.strokeStyle = 'rgba(80,72,90,0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let i = 0; i <= 4; i++) {
+      const an = (i / 4) * (Math.PI / 2);
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.cos(an) * w, y + Math.sin(an) * h);
+    }
+    for (const r of [0.3, 0.55, 0.8]) {
+      ctx.moveTo(x + w * r, y);
+      for (let i = 1; i <= 4; i++) {
+        const an = (i / 4) * (Math.PI / 2);
+        ctx.lineTo(x + Math.cos(an) * w * r, y + Math.sin(an) * h * r);
+      }
+    }
+    ctx.stroke();
+    houseOval(x + w * 0.5, y + h * 0.5, 3, 3, '#2b2533'); // a little spider
   } else if (k === 'teddy') {
     // a big stuffed bear sitting up: legs out front, round tummy with a heart, arms, head with ears and a muzzle
     const u = Math.min(w, h),
@@ -611,6 +899,62 @@ const HOUSE_MODE = {
     }
   }
 };
+// ===== USING FURNITURE =====
+// In a house, Punch or Kick beside furniture with a use (data/items.js) sits on it or lies down on it; Punch or Kick
+// again gets up. f.use = { k: 'sit' | 'lie', x, y, face } while using it.
+const USE_POSE = {
+  sit: [4, 30, 70, 20, 75, 88, 88, 84, 84, 0],
+  lie: [0, 15, 20, -15, 20, 4, 6, -4, 6, 90]
+};
+function houseUseAt(f) {
+  const s = HGRID.cell;
+  for (const it of HVIEW.items) {
+    const d = ITEM[it.id];
+    if (!d || !d.use) continue;
+    const x1 = it.x * s,
+      x2 = (it.x + d.w) * s,
+      fy = G - it.y * s;
+    if (f.x >= x1 - 10 && f.x <= x2 + 10 && Math.abs(f.y - fy) < 4) return { it, d, x1, x2, fy };
+  }
+  return null;
+}
+function houseUse(f, I) {
+  const press = wantIn(I, 'p') || wantIn(I, 'k');
+  if (f.use) {
+    const U = f.use;
+    f.x = U.x;
+    f.y = U.y;
+    f.vx = f.vy = 0;
+    f.face = U.face;
+    f.att = null;
+    smooth(f, USE_POSE[U.k], 0.25);
+    f.pose[9] = USE_POSE[U.k][9]; // lying down: the whole body turned flat
+
+    if (press) {
+      eatIn(I, 'p');
+      eatIn(I, 'k');
+      f.use = null;
+      f.pose[9] = 0;
+      f.y = U.fy;
+      f.vy = -4; // up you get
+      sfx(500, 0.06, 'triangle', 0.03, 200);
+    }
+    return true;
+  }
+  if (!press || f.st !== 'free' || f.y < f.gy - 1) return false;
+  const A = houseUseAt(f);
+  if (!A) return false;
+  eatIn(I, 'p');
+  eatIn(I, 'k');
+  const lie = A.d.use === 'lie',
+    // one seat chairs and beds: the middle; a couch, a bench or a trunk: where you are on it
+    x = lie || A.d.w === 1 ? (A.x1 + A.x2) / 2 : Math.max(A.x1 + 16, Math.min(A.x2 - 16, f.x));
+  // lying: head on the pillow (beds have theirs on the left; a tub's tap is on the right)
+  f.use = { k: A.d.use, x, y: lie ? A.fy + 2 : A.fy, fy: A.fy, face: lie ? -1 : f.face };
+  f.vx = 0;
+  sfx(lie ? 300 : 420, 0.08, 'triangle', 0.03, -100);
+  return true;
+}
 function startHouse(h) {
   closePanels();
   newSeed();
