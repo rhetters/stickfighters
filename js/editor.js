@@ -61,6 +61,12 @@ function normLevel(L) {
         .trim()
         .slice(0, ED_LIM.name) || 'MY LEVEL';
   if (!places.length) places.push(normPlace({}));
+  // a map: one place, one part a screen wide, no fight
+  if (s.map) {
+    places.length = 1;
+    const p = places[0].parts[0];
+    places[0].parts = [{ w: W, plats: p.plats.filter(q => q.x2 <= W), props: p.props.filter(q => q.x <= W), foes: [] }];
+  }
   const out = {
       id: typeof s.id === 'string' && /^[a-z0-9]{1,12}$/.test(s.id) ? s.id : edId(),
       name,
@@ -68,7 +74,8 @@ function normLevel(L) {
     },
     lp = edLastPart(out),
     bo = s.boss;
-  if (bo && typeof bo === 'object' && ED_BOSSES.includes(bo.t))
+  if (s.map) out.map = 1;
+  else if (bo && typeof bo === 'object' && ED_BOSSES.includes(bo.t))
     out.boss = { t: bo.t, x: Math.floor(edNum(bo.x, 0, lp.w - 1, lp.w / 2) / ED_CELL) * ED_CELL + ED_CELL / 2 };
   return out;
 }
@@ -81,6 +88,35 @@ const edLastPart = L => {
 const edParts = L => L.places.flatMap((pl, k) => pl.parts.map((p, i) => ({ pl: k, i, p, b: pl.b })));
 // A new level id (not part of the game: Math.random is fine)
 const edId = () => 'l' + Math.floor(Math.random() * 2176782336).toString(36);
+// Rhett's levels (Story's MY LEVELS) and maps (the stage rows' MY LEVELS) share one list
+const edLevels = list => (list || EDIT.levels).filter(L => !L.map);
+const edMaps = list => (list || EDIT.levels).filter(L => L.map);
+// A map as one screen of level, for playing it as a stage (stages.js) and drawing it: its place's look, scenery and
+// platforms from x 0 to W
+function buildMap(L) {
+  const pl = L.places[0],
+    B = BIOMES[pl.b],
+    p = pl.parts[0];
+  return {
+    id: 'map:' + L.id,
+    def: { name: L.name, num: 0, next: '' },
+    custom: L.id,
+    ch: [{ id: 'map', look: B.look, x0: 0, w: W, dusk: 0, flies: 0, props: p.props.map(q => ({ ...q })), biome: 0 }],
+    encs: [],
+    gates: [],
+    segs: [{ b: pl.b, x0: 0, x1: W }],
+    trans: [],
+    pch: [[0]],
+    ramps: null,
+    terr: { s: p.plats.map(q => edPlat(0, q, B)), w: [] },
+    haz: null,
+    run: null,
+    len: W,
+    cp: -1,
+    t: 0,
+    go: 0
+  };
+}
 // The saved levels are checked once when the game starts (save version 18 already made old levels one place each)
 EDIT.levels = edArr(EDIT.levels)
   .slice(0, ED_LIM.levels)

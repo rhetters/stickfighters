@@ -13,7 +13,7 @@ const PCOL = [
 const GUESTCOL = ['col-orange', 'col-sky', 'col-green', 'col-purple'];
 let LOBBY = [],
   TEAMS = false;
-const LB = { max: 4, mode: 'level', theme: 'castle', lvl: null, story: 'castle', pages: newPages(), stages: { pg: 0, sel: null } }; // the room size
+const LB = { max: 4, mode: 'level', theme: 'castle', lvl: null, story: 'castle', pages: newPages(), stages: newPages() }; // the room size
 // (2 to 4), the mode, the story picked (story: the last one, for coming back from MY LEVELS); pages: the tiles' pages
 // (or 'mine': one of your own levels, lvl)
 // ===== FIGHTER PICKS =====
@@ -213,43 +213,39 @@ function renderLobby() {
     LB.mode === 'level'
       ? storyRow({
           mine: LB.theme === 'mine',
-          cur: LB.theme === 'mine' ? levelCur(EDIT.levels, LB.lvl) : LB.theme,
-          levels: EDIT.levels,
+          cur: LB.theme === 'mine' ? levelCur(edLevels(), LB.lvl) : LB.theme,
+          levels: edLevels(),
           pages: LB.pages,
           pick: v => (LB.theme === 'mine' ? (LB.lvl = v) : (LB.theme = v), renderLobby()),
           toMine: () => ((LB.story = LB.theme), (LB.theme = 'mine'), renderLobby()),
           toStories: () => ((LB.theme = LB.story || 'castle'), renderLobby()),
           redraw: renderLobby
         })
-      : vs
-        ? teamTiles(TEAMS, v => ((TEAMS = v), renderLobby()))
-        : LB.mode === 'arcade'
-          ? stageRow(lbStage)
-          : []
+      : vs || LB.mode === 'arcade'
+        ? stageRow(lbStage())
+        : []
   );
   $('s-lobby').querySelector('.rmroom').classList.toggle('nosub', !$('lb-sub').children.length);
   // the difficulty, for Story and Arcade
   roomTiles(
     $('lb-diff'),
-    LB.mode === 'vs' ? stageRow(lbStage) : LB.mode === 'house' ? [] : diffTiles(SET.diff, v => ((SET.diff = v), save(), renderLobby()))
+    // up top: Free-for-all or Teams for Versus, the difficulty for Story and Arcade
+    vs ? teamTiles(TEAMS, v => ((TEAMS = v), renderLobby())) : LB.mode === 'house' ? [] : diffTiles(SET.diff, v => ((SET.diff = v), save(), renderLobby()))
   );
   const t0 = LOBBY.filter(r => r.team === 0).length,
     vsOk = n >= 2 && (!TEAMS || (t0 > 0 && t0 < n));
   const mine = LB.mode === 'level' && LB.theme === 'mine';
   $('lb-nostar').hidden = !mine;
-  $('lb-start').disabled = n < 1 || (vs && !vsOk) || (mine && !EDIT.levels.length);
+  $('lb-start').disabled = n < 1 || (vs && !vsOk) || (mine && !edLevels().length);
 }
-// The stage row (Versus: under the room's options; Arcade: beside the difficulty)
-const lbStage = {
-  get cur() {
-    return STAGE_SEL;
-  },
-  get pages() {
-    return LB.stages;
-  },
+// The stage row (Versus and Arcade: under the polaroids, like the stories)
+const lbStage = () => ({
+  cur: (STAGE_SEL = stageOk(STAGE_SEL, edMaps())),
+  maps: edMaps(),
+  pages: LB.stages,
   pick: v => ((STAGE_SEL = v), renderLobby()),
   redraw: () => renderLobby()
-};
+});
 // The room size: 2 to 4 places, never cutting off a player already in
 const lbMinSize = () => Math.max(2, ...LOBBY.map(r => r.slot + 1));
 function lbSize(d) {
@@ -311,7 +307,7 @@ function startMulti(kind) {
   else if (kind === 'level')
     if (LB.theme === 'mine') {
       // one of your own levels
-      const L = levelToPlay(EDIT.levels, LB.lvl);
+      const L = levelToPlay(edLevels(), LB.lvl);
       if (L) themeBurst($('s-lobby').querySelector('[data-lvl="' + (LB.lvl === '?' ? '?' : L.id) + '"]'), () => startCustom(L, 'menu'));
     } else
       themeBurst($('s-lobby').querySelector('[data-theme="' + LB.theme + '"]'), () =>

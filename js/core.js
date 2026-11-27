@@ -67,7 +67,8 @@ const EDIT = { levels: [] };
 //   v17: adds edit = { levels: [] } (Rhett's levels from the level creator)
 //   v18: a level's place and parts ({ b, parts }) become places: [{ b, parts }] (up to three places in a level)
 //   v19: colours per item: eco.tint = { itemId: [colour ids bought for it] } and fighters gain tint = { itemId: colour }
-const SAVE_VERSION = 19;
+//   v20: a level can be a map for Versus and Arcade (map: 1, one screen; levels from before stay levels)
+const SAVE_VERSION = 20;
 function migrate(s) {
   if (!s.saveVersion) {
     s.prog = s.prog || {};
@@ -172,6 +173,7 @@ function migrate(s) {
     if (s.chr && Array.isArray(s.chr.list)) for (const f of s.chr.list) if (f && !f.tint) f.tint = {};
     s.saveVersion = 19;
   }
+  if (s.saveVersion === 19) s.saveVersion = 20; // nothing to change: no level was a map before
   return s;
 }
 // Copies a loaded save into the live objects, keeping only the shapes we expect (a save is data, never code).

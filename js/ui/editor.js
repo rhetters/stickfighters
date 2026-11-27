@@ -218,7 +218,14 @@ function openLevels() {
   const box = $('ed-list'),
     opts = [
       { k: 'new', label: 'NEW LEVEL', pic: () => edPlusPic(), pick: () => openPlaces() },
-      ...EDIT.levels.map((L, i) => ({ k: 'lv' + i + ':' + JSON.stringify(L).length, label: L.name, pic: edThumb(L), pick: () => openEdit(i) }))
+      // a map: one screen for Versus and Arcade (a stage of your own)
+      { k: 'newmap', label: 'NEW MAP', pic: () => edPlusPic('#3ec5ff'), pick: () => openPlaces(false, true) },
+      ...EDIT.levels.map((L, i) => ({
+        k: 'lv' + i + ':' + JSON.stringify(L).length,
+        label: (L.map ? 'MAP: ' : '') + L.name,
+        pic: edThumb(L),
+        pick: () => openEdit(i)
+      }))
     ];
   box.innerHTML = '';
   for (const o of opts) {
@@ -238,12 +245,13 @@ function openLevels() {
     b.onclick = o.pick;
     box.appendChild(b);
   }
-  box.firstChild.disabled = EDIT.levels.length >= ED_LIM.levels;
+  box.children[0].disabled = edLevels().length >= ED_LIM.levels;
+  box.children[1].disabled = edMaps().length >= ED_LIM.maps;
   show('s-levels');
   box.firstChild.focus({ preventScroll: true });
 }
-function edPlusPic() {
-  ctx.fillStyle = '#ffd400';
+function edPlusPic(col) {
+  ctx.fillStyle = col || '#ffd400';
   ctx.strokeStyle = INK;
   ctx.lineWidth = 5;
   ctx.beginPath();
@@ -262,7 +270,7 @@ function edPlusPic() {
 // ===== PICK A PLACE =====
 // For a new level, or (add) for a new place in the level being edited
 const EDPLACE = {};
-function openPlaces(add = false) {
+function openPlaces(add = false, map = false) {
   EDS.adding = add;
   const box = $('ed-places');
   box.innerHTML = '';
@@ -289,16 +297,22 @@ function openPlaces(add = false) {
         EDPLACE[b] = cv.toDataURL();
       }
       t.querySelector('.pimg').style.setProperty('--ic', 'url(' + EDPLACE[b] + ')');
-      t.onclick = () => (add ? edAddPlace(b) : edNew(b));
+      t.onclick = () => (add ? edAddPlace(b) : edNew(b, map));
       box.appendChild(t);
     }
-  $('s-edpick').querySelector('h2').textContent = add ? 'ADD A PLACE' : 'PICK A PLACE';
+  $('s-edpick').querySelector('h2').textContent = add ? 'ADD A PLACE' : map ? 'A PLACE FOR YOUR MAP' : 'PICK A PLACE';
   show('s-edpick');
   box.firstChild.focus({ preventScroll: true });
 }
-function edNew(b) {
-  if (EDIT.levels.length >= ED_LIM.levels) return openLevels();
-  EDIT.levels.push(normLevel({ places: [{ b }], name: 'LEVEL ' + (EDIT.levels.length + 1) }));
+function edNew(b, map) {
+  if (map ? edMaps().length >= ED_LIM.maps : edLevels().length >= ED_LIM.levels) return openLevels();
+  EDIT.levels.push(
+    normLevel(
+      map
+        ? { places: [{ b }], name: 'MAP ' + (edMaps().length + 1), map: 1 }
+        : { places: [{ b }], name: 'LEVEL ' + (edLevels().length + 1) }
+    )
+  );
   save();
   openEdit(EDIT.levels.length - 1);
 }
@@ -328,6 +342,16 @@ function edPicks() {
   const b = edPlace().b;
   if (!EDS.prop || !edPropOk(EDS.prop, b)) EDS.prop = BIOMES[b].props[0][0];
   if (!edFoeOk(EDS.foe, b)) EDS.foe = 'g';
+}
+// Back from trying a map in Arcade
+function edReturnMap() {
+  const id = STG.st.map.id,
+    i = EDIT.levels.findIndex(L => L.id === id);
+  STG.edit = false;
+  init();
+  MODE = LEVEL;
+  if (i < 0) return openLevels();
+  openEdit(i, 0, 0);
 }
 // Back from playing a level (the pause menu's QUIT, the KO screen's EDIT, or the end of the level)
 function edReturn() {
@@ -448,10 +472,14 @@ function edPlatCut(p, x0, h) {
   p.plats = out.slice(0, ED_LIM.plats);
 }
 // ===== TABS AND PIECES =====
+// A map has only platforms, scenery and erase (no fight, boss or more parts)
+const ED_MAP_TABS = ['plat', 'prop', 'erase'];
+const edTabList = () => (edLevel().map ? ED_TABS.filter(t => ED_MAP_TABS.includes(t[0])) : ED_TABS);
 function edTabs() {
   const box = $('ed-tabs');
   box.innerHTML = '';
-  for (const [k, label] of ED_TABS) {
+  if (!edTabList().some(t => t[0] === EDS.tab)) EDS.tab = 'plat';
+  for (const [k, label] of edTabList()) {
     const b = document.createElement('button');
     b.className = 'chtab' + (EDS.tab === k ? ' on' : '');
     b.textContent = label;
@@ -625,6 +653,8 @@ function edPal() {
   } else {
     const k = EDS.tab;
     edMsg(ED_HELP[k]);
+    // a map has no PARTS tab: deleting it is here
+    if (L.map && k === 'erase') edBtn(box, EDS.del ? 'TAP AGAIN TO DELETE' : 'DELETE MAP', edDelLevel).classList.toggle('warn', !!EDS.del);
   }
 }
 // To the part d parts on (across places: the last part of a place leads to the first of the next)
@@ -723,6 +753,8 @@ $('ed-name').addEventListener('input', () => {
 $('ed-name').addEventListener('change', () => ($('ed-name').value = edLevel().name));
 $('ed-play').onclick = () => {
   edSave();
+  // a map is tried in Arcade, on it (QUIT comes back here)
+  if (edLevel().map) return edTryMap(edLevel());
   startCustom(edLevel(), 'edit');
 };
 $('ed-back').onclick = () => {
@@ -735,3 +767,12 @@ $('ed-lback').onclick = () => {
 };
 $('ed-pback').onclick = () => (EDS.adding ? openEdit(EDS.i, EDS.pl, EDS.part) : openLevels());
 $('b-levels').onclick = openLevels;
+
+// Try a map in Arcade (the level creator's PLAY); leaving the game comes back to the editor
+function edTryMap(L) {
+  STAGE_SEL = 'my:' + L.id;
+  STG.net = null;
+  STG.edit = true;
+  MODE = ARCADE;
+  start();
+}

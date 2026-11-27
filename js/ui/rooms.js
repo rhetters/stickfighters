@@ -161,35 +161,63 @@ function roomTiles(box, opts) {
   });
 }
 // ===== STAGES (Versus and Arcade), FIVE AT A TIME =====
-// '?' (a stage picked from the game's seed) and then the stages, paged five at a time like the stories.
-// o = { cur, pages ({ pg, sel }), pick(id), redraw(), disabled (a guest: only the host picks) }
+// Like the stories: five stages at a time with arrows, then RANDOM and MY LEVELS; under MY LEVELS (a pick starting
+// 'my:'), Rhett's maps five at a time, then RANDOM (one of them) and STAGES.
+// o = { cur (STAGE_SEL's kind of pick), maps (the maps offered), pages (newPages()), pick(v), redraw(), disabled }
 function stageRow(o) {
-  const pg = pageOf(o.pages, STAGES.map(s => s.id), o.cur),
+  const mine = typeof o.cur === 'string' && o.cur.startsWith('my:'),
+    st = mine ? o.pages.mine : o.pages.story,
+    items = mine ? o.maps.map(L => 'my:' + L.id) : STAGES.map(s => s.id),
+    pg = pageOf(st, items, o.cur),
     d = o.disabled,
     tiles = [
       {
-        data: ['pg', 'stage'],
+        data: ['pg', mine ? 'maps' : 'stage'],
         arrows: 1,
         up: pg.up,
         down: pg.down,
-        onUp: () => (o.pages.pg--, o.redraw()),
-        onDown: () => (o.pages.pg++, o.redraw())
-      },
-      { data: ['stage', '?'], img: 'i-q', label: 'RANDOM', aria: 'A stage at random', on: o.cur === '?', disabled: d, pick: () => o.pick('?') }
+        onUp: () => (st.pg--, o.redraw()),
+        onDown: () => (st.pg++, o.redraw())
+      }
     ];
-  for (const id of pg.list)
-    tiles.push({
-      data: ['stage', id],
-      img: 'chpic',
-      pic: stageThumbURL(id),
-      label: STAGE[id].tag,
-      aria: STAGE[id].name,
-      on: o.cur === id,
-      disabled: d,
-      pick: () => o.pick(id)
-    });
+  if (!mine) {
+    for (const id of pg.list)
+      tiles.push({
+        data: ['stage', id],
+        img: 'chpic',
+        pic: stageThumbURL(id),
+        label: STAGE[id].tag,
+        aria: STAGE[id].name,
+        on: o.cur === id,
+        disabled: d,
+        pick: () => o.pick(id)
+      });
+    tiles.push(
+      { data: ['stage', '?'], img: 'i-q', label: 'RANDOM', aria: 'A stage at random', on: o.cur === '?', disabled: d, pick: () => o.pick('?') },
+      {
+        data: ['stage', 'mine'],
+        img: 'i-levels',
+        label: 'MY LEVELS',
+        aria: o.maps.length ? 'Your own maps' : 'No maps yet: make one in Customize, Levels, NEW MAP',
+        disabled: d || !o.maps.length,
+        pick: () => o.pick('my:' + o.maps[0].id)
+      }
+    );
+    return tiles;
+  }
+  for (const id of pg.list) {
+    const L = o.maps.find(q => 'my:' + q.id === id);
+    tiles.push({ data: ['stage', id], img: 'chpic', pic: edThumbURL(L), label: L.name, on: o.cur === id, disabled: d, pick: () => o.pick(id) });
+  }
+  tiles.push(
+    { data: ['stage', 'my:?'], img: 'i-q', label: 'RANDOM', aria: 'One of your maps at random', on: o.cur === 'my:?', disabled: d, pick: () => o.pick('my:?') },
+    { data: ['stage', '<'], img: 'i-story', label: 'STAGES', aria: 'Back to the stages', disabled: d, pick: () => o.pick('?') }
+  );
   return tiles;
 }
+// A stage pick that makes sense: a stage, '?', or one of the maps offered (else '?')
+const stageOk = (v, maps) =>
+  v === '?' || !!STAGE[v] || (v === 'my:?' && maps.length > 0) || (typeof v === 'string' && maps.some(L => 'my:' + L.id === v)) ? v : '?';
 // A stage's picture for its tile: its look and platforms, drawn small (kept once drawn)
 const STAGE_THUMB = {};
 function stageThumbURL(id) {

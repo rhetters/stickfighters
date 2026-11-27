@@ -434,7 +434,7 @@ function netClientMsg(m) {
     NET.players = m.players;
     NET.mode = m.mode;
     NET.teams = !!m.teams;
-    NET.stage = STAGE[m.stage] ? m.stage : '?';
+    NET.stage = typeof m.stage === 'string' && /^(\?|[a-z]{1,12}|my:[a-z0-9?]{1,12})$/.test(m.stage) ? m.stage : '?';
     if (THEMES[m.theme] || m.theme === '?' || m.theme === 'mine') NET.theme = m.theme;
     NET.lvl = typeof m.lvl === 'string' ? m.lvl : null;
     NET.max = Math.max(2, Math.min(MAX_ONLINE, m.max || 4));
@@ -477,7 +477,7 @@ function netStart() {
   if (NET.mode === 'vs' && !netVsReady()) return false;
   const ids = Object.keys(THEMES),
     myst = NET.theme === '?',
-    mine = NET.mode === 'level' && NET.theme === 'mine' ? levelToPlay(netLevels(), NET.lvl) : null,
+    mine = NET.mode === 'level' && NET.theme === 'mine' ? levelToPlay(edLevels(netLevels()), NET.lvl) : null,
     theme = myst ? ids[Math.floor(Math.random() * ids.length)] : NET.theme;
   if (NET.mode === 'level' && NET.theme === 'mine' && !mine) return false;
   const r = live.map(p => p.rtt || 0).sort((a, b) => b - a),
@@ -554,7 +554,10 @@ function netStartLocal(m) {
   releaseAll();
   applyTouchVis();
   fr = 0;
-  STAGE_SEL = STAGE[m.stage] ? m.stage : '?'; // everyone on the host's stage (stages.js)
+  // everyone on the host's stage (stages.js); a map comes from the host's list of levels, which everyone has
+  STG.net = netLevels();
+  STG.edit = false;
+  STAGE_SEL = stageOk(m.stage, edMaps(STG.net));
   if (m.mode === 'vs') startVersus();
   else if (m.mode === 'level' && m.level) startCustom(normLevel(m.level), 'menu');
   else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle', 0, !!m.myst);
