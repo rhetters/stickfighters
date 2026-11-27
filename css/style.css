@@ -1053,6 +1053,7 @@ body.padnav #ui select:focus {
 .chslot,
 .chtab,
 .chopt,
+.chdel,
 #ch-body .chrow > button,
 #ch-rnd {
   font:
@@ -1200,8 +1201,10 @@ body.padnav #ui select:focus {
   grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
   gap: 6px;
 }
+/* under the polaroid, on every page of the Character screen */
 .chdel {
-  margin-top: 6px;
+  flex: none;
+  margin-top: 2px;
   border-color: #b8202c !important;
   color: #b8202c !important;
 }
