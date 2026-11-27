@@ -15,7 +15,8 @@ const HS = {
   ox: 0,
   oy: 0,
   zi: 0, // zoom level: index into HS_ZOOM
-  tool: 'erase' // TOOLS: rotate, flip or erase
+  tool: 'erase', // TOOLS: move, copy, rotate, flip or erase
+  hold: null // MOVE / DUPLICATE: the thing picked up, { i: its place in HOUSE.items, it: a copy of it }
 };
 const HS_FLOOR = 270; // where the floor line sits in the editor (lower than in play, to leave room for the pieces)
 // Zoom levels for the editor: 1 = 20 x 6 squares, then 40 x 12 and 60 x 18 (every square in view is still a button)
@@ -31,8 +32,11 @@ const HS_TABS = [
   ['hbg', 'BACKGROUND'],
   ['tools', 'TOOLS']
 ];
-// TOOLS: turn a thing a quarter turn, mirror it so it faces the other way, or erase
+// TOOLS: move a thing, copy it, turn it a quarter turn, mirror it so it faces the other way, or erase. MOVE and
+// DUPLICATE pick a thing up with one tap (HS.hold) and put it (or its copy) down with the next.
 const HS_TOOLS = [
+  ['move', 'MOVE', 'Tap a thing to pick it up, then tap where its bottom-left corner goes.'],
+  ['copy', 'DUPLICATE', 'Tap a thing to copy it, then tap where the copy’s bottom-left corner goes.'],
   ['rotate', 'ROTATE', 'Tap a thing to turn it a quarter turn.'],
   ['flip', 'FLIP', 'Tap a thing to flip it so it faces the other way.'],
   ['erase', 'ERASE', 'Tap or drag to remove things, front first. You get all their stars back.']
@@ -55,6 +59,7 @@ function houseSave() {
   ecoSave(true);
 }
 function openHouse() {
+  HS.hold = null;
   closePanels();
   releaseAll();
   state = 'menu';
@@ -110,6 +115,19 @@ function houseDraw() {
       ctx.lineTo((c0 + hsCols()) * s, G - r * s);
     }
     ctx.stroke();
+    // MOVE / DUPLICATE: the thing that's picked up has a dotted orange outline
+    if (HS.hold && HS.tab === 'tools') {
+      const it = HOUSE.items[HS.hold.i];
+      if (it) {
+        const [w, h] = houseFoot(it, ITEM[it.id]);
+        ctx.save();
+        ctx.strokeStyle = '#ff7a00';
+        ctx.lineWidth = 4 / z;
+        ctx.setLineDash([10 / z, 7 / z]);
+        ctx.strokeRect(HX(it.x) - 3, HY(it.y + h - 1) - 3, w * s + 6, h * s + 6);
+        ctx.restore();
+      }
+    }
     // the current fighter stands at the left of the land
     if (HS.ox < 4 && HS.oy === 0) {
       const L = lookOf(curFighter()),
@@ -228,6 +246,37 @@ function houseAct(c, r) {
       HOUSE.fills = { ...HOUSE.fills };
       delete HOUSE.fills[k];
     }
+  } else if (HS.tab === 'tools' && (HS.tool === 'move' || HS.tool === 'copy')) {
+    const i = houseItemAt(c, r),
+      mv = HS.tool === 'move';
+    if (!HS.hold || i === HS.hold.i) {
+      // pick it up (tapping the one you're holding puts it back where it was)
+      const back = !!HS.hold;
+      HS.hold = null;
+      if (i < 0 || back) {
+        houseMsg(i < 0 ? 'Tap a piece of furniture or a decoration to ' + (mv ? 'move' : 'copy') + ' it.' : hsToolHelp());
+        return houseDraw();
+      }
+      HS.hold = { i, it: { ...HOUSE.items[i] } };
+      sfx(460, 0.05, 'triangle', 0.03, 120);
+      houseMsg('Now tap where ' + (mv ? 'it goes' : 'the copy goes') + ' (its bottom-left corner).');
+      return houseDraw();
+    }
+    const it = { ...HS.hold.it },
+      d = ITEM[it.id],
+      [w, h] = houseFoot(it, d);
+    it.x = Math.min(c, HGRID.maxCols - w);
+    it.y = Math.min(r, HGRID.maxRows - h);
+    if (mv) HOUSE.items = HOUSE.items.map((q, k) => (k === HS.hold.i ? it : q));
+    else {
+      if (HOUSE.items.length >= HOUSE_MAX_ITEMS) return houseMsg('Your house is full (' + HOUSE_MAX_ITEMS + ' things).');
+      if (d.price && !spendStars(d.price, d.id)) return houseMsg('Not enough stars for ' + d.name + ' (' + d.price + ').');
+      HOUSE.items = [...HOUSE.items, it];
+    }
+    HS.hold = null;
+    houseMsg(hsToolHelp());
+    sfx(500, 0.06, 'square', 0.03, 200);
+    done = true;
   } else if (HS.tab === 'tools' && HS.tool !== 'erase') {
     const i = houseItemAt(c, r);
     if (i < 0) return houseMsg('Tap a piece of furniture or a decoration to ' + (HS.tool === 'flip' ? 'flip' : 'turn') + ' it.');
@@ -301,6 +350,7 @@ function houseTabs() {
     b.onclick = () => {
       HS.tab = id;
       HS.arm = null;
+      HS.hold = null;
       houseMsg(id === 'tools' ? hsToolHelp() : HS_HELP[id]);
       houseTabs();
       housePal();
@@ -372,8 +422,10 @@ function housePal() {
         () => houseToolPic(id),
         () => {
           HS.tool = id;
+          HS.hold = null;
           houseMsg(help);
           housePal();
+          houseDraw();
         }
       );
   if (HS.tab === 'hbg')
@@ -451,7 +503,38 @@ function houseToolPic(id) {
   ctx.lineWidth = 3;
   ctx.strokeStyle = INK;
   ctx.lineCap = ctx.lineJoin = 'round';
-  if (id === 'rotate') {
+  const arrow = (x1, y1, x2, y2) => {
+    const a = Math.atan2(y2 - y1, x2 - x1);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.moveTo(x2 - 6 * Math.cos(a - 0.6), y2 - 6 * Math.sin(a - 0.6));
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x2 - 6 * Math.cos(a + 0.6), y2 - 6 * Math.sin(a + 0.6));
+    ctx.stroke();
+  };
+  if (id === 'move') {
+    houseThing(chair, 20, 16, 24, 24);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.5;
+    arrow(32, 12, 32, 3);
+    arrow(32, 44, 32, 52);
+    arrow(17, 28, 6, 28);
+    arrow(47, 28, 58, 28);
+  } else if (id === 'copy') {
+    ctx.globalAlpha = 0.45;
+    houseThing(chair, 8, 10, 26, 30);
+    ctx.globalAlpha = 1;
+    houseThing(chair, 26, 18, 26, 30);
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(50, 6);
+    ctx.lineTo(50, 16);
+    ctx.moveTo(45, 11);
+    ctx.lineTo(55, 11);
+    ctx.stroke();
+  } else if (id === 'rotate') {
     ctx.save();
     ctx.translate(32, 28);
     ctx.rotate(Math.PI / 2);

@@ -15,7 +15,8 @@
 //            c clap, B low bongo, b high bongo, t tom; . = rest, - = hold the note before
 //     mel    a tune in note names (C5, F#4, Bb3), one bar per string, . rest, - hold
 // Intensity: menus and walking are 0, a fight 1, a boss 2. A song plays only its parts for the intensity it's at.
-// A story plays the song named after the biome you're in (data/themes.js), so every place has its own.
+// A story plays the song named after the biome you're in (data/themes.js), so every place has its own; its bosses
+// play 'boss-<theme>' if there is one, or else 'boss'.
 const MUSIC = {
   // the title and menus: bright and friendly
   menu: {
@@ -425,77 +426,111 @@ const MUSIC = {
       }
     ]
   },
-  // Suburban Street: a sunny, bouncy Saturday morning, whistling down the sidewalk
+  // The City's songs are quirky and jazzy (Rhett asked for something like a cheerful 90s adventure game's hometown):
+  // seventh chords, a bouncing bass, marimba, bells and a little organ.
+  // Suburban Street: a lazy shuffle down the sidewalk on a sunny Saturday, ending each time on a wistful minor chord
   burbs: {
-    bpm: 118,
-    prog: ['C', 'Am', 'F', 'G', 'C', 'Am', 'Dm', 'G'],
+    bpm: 108,
+    div: 3,
+    prog: ['Cmaj7', 'A7', 'Dm7', 'G7', 'Cmaj7', 'C7', 'Fmaj7', 'Fm'],
     parts: [
-      { ins: 'bass', pat: 'R . . 5 . . R . R . . 5 . 8 . .' },
-      { ins: 'pluck', o: 4, v: 0.55, pat: '. . c . . . c . . . c . . . c c' },
-      { ins: 'drums', max: 0, v: 0.6, pat: 'k . . . s . . . k . . . s . . .' },
-      { ins: 'drums', lvl: 1, pat: 'k . h . s . h h k . h k s . h .' },
+      { ins: 'bass', pat: 'R . . 3 . . 5 . . 8 . .|8 . . 5 . . 3 . . 5 . .' },
+      { ins: 'organ', o: 4, v: 0.3, pat: '. . c . . c . . c . . c' },
+      { ins: 'drums', max: 0, v: 0.6, pat: 'k . h s . h k . h s . h' },
+      { ins: 'drums', lvl: 1, pat: 'k . h s . h k k h s . o' },
+      { ins: 'bell', o: 5, v: 0.25, pat: '9 . . . . . . . . 5 . .' },
+      { ins: 'brass', lvl: 1, o: 4, v: 0.35, pat: 'c . . . . c . . . . . .' },
       {
-        ins: 'flute',
-        v: 0.7,
+        ins: 'marimba',
+        v: 0.8,
         mel: [
-          'E5 - G5 - C6 - - - B5 - A5 - G5 - - -',
-          'A5 - - - E5 - - - C5 - - - . . . .',
-          'F5 - A5 - C6 - - - A5 - G5 - F5 - - -',
-          'D5 - E5 - F5 - G5 - - - - - . . . .',
-          'E5 - G5 - C6 - - - D6 - C6 - B5 - - -',
-          'C6 - - - A5 - - - E5 - - - . . . .',
-          'F5 - - - A5 - - - D6 - C6 - A5 - - -',
-          'B5 - - - D6 - - - G5 - - - . . . .'
+          'E5 - G5 B5 - G5 E5 - D5 C5 - -',
+          'C#5 - E5 G5 - E5 A5 - - . . .',
+          'F5 - A5 C6 - A5 F5 - E5 D5 - -',
+          'B4 - D5 F5 - E5 D5 - B4 G4 - -',
+          'G5 - - E5 - G5 C6 - B5 G5 - E5',
+          'Bb5 - - G5 - E5 C5 - - . . .',
+          'A5 - C6 E6 - C6 A5 - G5 F5 - -',
+          'Ab5 - - G5 - - F5 - Eb5 D5 - -'
         ]
       }
     ]
   },
-  // Downtown: a funky driving groove, horns and a wah-wah bass, built for smashing through
+  // Downtown: a bouncy, ragtime-flavoured groove with a bubbling synth and a cheeky chromatic tune
   city: {
-    bpm: 132,
-    prog: ['Em', 'Em', 'A', 'A', 'Em', 'Em', 'C', 'B7'],
+    bpm: 138,
+    prog: ['C', 'E7', 'Fmaj7', 'Fm', 'C', 'A7', 'D7', 'G7'],
     parts: [
-      { ins: 'bass', pat: 'R . R 8 . R . 5 R . R . 8 . 5 .' },
-      { ins: 'organ', o: 4, v: 0.35, pat: '. c . c . c . c . c . c . c . c' },
-      { ins: 'drums', pat: 'k . h k s . h . k k h . s . h h' },
-      { ins: 'brass', lvl: 1, o: 4, v: 0.45, pat: 'c . . c . . c . . . . . c - . .' },
+      { ins: 'bass', pat: 'R . . R 5 . R . R . . R 5 . 3 .' },
+      { ins: 'arp', o: 5, v: 0.22, pat: 'R 5 8 5 R 5 8 5 3 5 8 5 3 5 8 5' },
+      { ins: 'drums', max: 0, v: 0.7, pat: 'k . h . s . h k . k h . s . h .' },
+      { ins: 'drums', lvl: 1, pat: 'k . h k s . h k k . h k s k s s' },
+      { ins: 'bell', o: 5, v: 0.25, pat: '. . . . 8 . . . . . . . 9 . . .' },
+      { ins: 'brass', lvl: 1, o: 4, v: 0.4, pat: '. . . . c . . c . . . . c - . .' },
       {
         ins: 'lead',
         v: 0.6,
         mel: [
-          'E5 - G5 - E5 - D5 - E5 - - - B4 - - -',
-          'E5 - G5 - A5 - G5 - E5 - - - . . . .',
-          'A5 - - - C#6 - - - B5 - A5 - E5 - - -',
-          'F#5 - E5 - C#5 - - - A4 - - - . . . .',
-          'E5 - G5 - B5 - - - A5 - G5 - E5 - - -',
-          'G5 - A5 - B5 - D6 - E6 - - - . . . .',
-          'E6 - - - C6 - - - G5 - - - E5 - - -',
-          'D#5 - - - F#5 - - - B5 - - - . . . .'
+          'G5 . G5 . E5 - C5 . D#5 E5 - - G5 - . .',
+          'G#5 . G#5 . E5 - B4 . D5 - - - E5 - . .',
+          'A5 . A5 . F5 - C5 . E5 - - - F5 - A5 -',
+          'Ab5 - - - G5 - F5 - Eb5 - D5 - C5 - - -',
+          'E5 - G5 - C6 - G5 - E5 . D#5 . E5 - - -',
+          'C#6 - - - A5 - E5 - G5 - - - A5 - . .',
+          'F#5 . A5 . C6 . A5 . F#5 . D5 . C5 . A4 .',
+          'B4 - D5 - F5 - G5 - B5 - - - . . . .'
         ]
       }
     ]
   },
-  // The Skyscraper: climbing higher and higher, a soaring tune with a ticking pulse
+  // The Skyscraper: a curious music-box tune that keeps climbing, over a ticking arpeggio
   tower: {
-    bpm: 124,
-    prog: ['Dm', 'Bb', 'C', 'Dm', 'Dm', 'Bb', 'Gm', 'A'],
+    bpm: 120,
+    prog: ['Am', 'Fmaj7', 'Dm7', 'E7', 'Am', 'Cmaj7', 'Dm7', 'E7'],
     parts: [
-      { ins: 'bass', pat: 'R . . R . . R . R . . R . . 5 .' },
-      { ins: 'arp', o: 4, v: 0.35, pat: 'R 3 5 8 R 3 5 8 R 3 5 8 R 3 5 8' },
-      { ins: 'drums', max: 0, v: 0.7, pat: 'k . . . s . . . k . . . s . . .' },
+      { ins: 'bass', pat: 'R . . . R . 5 . R . . . 5 . 8 .' },
+      { ins: 'arp', o: 4, v: 0.28, pat: 'R 3 5 8 9 8 5 3 R 3 5 8 9 8 5 3' },
+      { ins: 'pad', o: 3, v: 0.22, max: 0, pat: 'c - - - - - - - c - - - - - - -' },
+      { ins: 'drums', max: 0, v: 0.6, pat: 'k . . . . . h . k . . . s . h .' },
       { ins: 'drums', lvl: 1, pat: 'k . h . s . h k k . h . s . t t' },
+      { ins: 'brass', lvl: 1, o: 4, v: 0.35, pat: 'c - . . . . . . c . c . . . . .' },
       {
-        ins: 'brass',
-        v: 0.55,
+        ins: 'bell',
+        v: 0.75,
         mel: [
-          'D5 - - - F5 - - - A5 - - - D6 - - -',
-          'C6 - Bb5 - A5 - - - F5 - - - . . . .',
-          'C5 - - - E5 - - - G5 - - - C6 - - -',
-          'A5 - - - - - - - . . . . . . . .',
-          'D6 - - - C6 - - - A5 - - - F5 - - -',
-          'F5 - G5 - A5 - Bb5 - D6 - - - . . . .',
-          'G5 - - - Bb5 - - - D6 - - - G6 - - -',
-          'E6 - - - C#6 - - - A5 - - - . . . .'
+          'A4 - C5 - E5 - A5 - G#5 - A5 - E5 - - -',
+          'F5 - A5 - C6 - E6 - - - C6 - A5 - - -',
+          'D5 - F5 - A5 - C6 - B5 - A5 - F5 - - -',
+          'E5 - G#5 - B5 - D6 - - - . . . . . .',
+          'A5 - B5 - C6 - E6 - D6 - C6 - B5 - A5 -',
+          'G5 - - - B5 - - - E6 - - - D6 - C6 -',
+          'F6 - E6 - D6 - C6 - A5 - - - F5 - - -',
+          'G#5 - - - B5 - - - E6 - - - - - . .'
+        ]
+      }
+    ]
+  },
+  // Pink Kong on the roof: a funky, fast boss fight with organ stabs (the City's own boss song)
+  'boss-city': {
+    bpm: 150,
+    prog: ['Em', 'Em', 'C', 'D', 'Em', 'Em', 'Am7', 'B7'],
+    parts: [
+      { ins: 'bass', v: 1.1, pat: 'R . R 8 R . 7 . R . R 8 R . 5 .' },
+      { ins: 'organ', o: 4, v: 0.3, pat: '. c . c . c . c . c . c . c . c' },
+      { ins: 'drums', pat: 'k . h k s . h k k . h k s . s s' },
+      { ins: 'brass', o: 4, v: 0.45, pat: 'c - . c - . . . c . . c - - . .' },
+      {
+        ins: 'lead',
+        v: 0.6,
+        mel: [
+          'E5 . E5 . G5 . E5 . B5 - - - A5 G5 E5 .',
+          'D5 . E5 . G5 . A5 . B5 - - - . . . .',
+          'C6 - - - B5 - G5 - E5 - G5 - C6 - . .',
+          'D6 - - - C6 - A5 - F#5 - A5 - D6 - . .',
+          'E6 . D6 . B5 . G5 . A5 - B5 - E5 - - -',
+          'G5 . F#5 . E5 . D5 . E5 - - - . . . .',
+          'A5 - C6 - E6 - G6 - E6 - C6 - A5 - - -',
+          'D#6 - - - F#6 - - - B5 - - - . . . .'
         ]
       }
     ]

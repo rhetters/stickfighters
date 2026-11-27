@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Combo fix, new City music, MOVE and DUPLICATE (November 27, 2026)
+- The combo counter's timer bar ran through the number since it moved under the wave count; it's back underneath.
+- **New City music**, quirky and jazzy (seventh chords, a bouncing bass, marimba, bells, a little organ), all original tunes: a lazy shuffle for Suburban Street, a bouncy ragtime-flavoured groove for Downtown, a climbing music-box tune for the Skyscraper, and the City's own boss song for Pink Kong (the other stories' bosses keep theirs).
+- House **TOOLS** has **MOVE** (tap a thing to pick it up, tap where it goes) and **DUPLICATE** (the same, but the original stays and the copy costs what the thing costs). What you're holding has a dotted orange outline; tap it again to put it back.
+- Version 82.
+
 ## House TOOLS: rotate, flip and erase (November 27, 2026)
 - The House screen's last tab is now **TOOLS** (where ERASE was): **ROTATE** turns a piece of furniture or a decoration a quarter turn each tap, **FLIP** mirrors it so it faces the other way, and **ERASE** works as before (tap or drag, all the stars back).
 - A flipped bed puts your head on the other end when you lie down; a chair turned on its side can't be sat on.
