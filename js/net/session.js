@@ -183,7 +183,8 @@ const netDevKind = () =>
 const netUnready = () => NET.players.forEach(q => (q.ready = false));
 // The host changed a room option (mode, story, teams, room size): everyone readies up again
 // The room's choices as one string: picking what's already picked changes nothing, so nobody is unreadied
-const netOptKey = () => [NET.mode, NET.theme, NET.lvl, NET.stage, NET.diff, NET.teams, NET.max].join('|');
+const netOptKey = () =>
+  [NET.mode, NET.theme, NET.lvl, NET.stage, NET.diff, NET.teams, NET.max, NET.players.map(p => p.team).join()].join('|');
 function netOptChanged() {
   if (netOptKey() === NET.optKey) {
     if (typeof renderOnline === 'function') renderOnline();
