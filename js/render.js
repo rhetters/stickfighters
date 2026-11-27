@@ -910,7 +910,8 @@ function renderFrame() {
   for (const p of PL) drawPetOf(p); // pets trot along behind (pets.js)
   for (const p of PL) lifted(p.x, () => {
     // Surge glow while Surge is held (the sparkles that rise from it are made in updP)
-    if (inputOf(p).K.s && live() && p.st !== 'dead' && !p.stm.winded) {
+    // (in a car the car's outline glows instead: cars.js)
+    if (inputOf(p).K.s && live() && p.st !== 'dead' && !p.stm.winded && !p.car) {
       const pul = 0.45 + 0.2 * Math.sin(fr * 0.4),
         sc = surgeCol(p.look, fr >> 2),
         hs = p.s * (p.look ? p.look.ht : 1);
