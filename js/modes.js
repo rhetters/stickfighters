@@ -9,6 +9,7 @@ const ARCADE = {
   id: 'arcade',
   update() {
     reviveTick();
+    stageTick(); // a moving platform (stages.js)
     if (
       queue.length &&
       --spawnT <= 0 &&

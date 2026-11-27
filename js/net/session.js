@@ -21,6 +21,7 @@ const NET = {
   players: [], // [{ slot, id, name, f (fighter), cid (colour id), team (0 or 1), rtt, left }]
   mode: 'level',
   teams: false, // Versus in two teams instead of free-for-all
+  stage: '?', // the Versus or Arcade stage (data/stages.js; '?' = picked from the seed)
   theme: 'castle', // the story a co-op run plays ('?' = a surprise theme, with a bonus; 'mine' = one of the host's levels)
   lvl: null, // under MY LEVELS: the id of the host's level picked
   lvls: [], // a guest's copy of the host's levels (the host sends them one by one when a guest joins)
@@ -123,6 +124,7 @@ function netRoomMsg() {
     code: NET.code,
     mode: NET.mode,
     teams: NET.teams,
+    stage: NET.stage,
     theme: NET.theme,
     lvl: NET.lvl,
     diff: NET.diff,
@@ -218,6 +220,7 @@ function netReset() {
     match: false,
     mySlot: 0,
     teams: false,
+    stage: '?',
     theme: 'castle',
     lvl: null,
     lvls: [],
@@ -431,6 +434,7 @@ function netClientMsg(m) {
     NET.players = m.players;
     NET.mode = m.mode;
     NET.teams = !!m.teams;
+    NET.stage = STAGE[m.stage] ? m.stage : '?';
     if (THEMES[m.theme] || m.theme === '?' || m.theme === 'mine') NET.theme = m.theme;
     NET.lvl = typeof m.lvl === 'string' ? m.lvl : null;
     NET.max = Math.max(2, Math.min(MAX_ONLINE, m.max || 4));
@@ -491,6 +495,7 @@ function netStart() {
       feel: { ...FEEL, ...NET_FEEL, body: Math.min(1, FEEL.body) },
       players: live.map(p => ({ slot: p.slot, id: p.id, name: p.name, f: p.f, cid: p.cid, team: p.team })),
       teams: NET.mode === 'vs' && NET.teams,
+      stage: NET.stage,
       // House mode visits the host's house (decoration only, so it can't affect the simulation)
       house: NET.mode === 'house' ? normHouse(HOUSE) : undefined,
       // MY LEVELS sends the whole level, so everyone builds the same one
@@ -549,6 +554,7 @@ function netStartLocal(m) {
   releaseAll();
   applyTouchVis();
   fr = 0;
+  STAGE_SEL = STAGE[m.stage] ? m.stage : '?'; // everyone on the host's stage (stages.js)
   if (m.mode === 'vs') startVersus();
   else if (m.mode === 'level' && m.level) startCustom(normLevel(m.level), 'menu');
   else if (m.mode === 'level') startRun(THEMES[m.theme] ? m.theme : 'castle', 0, !!m.myst);

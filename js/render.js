@@ -356,7 +356,8 @@ function drawF(f) {
   }
 }
 function bg() {
-  if (MODE.bg && state !== 'train') return MODE.bg();
+  // (a mode's drawing can hand back false: the plain notebook page below, Arcade's own)
+  if (MODE.bg && state !== 'train' && MODE.bg() !== false) return;
   ctx.fillStyle = '#fbfaf4';
   ctx.fillRect(-30, -30, W + 60, H + 60);
   ctx.drawImage(gridC, 0, 0, W, H);
