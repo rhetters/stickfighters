@@ -34,6 +34,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M22 | Ron's notes on version 79 | Next | M | M21 | Versus ends on the victory screen, one item per style (colours do the rest), the chest on the Customize page, City and Pink Kong fixes |
 | M23 | House tools | Next | S | M18 | TOOLS in the house builder: rotate, flip and erase |
 | M24 | Ron's notes on version 81 | Next | S | M23 | Combo counter fix, new City music, MOVE and DUPLICATE in the house builder |
+| M25 | COLORS sub-categories | Next | S | M24 | COLORS asks Shirts / Jackets / Gloves first, with None beside the item being coloured |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
@@ -127,6 +128,12 @@ Ron's notes (November 27): the combo counter's bar running through its number; C
 of a quirky 90s adventure game's hometown theme, for each part; MOVE and DUPLICATE tools in the house builder.
 
 Built (version 82, see the CHANGELOG). Still to do: hear the City songs on the iPad and say what to change.
+
+### M25 · COLORS sub-categories
+Ron's ask (November 27): a None button beside the item being coloured, and COLORS showing a kind's sub-categories
+(Upper Body: Shirts, Jackets, Gloves) before the item and its colours.
+
+Built (version 83, see the CHANGELOG). Still to do: the kids try it on the iPad.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 

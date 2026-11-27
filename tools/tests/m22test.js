@@ -20,7 +20,7 @@ ok(await ev("(()=>{const a=tinted(ITEM['shirt-white'],{'shirt-white':'red'}),s=t
 ok(await ev("!tintable(ITEM['trail-rainbow'])&&!tintable(ITEM['band-rainbow'])&&!TINT.rainbow&&!buyTint('trail-rainbow','red')&&tinted(ITEM['trail-rainbow'],{'trail-rainbow':'red'})===ITEM['trail-rainbow']"),'Rainbow items can\'t be recoloured (and rainbow is never a colour)');
 await ev("(()=>{openChar();chGo('colors');$('ch-cats').querySelector('[data-k=\"paint-surge\"]').click()})()");await p.waitForTimeout(150);
 ok(await ev("/This item cannot be recolored\\./.test($('ch-grid').textContent)&&!$('ch-grid').querySelector('[data-id^=\"tint-\"]')"),'COLORS with Rainbow Surge: "This item cannot be recolored."');
-await ev("(()=>{CH.paint=null;chGo('colors');$('ch-cats').querySelector('[data-k=\"paint-upper\"]').click()})()");await p.waitForTimeout(150);
+await ev("(()=>{CH.paint=null;chGo('colors');$('ch-cats').querySelector('[data-k=\"paint-upper\"]').click();$('ch-cats').querySelector('[data-k=\"sec-shirt\"]').click()})()");await p.waitForTimeout(150);
 ok(await ev("$('ch-grid').querySelectorAll('[data-id^=\"tint-\"]').length===17"),'a T-Shirt has Original and the 16 colours');
 // the colour tiles have no dot: the corner where it was drawn is plain
 ok(await ev("(()=>{const cv=$('ch-grid').querySelector('[data-id=\"tint-red\"] canvas');if(!cv)return 'no canvas';const k=cv.getContext('2d'),sx=cv.width/64,d=k.getImageData(Math.round(54*sx),Math.round(12*sx),1,1).data;return !(d[0]>200&&d[1]<80&&d[2]<80)})()"),'colour tiles show the item only, no coloured dot');

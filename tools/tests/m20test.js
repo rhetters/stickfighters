@@ -22,6 +22,7 @@ ok(await ev("ITEMS.filter(i=>i.sec==='surge'&&i.fx).length===8"),'Surge styles h
 await ev("(()=>{titleOpenAll();openChar();chGo('colors')})()");await p.waitForTimeout(200);
 ok(await ev("$('ch-cats').classList.contains('paints')&&$('ch-cats').querySelectorAll('[data-k^=\"paint-\"]').length===8&&getComputedStyle($('ch-cats')).gridTemplateColumns.split(' ').length===4"),'COLORS shows the eight kinds, four to a row');
 await ev("$('ch-cats').querySelector('[data-k=\"paint-head\"]').click()");await p.waitForTimeout(150);
+await ev("$('ch-cats').querySelector('[data-k=\"sec-hat\"]').click()");await p.waitForTimeout(150);
 ok(await ev("$('ch-grid').querySelectorAll('[data-id^=\"tint-\"]').length===17&&$('ch-grid').querySelector('[data-id=\"cur-hat-cap\"]')"),'a kind: the item you wear at the top, then Original and every colour');
 const s1=await ev("ECO.stars");await ev("$('ch-grid').querySelector('[data-id=\"tint-red\"]').click()");
 ok(await ev("ECO.stars")===s1&&await ev("!!CH.tryTint&&previewFighter().hat.c===TINT.red.c"),'the first tap tries a colour on');

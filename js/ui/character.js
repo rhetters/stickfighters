@@ -7,7 +7,7 @@
 // tab = the part of the body open (null = the picture tiles of every part), sec = the kind open in it
 // paint / pitem / pick / tryTint: the COLORS page (its kind, the item being coloured, choosing another item, a colour
 // being tried on)
-const CH = { tab: null, sec: null, tryOn: {}, pose: null, raf: 0, t: 0, msg: '', del: -1, hist: [], paint: null, pitem: null, pick: false, tryTint: null };
+const CH = { tab: null, sec: null, tryOn: {}, pose: null, raf: 0, t: 0, msg: '', del: -1, hist: [], paint: null, psec: null, pitem: null, pick: false, tryTint: null };
 const NAMES = [
   'BLAZE',
   'ZIGZAG',
@@ -187,7 +187,9 @@ function renderChar() {
         ? 'body'
         : tab.id === 'colors'
           ? CH.paint
-            ? 'paint'
+            ? CH.psec || paintSecs(CH.paint).length < 2
+              ? 'paint'
+              : 'psecs'
             : 'paints'
           : secs.length > 1
             ? 'kinds'
@@ -197,25 +199,26 @@ function renderChar() {
   $('ch-path').textContent = tab
     ? tab.name.toUpperCase() +
       (CH.sec && tab.secs.length > 1 ? ' \u203a ' + SECS[CH.sec].name.toUpperCase() : '') +
-      (view === 'paint' ? ' \u203a ' + PAINTS.find(p => p.id === CH.paint).name.toUpperCase() : '')
+      (view === 'paint' || view === 'psecs' ? ' \u203a ' + PAINTS.find(p => p.id === CH.paint).name.toUpperCase() : '') +
+      (view === 'paint' && CH.psec && paintSecs(CH.paint).length > 1 ? ' \u203a ' + SECS[CH.psec].name.toUpperCase() : '')
     : '';
-  $('ch-cats').hidden = view !== 'cats' && view !== 'kinds' && view !== 'paints';
+  $('ch-cats').hidden = view !== 'cats' && view !== 'kinds' && view !== 'paints' && view !== 'psecs';
   $('ch-body').hidden = view !== 'body';
   $('ch-grid').hidden = view !== 'items' && view !== 'paint';
   $('ch-cats').classList.toggle('paints', view === 'paints');
   if (view === 'paints') renderPaints(c, base);
   if (view === 'paint') renderPaint(c, base);
   const fresh = ss => ITEMS.some(i => ss.includes(i.sec) && ECO.own.includes(i.id) && !ECO.seen.includes(i.id));
-  if (view === 'cats' || view === 'kinds') {
+  if (view === 'cats' || view === 'kinds' || view === 'psecs') {
     const opts =
       view === 'cats'
         ? TABS.map(t => ({ k: 'tab-' + t.id, label: t.name, pick: () => chGo(t.id), pic: chTabPic(t), nw: fresh(t.secs) }))
-        : tab.secs.map(sec => ({
+        : (view === 'psecs' ? paintSecs(CH.paint) : tab.secs).map(sec => ({
             k: 'sec-' + sec,
             label: SECS[sec].name,
-            pick: () => chGo(tab.id, sec),
+            pick: view === 'psecs' ? () => paintSec(sec) : () => chGo(tab.id, sec),
             pic: chSecPic(sec),
-            nw: fresh([sec])
+            nw: view === 'psecs' ? false : fresh([sec])
           })),
       box = $('ch-cats');
     roomTiles(
@@ -255,10 +258,21 @@ function chGo(tab, sec) {
   if (f) f.focus({ preventScroll: true });
 }
 function chUp() {
-  // COLORS: from a kind's colours back to the eight kinds
+  // COLORS: from a sub-category's colours back to the kind's sub-categories (Shirts, Jackets, Gloves…)
+  if (CH.tab === 'colors' && CH.paint && CH.psec && paintSecs(CH.paint).length > 1) {
+    const from = 'sec-' + CH.psec;
+    CH.psec = CH.pitem = CH.tryTint = null;
+    CH.pick = false;
+    CH.msg = '';
+    renderChar();
+    const b = $('ch-cats').querySelector('[data-k="' + from + '"]');
+    if (b) b.focus({ preventScroll: true });
+    return;
+  }
+  // COLORS: back to the eight kinds
   if (CH.tab === 'colors' && CH.paint) {
     const from = 'paint-' + CH.paint;
-    CH.paint = CH.pitem = CH.tryTint = null;
+    CH.paint = CH.psec = CH.pitem = CH.tryTint = null;
     CH.pick = false;
     CH.msg = '';
     renderChar();
@@ -490,9 +504,24 @@ function renderShelf(c, secs) {
   }
 }
 // ===== COLORS =====
-// Eight kinds (PAINTS), each showing what you wear in it. A kind shows the item you're colouring at the top (tap it
-// to pick another of yours) and every colour for that item below: its own colours free, the others bought for that
-// item alone (TINT_PRICE). Body is the body colours, as always.
+// Eight kinds (PAINTS), each showing what you wear in it. A kind with several sections (Upper Body: Shirts, Jackets,
+// Gloves) asks which first (CH.psec). Then the item you're colouring is at the top (tap it to wear another of yours),
+// with None beside it to take it off, and every colour for that item below: its own colours free, the others bought
+// for that item alone (TINT_PRICE). Body is the body colours, as always.
+// A kind's sections (the ones with items in the store)
+function paintSecs(id) {
+  return PAINTS.find(p => p.id === id).secs;
+}
+function paintSec(sec) {
+  CH.psec = sec;
+  CH.pick = false;
+  CH.tryTint = null;
+  CH.msg = '';
+  $('ch-grid').scrollTop = 0;
+  renderChar();
+  const f = $('ch-grid').querySelector('button');
+  if (f) f.focus({ preventScroll: true });
+}
 // What you wear in a kind (the first worn slot; Poses: your victory pose; Body: your body colour)
 function paintWorn(c, P) {
   if (P.id === 'body') return c.col;
@@ -539,13 +568,14 @@ function renderPaints(c, base) {
         }),
         pick: () => {
           CH.paint = P.id;
-          CH.pitem = P.id === 'body' ? null : paintWorn(c, P) || (paintOwned(c, P)[0] || {}).id || null;
+          CH.psec = P.secs.length > 1 ? null : P.secs[0];
+          CH.pitem = null;
           CH.pick = false;
           CH.tryTint = null;
           CH.msg = '';
           $('ch-grid').scrollTop = 0;
           renderChar();
-          const f = $('ch-grid').querySelector('button');
+          const f = document.querySelector('#ch-cats:not([hidden]) button') || $('ch-grid').querySelector('button');
           if (f) f.focus({ preventScroll: true });
         }
       };
@@ -557,12 +587,44 @@ function renderPaints(c, base) {
   [...box.children].forEach((b, i) => b.querySelector('.pimg').style.setProperty('--ic', 'url(' + opts[i].pic + ')'));
 }
 function renderPaint(c, base) {
-  const P = PAINTS.find(p => p.id === CH.paint),
+  const P0 = PAINTS.find(p => p.id === CH.paint),
     g = $('ch-grid');
-  if (P.id === 'body') return renderShelf(c, ['color']);
-  const keep = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.id : null,
+  if (P0.id === 'body') return renderShelf(c, ['color']);
+  // just the sub-category picked (Shirts), or the kind's only one (Surge)
+  const P = { ...P0, secs: CH.psec ? [CH.psec] : P0.secs },
+    sec = P.secs[0],
+    slot = SECS[sec].slot,
+    poses = P.id === 'poses',
+    worn = poses ? null : paintWorn(c, P),
+    keep = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.id : null,
     top = g.scrollTop,
-    mine = paintOwned(c, P);
+    mine = paintOwned(c, P),
+    nonePic = () => {
+      ctx.strokeStyle = '#c9bfae';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(32, 26, 15, 0, 7);
+      ctx.moveTo(21, 37);
+      ctx.lineTo(43, 15);
+      ctx.stroke();
+    },
+    // None: take off what you wear here (only if it's from this sub-category: Pants' None leaves your shorts on)
+    none = r =>
+      card(
+        r,
+        'own' + (!worn ? ' on' : ''),
+        'None',
+        !worn ? 'WEARING' : '',
+        nonePic,
+        () => {
+          CH.pick = false;
+          CH.tryTint = null;
+          CH.msg = '';
+          if (worn) setChar(cc => (cc.eq[slot] = null));
+          else renderChar();
+        },
+        'pnone'
+      );
   g.innerHTML = '';
   const shelf = note => {
     if (note) {
@@ -580,11 +642,14 @@ function renderPaint(c, base) {
     shelf('You have no ' + P.name.toLowerCase() + ' items yet: get some in ' + P.name + ' first.');
     return;
   }
-  if (!CH.pitem || !mine.some(i => i.id === CH.pitem)) CH.pitem = mine[0].id;
-  const it = ITEM[CH.pitem];
-  if (CH.pick) {
-    // pick which of your items to colour (and wear it)
-    const r = shelf('Pick one of yours to colour');
+  // what you're colouring: what you wear here (a pose: one on your wheel)
+  if (!poses) CH.pitem = worn;
+  else if (!CH.pitem || !mine.some(i => i.id === CH.pitem)) CH.pitem = mine[0].id;
+  const it = CH.pitem && ITEM[CH.pitem];
+  if (CH.pick || !it) {
+    // pick which of your items to wear and colour (or None)
+    const r = shelf(it ? 'Pick one of yours to colour' : 'You’re not wearing one: pick one of yours to wear and colour');
+    if (!poses) none(r);
     for (const m of mine)
       card(
         r,
@@ -602,22 +667,23 @@ function renderPaint(c, base) {
         'pick-' + m.id
       );
   } else {
-    // the item being coloured: tap to pick another
+    // the item being coloured: tap to pick another; None beside it takes it off
     const r = shelf();
     card(
       r,
       'own on',
       it.name,
-      mine.length > 1 ? 'TAP TO CHANGE' : 'COLOURING',
+      mine.length > 1 || !poses ? 'TAP TO CHANGE' : 'COLOURING',
       () => drawItemIcon(tinted(it, c.tint), 32, 26, 56, base),
       () => {
-        if (mine.length < 2) return;
+        if (mine.length < 2 && poses) return;
         CH.pick = true;
         CH.tryTint = null;
         renderChar();
       },
       'cur-' + it.id
     );
+    if (!poses) none(r);
     // its colours: the original, then every colour
     if (!tintable(it)) {
       shelf('This item cannot be recolored.');
