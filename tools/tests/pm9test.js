@@ -33,7 +33,7 @@ await ev("__pads[1].buttons[4].pressed=false;__pads[1].buttons[13].pressed=false
 // teams
 await ev("pause(true)");await p.click('#b-quit');await W(200);await ev("titleOpenAll()");await p.evaluate('openOnline()');await p.click('#b-multi');await W(100);
 await tap(2,0);await tap(3,0);ok(await ev("LOBBY.length===4"),'4 players in the lobby');
-await ev("document.querySelector('#lb-modes [data-mode=\"vs\"]').click()");await p.click('#lb-sub [data-teams="1"]');await W(100);ok(await ev("TEAMS")&&await ev("!!document.querySelector('#lb-sub [data-teams=\"1\"].on')"),'Teams switch on');
+await ev("document.querySelector('#lb-modes [data-mode=\"vs\"]').click()");await p.click('#lb-diff [data-teams="1"]');await W(100);ok(await ev("TEAMS")&&await ev("!!document.querySelector('#lb-diff [data-teams=\"1\"].on')"),'Teams switch on');
 ok(await ev("JSON.stringify(LOBBY.map(r=>r.team))")==='[0,1,0,1]','default teams: P1+P3 vs P2+P4 (as online)');
 await p.screenshot({path:S+'/shots/pm9-teams.png'});
 await p.click('#lb-cards .pcard:nth-child(2) .pteam');ok(await ev("LOBBY[1].team===0"),'tap TEAM to switch sides');

@@ -391,13 +391,18 @@ const AMB = [];
 // the bottom of the screen and a leafy crown over the top. Drawn on the screen, moving a little faster than the
 // path; a tree goes see-through while a player is behind it. Looks only.
 const OAKA = new Map();
-function drawOaksFg() {
+// mir = drawn mirrored across the screen (a one-screen stage gets a matching oak on the other side: stages.js)
+function drawOaksFg(mir) {
   const dk = chunkVal(CAM.x + W / 2, 'dusk'),
     vx = viewX(),
     z = CAM.z,
     seen = new Set();
   layer(1.35, 1300, 131, (x, r, i) => {
     if (r < 0.35 || x < -260 || x > W + 260) return;
+    if (mir) {
+      x = W - x;
+      i += 1000;
+    }
     seen.add(i);
     // see-through while a player is behind the trunk
     const behind = PL.some(p => !p.hide && p.st !== 'dead' && Math.abs((p.x - vx) * z - x) < 95),
@@ -483,7 +488,7 @@ function drawOaksFg() {
     }
     ctx.restore();
   });
-  for (const k of OAKA.keys()) if (!seen.has(k)) OAKA.delete(k);
+  for (const k of OAKA.keys()) if (!seen.has(k) && k >= 1000 === !!mir) OAKA.delete(k);
 }
 let ambCam = 0;
 function drawWoodsFg() {

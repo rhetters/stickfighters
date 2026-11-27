@@ -114,8 +114,8 @@ function renderOnline() {
     NET.mode === 'level'
       ? storyRow({
           mine: NET.theme === 'mine',
-          cur: NET.theme === 'mine' ? levelCur(netLevels(), NET.lvl) : NET.theme,
-          levels: netLevels(),
+          cur: NET.theme === 'mine' ? levelCur(edLevels(netLevels()), NET.lvl) : NET.theme,
+          levels: edLevels(netLevels()),
           pages: ONPAGES,
           pick: v => (NET.theme === 'mine' ? (NET.lvl = v) : (NET.theme = v), netOptChanged()),
           toMine: () => ((ONPAGES.story.last = NET.theme), (NET.theme = 'mine'), netOptChanged()),
@@ -123,11 +123,9 @@ function renderOnline() {
           redraw: renderOnline,
           disabled: !NET.host
         })
-      : NET.mode === 'vs'
-        ? teamTiles(NET.teams, v => ((NET.teams = v), netOptChanged()), !NET.host)
-        : NET.mode === 'arcade'
-          ? stageRow(onStage())
-          : []
+      : NET.mode === 'vs' || NET.mode === 'arcade'
+        ? stageRow(onStage())
+        : []
   );
   $('on-room').classList.toggle('nosub', !$('on-sub').children.length);
   // the difficulty for Story and Arcade (the host picks)
@@ -136,13 +134,13 @@ function renderOnline() {
     NET.mode === 'level' || NET.mode === 'arcade'
       ? diffTiles(NET.diff, v => ((NET.diff = v), netOptChanged()), !NET.host)
       : NET.mode === 'vs'
-        ? stageRow(onStage())
+        ? teamTiles(NET.teams, v => ((NET.teams = v), netOptChanged()), !NET.host)
         : []
   );
   const mine = NET.mode === 'level' && NET.theme === 'mine';
   $('on-nostar').hidden = !mine;
   // START can be pressed once everyone is ready (and Versus has its players; MY LEVELS needs a level)
-  $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady()) || (mine && !netLevels().length);
+  $('on-start').disabled = !netAllReady() || (NET.mode === 'vs' && !netVsReady()) || (mine && !edLevels(netLevels()).length);
   // who the room is waiting for
   const me = NET.players.find(p => p.slot === NET.mySlot),
     wait = NET.players.filter(p => !p.ready && !p.left).length;
@@ -152,10 +150,11 @@ function renderOnline() {
 }
 // The online room's story and level tiles' pages (this device's own: a guest can look through them too)
 const ONPAGES = newPages(),
-  ONSTAGES = { pg: 0, sel: null };
+  ONSTAGES = newPages();
 // The room's stage row: the host picks
 const onStage = () => ({
-  cur: NET.stage || '?',
+  cur: stageOk(NET.stage || '?', edMaps(netLevels())),
+  maps: edMaps(netLevels()),
   pages: ONSTAGES,
   pick: v => ((NET.stage = v), netOptChanged()),
   redraw: renderOnline,

@@ -2824,6 +2824,11 @@ body.padnav .ptile:focus b {
   overflow-wrap: anywhere;
   font-size: max(9px, calc(var(--ps) * 0.18));
 }
+/* MY LEVELS stays on one line (its tile gets a little wider) so the stage row is no taller than the modes */
+.rmrow .ptile[data-stage='mine'] b {
+  white-space: nowrap;
+  max-width: none;
+}
 /* the difficulty: three small tiles beside the room's sticky note, and under the Solo tiles */
 .rmtop > .rmdiff {
   margin-left: auto;

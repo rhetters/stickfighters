@@ -1,14 +1,37 @@
 // StickFighters: Versus and Arcade stages (data/stages.js). Builds the stage's platforms (terrain.js), moves a moving
 // one each step (carrying whoever stands on it), and draws the stage: its place's look, then the platforms.
 // ===== STAGES =====
-let STAGE_SEL = '?'; // the stage picked for the next Versus or Arcade game ('?' = one picked from the game's seed)
-const STG = { st: null, t: 0, s: [] }; // the stage being played, its time, its platforms
+// The stage picked for the next Versus or Arcade game: a stage's id, '?' (one picked from the game's seed), or one of
+// Rhett's maps: 'my:<id>' ('my:?' = one of them from the seed)
+let STAGE_SEL = '?';
+// the stage being played, its time, its platforms; net = the host's maps for an online game; edit = trying a map from
+// the level creator (QUIT goes back there)
+const STG = { st: null, t: 0, s: [], net: null, edit: false };
+// A map (editor.js) as a stage: its place's look, scenery and platforms (drawn by the level drawing), and its place's
+// low gravity and helmets
+function mapStage(L) {
+  const B = BIOMES[L.places[0].b];
+  return { id: 'my:' + L.id, tag: L.name, name: L.name, look: B.look, map: L, lv: buildMap(L), plats: [], lowg: B.lowg, helmet: B.helmet };
+}
+// The stage for a pick; maps come from the host's list online (STG.net), else from this device's
+function stagePick(sel) {
+  const seed = curSeed >>> 0,
+    maps = edMaps(STG.net || EDIT.levels);
+  if (typeof sel === 'string' && sel.startsWith('my:')) {
+    const L = sel === 'my:?' ? maps[seed % Math.max(1, maps.length)] : maps.find(q => 'my:' + q.id === sel);
+    if (L) return mapStage(L);
+  }
+  return STAGE[sel] || STAGES[seed % STAGES.length];
+}
 // Versus keeps the match's stage for every round (keep); a random pick comes from the seed, so online everyone gets
 // the same stage without using up the game's random numbers
 function stageStart(keep) {
-  if (!keep || !STG.st) STG.st = STAGE[STAGE_SEL] || STAGES[(curSeed >>> 0) % STAGES.length];
+  if (!NET.match) STG.net = null; // this device's own maps
+  if (!keep || !STG.st) STG.st = stagePick(STAGE_SEL);
   STG.t = 0;
-  STG.s = STG.st.plats.map(([x1, x2, h]) => ({ x1, x2, y1: G - h, y2: G - h, st: 'stage', bx: x1, by: G - h }));
+  STG.s = STG.st.lv
+    ? STG.st.lv.terr.s.map(q => ({ ...q }))
+    : STG.st.plats.map(([x1, x2, h]) => ({ x1, x2, y1: G - h, y2: G - h, st: 'stage', bx: x1, by: G - h }));
   terrainSet(STG.s);
 }
 function stageTick() {
@@ -35,17 +58,32 @@ function stageTick() {
 // The stage's look, then its platforms. false = the plain notebook page (render.js draws it).
 function stageBg() {
   const st = STG.st;
+  if (st && st.lv) return withLV(st.lv, () => drawLevelBg()); // a map: its place, scenery and platforms
   if (!st || st.look === 'paper' || !LOOKS[st.look]) return false;
-  stageLV(() => LOOKS[st.look].bg());
+  // the Castle Yard has one window, between its platforms
+  stageLV(() => (st.look === 'castle' ? drawCastle(W / 2) : LOOKS[st.look].bg()));
   for (const s of STG.s) stagePlat(s, st.look);
 }
 function stageFg() {
   const st = STG.st;
-  if (st && st.look !== 'paper' && LOOKS[st.look]) stageLV(() => LOOKS[st.look].fg());
+  if (st && st.lv) return withLV(st.lv, () => drawLevelFg());
+  if (!st || st.look === 'paper' || !LOOKS[st.look]) return;
+  stageLV(() => LOOKS[st.look].fg());
+  if (st.look === 'woods') stageLV(() => drawOaksFg(1)); // the Clearing: a big oak on each side
 }
 // Some looks read the level's scenery (the woods' trees); Arcade has no level, so they draw over the Versus arena's.
 // Drawing only: LV is put back straight after.
 let STAGE_ARENA = null;
+// Draw with a given level in LV (a map's), then put LV back. Drawing only.
+function withLV(lv, draw) {
+  const keep = LV;
+  LV = lv;
+  try {
+    draw();
+  } finally {
+    LV = keep;
+  }
+}
 function stageLV(draw) {
   if (LV) return draw();
   STAGE_ARENA = STAGE_ARENA || buildLevel('arena');
@@ -63,7 +101,7 @@ function stagePlat(s, look) {
     y = s.y1,
     st = {
       woods: ['#a96e3a', '#5aa04a'],
-      meadow: ['#a96e3a', '#5aa04a'],
+      meadow: ['#a96e3a', null], // plain planks
       castle: ['#b4b4bd', null],
       city: ['#6f7a8c', '#ffd400'],
       ship: ['#c98a4f', null],
@@ -106,7 +144,7 @@ function stagePlat(s, look) {
     ctx.lineTo(s.x2 - 4, y + 8);
     ctx.stroke();
   }
-  if (st[1] && (look === 'woods' || look === 'meadow')) {
+  if (st[1] && look === 'woods') {
     // a grass top
     ctx.fillStyle = st[1];
     ctx.strokeStyle = INK;

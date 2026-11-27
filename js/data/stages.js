@@ -3,6 +3,7 @@
 //   tag     its short name on the room's tile
 //   look    the place it looks like (LOOKS in biomes.js; 'paper' = the plain notebook page Arcade always had)
 //   plats   platforms you can jump up through and stand on: [x1, x2, height above the floor]
+//   lowg, helmet  low gravity and glass helmets, like the places of the same name (data/themes.js)
 //   move    a platform that moves: { i: which one, ax: 'x' or 'y', a: how far each way, p: frames for a round trip }
 const STAGES = [
   { id: 'paper', tag: 'PAPER', name: 'NOTEBOOK', look: 'paper', plats: [] },
@@ -10,7 +11,7 @@ const STAGES = [
   // three platforms: two low at the sides, one high in the middle
   {
     id: 'treehouse',
-    tag: 'TREES',
+    tag: 'MEADOW',
     name: 'TREEHOUSE',
     look: 'meadow',
     plats: [
@@ -31,7 +32,7 @@ const STAGES = [
     ]
   },
   // one platform that drifts slowly from side to side
-  { id: 'rooftop', tag: 'ROOF', name: 'ROOFTOP', look: 'city', plats: [[350, 550, 130]], move: { i: 0, ax: 'x', a: 230, p: 600 } },
+  { id: 'rooftop', tag: 'CITY', name: 'ROOFTOP', look: 'city', plats: [[350, 550, 130]], move: { i: 0, ax: 'x', a: 230, p: 600 } },
   // a big ship of decks at different heights
   {
     id: 'ship',
@@ -56,7 +57,9 @@ const STAGES = [
       [600, 780, 110],
       [360, 540, 200]
     ],
-    move: { i: 2, ax: 'y', a: 45, p: 420 }
+    move: { i: 2, ax: 'y', a: 45, p: 420 },
+    lowg: 0.65, // floaty jumps, like the Moon in Space
+    helmet: 1 // everyone (and their pet) in a glass helmet
   }
 ];
 const STAGE = Object.fromEntries(STAGES.map(s => [s.id, s]));

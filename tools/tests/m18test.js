@@ -122,8 +122,8 @@ await H.evaluate(()=>{NET.mode='house';netRoomChanged();netStart()});await H.wai
 ok(await G.evaluate(()=>state==='play'&&MODE.id==='house'&&HVIEW.items.some(i=>i.id==='hf-tv')&&TERRAIN.n===1),'the guest is in the host\'s house, floors included');
 ok(await G.evaluate(()=>PL.length===2&&NET.match),'both fighters are there');
 await H.evaluate(()=>{pause(true);$('b-quit').click()});await H.waitForTimeout(800);
-await H.evaluate(()=>{NET.mode='vs';netRoomChanged();document.querySelector('#on-sub [data-teams="1"]').click()});await H.waitForTimeout(500);
-ok(await G.evaluate(()=>NET.teams&&document.querySelector('#on-sub [data-teams="1"].on')&&document.querySelectorAll('#on-cards .pteam').length===2),'online Versus: the host turns on teams and everyone sees team buttons');
+await H.evaluate(()=>{NET.mode='vs';netRoomChanged();document.querySelector('#on-diff [data-teams="1"]').click()});await H.waitForTimeout(500);
+ok(await G.evaluate(()=>NET.teams&&document.querySelector('#on-diff [data-teams="1"].on')&&document.querySelectorAll('#on-cards .pteam').length===2),'online Versus: the host turns on teams and everyone sees team buttons');
 ok(await H.evaluate(()=>{const e=$('s-online');return e.scrollHeight<=e.clientHeight+1&&document.documentElement.scrollHeight<=innerHeight+1}),'the online room fits without a scroll bar in Versus with teams');
 ok(await H.evaluate(()=>{NET.players.forEach(p=>p.ready=true);renderOnline();return $('on-start').disabled===false}),'one player on each team, everyone ready: START can be pressed');
 await G.evaluate(()=>netSetTeam(NET.mySlot));await G.waitForTimeout(500);ok(await H.evaluate(()=>NET.players.every(p=>!p.team)&&$('on-start').disabled),'a guest can switch their own team; both on one team cannot start');

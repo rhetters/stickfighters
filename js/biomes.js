@@ -35,8 +35,10 @@ function altAt(x) {
   return a;
 }
 let helmOn = false;
+// A glass helmet here? (a place with helmet, or a stage with one: the Moon Base, stages.js)
+const helmAt = x => (MODE === LEVEL ? !!BIOMES[segAt(x).b].helmet : !!(STG.st && STG.st.helmet));
 function slopeStart() {
-  helmOn = !!(MODE === LEVEL && LV && LV.segs);
+  helmOn = !!(MODE === LEVEL && LV && LV.segs) || !!(MODE !== LEVEL && STG.st && STG.st.helmet);
   slopeOn = !!(MODE === LEVEL && LV && LV.ramps);
   slopeRef = slopeOn ? altAt(CAM.x + SLOPE_REF) : 0;
 }
@@ -340,7 +342,7 @@ function drips() {
 }
 // ===== CASTLE (inside the keep): the hall's stone wall right behind you, so banners, torches and shields hang on
 // it; tall arched windows look out at the sky and far towers; a long carpet runs down the stone floor =====
-function drawCastle() {
+function drawCastle(one) {
   const cx = CAM.x;
   paperBg();
   // the wall: stone courses that move with the floor (it's right behind the fighters)
@@ -359,11 +361,12 @@ function drawCastle() {
   }
   ctx.stroke();
   // tall windows every CASTLE_WIN px of the hall, looking out at the sky and the far towers
+  // (a stage, stages.js: just one window, at x = one)
   const sp = CASTLE_WIN,
-    i0 = Math.floor((cx - 200) / sp),
-    i1 = Math.floor((cx + W + 200) / sp);
+    i0 = one === undefined ? Math.floor((cx - 200) / sp) : 0,
+    i1 = one === undefined ? Math.floor((cx + W + 200) / sp) : 0;
   for (let i = i0; i <= i1; i++) {
-    const wx = i * sp + 280 - cx,
+    const wx = one === undefined ? i * sp + 280 - cx : one,
       top = 70,
       bot = G - 120;
     ctx.save();
@@ -2287,7 +2290,7 @@ const HELM_FIT = {
   'hat-viking': [0.7, 2.9]
 };
 function drawHelmet(f, o) {
-  if (!helmOn || !o.hd || !o.hr || !BIOMES[segAt(f.x).b].helmet) return;
+  if (!helmOn || !o.hd || !o.hr || !helmAt(f.x)) return;
   const fit = HELM_FIT[f.look && f.look.hat && f.look.hat.id] || [0.55, 2.5],
     hx = o.hd[0] - (f.face || 1) * 0.1 * o.hr,
     hy = o.hd[1] - fit[0] * o.hr,

@@ -815,14 +815,14 @@ function hud() {
   ctx.textAlign = 'center';
   ctx.font = '900 18px Impact,"Arial Black",sans-serif';
   if (MODE.hud && state !== 'train') MODE.hud();
-  else
-    ctx.fillText(
-      state === 'train'
-        ? 'TRAINING ROOM'
-        : 'WAVE ' + wave + '  ·  ' + (queue.length + E.filter(e => !e.dying).length) + ' LEFT',
-      W / 2,
-      HUD_Y
-    );
+  else if (state === 'train') ctx.fillText('TRAINING ROOM', W / 2, HUD_Y);
+  else {
+    // Arcade: the wave in the top right, under the stars and the pause button (clear of the stage's platforms)
+    ctx.textAlign = 'right';
+    ctx.font = '900 16px Impact,"Arial Black",sans-serif';
+    ctx.fillText('WAVE ' + wave + '  ·  ' + (queue.length + E.filter(e => !e.dying).length) + ' LEFT', W - 16, 66);
+    ctx.textAlign = 'center';
+  }
   const CP = PL.reduce((a, b) => (b.combo > a.combo ? b : a), PL[0]),
     combo = CP.combo,
     comboT = CP.comboT;
@@ -832,9 +832,9 @@ function hud() {
     ctx.font = `italic 900 ${sz}px Impact,"Arial Black",sans-serif`;
     ctx.strokeStyle = INK;
     ctx.lineWidth = 6;
-    ctx.strokeText(combo + ' HITS', W - 16, 88);
+    ctx.strokeText(combo + ' HITS', W - 16, 102);
     ctx.fillStyle = '#ff7a00';
-    ctx.fillText(combo + ' HITS', W - 16, 88);
+    ctx.fillText(combo + ' HITS', W - 16, 102);
     ctx.fillStyle = INK;
     ctx.fillRect(W - 16 - 100, 96, 100, 5);
     ctx.fillStyle = '#ff4fa3';

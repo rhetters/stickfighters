@@ -4,7 +4,7 @@
 // Screenshots go to tools/tests/out/shots (not committed).
 const {execFileSync}=require('child_process'),fs=require('fs'),path=require('path');
 const TESTS=['names','selftest','m4test','m5test','m6test','m7test','m7ui','m8test','cptest','bindtest','m9lobby','m9vs','pm9test',
-  'menu2test','m10test','navtest','m18test','m12test','m13test','m14test','m15test','m19test','m20test','m16test','m17test','airtest','devtest','spam','nettest','nettest2','nettest3','netview','nethouse','netready','mylevels','hitmodel','net6','netlag'];
+  'menu2test','m10test','navtest','m18test','m12test','m13test','m14test','m15test','m19test','m20test','m16test','m17test','airtest','devtest','spam','nettest','nettest2','nettest3','netview','nethouse','netready','mylevels','hitmodel','net6','netlag','netloss'];
 const want=process.argv.slice(2),out=path.join(__dirname,'out');fs.mkdirSync(path.join(out,'shots'),{recursive:true});
 let bad=[];
 for(const t of TESTS.filter(t=>!want.length||want.some(w=>t.includes(w)))){

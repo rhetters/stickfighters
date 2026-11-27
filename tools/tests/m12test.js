@@ -12,7 +12,7 @@ ok(await ev("levelOf(0)===1&&XP_AT[2]===60&&levelOf(XP_AT[5])===5&&levelOf(XP_AT
 ok(await ev("SKN.reduce((n,k)=>n+k.max,0)>60&&SKB.filter(b=>b.ult).length===4&&SKB.every(b=>!b.ult||b.ult.every(u=>A[u]&&A[u].nm))"),'the tree holds more points than level 30 gives; four branches have three ultimate steps each');
 ok(await ev("[...SK_LOCKED].every(k=>A[k].ul==='Tree')&&Object.keys(A).every(k=>A[k].ul!=='Tree'||SK_LOCKED.has(k))"),'every move marked Tree in data/moves.js has a node that unlocks it, and the other way round');
 // a new fighter: only the basics, no ultimate
-await ev("saveFighter(0,{...FIGHTER0,name:'RHETT'});CHR.cur=0;titleOpenAll();$('b-start').click()");await W(300);
+await ev("saveFighter(0,{...FIGHTER0,name:'RHETT'});CHR.cur=0;titleOpenAll();$('b-start').click();SHOWN==='s-themes'&&THS.kind==='stage'&&THS.go('?')");await W(300);
 ok(await ev("PL[0].bd.lv===1&&PL[0].bd.locked.has('haymaker')&&PL[0].bd.locked.has('barrage')&&!PL[0].bd.locked.has('jab')&&!PL[0].bd.ult"),'a new fighter is level 1 with the basic moves and no ultimate');
 await ev("window.SEEN=[];const _s=startAtk;startAtk=function(f,d,b){if(f.pl)SEEN.push(d.n);return _s(f,d,b)};E.forEach(e=>e.gone=1);E=[];queue=[];spawnT=1e9");
 for(const k of['j','j','j']){await p.keyboard.press(k);await W(200)}
@@ -40,7 +40,7 @@ ok(await ev("[[],['l-u1'],['l-u1','l-u2'],['l-u1','l-u2','l-u3']].map(u=>{const 
 ok(await ev("(()=>{const pr={xp:XP_AT[4],sk:{}};const a=canAdd(pr,'l-u1');pr.xp=XP_AT[5];const b=canAdd(pr,'l-u1'),c=canAdd(pr,'l-u2');pr.sk={'l-u1':1};const d=canAdd(pr,'f-u1'),e=canTake(pr,'l-u1');pr.xp=XP_AT[15];pr.sk={'l-u1':1,'l-u2':1};const g=canTake(pr,'l-u1');return /level 5/.test(a)&&b===''&&/Spin Kick first|level 15/.test(c)&&/Legs ultimate/.test(d)&&e===''&&g!==''})()"),'ultimate steps: level 5 / 15 / 30, in order, one branch at a time, and free to take back (top step first)');
 ok(await ev("(()=>{const pr={xp:XP_AT[10],sk:{'f-u1':1}};return canAdd(pr,'l-palm')===''&&canAdd(pr,'f-hay')===''})()"),'owning one ultimate leaves every other branch\'s moves open');
 // the ultimate in a fight, the Surge bar and Second Wind
-await ev("const f=fighter(0);f.prog={xp:XP_AT[20],sk:{'f-hay':1,'f-dmg':2,'f-knee':1,'s-max':3,'b-tough':3,'b-throw':1,'b-rise':2,'b-thr':2,'b-tough2':3,'b-cap':1,'f-u1':1,'f-u2':1}};saveFighter(0,f);titleOpenAll();$('b-start').click()");await W(300);
+await ev("const f=fighter(0);f.prog={xp:XP_AT[20],sk:{'f-hay':1,'f-dmg':2,'f-knee':1,'s-max':3,'b-tough':3,'b-throw':1,'b-rise':2,'b-thr':2,'b-tough2':3,'b-cap':1,'f-u1':1,'f-u2':1}};saveFighter(0,f);titleOpenAll();$('b-start').click();SHOWN==='s-themes'&&THS.kind==='stage'&&THS.go('?')");await W(300);
 ok(await ev("PL[0].smax===118&&PL[0].stm.v===118&&!PL[0].bd.locked.has('haymaker')&&!PL[0].bd.locked.has('knee')"),'spent points open moves and a bigger Surge bar (118)');
 await ev("E.forEach(e=>e.gone=1);E=[];queue=[];spawnT=1e9;E.push(F(PL[0].x+40,'g',0));E[0].y=G;E[0].hp=999;PL[0].meter=100");await p.keyboard.press('u');await W(150);
 ok(await ev("PL[0].att&&PL[0].att.d.n==='uhundred'"),'level 20 with the Fists ultimate: ULT starts Hundred Fists');

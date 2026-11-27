@@ -11,7 +11,7 @@ await G.evaluate(code=>{$('b-online').click();const [w,n]=code.split('-');ONC.w=
 await G.evaluate(lag);await G.waitForTimeout(3500);
 console.log('guest rtt',await G.evaluate(()=>Math.round(NET.rtt)),'host sees',await H.evaluate(()=>NET.players[1].rtt));
 await H.evaluate(()=>{NET.mode='vs';netRoomChanged();netStart()});await G.waitForTimeout(800);
-const D=await H.evaluate(()=>NET.D);ok(D>=4&&D<=6,'input delay covers one trip: D='+D);
+const D=await H.evaluate(()=>NET.D);ok(D>=4&&D<=8,'input delay covers one trip and a hiccup: D='+D);
 await G.keyboard.down('a');await H.keyboard.down('d');await G.waitForTimeout(1500);await G.keyboard.up('a');await H.keyboard.up('d');
 const t0=Date.now(),f0=await G.evaluate(()=>NET.simF);await G.waitForTimeout(3000);const f1=await G.evaluate(()=>NET.simF);
 console.log('guest frames per second',Math.round((f1-f0)/((Date.now()-t0)/1000)));

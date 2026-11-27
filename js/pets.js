@@ -524,7 +524,7 @@ function drawPetOf(f) {
   lifted(q.x, () => {
     drawPet(q.roll ? { ...q.it, rolling: 1 } : q.it, q.x, q.y, s, q.face, q.t, q.mv, q.still > 40);
     // on the moon a pet gets a space bubble too, like its owner's helmet
-    if (helmOn && BIOMES[segAt(q.x).b].helmet) {
+    if (helmOn && helmAt(q.x)) {
       const B = PET_BUB[q.it.k] || PET_BUB.dog;
       drawBubble(q.x + q.face * B[0] * s, q.y - B[1] * s, B[2] * s);
     }

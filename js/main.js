@@ -63,6 +63,7 @@ function newSeed() {
   reseed(curSeed);
 }
 function openTitle() {
+  if (typeof STG !== 'undefined') STG.edit = false; // no longer trying a map from the level creator
   $('moves').hidden = true;
   $('feel').hidden = true;
   $('info').hidden = true;
@@ -246,7 +247,14 @@ function bindSettings() {
     save();
   };
 }
-$('b-start').onclick = () => tutOffer(start);
+// Solo Arcade: pick a stage first (the Story screen's cards, ui/themes.js)
+$('b-start').onclick = () =>
+  tutOffer(() =>
+    openStages(v => {
+      STAGE_SEL = v;
+      start();
+    }, 's-solo')
+  );
 $('b-train').onclick = startTrain;
 // ===== TITLE MENU =====
 // First visit: a flashing PRESS START; any key, tap or controller button opens the menu.
@@ -366,6 +374,7 @@ $('b-set2').onclick = () => {
 function leaveGame() {
   if (MODE === HOUSE_MODE) return HVIEW.local ? openLobby() : openHouse();
   if (MODE === LEVEL && LV && LV.custom && LV.from === 'edit') return edReturn();
+  if (STG.edit && MODE === ARCADE && STG.st && STG.st.map) return edReturnMap(); // trying a map (ui/editor.js)
   openTitle();
 }
 $('b-quit').onclick = netOr(leaveGame, 'room');

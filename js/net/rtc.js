@@ -314,6 +314,25 @@ function rtcChannel(P, ch) {
   };
   ch.onclose = () => rtcDrop(P.id);
 }
+// The fast channel: unordered, never resent, for buttons only (a lost one is covered by the next, which repeats the
+// last few frames; the game channel sends them too). A late packet on the game channel holds up everything behind
+// it until it's resent, which on Wi-Fi made online play freeze and jump.
+function rtcFast(P, ch) {
+  P.fast = ch;
+  ch.onmessage = e => {
+    let m;
+    try {
+      m = JSON.parse(e.data); // data only, never code
+    } catch (err) {
+      return;
+    }
+    if (m && typeof m === 'object') RTC.on.msg(P.id, m);
+  };
+}
+function rtcSendFast(id, m) {
+  const P = RTC.peers[id];
+  if (P && P.fast && P.fast.readyState === 'open') P.fast.send(JSON.stringify(m));
+}
 function rtcDrop(id) {
   const P = RTC.peers[id];
   if (!P) return;
@@ -338,7 +357,7 @@ async function rtcSignalMsg(m) {
       P = rtcPeer(m.src);
       P.cid = pl.cid;
       P.answered = true;
-      P.pc.ondatachannel = e => rtcChannel(P, e.channel);
+      P.pc.ondatachannel = e => (e.channel.label === 'fast' ? rtcFast(P, e.channel) : rtcChannel(P, e.channel));
       await P.pc.setRemoteDescription(pl.sdp);
       await P.pc.setLocalDescription(await P.pc.createAnswer());
       sigSend(m.src, 'ANSWER', { sdp: P.pc.localDescription, cid: pl.cid });
@@ -376,6 +395,7 @@ async function rtcJoin(code) {
     P = rtcPeer(host);
   P.cid = 'c' + Math.random().toString(36).slice(2, 10);
   rtcChannel(P, P.pc.createDataChannel('game', { ordered: true }));
+  rtcFast(P, P.pc.createDataChannel('fast', { ordered: false, maxRetransmits: 0 }));
   await P.pc.setLocalDescription(await P.pc.createOffer());
   const offer = () =>
     !P.answered &&
@@ -396,6 +416,7 @@ async function rtcConnect(id) {
   const P = rtcPeer(id);
   P.cid = 'c' + Math.random().toString(36).slice(2, 10);
   rtcChannel(P, P.pc.createDataChannel('game', { ordered: true }));
+  rtcFast(P, P.pc.createDataChannel('fast', { ordered: false, maxRetransmits: 0 }));
   await P.pc.setLocalDescription(await P.pc.createOffer());
   const offer = () =>
     !P.answered && RTC.peers[id] === P && sigSend(id, 'OFFER', { sdp: P.pc.localDescription, cid: P.cid });

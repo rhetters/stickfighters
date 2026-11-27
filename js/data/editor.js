@@ -1,7 +1,9 @@
 // StickFighters: the level creator's limits and choices (plain data; VISION.md rule R3). Rhett's levels are data
 // too (editor.js checks every one when it's loaded and never runs anything from it).
-// A level: { id, name, places: [place], boss? }
-// A place (one of the 15 biomes in data/themes.js; a transition picked at random carries you to the next one):
+// A level: { id, name, places: [place], boss?, map? }
+// map: 1 = a Versus / Arcade map (a stage of your own): one place, one part exactly a screen wide (ED_COLS squares),
+//   platforms and scenery only (no enemies, fight flag or boss). It's picked under MY LEVELS on the stage rows.
+// A place (one of the 18 biomes in data/themes.js; a transition picked at random carries you to the next one):
 //   b      the biome's id
 //   parts  [part], played left to right
 // A part (one stretch of a place):
@@ -13,7 +15,7 @@
 //   at     the fight flag: where the fight stops the screen (only with foes)
 // boss: { t (one of ED_BOSSES), x } in the level's very last part (the last part of its last place); its fight is
 //   that part's fight
-const ED_LIM = { levels: 12, places: 3, parts: 6, cols: [15, 40], plats: 12, foes: 10, props: 16, name: 16 };
+const ED_LIM = { levels: 12, maps: 12, places: 3, parts: 6, cols: [15, 40], plats: 12, foes: 10, props: 16, name: 16 };
 const ED_CELL = 60; // a grid square, in pixels
 const ED_ROWS = 5; // platforms go 1 to 5 squares above the ground
 // The pink army types you can place (and each place's own mini-boss, BIOMES[b].mini.t)
