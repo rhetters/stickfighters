@@ -834,13 +834,15 @@ function hud() {
     ctx.font = `italic 900 ${sz}px Impact,"Arial Black",sans-serif`;
     ctx.strokeStyle = INK;
     ctx.lineWidth = 6;
-    ctx.strokeText(combo + ' HITS', W - 16, 102);
+    // under Arcade's wave count; its timer bar sits just below the words
+    const cy = 122;
+    ctx.strokeText(combo + ' HITS', W - 16, cy);
     ctx.fillStyle = '#ff7a00';
-    ctx.fillText(combo + ' HITS', W - 16, 102);
+    ctx.fillText(combo + ' HITS', W - 16, cy);
     ctx.fillStyle = INK;
-    ctx.fillRect(W - 16 - 100, 96, 100, 5);
+    ctx.fillRect(W - 16 - 100, cy + 7, 100, 5);
     ctx.fillStyle = '#ff4fa3';
-    ctx.fillRect(W - 16 - (100 * comboT) / 100, 96, (100 * comboT) / 100, 5);
+    ctx.fillRect(W - 16 - (100 * comboT) / 100, cy + 7, (100 * comboT) / 100, 5);
   }
   if (banner && banner.t > 0) {
     banner.t--;

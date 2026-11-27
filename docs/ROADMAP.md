@@ -33,6 +33,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M21 | Ron's stage notes | Next | M | M20 | Smoother online play, your own Versus and Arcade maps, Solo Arcade picks a stage, stage fixes (Moon low gravity) |
 | M22 | Ron's notes on version 79 | Next | M | M21 | Versus ends on the victory screen, one item per style (colours do the rest), the chest on the Customize page, City and Pink Kong fixes |
 | M23 | House tools | Next | S | M18 | TOOLS in the house builder: rotate, flip and erase |
+| M24 | Ron's notes on version 81 | Next | S | M23 | Combo counter fix, new City music, MOVE and DUPLICATE in the house builder |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
@@ -120,6 +121,12 @@ Ron's ask (November 27): a TOOLS tab in the house builder where ERASE was, with 
 face the other way) and erase.
 
 Built (version 81, see the CHANGELOG). Still to do: the kids try it on the iPad.
+
+### M24 · Ron's notes on version 81
+Ron's notes (November 27): the combo counter's bar running through its number; City music more unique, in the spirit
+of a quirky 90s adventure game's hometown theme, for each part; MOVE and DUPLICATE tools in the house builder.
+
+Built (version 82, see the CHANGELOG). Still to do: hear the City songs on the iPad and say what to change.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 

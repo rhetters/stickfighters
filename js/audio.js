@@ -239,11 +239,12 @@ function musPlay(id, fin, then) {
 }
 // How one song hands over to the next: a jingle first (sting), how long the old one fades (out) and how quickly the
 // new one comes in (fin). Never a silent gap: songs cross-fade, or a jingle leads straight into the next song.
-const IN_GAME = id => !!id && (!!BIOMES[id] || id === 'boss' || id === 'arcade' || id === 'training'),
+const isBoss = id => id === 'boss' || /^boss-/.test(id || ''),
+  IN_GAME = id => !!id && (!!BIOMES[id] || isBoss(id) || id === 'arcade' || id === 'training'),
   CALM = id => id === 'menu' || id === 'dressup' || id === 'house'; // the menus, the Character screen, the house
 function musTrans(from, to) {
-  if (to === 'boss') return { sting: 'bossin', out: 0.4 };
-  if (from === 'boss' && IN_GAME(to)) {
+  if (isBoss(to)) return { sting: 'bossin', out: 0.4 };
+  if (isBoss(from) && IN_GAME(to)) {
     const won = MODE === LEVEL && LV && LV.encs.some(e => e.boss && e.st === 2); // not when you were knocked out
     return won ? { sting: 'bosswin', out: 0.4 } : { out: 1, fin: 0.5 };
   }
@@ -291,7 +292,10 @@ function musWant() {
     if (MODE.id === 'level' && LV) {
       const ae = LV.encs.find(e => e.st === 1),
         cn = LV.cine;
-      if ((ae && ae.boss) || (LV.esc && !LV.fin)) return ['boss', 2];
+      if ((ae && ae.boss) || (LV.esc && !LV.fin)) {
+        const own = LV.run && 'boss-' + LV.run.theme; // a story's own boss song, if it has one
+        return [own && MUSIC[own] ? own : 'boss', 2];
+      }
       // a scene that takes you to the next place (catapult, pipe…) plays its own jingle, then the next place's song
       if (cn && cn.tr && MUSIC['tr-' + cn.k]) return ['tr-' + cn.k, 0, cn.tr.to];
       // the song of the biome you're in (the Wooded Trail outside a story)

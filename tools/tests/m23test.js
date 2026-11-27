@@ -13,9 +13,10 @@ ok(await ev("HOUSE.items.length===3&&HOUSE.items.every(i=>!i.r&&!i.f)"),'a versi
 await ev("titleOpenAll();openHouse()");await p.waitForTimeout(150);
 ok(await ev("[...$('hs-tabs').children].map(b=>b.textContent).join()==='WALLS,BARRIERS,FURNITURE,DECORATIONS,BACKGROUND,TOOLS'"),'the last tab is TOOLS (where ERASE was)');
 await ev("$('hs-tabs').children[5].click()");await p.waitForTimeout(100);
-ok(await ev("[...$('hs-pal').children].map(b=>b.querySelector('b').textContent).join()==='ROTATE,FLIP,ERASE'"),'TOOLS: ROTATE, FLIP and ERASE');
+ok(await ev("['ROTATE','FLIP','ERASE'].every(t=>[...$('hs-pal').children].some(b=>b.querySelector('b').textContent===t))"),'TOOLS: ROTATE, FLIP and ERASE');
+const tool=t=>`[...$('hs-pal').children].find(b=>b.querySelector('b').textContent==='${t}').click()`;
 // rotate the couch (3 x 1): it stands on end (1 x 3), and four turns bring it back
-await ev("$('hs-pal').children[0].click()");
+await ev(tool('ROTATE'));
 const v=c0=>`[...document.querySelectorAll('.hcell')].find(b=>b.dataset.v==='${c0},0')`;
 await p.evaluate(`${v(12)}.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:${v(12)}.getBoundingClientRect().x+5,clientY:${v(12)}.getBoundingClientRect().y+5}))`);
 ok(await ev("(()=>{const it=HOUSE.items.find(i=>i.id==='hf-couch');const [w,h]=houseFoot(it,ITEM[it.id]);return it.r===1&&w===1&&h===3})()"),'ROTATE turns the couch a quarter turn: one square wide, three high');
@@ -23,13 +24,13 @@ ok(await ev("houseItemAt(12,2)>=0&&houseItemAt(13,0)<0"),'it covers its new squa
 await ev("for(let i=0;i<3;i++)houseAct(12,0)");
 ok(await ev("!('r' in HOUSE.items.find(i=>i.id==='hf-couch'))"),'four turns bring it back');
 // flip the bed: lie down with the head on the right
-await ev("$('hs-pal').children[1].click();houseAct(6,0)");
+await ev(tool('FLIP')+";houseAct(6,0)");
 ok(await ev("HOUSE.items.find(i=>i.id==='hf-bed').f===1"),'FLIP mirrors the bed');
 await ev("houseAct(6,0);houseAct(6,0)");
 ok(await ev("HOUSE.items.find(i=>i.id==='hf-bed').f===1"),'flipping twice puts it back, a third time mirrors it again');
 ok(await ev("(()=>{const s0=ECO.stars;houseAct(18,4);return ECO.stars===s0})()"),'tapping an empty square does nothing (no stars)');
 // erase still works and refunds
-await ev("$('hs-pal').children[2].click()");
+await ev(tool('ERASE'));
 ok(await ev("(()=>{const s0=ECO.stars;houseAct(2,0);return !HOUSE.items.some(i=>i.id==='hf-chair')&&ECO.stars===s0+(ITEM['hf-chair'].price||0)})()"),'ERASE removes a thing and gives its stars back');
 // saved and shared
 ok(await ev("(()=>{save();const s=JSON.parse(localStorage.getItem('orangeArmy.v1'));return s.saveVersion===SAVE_VERSION&&SAVE_VERSION>=22&&s.house.items.find(i=>i.id==='hf-bed').f===1&&normHouse({items:[{id:'hf-bed',x:1,y:0,r:7,f:'x'}]},true).items[0].r===undefined})()"),'turned and flipped things are saved; a visitor\'s house is checked (bad turns dropped)');
