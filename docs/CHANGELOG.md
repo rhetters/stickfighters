@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Quicksand without the yellow flash (November 28, 2026)
+- An enemy swallowed by quicksand or falling into a gap no longer fills the screen with a giant yellow burst (and no longer shows "9999"): it is knocked out by a hit of exactly its health left.
+- Version 89.
+
 ## The Desert (November 27, 2026)
 - **A seventh story, Desert:** the Sand Dunes, the Oasis and inside the Pyramid, with its own story picture and a song for each place (on the "desert" scale, with hand drums and a reedy flute), plus a boss song.
 - **Quicksand** in the Sand Dunes and at the Oasis: stand in it and you sink, slowly; tap Jump to climb out. Sink all the way and you lose a heart and pop out at the edge (it never knocks you out). Knock the pink army into it and it swallows them (mini-bosses get spat back out, hurt).

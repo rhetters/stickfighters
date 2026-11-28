@@ -45,6 +45,9 @@ function desertLayout(B, es, dz, R) {
   }
 }
 // ===== WHERE THINGS ARE =====
+// The hit that knocks out an enemy swallowed or fallen: exactly its health left (hit sparks and the number grow with
+// the damage)
+const finish = f => Math.max(1, Math.ceil(f.hp));
 const deskOn = () => MODE === LEVEL && LV && LV.dz;
 const pitAt = x => LV.dz.pits.some(p => x > p.x0 && x < p.x1);
 const qsAt = x => LV.dz.qs.find(q => x > q.x0 && x < q.x1);
@@ -83,7 +86,7 @@ function desertTick() {
       // fell into a gap
       if (f.y > G + PIT_FALL) {
         if (f.pl) pitBack(f);
-        else if (!f.dying && !f.corpse) natHit(f, 9999, 0, 1); // knocked into a gap: out (it counts as a KO)
+        else if (!f.dying && !f.corpse) natHit(f, finish(f), 0, 1); // knocked into a gap: out (it counts as a KO)
         else if (f.y > G + 900) f.gone = 1;
         continue;
       }
@@ -140,7 +143,7 @@ function quickIn(f, q) {
       natHit(f, Math.round(f.max / 3), -14, f.x < (q.x0 + q.x1) / 2 ? -1 : 1);
       f.x = f.x - q.x0 < q.x1 - f.x ? q.x0 - 40 : q.x1 + 40;
     } else {
-      natHit(f, 9999, 0, 1);
+      natHit(f, finish(f), 0, 1);
       f.sink = QS_DEEP * 0.6;
       txt(f.x, f.y - 90, 'GULP!', '#c98a2e', 22);
     }

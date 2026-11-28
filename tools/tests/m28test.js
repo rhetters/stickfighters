@@ -32,6 +32,8 @@ ok(R.grab&&R.on&&R.by===0&&R.held>150,'holding Punch, a jump grabs the rope and 
 ok(R.amax>0.8,'Right swings the rope higher and higher');
 ok(R.x>R.x1&&R.y===await ev('G')&&R.hp===R.max&&R.free,'letting go of Punch flies you over the gap, with the swing\'s speed');
 // a fall: a heart lost, back on the last ledge
+const PF=await ev(`(()=>{${put}const pt=LV.dz.pits[0];put(pt.x0-300);E.length=0;FX.length=0;spawn({t:'g',x:pt.x0+200});const e=E[0];e.x=(pt.x0+pt.x1)/2;e.y=G-20;e.st='fly';let big=0;for(let i=0;i<80;i++){fr++;update();big=Math.max(big,...FX.filter(o=>o.k==='s').map(o=>o.r),0)}return {ko:!!(e.dying||e.gone),big}})()`);
+ok(PF.ko&&PF.big<100,'an enemy that falls into a gap is knocked out, with a normal-sized burst '+JSON.stringify(PF));
 const F=await ev(`(()=>{${put}const pt=LV.dz.pits[0],P=put(pt.x0-40);setA('kb','r',1);let fell=0;for(let i=0;i<25;i++){fr++;update()}setA('kb','r',0);for(let i=0;i<90;i++){fr++;update();if(P.y>G+50)fell=1}
  return {fell,hp:P.hp,max:P.max,x:Math.round(P.x),x0:pt.x0,y:P.y}})()`);
 ok(F.fell&&F.hp===F.max-F.max/5&&F.x<=F.x0&&F.x>F.x0-60&&F.y<=await ev('G'),'falling into a gap costs a heart and pops you back on the last ledge '+JSON.stringify(F));
@@ -48,7 +50,8 @@ ok(Q.s2<Q.s1,'tapping Jump climbs out');
 ok(Q.popped&&Q.hp===Q.max-Q.max/5&&Q.out,'sinking all the way costs a heart and pops you out at the edge');
 // an enemy knocked into quicksand is swallowed; the Pharaoh isn't
 const S=await ev(`(()=>{${put}startRun('desert');cineEnd();for(const t of LV.trans)t.done=1;for(const g of LV.gates)g.hp=0;for(const e of LV.encs)e.st=2;E.length=0;const q=LV.dz.qs[LV.dz.qs.length-1],P=put(q.x0-300);spawn({t:'g',x:(q.x0+q.x1)/2});spawn({t:'H',x:(q.x0+q.x1)/2+20});const e=E[0],h=E[1];for(const f of E){f.y=G;f.x=(q.x0+q.x1)/2}
- hurtE(e,{dmg:1,kb:1,lift:-4,ef:'launch'},1,null,P);let gone=0;for(let i=0;i<240;i++){fr++;update();h.x=(q.x0+q.x1)/2;if(e.dying)gone=1}return {gone,boss:h.hp>0&&!(h.sink>0)}})()`);
+ hurtE(e,{dmg:1,kb:1,lift:-4,ef:'launch'},1,null,P);let gone=0,big=0;for(let i=0;i<240;i++){fr++;update();h.x=(q.x0+q.x1)/2;if(e.dying)gone=1;big=Math.max(big,...FX.filter(o=>o.k==='s').map(o=>o.r),0)}return {gone,big,boss:h.hp>0&&!(h.sink>0)}})()`);
+ok(S.big<100,'being swallowed knocks it out with a normal-sized burst, not one that fills the screen');
 ok(S.gone&&S.boss,'a pink fighter knocked into quicksand is swallowed; the Pharaoh doesn\'t sink '+JSON.stringify(S));
 // the Pharaoh's scarabs: they chase you, sting, and a Surge run scatters them
 const W2=await ev(`(()=>{${put}for(const t of LV.trans)t.done=1;for(const g of LV.gates)g.hp=0;for(const e of LV.encs)e.st=2;E.length=0;const s=LV.segs[2],P=put(s.x0+2700);spawn({t:'H',x:P.x+400});const h=E[0];h.y=G;h.st='free';h.face=-1;h.x=P.x+400;h.tgx=P.x;
