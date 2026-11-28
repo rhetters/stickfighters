@@ -501,6 +501,45 @@ function edTabs() {
   }
 }
 // A piece to pick: a little canvas picture and a name
+// An enemy or boss standing in its card's picture (52 x 42), scaled to fit whole: its outline is measured once by
+// drawing it big on a spare canvas (heads, hats, hair and weapons all count)
+const ED_FIG_BOX = {};
+function edFigBox(t) {
+  if (ED_FIG_BOX[t]) return ED_FIG_BOX[t];
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 400;
+  withCtx(cv.getContext('2d'), () => edFigDraw(t, 200, 300, 1));
+  const d = cv.getContext('2d').getImageData(0, 0, 400, 400).data;
+  let x0 = 400,
+    y0 = 400,
+    x1 = 0,
+    y1 = 0;
+  for (let y = 0; y < 400; y++)
+    for (let x = 0; x < 400; x++)
+      if (d[(y * 400 + x) * 4 + 3] > 20) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+  // nothing drawn: a sensible guess
+  return (ED_FIG_BOX[t] = x1 < x0 ? { x0: 170, y0: 220, x1: 230, y1: 300 } : { x0, y0, x1: x1 + 1, y1: y1 + 1 });
+}
+function edFigDraw(t, x, y, s) {
+  const e = edFoeFig(t);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(s, s);
+  Object.assign(e, { x: 0, y: 0, gy: 0, face: 1, st: 'free', flash: 0, hp: e.max, pmax: 0 });
+  drawF(e);
+  ctx.restore();
+}
+function edFigPic(t) {
+  const b = edFigBox(t),
+    s = Math.min(1, 38 / (b.y1 - b.y0), 46 / (b.x1 - b.x0));
+  // its feet's spot (200, 300 on the spare canvas) placed so the outline is centred in the picture
+  edFigDraw(t, 26 - ((b.x0 + b.x1) / 2 - 200) * s, 41 - (b.y1 - 300) * s, s);
+}
 function edPiece(box, on, label, draw, pick, sub) {
   const b = document.createElement('button');
   b.className = 'chitem own' + (on ? ' on' : '');
@@ -549,16 +588,7 @@ function edPal() {
         box,
         EDS.foe === t,
         TNAME[t],
-        () => {
-          const e = edFoeFig(t),
-            s = Math.min(1, 0.62 / (T[t].s || 1));
-          ctx.save();
-          ctx.translate(26, 40);
-          ctx.scale(s, s);
-          Object.assign(e, { x: 0, y: 0, gy: 0, face: 1, st: 'free', flash: 0, hp: e.max, pmax: 0 });
-          drawF(e);
-          ctx.restore();
-        },
+        () => edFigPic(t),
         () => {
           EDS.foe = t;
           edPal();
@@ -608,16 +638,7 @@ function edPal() {
         box,
         !!L.boss && L.boss.t === t,
         TNAME[t],
-        () => {
-          const e = edFoeFig(t),
-            s = Math.min(1, 0.62 / (T[t].s || 1));
-          ctx.save();
-          ctx.translate(26, 40);
-          ctx.scale(s, s);
-          Object.assign(e, { x: 0, y: 0, gy: 0, face: 1, st: 'free', flash: 0, hp: e.max, pmax: 0 });
-          drawF(e);
-          ctx.restore();
-        },
+        () => edFigPic(t),
         () => {
           EDS.boss = t;
           // a boss already in the level changes to this one

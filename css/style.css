@@ -3506,19 +3506,22 @@ body.big .screen p {
 }
 #ed-pal .chitem canvas {
   width: auto;
-  height: min(38px, calc(100cqh - 22px)); /* the picture shrinks to fit a short floor (a phone) */
+  height: min(38px, calc(100cqh - 30px)); /* the picture shrinks to fit a short floor (a phone) */
   aspect-ratio: 48 / 38;
 }
 #ed-pal .chitem b {
+  /* up to two short lines (The Pink / General), never cut off */
   font-size: 9px;
-  line-height: 1.1;
+  line-height: 1.05;
   max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 #ed-pal .chitem small {
   font-size: 8px;
+}
+/* a card with a second line (MINI-BOSS, PICKED) has a slightly smaller picture, so it's no taller than the rest */
+#ed-pal .chitem:has(small) canvas {
+  height: min(31px, calc(100cqh - 38px));
 }
 @media (max-height: 500px) {
   /* a phone: no room for the MINI-BOSS line (the picture's crown says so) */

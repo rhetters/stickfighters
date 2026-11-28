@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## Whole figures in the level creator's cards (November 27, 2026)
+- Every enemy and boss now fits whole in its card's picture (heads, hats and weapons were cut off at the top): each figure is measured once and scaled to fit.
+- Boss names show in full on two short lines (The Pink / General) instead of being cut short, and the picked boss's card is no taller than the rest, so the BOSS row has no scroll bar either.
+- Version 86.
+
 ## No scroll bar in the level creator, framed stage pictures (November 27, 2026)
 - The level creator's bottom row (enemies, scenery, PARTS…) no longer shows a scroll bar: it's one row that fits, and on a phone the pictures shrink to fit (a long row still slides sideways with a finger).
 - The stage and arena pictures (Solo Arcade's cards and the rooms' stage row) now sit inside the same rounded, black-outlined frame as the other tiles, instead of a plain rectangle on top of it.
