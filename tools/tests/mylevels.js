@@ -15,7 +15,7 @@ const cards=()=>S.evaluate(()=>[...$('th-cards').querySelectorAll('.thcard')].ma
 ok(await cards()==='CASTLE SIEGE,PIRATE COVE,MOUNTAIN,SPACE,VOLCANO,RANDOM,MY STORIES'&&await S.evaluate(()=>$('th-nostar').hidden),'Solo Story screen: the stories, ?, and MY LEVELS (no sticker yet) '+await cards());
 await S.evaluate(()=>[...$('th-cards').children].find(c=>/MY STORIES/.test(c.textContent)).click());await S.waitForTimeout(200);
 ok(await cards()==='ROPE RUN,ICE DASH,RANDOM,STORIES'&&await S.evaluate(()=>!$('th-nostar').hidden&&/NO XP OR\s*NINJA STARS/.test($('th-nostar').textContent)),'MY LEVELS swaps the stories for your levels, with the red NO XP OR NINJA STARS sticker');
-ok(await S.evaluate(()=>/^url\("?data:image\/png/.test($('th-cards').querySelector('.thcard').querySelector('.thpic').style.backgroundImage)),'each level shows its own picture');
+ok(await S.evaluate(()=>/^\s*url\("?data:image\/png/.test($('th-cards').querySelector('.thcard').querySelector('.thpic').style.getPropertyValue('--ic'))),'each level shows its own picture (inside the tile frame)');
 await S.evaluate(()=>$('th-cards').querySelector('.thmy').click());await S.waitForTimeout(100);
 ok(await cards()==='CASTLE SIEGE,PIRATE COVE,MOUNTAIN,SPACE,VOLCANO,RANDOM,MY STORIES'&&await S.evaluate(()=>$('th-nostar').hidden),'STORIES goes back');
 await S.evaluate(()=>{[...$('th-cards').children].find(c=>/MY STORIES/.test(c.textContent)).click();$('th-cards').querySelectorAll('.thcard')[1].click()});await S.waitForTimeout(400);
