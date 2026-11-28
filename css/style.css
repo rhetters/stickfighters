@@ -2121,7 +2121,7 @@ body.padnav .thcard:focus small {
   right: -12px;
   transform: rotate(8deg);
   padding: 3px 8px;
-  border: 2.5px solid var(--ink, #1c1626);
+  border: 2.5px solid #1c1626;
   border-radius: 6px;
   background: #ffc83a;
   color: #1c1626;
@@ -3392,7 +3392,13 @@ body.big .screen p {
     sans-serif;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--ink, #1c1626);
+  color: #1c1626; /* always dark: the box is always light (var(--ink) turns light in dark mode) */
+  -webkit-text-fill-color: #1c1626;
+  caret-color: #ff7a00;
+}
+.edname input::placeholder {
+  color: #9a90a6;
+  -webkit-text-fill-color: #9a90a6;
 }
 .edname input:focus {
   outline: none;

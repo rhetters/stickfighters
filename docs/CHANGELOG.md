@@ -2,6 +2,10 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## The story's name readable in dark mode (November 27, 2026)
+- On a computer set to dark mode, the name at the top of the level creator (stories and arenas) was light grey on its light box; it's always dark ink now.
+- Version 87.
+
 ## Whole figures in the level creator's cards (November 27, 2026)
 - Every enemy and boss now fits whole in its card's picture (heads, hats and weapons were cut off at the top): each figure is measured once and scaled to fit.
 - Boss names show in full on two short lines (The Pink / General) instead of being cut short, and the picked boss's card is no taller than the rest, so the BOSS row has no scroll bar either.
