@@ -259,7 +259,20 @@ function stageThumbURL(id) {
     Object.assign(STG, { st: keep.st, s: keep.s });
     Object.assign(CAM, { x: keep.cx, y: keep.cy, z: keep.cz });
   }
-  return (STAGE_THUMB[id] = cv.toDataURL());
+  // into a tile: the same square inside the tile's rounded, outlined frame as a level's picture (edThumbURL), with
+  // the stage along the bottom and its own sky above
+  const sq = document.createElement('canvas');
+  sq.width = sq.height = 200;
+  const q = sq.getContext('2d'),
+    sky = k.getImageData(2, 2, 1, 1).data,
+    h = (166 * cv.height) / cv.width;
+  q.beginPath();
+  q.roundRect(17, 17, 166, 166, 16);
+  q.clip();
+  q.fillStyle = 'rgb(' + sky[0] + ',' + sky[1] + ',' + sky[2] + ')';
+  q.fillRect(17, 17, 166, 166);
+  q.drawImage(cv, 17, 183 - h, 166, h);
+  return (STAGE_THUMB[id] = sq.toDataURL());
 }
 // ===== STORIES AND MY LEVELS, FIVE AT A TIME =====
 // The Story screen, the Players screen and the online room show five stories (or, under MY LEVELS, five of the host's

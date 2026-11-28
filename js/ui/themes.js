@@ -29,7 +29,7 @@ function stageCards(box, card, focus) {
   const maps = edMaps(),
     st = THS.mine ? THS.spages.mine : THS.spages.story,
     pg = pageOf(st, THS.mine ? maps.map(L => 'my:' + L.id) : STAGES.map(s => s.id), null),
-    pic = (b, url) => (b.querySelector('.thpic').style.backgroundImage = 'url(' + url + ')');
+    pic = (b, url) => b.querySelector('.thpic').style.setProperty('--ic', 'url(' + url + ')'); // inside the tile's frame (.th-mine)
   const ar = document.createElement('div');
   ar.className = 'pgarrows';
   ar.innerHTML = '<button class="pgup" aria-label="Back a page">&#9650;</button><button class="pgdn" aria-label="Next page">&#9660;</button>';
@@ -114,7 +114,7 @@ function themeCards(focus) {
       const L = edLevels().find(q => q.id === id),
         b = card(L.name, '<span class="thpic th-mine"></span><b></b><small></small>', () => themeBurst(b, () => startCustom(L, 'menu')));
       b.querySelector('b').textContent = L.name;
-      b.querySelector('.thpic').style.backgroundImage = 'url(' + edThumbURL(L) + ')';
+      b.querySelector('.thpic').style.setProperty('--ic', 'url(' + edThumbURL(L) + ')');
     }
     if (!edLevels().length)
       card('No stories yet: make one in Customize, then My Stories', '<span class="thpic th-levels"></span><b>NONE YET</b><small>MAKE ONE IN CUSTOMIZE</small>', () => 0);
