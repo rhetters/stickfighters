@@ -63,4 +63,4 @@ ok(D.pyramid,'the Desert draws: dunes, the oasis, the Pyramid with its torches, 
 const lum=await ev(`(()=>{${put}E.length=0;const s=LV.segs.find(q=>q.b==='pyramid');put(s.x0+1500);for(let i=0;i<5;i++){fr++;update()}render();const cv=ctx.canvas,d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;let t=0,n=0;for(let i=0;i<d.length;i+=4*97){t+=(d[i]+d[i+1]+d[i+2])/3;n++}return Math.round(t/n)})()`);
 ok(lum>70,'inside the Pyramid it\'s dark, but never too dark to see (brightness '+lum+')');
 ok(errs.length===0,'no errors '+JSON.stringify(errs.slice(0,3)));
-await b.close();if(fails){console.log(fails+' FAILED');process.exit(1)}console.log('all ok')})();
+await b.close();if(fails){console.log(fails+' FAILED');process.exit(1)}console.log('ALL PASS')})();
