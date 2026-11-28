@@ -404,7 +404,7 @@ const BIOMES = {
     ],
     mini: { t: 'my', chance: 0.05, lines: ['NO CLIMBING THE BUILDING!', 'GOING DOWN?', 'THE VIEW IS MINE!'] }
   },
-  // ===== THE DESERT (desert.js draws it and runs the quicksand, the ropes and the dark) =====
+  // ===== THE DESERT (desert.js draws it and runs the quicksand, the ropes and the dark). Mummies (w) only in the Pyramid =====
   sand: {
     name: 'SAND DUNES',
     look: 'sand',
@@ -420,9 +420,9 @@ const BIOMES = {
     w: [1050, 1300],
     fights: 5,
     mix: [
-      { at: 1, w: { g: 6, r: 2, w: 1 } },
-      { at: 2, w: { g: 5, r: 3, w: 2, f: 1 } },
-      { at: 3, w: { g: 4, r: 2, w: 2, u: 1, f: 2, b: 1 } }
+      { at: 1, w: { g: 6, r: 2 } },
+      { at: 2, w: { g: 5, r: 3, u: 1, f: 1 } },
+      { at: 3, w: { g: 4, r: 2, u: 2, f: 2, b: 1 } }
     ],
     mini: { t: 'md', chance: 0.04, lines: ['SAND IN YOUR EYES!', 'THE DUNES ARE MINE!', 'HOT HOT HOT... HEADED YOUR WAY!'] }
   },
@@ -441,8 +441,8 @@ const BIOMES = {
     w: [1050, 1300],
     fights: 5,
     mix: [
-      { at: 3, w: { g: 4, r: 2, w: 3, f: 2, b: 1 } },
-      { at: 4, w: { g: 3, r: 2, w: 3, f: 2, b: 2, u: 1 } }
+      { at: 3, w: { g: 4, r: 3, u: 1, f: 2, b: 1 } },
+      { at: 4, w: { g: 3, r: 3, f: 2, b: 2, u: 2 } }
     ],
     mini: { t: 'mo', chance: 0.04, lines: ['NO SWIMMING IN MY OASIS!', 'THIRSTY? FOR DEFEAT?', 'THIS WATER IS PINK NOW!'] }
   },

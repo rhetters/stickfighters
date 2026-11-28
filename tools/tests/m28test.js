@@ -18,6 +18,8 @@ const L=await ev(`(()=>{SET.seed='3';startRun('desert');cineEnd();for(const t of
  return {pits:D.pits.length,ropes:D.ropes.length,pitsIn:D.pits.every(q=>inS(q.x0,'pyramid')),pitsFree:D.pits.every(q=>!arenas.some(a=>q.x1>a[0]&&q.x0<a[1])),
   qsSand:D.qs.some(q=>inS(q.x0,'sand')),qsOasis:D.qs.some(q=>inS(q.x0,'oasis')),qsNotPyr:!D.qs.some(q=>inS(q.x0,'pyramid')),gaps,dmax:DARK_MAX}})()`);
 ok(L.pits>=2&&L.ropes===L.pits&&L.pitsIn&&L.pitsFree,'gaps in the Pyramid\'s floor between its fights, each with a rope '+JSON.stringify(L));
+const MU=await ev(`(()=>{const out={sand:0,oasis:0,pyramid:0};for(const sd of ['1','2','3','4','5','6']){const lv=genRun('desert',sd,0);for(const e of lv.encs){if(!e.list||e.boss)continue;const s=lv.segs.find(q=>e.x>=q.x0&&e.x<q.x1);if(s)out[s.b]+=e.list.filter(t=>t==='w').length}}return out})()`);
+ok(MU.sand===0&&MU.oasis===0&&MU.pyramid>0,'mummies only inside the Pyramid '+JSON.stringify(MU));
 ok(L.qsSand&&L.qsOasis&&L.qsNotPyr,'quicksand in the Sand Dunes and at the Oasis');
 ok(L.gaps&&L.dmax<=0.7,'a wall torch at least every '+320+' across the Pyramid, and the dark never goes past '+L.dmax);
 // put player 1 at x (with the camera there and a frame for the walls to follow)
@@ -54,6 +56,18 @@ const S=await ev(`(()=>{${put}startRun('desert');cineEnd();for(const t of LV.tra
 ok(S.big<100,'being swallowed knocks it out with a normal-sized burst, not one that fills the screen');
 ok(S.gone&&S.boss,'a pink fighter knocked into quicksand is swallowed; the Pharaoh doesn\'t sink '+JSON.stringify(S));
 // the Pharaoh's scarabs: they chase you, sting, and a Surge run scatters them
+// a party: one rope over each gap for each player, side by side, so two can swing at once
+const M=await ev(`(()=>{${put}E.length=0;const one=LV.dz.ropes.length===LV.dz.pits.length;const q=mkPlayer(0,1,'#2fb5ff','#1d86c4');PL.push(q);
+ const pt=LV.dz.pits[1],P=put(pt.x0-60);fr++;update();const D=LV.dz,mine=D.ropes.filter(r=>r.p===1);
+ q.x=pt.x0-35;q.y=G;q.vx=q.vy=0;q.st='free';q.hp=q.max;
+ for(const s of [0,1])setA('kb','r',1,s);for(let i=0;i<14;i++){fr++;update()}for(const s of [0,1])setA('kb','j',1,s);fr++;update();for(const s of [0,1]){setA('kb','j',0,s);setA('kb','p',1,s)}
+ let both=0,M1=0,M2=0;for(let i=0;i<80;i++){fr++;update();if(P.rope&&q.rope&&P.rope.i!==q.rope.i)both=1;if(P.rope)M1=1;if(q.rope)M2=1}
+ for(const s of [0,1]){setA('kb','p',0,s);setA('kb','r',0,s)}for(let i=0;i<120;i++){fr++;update()}
+ const res={M1,M2,qx:Math.round(q.x),px:Math.round(P.x),one,per:mine.length,total:D.ropes.length,pits:D.pits.length,both,xs:mine.map(r=>r.x),free:D.ropes.every(r=>r.by<0)};PL.splice(1);return res})()`);
+ok(M.one,'one player: one rope over each gap');
+ok(M.per===2&&M.total===2*M.pits&&M.xs[1]-M.xs[0]>30,'two players: two ropes side by side over each gap '+JSON.stringify(M));
+ok(M.both,'both players grab their own rope and swing at the same time');
+ok(M.free,'let go, every rope is free again');
 const W2=await ev(`(()=>{${put}for(const t of LV.trans)t.done=1;for(const g of LV.gates)g.hp=0;for(const e of LV.encs)e.st=2;E.length=0;const s=LV.segs[2],P=put(s.x0+2700);spawn({t:'H',x:P.x+400});const h=E[0];h.y=G;h.st='free';h.face=-1;h.x=P.x+400;h.tgx=P.x;
  swarmSend(h);const n=swarmCount(),y0=LV.sw[0].x;let hit=0;for(let i=0;i<120;i++){h.st='free';h.cd=99;h.x=P.x+400;P.x=s.x0+2700;fr++;update();if(P.hp<P.max)hit=1}
  P.hp=P.max;P.st='free';P.inv=0;LV.sw=null;for(let i=0;i<30;i++){fr++;update()}swarmSend(h);const sw=LV.sw[LV.sw.length-1];sw.x=P.x+200;sw.y=P.y-45;setA('kb','r',1);setA('kb','s',1);let gone=0;for(let i=0;i<60&&!gone;i++){h.st='free';h.cd=99;fr++;update();gone=!LV.sw||!LV.sw.includes(sw)}
