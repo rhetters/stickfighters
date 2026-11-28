@@ -30,6 +30,7 @@ function drawBossParts(f, J, L, r, w, ph) {
   const X = new Set(L.extra),
     fc = J.face,
     mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  desertParts(X, J, r, w, ph); // the mummies' wrappings and the Pharaoh's clothes (desert.js)
   if (ph === 'back') {
     // Pinkbeard's long coat, behind the arms and legs
     if (X.has('piratecoat') && J.sh && J.hp) {
@@ -208,6 +209,7 @@ function skirt(J, r, w) {
 }
 // The bosses' head parts, in the head's own frame (x forward, y down, r = head radius)
 function bossHead(X, r, w) {
+  desertHead(X, r, w); // desert.js
   if (X.has('tikimask')) {
     // a tall carved wooden mask with a crown of leaves: angry brows, round eyes and a wide grin full of teeth
     for (let i = 0; i < 5; i++) {

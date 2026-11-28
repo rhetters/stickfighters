@@ -81,7 +81,8 @@ function genRun(themeId, seed, ng = 0) {
     trans = [],
     ramps = [],
     terr = { s: [], w: [], c: [] },
-    haz = { vents: [], pools: [] }; // the volcano's steam vents and lava pools (volcano.js)
+    haz = { vents: [], pools: [] }, // the volcano's steam vents and lava pools (volcano.js)
+    dz = { pits: [], qs: [], ropes: [] }; // the desert's gaps, ropes and quicksand (desert.js)
   let x = 0,
     shaft = null; // the Skyscraper's climb: where it is, its floors and roof
   // scenery for a chunk: a few props spread across it
@@ -174,7 +175,12 @@ function genRun(themeId, seed, ng = 0) {
       c.dusk = light(k + 1);
       c.flies = c.dusk > 0.6 ? 1 : 0;
       // on a climb, each fight's ledge is near the start of its chunk and the rest of the chunk goes uphill
-      const at = B.climb ? Math.round(560 + R() * 120) : Math.round(w * (0.45 + R() * 0.15)),
+      // (with gaps between the fights, each fight sits early in its chunk so there's room for a gap and its rope)
+      const at = B.climb
+          ? Math.round(560 + R() * 120)
+          : B.pits
+            ? Math.round(w * 0.4 + R() * 20)
+            : Math.round(w * (0.45 + R() * 0.15)),
         e = {
           x: c.x0 + at,
           lock: Math.max(0, c.x0 + at - W / 2),
@@ -207,6 +213,8 @@ function genRun(themeId, seed, ng = 0) {
       }
       encs.push(e);
     }
+    // quicksand, and gaps with ropes over them (desert.js)
+    if (B.quick || B.pits) desertLayout(B, encs.slice(-B.fights), dz, R);
     // pools of lava on the floor between the crater's fights (to jump over)
     if (B.ledges) {
       const es = encs.slice(-B.fights);
@@ -292,6 +300,10 @@ function genRun(themeId, seed, ng = 0) {
       ch[j].flies = ch[j].dusk > 0.6 ? 1 : 0;
     }
   });
+  // the dark places (inside the Pyramid) get a wall torch at a steady spacing, so it is never too dark to see
+  for (const c of ch)
+    if (BIOMES[th.biomes[c.biome]].dark)
+      for (let t = TORCH_GAP / 2; t < c.w; t += TORCH_GAP) c.props.push({ k: 'walltorch', x: Math.round(t), s: 1 });
   return {
     id: 'run:' + themeId,
     def: {
@@ -309,6 +321,7 @@ function genRun(themeId, seed, ng = 0) {
     terr: terr.s.length ? terr : null,
     shaft,
     haz: haz.vents.length || haz.pools.length ? haz : null,
+    dz: dz.pits.length || dz.qs.length ? dz : null,
     run: { theme: themeId, seed, ng },
     len: x,
     cp: -1,

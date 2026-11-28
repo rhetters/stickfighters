@@ -365,7 +365,7 @@ const LEVEL = {
   bg: () => drawLevelBg(),
   fg: () => drawLevelFg(),
   hud: levelHud,
-  world: () => (drawVolcanoFront(), drawCine(), drawSay()),
+  world: () => (drawVolcanoFront(), drawSwarms(), drawCine(), drawSay()),
   revive: 1,
   // each player's stats for the victory screen, kept on the run (so a continue keeps them)
   tally(p, k, n) {

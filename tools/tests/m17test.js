@@ -19,8 +19,8 @@ ok(await ev("[...$('s-cust').querySelectorAll('.ptile')].map(b=>b.id).join()==='
 await p.click('#b-levels');await W(300);
 ok(await ev("SHOWN==='s-levels'&&$('ed-list').children.length===2"),'MY LEVELS: NEW LEVEL, NEW MAP and no levels yet');
 await p.click('#ed-list .ptile');await W(800);
-ok(await ev("SHOWN==='s-edpick'&&$('ed-places').children.length===18"),'NEW LEVEL: pick one of the 18 places');
-await p.click('#ed-places .ptile:nth-child(7)');await W(400); // row 2, column 1: the Sewer Tunnels
+ok(await ev("SHOWN==='s-edpick'&&$('ed-places').children.length===21"),'NEW LEVEL: pick one of the 21 places');
+await p.click('#ed-places .ptile:nth-child(8)');await W(400); // row 2, column 1: the Sewer Tunnels
 ok(await ev("SHOWN==='s-edit'&&EDIT.levels.length===1&&EDIT.levels[0].places[0].b==='sewer'"),'a new level in the Sewer Tunnels, and the editor opens');
 // the editor: drag a platform along a row, enemies, scenery, the flag, erase
 const box=await ev("(()=>{const r=$('ed-cells').getBoundingClientRect();return [r.x,r.y,r.width,r.height]})()");
@@ -28,7 +28,7 @@ const cell=(c,r)=>[box[0]+(c+0.5)*box[2]/15,box[1]+(5-r+0.5)*box[3]/6];
 let q=cell(3,2);await p.mouse.move(...q);await p.mouse.down();for(let k=4;k<=7;k++){q=cell(k,2);await p.mouse.move(...q)}await p.mouse.up();
 ok(await ev("JSON.stringify(EDIT.levels[0].places[0].parts[0].plats)==='[{\"x1\":180,\"x2\":480,\"h\":2}]'"),'dragging along a row lays one platform');
 await p.click('#ed-tabs [data-k="foe"]');await W(50);
-ok(await ev("[...$('ed-pal').querySelectorAll('.chitem b')].map(b=>b.textContent).join()==='Grunt,Runner,Guard,Brute,Flanker,Captain,Sludge Brute'"),'ENEMIES: the six pink army types and the sewer\'s mini-boss');
+ok(await ev("[...$('ed-pal').querySelectorAll('.chitem b')].map(b=>b.textContent).join()==='Grunt,Runner,Guard,Brute,Flanker,Mummy,Captain,Sludge Brute'"),'ENEMIES: the seven pink army types and the sewer\'s mini-boss');
 await p.click('#ed-pal .chitem:nth-child(4)');q=cell(5,3);await p.mouse.click(...q);q=cell(12,0);await p.mouse.click(...q);
 ok(await ev("(()=>{const P=EDIT.levels[0].places[0].parts[0];return P.foes.length===2&&P.foes[0].t==='b'&&P.foes[0].x===330&&P.at===450&&edLand(P,330)===G-120&&edLand(P,750)===G})()"),'tap to drop in enemies (one lands on the platform), and the fight gets a flag');
 await p.click('#ed-tabs [data-k="flag"]');q=cell(9,0);await p.mouse.click(...q);
@@ -73,7 +73,7 @@ const btn=t=>ev(`[...$('ed-pal').children].find(b=>/${t}/.test(b.textContent)).c
 await btn('ADD A PLACE');await W(600);
 ok(await ev("SHOWN==='s-edpick'&&$('s-edpick').querySelector('h2').textContent==='ADD A PLACE'"),'ADD A PLACE picks a place');
 await ev("$('ed-pback').click()");await W(200);ok(await ev("SHOWN==='s-edit'&&EDIT.levels[0].places.length===1"),'BACK from it goes back to the editor');
-await btn('ADD A PLACE');await W(400);await p.click('#ed-places .ptile:nth-child(17)');await W(400); // row 3, column 5: the crater
+await btn('ADD A PLACE');await W(400);await p.click('#ed-places .ptile:nth-child(19)');await W(400); // row 3, column 5: the crater
 ok(await ev("SHOWN==='s-edit'&&EDIT.levels[0].places.map(q=>q.b).join()==='sewer,crater'&&EDS.pl===1&&EDS.part===0&&$('ed-part').textContent==='PLACE 2: THE CRATER · PART 1 OF 1'"),'a second place, and the editor goes to it: '+await ev("$('ed-part').textContent"));
 await p.click('#ed-tabs [data-k="parts"]');await W(50);
 await btn('ADD A PART');await btn('◀ PART');await btn('◀ PART');
@@ -85,7 +85,7 @@ await btn('DELETE THIS PLACE');await btn('TAP AGAIN');
 ok(await ev("EDIT.levels[0].places.map(q=>q.b).join()==='sewer,crater'"),'DELETE THIS PLACE (tap twice)');
 // the boss: only in the very last part
 await ev("edGoTo(0,0)");await p.click('#ed-tabs [data-k="boss"]');await W(50);
-ok(await ev("[...$('ed-pal').querySelectorAll('.chitem b')].map(b=>b.textContent).length===6&&[...$('ed-pal').children].some(b=>/GO TO THE LAST PART/.test(b.textContent))"),'BOSS: the six main bosses, and a way to the last part');
+ok(await ev("[...$('ed-pal').querySelectorAll('.chitem b')].map(b=>b.textContent).length===7&&[...$('ed-pal').children].some(b=>/GO TO THE LAST PART/.test(b.textContent))"),'BOSS: the seven main bosses, and a way to the last part');
 await p.click('#ed-pal .chitem:nth-child(3)');q=cell(7,0);await p.mouse.click(...q);
 ok(await ev("!EDIT.levels[0].boss&&/last part/.test($('ed-msg').textContent)"),'no boss outside the last part');
 await btn('GO TO THE LAST PART');await W(50);q=cell(7,0);await p.mouse.click(...q);

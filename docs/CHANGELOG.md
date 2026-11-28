@@ -2,6 +2,16 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## The Desert (November 27, 2026)
+- **A seventh story, Desert:** the Sand Dunes, the Oasis and inside the Pyramid, with its own story picture and a song for each place (on the "desert" scale, with hand drums and a reedy flute), plus a boss song.
+- **Quicksand** in the Sand Dunes and at the Oasis: stand in it and you sink, slowly; tap Jump to climb out. Sink all the way and you lose a heart and pop out at the edge (it never knocks you out). Knock the pink army into it and it swallows them (mini-bosses get spat back out, hurt).
+- **Gaps in the Pyramid's floor** with a rope over each: jump and **hold Punch** to grab the rope, Left / Right to swing higher, let go of Punch to fly off with the swing's speed. Fall in and you lose a heart and pop back on the ledge.
+- **The Pyramid is dark,** lit by wall torches (one every few steps, so it's never too dark) and a soft glow around each player.
+- **Mummies:** pink fighters wrapped in bandages that shuffle along and grab with both hands, and three new mini-bosses (Dune Bully, Oasis Ogre, Tomb Guardian).
+- **The Pink Pharaoh** at the end, in a striped headcloth with a crook: he sends swarms of scarabs that chase you and sting. Outrun them, or Surge run straight through a swarm to scatter it.
+- Mummies and the Pharaoh are in the level creator too.
+- Version 88.
+
 ## The story's name readable in dark mode (November 27, 2026)
 - On a computer set to dark mode, the name at the top of the level creator (stories and arenas) was light grey on its light box; it's always dark ink now.
 - Version 87.

@@ -8,6 +8,8 @@
 //            swept: down), 'kd' (knocked down), 'launch', 'splat' or 'bounce' (sent flying)
 //     drop   a thing thrown that falls on the target from above (Pink Kong's air conditioners: 'ac'), dropAt frames
 //            into the move; it lands where the target was, after a shadow warns (city.js)
+//     swarm  a swarm of scarab beetles flies out at the target, swarmAt frames into the move (the Pharaoh: 'scarab',
+//            desert.js); it chases one player for a while: dodge it, outrun it, or Surge-run through it to scatter it
 //     chain  1 = more of the same enemy's combo string comes after this hit: the player is only safe for a moment
 //            (STR_INV), so the next hit can land, up to the difficulty's str hits and strDmg damage (data/difficulty.js)
 //   Add a new engine flag only when no existing one can say it, and write it here.
@@ -161,6 +163,40 @@ const EA = {
       [1, IDLE]
     ]
   },
+  // a mummy's two-handed grab: it shuffles forward with both arms out and clamps them shut
+  mclaw: {
+    d: 46,
+    h: [26, 31],
+    dmg: 7,
+    r: 58,
+    kb: 6,
+    lv: 2.2,
+    k: [
+      [0, [6, 92, 8, 84, 8, 18, 20, -18, 14, 0]],
+      [0.45, [-8, 120, 10, 112, 10, 14, 24, -22, 16, 0]],
+      [0.6, [16, 88, 2, 80, 2, 30, 18, -26, 14, 0]],
+      [0.85, [16, 88, 2, 80, 2, 30, 18, -26, 14, 0]],
+      [1, [6, 92, 8, 84, 8, 18, 20, -18, 14, 0]]
+    ]
+  },
+  // the Pharaoh lifts his crook and a swarm of scarabs pours out at whoever he points it at
+  hswarm: {
+    d: 60,
+    h: [99, 99],
+    dmg: 0,
+    r: 0,
+    kb: 0,
+    swarm: 'scarab',
+    swarmAt: 30,
+    boss: 1,
+    k: [
+      [0, IDLE],
+      [0.35, [-14, 165, 15, 30, 40, 22, 25, -22, 25, 0]],
+      [0.55, [-14, 165, 15, 30, 40, 22, 25, -22, 25, 0]],
+      [0.7, [18, 95, 5, 30, 40, 30, 25, -30, 25, 0]],
+      [1, IDLE]
+    ]
+  },
   cquake: {
     d: 9999,
     kt: 30,
@@ -266,6 +302,24 @@ const T = {
     fr: 0.86,
     bnc: 0.5,
     ai: 'flank'
+  },
+  // mummy: a pink stick fighter wrapped in bandages (the Desert). Slow, a bit tougher than a Grunt, grabs with both
+  // hands; walks with its arms out in front
+  w: {
+    hp: 26,
+    s: 1.02,
+    spd: 1.05,
+    col: '#ff6fae',
+    d2: '#d94d8c',
+    atk: 'mclaw',
+    cd: 80,
+    sc: 14,
+    ar: 54,
+    stop: 40,
+    m: 1.15,
+    fr: 0.8,
+    bnc: 0.35,
+    look: { lw: 7, extra: ['mummy'] }
   },
   c: {
     hp: 240,
@@ -611,6 +665,83 @@ const T = {
     boss: 'WINDOW WASHER',
     ai: 'boss'
   },
+  // the Desert's mini-bosses: a dune brute, an oasis brute and a giant mummy guarding the tomb
+  md: {
+    hp: 215,
+    s: 1.85,
+    spd: 1.1,
+    col: '#e8558f',
+    d2: '#a8365f',
+    atk: 'cslam',
+    cd: 70,
+    sc: 320,
+    ar: 90,
+    stop: 70,
+    m: 3.4,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 100,
+    boss: 'DUNE BULLY',
+    ai: 'boss'
+  },
+  mo: {
+    hp: 225,
+    s: 1.85,
+    spd: 1.1,
+    col: '#d94f9a',
+    d2: '#99356b',
+    atk: 'cslam',
+    cd: 70,
+    sc: 320,
+    ar: 90,
+    stop: 70,
+    m: 3.5,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 105,
+    boss: 'OASIS OGRE',
+    ai: 'boss'
+  },
+  mp: {
+    hp: 240,
+    s: 1.9,
+    spd: 1,
+    col: '#ff6fae',
+    d2: '#d94d8c',
+    atk: 'cslam',
+    cd: 72,
+    sc: 340,
+    ar: 92,
+    stop: 72,
+    m: 3.6,
+    fr: 0.65,
+    bnc: 0.2,
+    poise: 110,
+    boss: 'TOMB GUARDIAN',
+    look: { lw: 9, extra: ['mummy'] },
+    ai: 'boss'
+  },
+  // the Pink Pharaoh: the Desert's boss, in a striped headdress and gold collar with a crook; calls mummies and sends
+  // swarms of scarabs
+  H: {
+    hp: 620,
+    s: 2,
+    spd: 1.2,
+    col: '#e0408a',
+    d2: '#a02a62',
+    atk: 'cslam',
+    cd: 58,
+    sc: 1750,
+    ar: 100,
+    stop: 78,
+    m: 4.6,
+    fr: 0.62,
+    bnc: 0.15,
+    poise: 150,
+    boss: 'THE PINK PHARAOH',
+    look: { head: 1.1, lw: 8, stance: 'boxer', extra: ['nemes', 'pharaohbeard', 'broadcollar', 'shendyt', 'crook'] },
+    ai: 'boss'
+  },
   // Pink Kong: a giant pink gorilla on the skyscraper's roof
   N: {
     hp: 650,
@@ -769,7 +900,12 @@ const TNAME = {
   mq: 'Grumpy Neighbor',
   mz: 'Traffic Titan',
   my: 'Window Washer',
-  N: 'Pink Kong'
+  N: 'Pink Kong',
+  w: 'Mummy',
+  md: 'Dune Bully',
+  mo: 'Oasis Ogre',
+  mp: 'Tomb Guardian',
+  H: 'The Pink Pharaoh'
 };
 // How to beat each type, shown in the training Info panel (I)
 const TTIP = {
@@ -802,7 +938,12 @@ const TTIP = {
   mq: 'GRUMPY NEIGHBOR (suburbs mini-boss): tough poise; heavy hits and throws',
   mz: 'TRAFFIC TITAN (downtown mini-boss): it takes a few car hits. Turbo into it',
   my: 'WINDOW WASHER (skyscraper mini-boss): tough poise; knock it down the stairs',
-  N: 'PINK KONG: leaps onto the roof, three phases. His chest pound blasts you back; jump his quake leaps; dodge the air conditioners he throws (watch for the shadow)'
+  N: 'PINK KONG: leaps onto the roof, three phases. His chest pound blasts you back; jump his quake leaps; dodge the air conditioners he throws (watch for the shadow)',
+  w: 'MUMMY: slow, but its two-handed grab hits hard. Hit it before it reaches you; knock it into quicksand or a pit',
+  md: 'DUNE BULLY (sand mini-boss): knock it into the quicksand and it sinks',
+  mo: 'OASIS OGRE (oasis mini-boss): tough poise; heavy hits and throws',
+  mp: 'TOMB GUARDIAN (pyramid mini-boss): a giant mummy. Break its poise, then juggle it',
+  H: 'THE PINK PHARAOH: three phases, raises mummies. Outrun his scarab swarms, or Surge-run straight through them to scatter them'
 };
 for (const o of [A, EA])
   for (const k in o) {

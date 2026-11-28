@@ -19,9 +19,9 @@ const ED_LIM = { levels: 12, maps: 12, places: 3, parts: 6, cols: [15, 40], plat
 const ED_CELL = 60; // a grid square, in pixels
 const ED_ROWS = 5; // platforms go 1 to 5 squares above the ground
 // The pink army types you can place (and each place's own mini-boss, BIOMES[b].mini.t)
-const ED_FOES = ['g', 'r', 'u', 'b', 'f', 'c'];
+const ED_FOES = ['g', 'r', 'u', 'b', 'f', 'w', 'c'];
 // The main bosses you can put at the end of a level (each story's boss; they arrive the way they do in their story)
-const ED_BOSSES = ['G', 'P', 'Y', 'Z', 'K', 'N'];
+const ED_BOSSES = ['G', 'P', 'Y', 'Z', 'K', 'N', 'H'];
 // Scenery layers, back to front: far background (small and drifting slower), background, foreground (in front of the
 // fighters; see-through while someone is behind it)
 const ED_LAYERS = [
@@ -32,6 +32,7 @@ const ED_LAYERS = [
 // What a place's platforms are made of (biomes.js drawPlatforms; any other place: wooden planks)
 const ED_PLAT = {
   sewer: 'stone',
+  pyramid: 'stone',
   castle: 'stone',
   cave: 'stone',
   slope: 'stone',

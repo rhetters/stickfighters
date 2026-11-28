@@ -37,6 +37,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M25 | COLORS sub-categories | Next | S | M24 | COLORS asks Shirts / Jackets / Gloves first, with None beside the item being coloured |
 | M26 | Ron's notes on version 83 | Next | S | M25 | Level creator top bar, NEW STORY / NEW ARENA / MY STORIES, RANDOM labels, online room fixes |
 | M27 | Ron's notes on version 84 | Next | S | M26 | No scroll bar in the level creator, framed stage pictures |
+| M28 | The Desert | Next | L | M13, M15 | A seventh story: quicksand, rope swings over the Pyramid's gaps, a dark Pyramid lit by torches, pink mummies and the Pink Pharaoh |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
@@ -150,6 +151,16 @@ Ron's notes (November 27): a scroll bar on the level creator's enemies row; the 
 outline or rounded corners, unlike the other tiles.
 
 Built (version 85, see the CHANGELOG). Still to do: the kids try it on the iPad.
+
+### M28 · The Desert
+Rhett's idea (November 27): a Desert story (Sand, Oasis, Pyramid) with quicksand; inside the Pyramid, gaps crossed by
+holding Punch on a rope and swinging with Left / Right, letting go with the swing's speed; a dark Pyramid lit by
+torches that never gets too dark; pink mummies; a Pharaoh boss. Ron's choices: a fall costs a heart and puts you back
+on the ledge; quicksand sinks you slowly and Jump climbs out (all the way down costs a heart); the Pharaoh's move is a
+scarab swarm; wall torches plus a glow on each player.
+
+Built (version 88, see the CHANGELOG). Still to do: the kids try it on the iPad (is the rope easy enough to grab and
+swing? is the Pyramid bright enough on the iPad screen?).
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 

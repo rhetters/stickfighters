@@ -157,6 +157,7 @@ function drawLevelBg() {
   for (const g of LV.gates) lifted(g.x, () => drawGate(g));
   if (LV.terr) drawRockLedges(); // the volcano's ledges, in front of the scenery (volcano.js)
   if (LV.haz) drawVents();
+  if (LV.dz) drawDesertWorld(); // gaps, quicksand, ropes (desert.js)
   ctx.restore();
 }
 // The foreground (grass, oaks, snow in front) sinks with the backdrop when the camera rises, so it stays on the ground
@@ -644,6 +645,7 @@ function drawBiomeProp(p, x) {
   else if (drawSpacePropDone(k, x, s)) return;
   else if (drawVolcanoProp(k, x, s)) return;
   else if (drawCityProp(k, x, s)) return;
+  else if (drawDesertProp(k, x, s)) return;
   else if (k === 'trans-pipe' || k === 'trans-pipeout') drawBigPipe(x, k === 'trans-pipeout');
   else if (k === 'trans-rope') drawChasm(x);
   else if (k === 'trans-gate') {

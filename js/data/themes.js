@@ -29,6 +29,14 @@
 //            platforms and ladders one screen wide, an ambush on each floor (a hatch above stays shut until it's won)
 //            and the main boss on the roof. `fights` is the number of floors; `w` is unused. In your own levels it's
 //            an ordinary place at street level.
+//   quick    patches of quicksand in each fight and between fights (desert.js): you sink slowly and slow down; tap
+//            Jump to climb out. Sinking all the way costs a heart (never a knockout) and pops you out. Enemies knocked
+//            in are swallowed.
+//   pits     gaps in the floor between fights, each with a rope hanging over it (desert.js): hold Punch to grab the
+//            rope, Left / Right to swing, let go to fly off. Falling in costs a heart (never a knockout) and puts you
+//            back on the last ledge you stood on. Enemies knocked in are gone.
+//   dark     it's dark here: wall torches light the way and every player glows a little (drawing only; desert.js
+//            keeps it from ever getting too dark)
 const BIOMES = {
   woods: {
     name: 'WOODED TRAIL',
@@ -395,6 +403,70 @@ const BIOMES = {
       { at: 6, w: { g: 2, u: 3, f: 2, b: 2, r: 1 } }
     ],
     mini: { t: 'my', chance: 0.05, lines: ['NO CLIMBING THE BUILDING!', 'GOING DOWN?', 'THE VIEW IS MINE!'] }
+  },
+  // ===== THE DESERT (desert.js draws it and runs the quicksand, the ropes and the dark) =====
+  sand: {
+    name: 'SAND DUNES',
+    look: 'sand',
+    quick: 1,
+    props: [
+      ['cactus', 3],
+      ['desertrock', 2],
+      ['skull', 1],
+      ['bones', 1],
+      ['tumbleweed', 2],
+      ['sandpot', 1]
+    ],
+    w: [1050, 1300],
+    fights: 5,
+    mix: [
+      { at: 1, w: { g: 6, r: 2, w: 1 } },
+      { at: 2, w: { g: 5, r: 3, w: 2, f: 1 } },
+      { at: 3, w: { g: 4, r: 2, w: 2, u: 1, f: 2, b: 1 } }
+    ],
+    mini: { t: 'md', chance: 0.04, lines: ['SAND IN YOUR EYES!', 'THE DUNES ARE MINE!', 'HOT HOT HOT... HEADED YOUR WAY!'] }
+  },
+  oasis: {
+    name: 'THE OASIS',
+    look: 'oasis',
+    quick: 1,
+    props: [
+      ['palm', 4],
+      ['reeds', 3],
+      ['tent', 1],
+      ['camel', 1],
+      ['well', 1],
+      ['sandpot', 2]
+    ],
+    w: [1050, 1300],
+    fights: 5,
+    mix: [
+      { at: 3, w: { g: 4, r: 2, w: 3, f: 2, b: 1 } },
+      { at: 4, w: { g: 3, r: 2, w: 3, f: 2, b: 2, u: 1 } }
+    ],
+    mini: { t: 'mo', chance: 0.04, lines: ['NO SWIMMING IN MY OASIS!', 'THIRSTY? FOR DEFEAT?', 'THIS WATER IS PINK NOW!'] }
+  },
+  pyramid: {
+    name: 'THE PYRAMID',
+    look: 'pyramid',
+    pits: 1,
+    dark: 1,
+    props: [
+      ['hieroglyphs', 3],
+      ['column', 2],
+      ['urn', 2],
+      ['jackal', 1],
+      ['sarcophagus', 1],
+      ['chest', 1],
+      ['coins', 1]
+    ],
+    w: [1650, 1850],
+    fights: 5,
+    mix: [
+      { at: 5, w: { w: 5, g: 2, u: 2, f: 2, b: 1 } },
+      { at: 6, w: { w: 5, g: 2, u: 2, f: 2, b: 2 } }
+    ],
+    mini: { t: 'mp', chance: 0.05, lines: ['WHO WOKE ME UP?!', 'NOBODY ENTERS THE TOMB!', 'MMMRRRFFF! (THAT MEANS GO HOME)'] }
   }
 };
 // ===== TRANSITIONS between biomes =====
@@ -443,7 +515,11 @@ const TRANS_INTO = {
   burbs: ['catapult', 'rope', 'balloon'],
   // Downtown is driven: the car park, where everyone gets a car; the Skyscraper's door, where everyone gets out
   city: ['cars'],
-  tower: ['park']
+  tower: ['park'],
+  sand: ['catapult', 'rope', 'balloon'],
+  oasis: ['catapult', 'rope', 'balloon'],
+  // the Pyramid's door: a stone slab to smash through
+  pyramid: ['gate']
 };
 // ===== THEMES =====
 //   c      the theme's colour (its card on the Campaign screen)
@@ -526,6 +602,17 @@ const THEMES = {
       intro: 'jump',
       adds: ['g', 'r', 'f', 'g', 'b', 'u'],
       lines: ['ME PINK KONG! THIS ROOF MINE!', 'HOO HOO HAA HAA! WHO CLIMB MY TOWER?', 'YOU WANT BANANA? COME GET IT!']
+    }
+  },
+  desert: {
+    name: 'DESERT',
+    c: '#e8a33c',
+    biomes: ['sand', 'oasis', 'pyramid'],
+    boss: {
+      t: 'H',
+      intro: 'jump',
+      adds: ['w', 'w', 'g', 'r', 'w', 'f'],
+      lines: ['WHO DARES ENTER MY PYRAMID?', 'BOW BEFORE THE PINK PHARAOH!', 'MY SCARABS ARE HUNGRY!']
     }
   }
 };
