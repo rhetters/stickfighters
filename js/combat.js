@@ -63,6 +63,7 @@ function tickAtk(f) {
   a.f++;
   f.tp = kf(d.k, Math.min(1, a.f / (d.kt || d.d)));
   if (d.drop && a.f === d.dropAt) dropThrow(f, d.drop); // thrown to fall on the target (city.js)
+  if (d.swarm && a.f === d.swarmAt) swarmSend(f); // scarabs fly out at the target (desert.js)
   if (f.pl && a.b && !a.chained && !d.cost && !d.air && a.f <= Math.min(5, d.h[0]) && f.y >= f.gy - 1) {
     const o = a.b === 'p' ? 'k' : 'p';
     if (want(o) && Math.abs(press[o] - a.pf) <= 3) {
@@ -911,6 +912,7 @@ function sep() {
 // was above and has reached (platforms, the Skyscraper's floors, a house's floors; terrain.js), else the floor line G.
 // Fighters themselves stand on f.gy (terrain.js).
 function groundY(x, py, y, r) {
+  if (deskOn() && pitAt(x)) return G + 4000; // a gap in the floor (desert.js)
   if (!TERRAIN.n) return G;
   let gy = G;
   for (const s of surfAt(x)) {
@@ -930,6 +932,7 @@ function phys(f) {
   let imp = 0;
   if (TERRAIN.n) terrainStep(f, x0, y0);
   else f.gy = G;
+  if (deskOn()) deskEdge(f, x0, y0); // gaps and quicksand edges (desert.js)
   const gy = f.gy;
   if (f.y >= gy) {
     if (f.vy > 0) imp = f.vy;

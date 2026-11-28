@@ -510,6 +510,112 @@ const MUSIC = {
       }
     ]
   },
+  // The Desert's songs use the "desert" scale (E F G# A B C D: a minor-ish scale with a big step in it), with
+  // hand drums and a reedy flute.
+  // The Sand Dunes: a camel's loping walk under the hot sun
+  sand: {
+    bpm: 112,
+    prog: ['E', 'E', 'F', 'E', 'Am', 'G', 'F', 'E'],
+    parts: [
+      { ins: 'bass', pat: 'R . . R . . 5 . R . . R . 5 . .' },
+      { ins: 'drums', max: 0, v: 0.7, pat: 'B . . b . . B . B . b . . b . .' },
+      { ins: 'drums', lvl: 1, pat: 'k . b b s . B . k . b b s b B B' },
+      { ins: 'pluck', o: 4, v: 0.45, pat: 'R . 3 . 5 . 3 . R . 3 . 5 . 8 .' },
+      { ins: 'brass', lvl: 1, o: 4, v: 0.3, pat: 'c . . . . . c . . . . . . . . .' },
+      {
+        ins: 'flute',
+        v: 0.7,
+        mel: [
+          'E5 - F5 - G#5 - - - A5 - G#5 - F5 - E5 -',
+          'G#5 - A5 - B5 - - - C6 - B5 - A5 - G#5 -',
+          'A5 - - - G#5 - F5 - E5 - F5 - - - . .',
+          'E5 - - - - - . . B4 - C5 - D5 - E5 -',
+          'C6 - - - B5 - A5 - E5 - A5 - - - . .',
+          'B5 - - - A5 - G5 - D5 - G5 - - - . .',
+          'A5 - G#5 - F5 - E5 - D5 - C5 - B4 - A4 -',
+          'G#4 - - - B4 - - - E5 - - - - - . .'
+        ]
+      }
+    ]
+  },
+  // The Oasis: shade and cool water, a gentle swaying waltz with a marimba
+  oasis: {
+    bpm: 96,
+    beats: 3,
+    prog: ['Am', 'Am', 'Dm', 'E', 'F', 'G', 'E', 'Am'],
+    parts: [
+      { ins: 'bass', pat: 'R . . . 5 . . . 5 . . .' },
+      { ins: 'pad', o: 3, v: 0.2, max: 0, pat: 'c - - - - - - - - - - -' },
+      { ins: 'drums', max: 0, v: 0.5, pat: 'B . . . b . . . b . . .' },
+      { ins: 'drums', lvl: 1, pat: 'k . . b s . . b s . b b' },
+      { ins: 'bell', o: 5, v: 0.2, pat: '. . . . . . 5 . . . . .' },
+      {
+        ins: 'marimba',
+        v: 0.8,
+        mel: [
+          'A4 - C5 - E5 - - - D5 - C5 -',
+          'B4 - C5 - A4 - - - . . . .',
+          'D5 - F5 - A5 - - - G5 - F5 -',
+          'E5 - - - G#5 - - - B5 - - -',
+          'A5 - - - G5 - - - F5 - E5 -',
+          'D5 - - - B4 - - - G4 - - -',
+          'G#4 - B4 - E5 - - - D5 - B4 -',
+          'A4 - - - - - - - . . . .'
+        ]
+      }
+    ]
+  },
+  // Inside the Pyramid: dark and mysterious, a slow drum and a snaking tune echoing down the halls
+  pyramid: {
+    bpm: 100,
+    prog: ['Em', 'Em', 'F', 'Em', 'Dm', 'Em', 'F', 'B7'],
+    parts: [
+      { ins: 'bass', pat: 'R . . . . . . . R . . R . . . .' },
+      { ins: 'pad', o: 3, v: 0.25, pat: 'c - - - - - - - - - - - - - - -' },
+      { ins: 'drums', max: 0, v: 0.6, pat: 'B . . . . . b . B . . . b . . .' },
+      { ins: 'drums', lvl: 1, pat: 'k . . b s . b . k . k b s . t t' },
+      { ins: 'arp', lvl: 1, o: 4, v: 0.18, pat: 'R . 3 . 5 . 3 . R . 3 . 5 . 7 .' },
+      {
+        ins: 'flute',
+        v: 0.6,
+        mel: [
+          'E5 - - - F5 - - - G#5 - - - F5 - E5 -',
+          'B4 - - - - - - - . . . . . . . .',
+          'C5 - - - D5 - - - E5 - F5 - E5 - D5 -',
+          'E5 - - - - - - - . . . . . . . .',
+          'F5 - - - E5 - - - D5 - - - C5 - D5 -',
+          'B4 - - - G#4 - - - B4 - - - E5 - - -',
+          'A5 - G#5 - F5 - E5 - F5 - - - E5 - - -',
+          'D#5 - - - F#5 - - - B5 - - - . . . .'
+        ]
+      }
+    ]
+  },
+  // The Pink Pharaoh: a fast, stomping boss fight with brass blasts and racing hand drums
+  'boss-desert': {
+    bpm: 156,
+    prog: ['E', 'F', 'E', 'Dm', 'E', 'F', 'G', 'F'],
+    parts: [
+      { ins: 'bass', v: 1.1, pat: 'R . R . 5 . R . R . R . 3 . 5 .' },
+      { ins: 'drums', pat: 'k . b b s . b k k . b b s b s s' },
+      { ins: 'brass', o: 4, v: 0.45, pat: 'c . . . . . c . . . c . . . . .' },
+      { ins: 'arp', o: 5, v: 0.2, pat: 'R 3 5 3 R 3 5 3 R 3 5 3 8 5 3 5' },
+      {
+        ins: 'lead',
+        v: 0.6,
+        mel: [
+          'E5 - F5 - G#5 - A5 - B5 - A5 - G#5 - F5 -',
+          'F5 - - - A5 - C6 - - - A5 - F5 - - -',
+          'G#5 - B5 - E6 - - - D6 - C6 - B5 - A5 -',
+          'F5 - - - A5 - D5 - - - F5 - A5 - - -',
+          'E5 - F5 - G#5 - B5 - E6 - - - D6 - C6 -',
+          'C6 - - - A5 - F5 - - - A5 - C6 - - -',
+          'D6 - - - B5 - G5 - D5 - G5 - B5 - - -',
+          'C6 - B5 - A5 - G#5 - F5 - E5 - F5 - - -'
+        ]
+      }
+    ]
+  },
   // Pink Kong on the roof: a funky, fast boss fight with organ stabs (the City's own boss song)
   'boss-city': {
     bpm: 150,

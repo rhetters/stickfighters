@@ -5,7 +5,7 @@ const {chromium}=require('playwright');let fails=0;const ok=(c,m)=>{console.log(
 (async()=>{const b=await chromium.launch();const errs=[];const p=await (await b.newContext({viewport:{width:1080,height:810}})).newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
 await p.goto(GAME);await p.evaluate("SET.tut=1");await p.waitForTimeout(300);const ev=x=>p.evaluate(x);
 const bosses=await ev("Object.values(THEMES).map(t=>t.boss.t)");
-ok(bosses.length===6&&await ev(`${JSON.stringify(bosses)}.every(t=>T[t].look&&T[t].look.extra.length)`),'every theme’s boss has its own look: '+bosses.join(', '));
+ok(bosses.length===7&&await ev(`${JSON.stringify(bosses)}.every(t=>T[t].look&&T[t].look.extra.length)`),'every theme’s boss has its own look: '+bosses.join(', '));
 ok(await ev("(()=>{const s=Object.values(THEMES).map(t=>T[t.boss.t].look.extra.slice().sort().join());return new Set(s).size===s.length})()"),'no two bosses share their parts');
 ok(await ev("(()=>{const e=F(300,'G'),m=F(300,'mw');return !!e.look&&e.look.extra.includes('generalcap')&&!m.look})()"),'bosses get their look when they appear; mini-bosses keep the crown');
 ok(await ev("Object.values(T).every(t=>!t.look||Object.keys(t.look).every(k=>!EQ.includes(k)||ITEM[t.look[k]]))"),'every store item a boss wears exists');

@@ -25,6 +25,7 @@ function hazTick(ae) {
   rockTick(ae);
   if (LV.esc) escTick(ae);
   if ((LV.haz && LV.haz.pools.length) || LV.esc) lavaTick();
+  if (LV.dz || LV.sw) desertTick(); // quicksand, gaps, ropes, scarabs (desert.js)
 }
 // Steam vents: anyone standing on one when it blasts goes high into the air. Players ride it like a super jump;
 // enemies are knocked flying (a little damage, never a knockout).

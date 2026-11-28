@@ -285,6 +285,7 @@ function updP(f) {
   }
   if (f.comboT > 0 && --f.comboT === 0) f.combo = 0;
   if (f.car && f.st !== 'dead') return carTick(f, I); // driving (cars.js)
+  if (deskOn() && deskP(f, I, want, eat)) return; // on a rope; climbing out of quicksand (desert.js)
   if (MODE === HOUSE_MODE && f.st !== 'dead' && houseUse(f, I)) return; // sitting or lying on furniture (house.js)
   let tp = f.pose,
     k = 0.3;
@@ -465,6 +466,7 @@ function updP(f) {
       f.hop = 0;
       f.dvc = 0; // Dive Kicks in a row (see combat.js)
       f.dvl = 0;
+      f.fling = 0;
     }
     // Surge run: hold Surge + a direction. Faster, drains the bar, passes through enemy bodies.
     const run = K.s && m && canSurge(f);
@@ -474,8 +476,9 @@ function updP(f) {
     const spd = STM.winded ? 2.4 : run ? SURGE.runSpeed : f.cw ? 2.2 : 4;
     if (m) {
       f.face = m;
-      f.vx += (m * spd - f.vx) * (run ? 0.25 : 0.3);
-    } else f.vx *= g ? 0.78 : 0.97;
+      if (f.fling && !g) f.vx += m * f.vx < 5 ? m * 0.3 : 0; // flung off a rope (desert.js): the swing's speed carries you; you only steer
+      else f.vx += (m * spd - f.vx) * (run ? 0.25 : 0.3);
+    } else f.vx *= g ? 0.78 : f.fling ? 0.995 : 0.97;
     if (run) {
       f.phase = 2;
       if (!infS()) {

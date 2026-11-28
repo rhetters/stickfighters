@@ -363,7 +363,10 @@ const AMB_LOOK = {
   crater: { bed: ['lowpass', 200, 0.09, 0.05], ev: 'bubble' },
   burbs: { bed: ['bandpass', 550, 0.05, 0], puff: 1, ev: 'bird' },
   city: { bed: ['lowpass', 260, 0.08, 0.04], ev: 'honk' },
-  tower: { bed: ['bandpass', 850, 0.1, 0], puff: 1, ev: 'honk' }
+  tower: { bed: ['bandpass', 850, 0.1, 0], puff: 1, ev: 'honk' },
+  sand: { bed: ['bandpass', 750, 0.09, 0], puff: 1, ev: null },
+  oasis: { bed: ['bandpass', 1800, 0.04, 0], puff: 1, ev: 'bird' },
+  pyramid: { bed: ['lowpass', 240, 0.06, 0.1], ev: 'crackle' }
 };
 function ambLook() {
   if (state !== 'play' || !MODE || MODE.id !== 'level' || !LV) return null;

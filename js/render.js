@@ -212,6 +212,7 @@ function drawF(f) {
   if (f.hide) return; // inside a pipe (run.js)
   if (f.car) return drawCar(f); // driving (cars.js)
   if (f.draw !== undefined) return drawPencilIn(f);
+  if (f.sink > 0.5 && !f.skD) return drawSunk(f); // sinking in quicksand (desert.js)
   let a = 1;
   if (f.pl && f.inv > 0 && f.inv < 900 && f.st !== 'dead' && Math.floor(f.t / 3) % 2) a = 0.45;
   if (f.pl && f.phase > 0) a = Math.min(a, 0.55);

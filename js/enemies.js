@@ -141,7 +141,7 @@ function updE(e) {
     if (e.y >= e.gy - 3 && Q && !(state === 'train' && TR.passive)) {
       aiThink(e, Q, T_);
     } else if (e.y >= e.gy - 3) e.vx *= 0.7;
-    tp = freePose(e);
+    tp = T_.look && T_.look.extra && T_.look.extra.includes('mummy') ? mummyPose(e) : freePose(e); // desert.js
   }
   const imp = e.corpse ? 0 : phys(e);
   if (e.st === 'fly' && imp > 0) {
@@ -353,10 +353,18 @@ BOSSPH.N = [
   { at: 0.66, cd: 0.75, enter: () => (bn('KONG IS ANGRY!'), bossCall(['g', 'r', 'f'])) },
   { at: 0.33, cd: 0.5, enter: () => (bn('KONG IS FURIOUS!'), bossCall(['b', 'u', 'g', 'r'])) }
 ];
+// The Pink Pharaoh: the same three phases, raising mummies from the tomb
+BOSSPH.H = [
+  { at: 1, cd: 1 },
+  { at: 0.66, cd: 0.75, enter: () => (bn('THE PHARAOH IS ANGRY!'), bossCall(['w', 'w', 'g'])) },
+  { at: 0.33, cd: 0.5, enter: () => (bn('THE PHARAOH IS FURIOUS!'), bossCall(['w', 'w', 'b', 'f'])) }
+];
 // A boss's own moves, picked before the shared ones (slam, charge, quake): returns a move name, or null for those.
-// Pink Kong throws air conditioners at whoever is far off and pounds his chest at anyone close in front.
+// Pink Kong throws air conditioners at whoever is far off and pounds his chest at anyone close in front. The Pink
+// Pharaoh sends a scarab swarm at whoever is far off (one at a time, two once he's furious).
 const BOSSPICK = {
-  N: (e, dist) => (dist > 230 && rnd() < 0.55 ? 'kthrow' : dist < 210 && rnd() < 0.3 ? 'kpound' : null)
+  N: (e, dist) => (dist > 230 && rnd() < 0.55 ? 'kthrow' : dist < 210 && rnd() < 0.3 ? 'kpound' : null),
+  H: (e, dist) => (dist > 200 && swarmCount() < (e.bp > 2 ? 2 : 1) && rnd() < 0.5 ? 'hswarm' : null)
 };
 BOSSPH.Z = [
   { at: 1, cd: 1 },
