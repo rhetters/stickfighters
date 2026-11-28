@@ -36,6 +36,7 @@ Each milestone has an ID. Say "Start M12" or "change the scope of M12", and Clau
 | M24 | Ron's notes on version 81 | Next | S | M23 | Combo counter fix, new City music, MOVE and DUPLICATE in the house builder |
 | M25 | COLORS sub-categories | Next | S | M24 | COLORS asks Shirts / Jackets / Gloves first, with None beside the item being coloured |
 | M26 | Ron's notes on version 83 | Next | S | M25 | Level creator top bar, NEW STORY / NEW ARENA / MY STORIES, RANDOM labels, online room fixes |
+| M27 | Ron's notes on version 84 | Next | S | M26 | No scroll bar in the level creator, framed stage pictures |
 | M11.5 | Rollback for online play (suggested before Steam) | Maybe | L | M11 | Your presses act instantly online; others are predicted and corrected |
 | Someday | Cloud saves, Steam | Maybe | — | M11.5 (suggested) | Desktop app, Steam Workshop, server-backed stars |
 
@@ -143,6 +144,12 @@ the host re-picking the same thing unreadied everyone; the host's pick too faded
 Multiplayer screen after the room closed.
 
 Built (version 84, see the CHANGELOG). Still to do: the kids try it on the iPad.
+
+### M27 · Ron's notes on version 84
+Ron's notes (November 27): a scroll bar on the level creator's enemies row; the stage and arena pictures had no
+outline or rounded corners, unlike the other tiles.
+
+Built (version 85, see the CHANGELOG). Still to do: the kids try it on the iPad.
 
 ### M11.5 · Rollback for online play (suggested before Steam)
 

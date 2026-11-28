@@ -2,6 +2,11 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## No scroll bar in the level creator, framed stage pictures (November 27, 2026)
+- The level creator's bottom row (enemies, scenery, PARTS…) no longer shows a scroll bar: it's one row that fits, and on a phone the pictures shrink to fit (a long row still slides sideways with a finger).
+- The stage and arena pictures (Solo Arcade's cards and the rooms' stage row) now sit inside the same rounded, black-outlined frame as the other tiles, instead of a plain rectangle on top of it.
+- Version 85.
+
 ## The level creator's top bar, stories and arenas, room fixes (November 27, 2026)
 - **The level creator's top bar:** DONE, the name and **DELETE STORY** (or DELETE ARENA) on one row, the tabs under them, the help under those, so nothing overlaps any more (on an iPad or a phone). The name has a pencil and a dashed underline, so it looks like something you can tap and rename. Delete moved out of PARTS; it still asks for a second tap, and tapping anything else keeps it.
 - **New names:** NEW STORY and NEW ARENA (for NEW LEVEL and NEW MAP); MY STORIES everywhere for MY LEVELS (Customize, the Story screen, the rooms), and MY ARENAS on the stage rows, where your arenas are. New ones are called STORY 1, ARENA 1… (yours keep their names).

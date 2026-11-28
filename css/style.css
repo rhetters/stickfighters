@@ -3483,11 +3483,21 @@ body.big .screen p {
   font-size: 12px;
 }
 #ed-pal {
+  /* one row that fits the floor's height (a long row slides sideways with a finger; no scroll bars) */
   display: flex;
+  align-items: center;
+  justify-content: safe center;
   gap: 5px;
   overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
   max-width: 100%;
+  container-type: size; /* its height is the floor's (100cqh above) */
+  width: 100%;
   padding: 1px 2px 2px;
+}
+#ed-pal::-webkit-scrollbar {
+  display: none;
 }
 #ed-pal .chitem {
   flex: 0 0 auto;
@@ -3495,21 +3505,45 @@ body.big .screen p {
   padding: 1px;
 }
 #ed-pal .chitem canvas {
-  width: 48px;
-  height: 38px;
+  width: auto;
+  height: min(38px, calc(100cqh - 22px)); /* the picture shrinks to fit a short floor (a phone) */
+  aspect-ratio: 48 / 38;
 }
 #ed-pal .chitem b {
   font-size: 9px;
   line-height: 1.1;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 #ed-pal .chitem small {
   font-size: 8px;
+}
+@media (max-height: 500px) {
+  /* a phone: no room for the MINI-BOSS line (the picture's crown says so) */
+  #ed-pal .chitem small {
+    display: none;
+  }
 }
 #ed-pal.edparts {
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
   gap: 4px;
+}
+@media (max-height: 500px) {
+  /* a phone: PARTS' buttons in one row, a little smaller */
+  #ed-pal.edparts {
+    flex-wrap: nowrap;
+    justify-content: safe center;
+    gap: 3px;
+  }
+  #ed-pal.edparts .edbtn {
+    flex: 0 0 auto;
+    padding: 2px 5px;
+    font-size: 10px;
+  }
 }
 .edbtn {
   min-width: 0;
@@ -3536,7 +3570,9 @@ body.big .screen p {
   background-image: url(../img/menu-levels.svg);
 }
 .th-mine {
+  /* a drawn picture (a stage, your story or arena) inside the same outlined, rounded frame as the other tiles */
   background-color: transparent;
+  background-image: var(--ic), url(../img/tile-frame.svg);
 }
 .nostar {
   position: absolute;
