@@ -2,6 +2,12 @@
 
 One short entry per release, newest first. Each finished milestone also has a branch (`m5`, `m6`, …).
 
+## A rope for everyone; mummies only in the Pyramid (November 28, 2026)
+- **One rope for each player** over every gap in the Pyramid, hanging side by side, so nobody has to wait for a rope to stop swinging. A rope left swinging also settles faster, and your hands slide down near the knot when you grab it, so every grab gives a long swing.
+- A rope is freed if whoever held it is knocked out or leaves.
+- **Mummies only inside the Pyramid:** the Sand Dunes and the Oasis have the rest of the pink army.
+- Version 90.
+
 ## Quicksand without the yellow flash (November 28, 2026)
 - An enemy swallowed by quicksand or falling into a gap no longer fills the screen with a giant yellow burst (and no longer shows "9999"): it is knocked out by a hit of exactly its health left.
 - Version 89.

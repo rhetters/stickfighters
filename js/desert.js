@@ -9,12 +9,13 @@ const QS_DEEP = 60, // how far you sink before quicksand costs a heart
   QS_SLOW = 0.4, // walking speed in it
   QS_HOP = 20, // how much one tap of Jump climbs out
   PIT_W = 500, // a gap's width (too far to jump, even with a Surge jump; a rope swings you over)
-  ROPE_IN = 120, // the rope hangs this far in from the gap's near edge (a running jump reaches it)
+  ROPE_IN = 120, // the ropes hang around this far in from the gap's near edge (a running jump reaches them)
+  ROPE_GAP = 42, // between the ropes over one gap (one rope for each player, so nobody waits for a turn)
   PIT_FALL = 320, // how far below the floor a fall counts as gone
   ROPE_TOP = 400, // the ceiling (anchor) above the floor
   ROPE_LEN = 300, // the rope's length: its end hangs 100 above the floor
   ROPE_HAND = 80, // feet to hands, hanging (arms up)
-  ROPE_GRIP = 38,
+  ROPE_GRIP = 46,
   ROPE_HOP = [4, 6.5], // the hop you push off with when you let go (sideways, up) // how close your hands must be to grab it
   SWARM_T = 330, // how long a scarab swarm chases
   SWARM_SPD = 3.4; // its speed (you can outrun it; a Surge run goes straight through it)
@@ -40,9 +41,24 @@ function desertLayout(B, es, dz, R) {
     if (B.pits && b - a >= PIT_W + 160) {
       const m = Math.round((a + b) / 2);
       dz.pits.push({ x0: m - PIT_W / 2, x1: m + PIT_W / 2 });
-      dz.ropes.push({ x: m - PIT_W / 2 + ROPE_IN, y: G - ROPE_TOP, L: ROPE_LEN, a: 0, w: 0, by: -1 });
+      dz.ropes.push(newRope(dz.pits.length - 1, 0, 1, m - PIT_W / 2));
     }
   }
+}
+// Rope k of n over gap p (whose near edge is at x0), hanging still
+function newRope(p, k, n, x0) {
+  return { p, k, x: Math.round(x0 + ROPE_IN + (k - (n - 1) / 2) * ROPE_GAP), y: G - ROPE_TOP, L: ROPE_LEN, a: 0, w: 0, by: -1 };
+}
+// One rope over each gap for each player in the party (2 players, 2 ropes side by side…). Made again (all hanging
+// still) when the party grows, as soon as nobody is holding one.
+function ropesFor(D) {
+  const n = Math.max(1, Math.min(6, PL.length));
+  if ((D.nr || 1) >= n || D.ropes.some(r => r.by >= 0)) return;
+  D.nr = n;
+  D.ropes = [];
+  D.pits.forEach((pt, p) => {
+    for (let k = 0; k < n; k++) D.ropes.push(newRope(p, k, n, pt.x0));
+  });
 }
 // ===== WHERE THINGS ARE =====
 // The hit that knocks out an enemy swallowed or fallen: exactly its health left (hit sparks and the number grow with
@@ -80,7 +96,12 @@ function deskEdge(f, x0, y0) {
 function desertTick() {
   const D = MODE === LEVEL && LV.dz;
   if (D) {
-    for (const r of D.ropes) if (r.by < 0) ropeSway(r);
+    ropesFor(D);
+    for (const r of D.ropes) {
+      // a rope whose holder let go some other way (knocked out, a scene, left the game) is free again
+      if (r.by >= 0 && !PL.some(p => p.slot === r.by && p.rope && D.ropes[p.rope.i] === r)) r.by = -1;
+      if (r.by < 0) ropeSway(r);
+    }
     for (const f of [...PL, ...E]) {
       if (f.st === 'cine' || f.gone || f.left) continue;
       // fell into a gap
@@ -168,7 +189,7 @@ function pitBack(f) {
 // A rope nobody holds swings back to hanging straight
 function ropeSway(r) {
   r.w += -(0.7 / r.L) * Math.sin(r.a);
-  r.w *= 0.985;
+  r.w *= 0.97;
   r.a += r.w;
 }
 // The player's own step on a rope or in quicksand (from updP, before anything else they'd do). True = on a rope:
@@ -236,7 +257,7 @@ function deskP(f, I, want, eat) {
       if (Math.hypot(hx - px, hy - py) > ROPE_GRIP) continue;
       eat('p');
       r.by = f.slot;
-      f.rope = { i, d: t };
+      f.rope = { i, d: Math.max(t, r.L * 0.8) }; // hands slide down near the knot: a long swing
       // the swing starts with how you were moving across the rope
       r.w = (f.vx * Math.cos(r.a) - f.vy * Math.sin(r.a)) / t;
       f.att = null;
@@ -634,8 +655,8 @@ function drawDesertWorld() {
     ctx.arc(ex, ey, 8, 0, 7);
     ctx.fill();
     ctx.stroke();
-    // a hint over the first rope while nobody has grabbed it yet: hold Punch
-    if (!hold && Math.abs(PL[0] ? PL[0].x - R.x : 999) < 420 && (fr >> 5) % 2) {
+    // a hint under a gap's first rope while nobody is on its ropes: hold Punch
+    if (!R.k && !D.ropes.some(q => q.p === R.p && q.by >= 0) && Math.abs(PL[0] ? PL[0].x - R.x : 999) < 420 && (fr >> 5) % 2) {
       ctx.font = '900 16px Impact,"Arial Black",sans-serif';
       ctx.textAlign = 'center';
       ctx.lineWidth = 4;

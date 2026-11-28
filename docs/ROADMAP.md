@@ -159,7 +159,7 @@ torches that never gets too dark; pink mummies; a Pharaoh boss. Ron's choices: a
 on the ledge; quicksand sinks you slowly and Jump climbs out (all the way down costs a heart); the Pharaoh's move is a
 scarab swarm; wall torches plus a glow on each player.
 
-Built (versions 88–89, see the CHANGELOG). Still to do: the kids try it on the iPad (is the rope easy enough to grab and
+Built (versions 88–90, see the CHANGELOG). Still to do: the kids try it on the iPad (is the rope easy enough to grab and
 swing? is the Pyramid bright enough on the iPad screen?).
 
 ### M11.5 · Rollback for online play (suggested before Steam)
